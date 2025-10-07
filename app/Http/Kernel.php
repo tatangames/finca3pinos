@@ -21,6 +21,10 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+
+
+        // 👇 AÑADE ESTE (debe ser global, antes de resolver rutas)
+        \App\Http\Middleware\DetectRegionRedirect::class,
     ];
 
     /**
@@ -64,5 +68,8 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+
+        // 👇 AÑADE ESTE alias para usarlo en el grupo con prefijo {region}
+        'set.region' => \App\Http\Middleware\SetRegion::class,
     ];
 }

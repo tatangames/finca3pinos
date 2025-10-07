@@ -71,11 +71,26 @@ Route::post('/admin/perfil/actualizar/todot', [PerfilController::class, 'editarU
 
 
 
+Route::get('/', function () {
+    return redirect('/' . config('region.default'));
+});
 
+// ─────────────────────────────────────────────
+// 2. Grupo con prefijo de región: /sv/, /us/, /latin-es/
+// ─────────────────────────────────────────────
+Route::prefix('{region}')
+    ->whereIn('region', config('region.supported'))
+    ->middleware('set.region')  // este middleware fija locale + región
+    ->name('region.')
+    ->group(function () {
 
-Route::get('/', [FrontendController::class,'vistaLogin'])->name('user.index');
-Route::get('/login', [UsuarioAuthController::class,'showLoginFormUsuario'])->name('user.login');
-Route::post('/login', [UsuarioAuthController::class, 'loginUsuario']);
+        // Página principal (login / landing)
+        Route::get('/', [FrontendController::class, 'vistaLogin'])->name('user.index');
 
+        // Login de usuarios
+        Route::get('/login', [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');
+        Route::post('/login', [UsuarioAuthController::class, 'loginUsuario'])->name('user.login.process');
 
-Route::get('/dashboard', [DashboardController::class,'vistaInicio'])->name('user.dashboard');
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'vistaInicio'])->name('user.dashboard');
+    });
