@@ -105,6 +105,11 @@ Route::prefix('{region}')
 
         // dashboard
         Route::get('/dashboard', [DashboardController::class, 'vistaInicio'])->name('user.dashboard');
+
+        // ABOUT
+        Route::get('/', [FrontendController::class, 'vistaLogin'])->name('user.index');
+
+
     });
 
 
