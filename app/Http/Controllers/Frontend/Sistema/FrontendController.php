@@ -9,6 +9,6 @@ class FrontendController extends Controller
 {
     public function vistaLogin()
     {
-      return view('frontend.home');
+      return view('frontend.index');
     }
 }
