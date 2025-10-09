@@ -23,8 +23,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
 
 
-        // 👇 AÑADE ESTE (debe ser global, antes de resolver rutas)
-        \App\Http\Middleware\DetectRegionRedirect::class,
+
     ];
 
     /**
@@ -34,6 +33,7 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
+            \App\Http\Middleware\DetectRegionRedirect::class, // ← primero
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,

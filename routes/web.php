@@ -21,76 +21,97 @@ use App\Http\Controllers\Frontend\Sistema\DashboardController;
 
 
 
-// ===================== BACKEND =====================================
+/*
+|--------------------------------------------------------------------------
+| 1) ADMIN – fuera del prefijo {region}
+|--------------------------------------------------------------------------
+*/
 
-
-// inicio de sesion para admin, editor, cliente
-Route::get('/admin', [AdminAuthController::class, 'showLoginFormAdmin'])->name('admin.login');
-Route::post('/admin/login', [AdminAuthController::class, 'loginAdmin']);
-Route::post('/admin/login/logout', [AdminAuthController::class, 'logoutAdmin'])->name('admin.logout');
-
-// --- CONTROL WEB ---
-Route::get('/panel', [ControlRolController::class,'indexRedireccionamiento'])->name('admin.panel');
-
-// --- SIN PERMISOS VISTA 403 ---
-Route::get('sin-permisos', [ControlRolController::class,'indexSinPermiso'])->name('no.permisos.index');
-
-
-// --- ROLES ---
-Route::get('/admin/roles/index', [RolesController::class,'index'])->name('admin.roles.index');
-Route::get('/admin/roles/tabla', [RolesController::class,'tablaRoles']);
-Route::get('/admin/roles/lista/permisos/{id}', [RolesController::class,'vistaPermisos']);
-Route::get('/admin/roles/permisos/tabla/{id}', [RolesController::class,'tablaRolesPermisos']);
-Route::post('/admin/roles/permiso/borrar', [RolesController::class, 'borrarPermiso']);
-Route::post('/admin/roles/permiso/agregar', [RolesController::class, 'agregarPermiso']);
-Route::get('/admin/roles/permisos/lista', [RolesController::class,'listaTodosPermisos']);
-Route::get('/admin/roles/permisos-todos/tabla', [RolesController::class,'tablaTodosPermisos']);
-Route::post('/admin/roles/borrar-global', [RolesController::class, 'borrarRolGlobal']);
-
-// --- PERMISOS ---
-Route::get('/admin/permisos/index', [PermisoController::class,'index'])->name('admin.permisos.index');
-Route::get('/admin/permisos/tabla', [PermisoController::class,'tablaUsuarios']);
-Route::post('/admin/permisos/nuevo-usuario', [PermisoController::class, 'nuevoUsuario']);
-Route::post('/admin/permisos/info-usuario', [PermisoController::class, 'infoUsuario']);
-Route::post('/admin/permisos/editar-usuario', [PermisoController::class, 'editarUsuario']);
-Route::post('/admin/permisos/nuevo-rol', [PermisoController::class, 'nuevoRol']);
-Route::post('/admin/permisos/extra-nuevo', [PermisoController::class, 'nuevoPermisoExtra']);
-Route::post('/admin/permisos/extra-borrar', [PermisoController::class, 'borrarPermisoGlobal']);
-
-// --- PERFIL ---
-Route::get('/admin/perfil/index', [PerfilController::class,'indexEditarPerfil'])->name('admin.perfil');
-Route::post('/admin/perfil/actualizar/todot', [PerfilController::class, 'editarUsuario']);
-
-
-
-
-
-
-// ===================== FRONTEND =====================================
-
-
-
-
-Route::get('/', function () {
-    return redirect('/' . config('region.default'));
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/',        [AdminAuthController::class, 'showLoginFormAdmin'])->name('login');   // GET /admin
+    Route::post('/login',  [AdminAuthController::class, 'loginAdmin'])->name('login.process');   // POST /admin/login
+    Route::post('/logout', [AdminAuthController::class, 'logoutAdmin'])->name('logout');         // POST /admin/logout
 });
 
-// ─────────────────────────────────────────────
-// 2. Grupo con prefijo de región: /sv/, /us/, /latin-es/
-// ─────────────────────────────────────────────
+
+// Rutas protegidas de admin (panel, etc.)
+Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
+    // --- CONTROL WEB ---
+    Route::get('/panel', [ControlRolController::class,'indexRedireccionamiento'])->name('panel');
+
+    // --- SIN PERMISOS VISTA 403 ---
+    Route::get('/sin-permisos', [ControlRolController::class,'indexSinPermiso'])->name('no.permisos.index');
+
+
+    // --- ROLES ---
+    Route::get('/roles/index', [RolesController::class,'index'])->name('roles.index');
+    Route::get('/roles/tabla', [RolesController::class,'tablaRoles']);
+    Route::get('/roles/lista/permisos/{id}', [RolesController::class,'vistaPermisos']);
+    Route::get('/roles/permisos/tabla/{id}', [RolesController::class,'tablaRolesPermisos']);
+    Route::post('/roles/permiso/borrar', [RolesController::class, 'borrarPermiso']);
+    Route::post('/roles/permiso/agregar', [RolesController::class, 'agregarPermiso']);
+    Route::get('/roles/permisos/lista', [RolesController::class,'listaTodosPermisos']);
+    Route::get('/roles/permisos-todos/tabla', [RolesController::class,'tablaTodosPermisos']);
+    Route::post('/roles/borrar-global', [RolesController::class, 'borrarRolGlobal']);
+
+    // --- PERMISOS ---
+    Route::get('/permisos/index', [PermisoController::class,'index'])->name('permisos.index');
+    Route::get('/permisos/tabla', [PermisoController::class,'tablaUsuarios']);
+    Route::post('/permisos/nuevo-usuario', [PermisoController::class, 'nuevoUsuario']);
+    Route::post('/permisos/info-usuario', [PermisoController::class, 'infoUsuario']);
+    Route::post('/permisos/editar-usuario', [PermisoController::class, 'editarUsuario']);
+    Route::post('/permisos/nuevo-rol', [PermisoController::class, 'nuevoRol']);
+    Route::post('/permisos/extra-nuevo', [PermisoController::class, 'nuevoPermisoExtra']);
+    Route::post('/permisos/extra-borrar', [PermisoController::class, 'borrarPermisoGlobal']);
+
+    // --- PERFIL ---
+    Route::get('/perfil/index', [PerfilController::class,'indexEditarPerfil'])->name('perfil');
+    Route::post('/perfil/actualizar/todot', [PerfilController::class, 'editarUsuario']);
+});
+
+
+
+/*
+|--------------------------------------------------------------------------
+| 2) HOME raíz: redirige a la región por defecto
+|--------------------------------------------------------------------------
+*/
+Route::get('/', function () {
+    return redirect('/' . config('region.default')); // ej: /sv
+});
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| 3) FRONTEND por región: /sv, /us, /latin-es, etc.
+|    OJO: aquí restringimos {region} para que JAMÁS matchee "admin".
+|--------------------------------------------------------------------------
+*/
 Route::prefix('{region}')
-    ->whereIn('region', config('region.supported'))
-    ->middleware('set.region')  // este middleware fija locale + región
+    ->whereIn('region', config('region.supported'))   // ['sv','us','latin-es', ...]
+    ->middleware('set.region')
     ->name('region.')
     ->group(function () {
 
-        // Página principal (login / landing)
+        // landing
         Route::get('/', [FrontendController::class, 'vistaLogin'])->name('user.index');
 
-        // Login de usuarios
-        Route::get('/login', [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');
+        // login usuario
+        Route::get('/login',  [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');
         Route::post('/login', [UsuarioAuthController::class, 'loginUsuario'])->name('user.login.process');
 
-        // Dashboard
+        // dashboard
         Route::get('/dashboard', [DashboardController::class, 'vistaInicio'])->name('user.dashboard');
     });
+
+
+
+
+
+
+
+
+

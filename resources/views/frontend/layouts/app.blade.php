@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
     <meta name="format-detection" content="telephone=no">
-    <title>@yield('title', 'Homepage Light Version – Cafe')</title>
+
+    <title>@yield('title', __('meta.title'))</title>
+    <meta name="description" content="@yield('meta_description', __('meta.description'))">
 
     <style>img:is([sizes="auto" i], [sizes^="auto," i]) { contain-intrinsic-size: 3000px 1500px }</style>
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
@@ -44,10 +46,9 @@
     <link rel="stylesheet" id="vc_animate-css-css" href="{{ asset('frontend/css/animate.min.css') }}" type="text/css" media="all">
 
     {{-- Favicons --}}
-    <link rel="icon" href="{{ asset('images/cropped-favicon-100x100.png') }}" sizes="32x32">
-    <link rel="icon" href="{{ asset('images/cropped-favicon-300x300.png') }}" sizes="192x192">
-    <link rel="apple-touch-icon" href="{{ asset('images/cropped-favicon-300x300.png') }}">
-    <meta name="msapplication-TileImage" content="{{ asset('images/cropped-favicon-300x300.png') }}">
+    <link href="{{ asset('images/logopestana.jpg') }}" rel="icon">
+    <link rel="apple-touch-icon" href="{{ asset('images/logopestana.jpg') }}">
+    <meta name="msapplication-TileImage" content="{{ asset('images/logopestana.jpg') }}">
 
     @stack('head')
 </head>

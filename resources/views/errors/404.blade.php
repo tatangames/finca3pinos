@@ -1,6 +1,3 @@
-@include('frontend.menu.superior')
-@include('frontend.menu.body.bodycontacto')
-@include("frontend.menu.navbar")
 
 
 <!-- START SECTION 404 -->
@@ -12,13 +9,10 @@
             <p class="text-center"></p>
         </div>
         <div class="port-info">
-            <a href="{{ route('user.index') }}" class="btn btn-primary btn-lg">Volver a Inicio</a>
+            <a href="{{ route('region.user.index', ['region' => app()->getLocale()]) }}" class="btn btn-primary btn-lg">Volver a Inicio</a>
         </div>
     </div>
 </section>
 <!-- END SECTION 404 -->
 
 
-
-@include("frontend.menu.footer-js")
-@include("frontend.menu.final")

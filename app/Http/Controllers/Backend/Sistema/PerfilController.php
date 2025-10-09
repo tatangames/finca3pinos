@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 class PerfilController extends Controller
 {
-    public function __construct(){
-        $this->middleware('auth:admin');
-    }
 
 
     public function indexEditarPerfil(){

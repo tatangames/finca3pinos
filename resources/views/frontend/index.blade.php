@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Homepage Light Version – Cafe')
+@section('title', __('meta.title'))
 
 @section('content')
 <div class="container">

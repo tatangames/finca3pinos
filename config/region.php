@@ -1,24 +1,62 @@
 <?php
 
 return [
-    // slugs visibles en la URL
+
+    /*
+    |--------------------------------------------------------------------------
+    | Regiones soportadas en la URL
+    |--------------------------------------------------------------------------
+    |
+    | Estos slugs aparecerán como el primer segmento de la URL, por ejemplo:
+    |   /us     → inglés
+    |   /sv     → español (El Salvador)
+    |   /latin-es → español general para Latinoamérica
+    |
+    */
+
     'supported' => ['us', 'latin-es', 'sv'],
 
-    // mapeo a locale de Laravel (traducciones)
+    /*
+    |--------------------------------------------------------------------------
+    | Mapeo de región → locale de Laravel
+    |--------------------------------------------------------------------------
+    |
+    | Define qué carpeta de /lang se usará para cada región.
+    | Ejemplo: 'us' usa /lang/en/, 'sv' usa /lang/sv/
+    |
+    */
+
     'locale_map' => [
         'us'       => 'en',
-        'latin-es' => 'es',
-        'sv'       => 'es', // El Salvador en español
+        'latin-es' => 'latin-es',
+        'sv'       => 'sv', // El Salvador → español local
     ],
 
-    // región por defecto si no se detecta nada
+    /*
+    |--------------------------------------------------------------------------
+    | Región por defecto
+    |--------------------------------------------------------------------------
+    |
+    | Si no se detecta una región válida en la URL o por IP, se usará esta.
+    |
+    */
+
     'default' => 'sv',
 
-    // Detección por país ISO2 -> región
+    /*
+    |--------------------------------------------------------------------------
+    | Detección por país ISO2 → región
+    |--------------------------------------------------------------------------
+    |
+    | Mapea el código de país (obtenido por geoip u otro método)
+    | a una región del sitio.
+    |
+    */
+
     'country_to_region' => [
-        'SV' => 'sv',
-        'US' => 'us',
-        'CA' => 'us',
-        // el resto caerá a latin-es
+        'SV' => 'sv', // El Salvador
+        'US' => 'us', // Estados Unidos
+        'CA' => 'us', // Canadá → inglés
+        // el resto caerá en 'latin-es'
     ],
 ];
