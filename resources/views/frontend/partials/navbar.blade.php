@@ -1,6 +1,7 @@
 <div id="nav-wrapper" class="wrapper-">
     <nav data-spy="" data-offset-top="0" class="navbar ">
         <div class="container">
+
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed">
                     <span class="sr-only">Toggle navigation</span>
@@ -8,8 +9,8 @@
                     <span class="icon-bar middle-bar"></span>
                     <span class="icon-bar bottom-bar"></span>
                 </button>
-                <a class="logo" href="#">
-                    <img width="200" height="62" src="{{ asset('images/logo_black-9.png') }}"
+                <a class="logo" href="{{ url('/' . session('region', config('region.default'))) }}">
+                    <img style="width: 150px;" src="{{ asset('images/logoindex.png') }}"
                          class="attachment-full size-full" alt="" decoding="async">
                 </a>
             </div>
@@ -27,15 +28,8 @@
                 {{-- Main Menu --}}
                 <ul id="menu-main-menu" class="nav navbar-nav">
                     {{-- Keep placeholders (#) for Laravel routes you will wire later --}}
-                    <li class="menu-item menu-item-has-children current-menu-parent">
-                        <a href="#"><span>Home</span></a>
-                        <ul class="sub-menu">
-                            <li><a href="#"><span>Coffee Market</span></a></li>
-                            <li class="current-menu-item"><a href="#"><span>Light Version</span></a></li>
-                            <li><a href="#"><span>Coffee Shop Dark</span></a></li>
-                            <li><a href="#"><span>Coffee Cup Waves</span></a></li>
-                        </ul>
-                    </li>
+                    <li><a href="{{ url('/' . session('region', config('region.default'))) }}"><span>{{ __('meta.home') }}</span></a></li>
+
                     <li class="menu-item menu-item-has-children">
                         <a href="#"><span>About us</span></a>
                         <ul class="sub-menu">
@@ -48,6 +42,8 @@
                             <li><a href="#"><span>FAQ</span></a></li>
                         </ul>
                     </li>
+
+
                     <li class="menu-item menu-item-has-children">
                         <a href="#"><span>Products</span></a>
                         <ul class="sub-menu">
