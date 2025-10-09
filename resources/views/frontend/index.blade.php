@@ -186,10 +186,15 @@
                             <div class="vc_row wpb_row vc_row-fluid vc_custom_1506640683138 vc_row-has-fill bg-pos-left-center">
                                 <div class="wpb_animate_when_almost_visible wpb_zoomIn zoomIn wpb_column vc_column_container vc_col-sm-12 vc_col-lg-5 vc_col-md-5">
                                     <div class="vc_column-inner"><div class="wpb_wrapper">
-                                        <div class="heading head-subheader align-left color-white subcolor-main transform-default"><h5 class="subheader">Who we are</h5><h2 class="header">About market</h2></div>
+                                        <div class="heading head-subheader align-left color-white subcolor-main transform-default"><h5 class="subheader">Who we are</h5><h2 class="header">About marke1t</h2></div>
                                         <div class="es-resp"><div class="hidden-sm hidden-ms hidden-xs" style="height: 26px;"></div><div class="hidden-xl hidden-lg hidden-md hidden-xs" style="height: 26px;"></div><div class="visible-xs" style="height: 26px;"></div></div>
                                         <div class="wpb_text_column wpb_content_element "><div class="wpb_wrapper">
-                                            <p style="text-align:left;"><span class="text-large" style="color:#c0aa83;">Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies. Praesent gravida hendrerit ex, nec eleifend sem convallis vitae.</span></p>
+
+
+                                            <p style="text-align:left;"><span class="text-large" style="color:#c0aa83;">{!! $aboutHistory !!}</span></p>
+
+
+
                                         </div></div>
                                         <div class="vc_empty_space" style="height:20px"><span class="vc_empty_space_inner"></span></div>
                                         <div class="wpb_single_image wpb_content_element vc_align_left">
