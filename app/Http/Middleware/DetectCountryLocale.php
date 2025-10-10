@@ -93,12 +93,38 @@ class DetectCountryLocale
 
     private function clientIp($request): string
     {
+        // 1) Prioriza Cloudflare si llega
+        if ($cip = $request->header('CF-Connecting-IP')) {
+            return trim($cip);
+        }
+
+        // 2) X-Forwarded-For puede traer "ip1, ip2, ip3"
         if ($xff = $request->header('X-Forwarded-For')) {
             $parts = array_map('trim', explode(',', $xff));
+            foreach ($parts as $candidate) {
+                if ($this->isPublicIp($candidate)) {
+                    return $candidate;
+                }
+            }
+            // Si ninguna pública, usa la primera igual
             if (!empty($parts[0])) return $parts[0];
         }
-        if ($cip = $request->header('CF-Connecting-IP')) return $cip;
-        if ($rip = $request->header('X-Real-IP'))        return $rip;
+
+        // 3) X-Real-IP
+        if ($rip = $request->header('X-Real-IP')) {
+            return trim($rip);
+        }
+
+        // 4) Fallback
         return $request->ip();
+    }
+
+    private function isPublicIp(string $ip): bool
+    {
+        if (!filter_var($ip, FILTER_VALIDATE_IP)) return false;
+
+        // Excluye reservadas/privadas
+        $flags = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
+        return (bool) filter_var($ip, FILTER_VALIDATE_IP, $flags);
     }
 }
