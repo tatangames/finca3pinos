@@ -4,8 +4,6 @@
 /public/hot
 /public/storage
 /storage/*
-!/storage/geoip/
-!/storage/geoip/GeoLite2-City.mmdb
 /vendor
 .env
 .env.backup
