@@ -15,7 +15,7 @@ use App\Http\Controllers\Frontend\Sistema\UsuarioAuthController;
 use App\Http\Controllers\Frontend\Sistema\FrontendController;
 use App\Http\Controllers\Frontend\Sistema\DashboardController;
 
-
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 
 
@@ -27,7 +27,7 @@ use App\Http\Controllers\Frontend\Sistema\DashboardController;
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')->name('admin.')->group(function () {
+/*Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/',        [AdminAuthController::class, 'showLoginFormAdmin'])->name('login');   // GET /admin
     Route::post('/login',  [AdminAuthController::class, 'loginAdmin'])->name('login.process');   // POST /admin/login
     Route::post('/logout', [AdminAuthController::class, 'logoutAdmin'])->name('logout');         // POST /admin/logout
@@ -67,51 +67,29 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     // --- PERFIL ---
     Route::get('/perfil/index', [PerfilController::class,'indexEditarPerfil'])->name('perfil');
     Route::post('/perfil/actualizar/todot', [PerfilController::class, 'editarUsuario']);
-});
-
-
-
-/*
-|--------------------------------------------------------------------------
-| 2) HOME raíz: redirige a la región por defecto
-|--------------------------------------------------------------------------
-*/
-Route::get('/', function () {
-    return redirect('/' . config('region.default')); // ej: /sv
-});
+});*/
 
 
 
 
 
-/*
-|--------------------------------------------------------------------------
-| 3) FRONTEND por región: /sv, /us, /latin-es, etc.
-|    OJO: aquí restringimos {region} para que JAMÁS matchee "admin".
-|--------------------------------------------------------------------------
-*/
-Route::prefix('{region}')
-    ->whereIn('region', config('region.supported'))   // ['sv','us','latin-es', ...]
-    ->middleware('set.region')
-    ->name('region.')
-    ->group(function () {
+Route::middleware(['detect.country.locale'])->group(function () {
 
-        // landing
-        Route::get('/', [FrontendController::class, 'vistaLogin'])->name('user.index');
+    Route::group([
+        'prefix' => LaravelLocalization::setLocale(),
+        'middleware' => ['localeSessionRedirect','localizationRedirect','localeViewPath']
+    ], function () {
+        Route::get('/', [FrontendController::class, 'vistaIndex'])->name('user.index');
 
-        // login usuario
+        Route::get(LaravelLocalization::transRoute('routes.about'), [FrontendController::class, 'about'])->name('about');
+
         Route::get('/login',  [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');
         Route::post('/login', [UsuarioAuthController::class, 'loginUsuario'])->name('user.login.process');
 
-        // dashboard
         Route::get('/dashboard', [DashboardController::class, 'vistaInicio'])->name('user.dashboard');
-
-        // ABOUT
-        Route::get('/', [FrontendController::class, 'vistaLogin'])->name('user.index');
-
-
     });
 
+});
 
 
 

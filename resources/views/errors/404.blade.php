@@ -9,7 +9,7 @@
             <p class="text-center"></p>
         </div>
         <div class="port-info">
-            <a href="{{ route('region.user.index', ['region' => app()->getLocale()]) }}" class="btn btn-primary btn-lg">Volver a Inicio</a>
+            <a href="#" class="btn btn-primary btn-lg">Volver a Inicio</a>
         </div>
     </div>
 </section>

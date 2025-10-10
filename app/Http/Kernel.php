@@ -33,7 +33,6 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            \App\Http\Middleware\DetectRegionRedirect::class, // ← primero
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
@@ -68,8 +67,6 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-
-        // 👇 AÑADE ESTE alias para usarlo en el grupo con prefijo {region}
-        'set.region' => \App\Http\Middleware\SetRegion::class,
+        'detect.country.locale' => \App\Http\Middleware\DetectCountryLocale::class,
     ];
 }

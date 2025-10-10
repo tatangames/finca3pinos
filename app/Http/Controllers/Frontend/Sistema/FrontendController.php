@@ -4,21 +4,23 @@ namespace App\Http\Controllers\Frontend\Sistema;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Models\Region;
 use App\Models\RegionContent;
 use Illuminate\Support\Facades\Cache;
 
 class FrontendController extends Controller
 {
-    public function vistaLogin()
+    public function vistaIndex()
     {
+        // idioma actual: 'sv' o 'us' o 'latin-es'
+        $regionSlug = LaravelLocalization::getCurrentLocale();
 
-        $regionSlug = session('region', config('region.default', 'sv'));
-
-        // Carga con caché (30 min). Podés repetir esta función para otras keys.
         $aboutHistory = Cache::remember("rc:$regionSlug:about.history", now()->addMinutes(30), function () use ($regionSlug) {
             $region = Region::where('slug', $regionSlug)->first();
-            if (!$region) return '<p>(Contenido no disponible)</p>';
+            if (!$region) {
+                return '<p>(Contenido no disponible)</p>';
+            }
 
             $content = RegionContent::where('region_id', $region->id)
                 ->where('key', 'about.history')
@@ -30,10 +32,13 @@ class FrontendController extends Controller
 
         return view('frontend.index', [
             'aboutHistory' => $aboutHistory,
-            // si querés más bloques:
-            // 'homeDescription' => $homeDescription,
-            // 'footerBlurb'     => $footerBlurb,
         ]);
 
     }
+
+    public function vistaAbout(){
+
+        return "vista about";
+    }
+
 }

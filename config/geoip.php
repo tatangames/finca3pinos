@@ -137,19 +137,19 @@ return [
     */
 
     'default_location' => [
-        'ip' => '127.0.0.0',
-        'iso_code' => 'US',
-        'country' => 'United States',
-        'city' => 'New Haven',
-        'state' => 'CT',
-        'state_name' => 'Connecticut',
-        'postal_code' => '06510',
-        'lat' => 41.31,
-        'lon' => -72.92,
-        'timezone' => 'America/New_York',
-        'continent' => 'NA',
-        'default' => true,
-        'currency' => 'USD',
+        'ip'           => '127.0.0.1',
+        'iso_code'     => 'SV',
+        'country'      => 'El Salvador',
+        'city'         => 'San Salvador',
+        'state'        => 'SS',
+        'state_name'   => 'San Salvador',
+        'postal_code'  => '1101',
+        'lat'          => 13.6929,
+        'lon'          => -89.2182,
+        'timezone'     => 'America/El_Salvador',
+        'continent'    => 'NA',
+        'default'      => true,
+        'currency'     => 'USD',
     ],
 
 ];

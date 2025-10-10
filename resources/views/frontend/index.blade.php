@@ -54,7 +54,7 @@
                                                                                         <div class="wpb_wrapper">
                                                                                             <div class="wpb_text_column wpb_content_element ">
                                                                                                 <div class="wpb_wrapper">
-                                                                                                    <p>Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies.</p>
+                                                                                                    <p>11Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies.</p>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
@@ -211,10 +211,10 @@
                                     <div class="vc_column-inner"><div class="wpb_wrapper">
                                         <ul class="block-icon icon-top align-left i-transparent layout-col1">
                                             <li class="icon-image"><span class="icon-image bg-transparent"><img decoding="async" src="{{ asset('images/about-icon-1.png') }}" class="icon-image" alt="The best World sorts"></span> <h5>The best World sorts</h5>
-                                                <div class="descr">Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies.</div>
+                                                <div class="descr">1Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies.</div>
                                             </li>
                                             <li class="icon-image"><span class="icon-image bg-transparent"><img decoding="async" src="{{ asset('images/about-icon-3.png') }}" class="icon-image" alt="Professional baristas"></span> <h5>Professional baristas</h5>
-                                                <div class="descr">Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies.</div>
+                                                <div class="descr">2Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies.</div>
                                             </li>
                                         </ul>
                                     </div></div>
@@ -223,10 +223,10 @@
                                     <div class="vc_column-inner"><div class="wpb_wrapper">
                                         <ul class="block-icon icon-top align-left i-transparent layout-col1">
                                             <li class="icon-image"><span class="icon-image bg-transparent"><img decoding="async" src="{{ asset('images/about-icon-2.png') }}" class="icon-image" alt="Many points of sale"></span> <h5>Many points of sale</h5>
-                                                <div class="descr">Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies.</div>
+                                                <div class="descr">3Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies.</div>
                                             </li>
                                             <li class="icon-image"><span class="icon-image bg-transparent"><img decoding="async" src="{{ asset('images/about-icon-4.png') }}" class="icon-image" alt="24/7 fast delivery"></span> <h5>24/7 fast delivery</h5>
-                                                <div class="descr">Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies.</div>
+                                                <div class="descr">4Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinar tellus eget magna aliquet ultricies.</div>
                                             </li>
                                         </ul>
                                         <div class="vc_empty_space" style="height:140px"><span class="vc_empty_space_inner"></span></div>
@@ -266,7 +266,7 @@
                                     <div class="vc_column-inner"><div class="wpb_wrapper">
                                         <div class="heading heading-large align-left color-black transform-default"><h3 class="header">Sale and delivery points</h3></div>
                                         <div class="wpb_text_column wpb_content_element "><div class="wpb_wrapper">
-                                            <p style="text-align:left;">Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinartellus eget magna aliquet ultricies. Praesent gravida hendreritex, nec eleifend semconvallis vitae.</p>
+                                            <p style="text-align:left;">666Sed sagittis sodales lobortis. Curabitur in eleifend turpis, id vehicula odio. Donec pulvinartellus eget magna aliquet ultricies. Praesent gravida hendreritex, nec eleifend semconvallis vitae.</p>
                                         </div></div>
                                         <div class="heading align-left color-main transform-default"><h4 class="header">Where buy our coffee:</h4></div>
 

@@ -10,6 +10,7 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "mcamara/laravel-localization": "^2.0",
         "spatie/laravel-permission": "^6.21",
         "torann/geoip": "^3.0",
         "tymon/jwt-auth": "^2.2"
@@ -28,10 +29,7 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        },
-        "files": [
-            "app/helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
