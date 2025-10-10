@@ -8,11 +8,11 @@ use Illuminate\Http\Request;
 class TrustProxies extends Middleware
 {
     /**
-     * The trusted proxies for this application.
+     * Los proxies en los que confía la aplicación.
      *
-     * @var array<int, string>|string|null
+     * En tu caso (Nginx en Hostinger), solo confía en el proxy local.
      */
-    protected $proxies = '*';
+    protected $proxies = ['127.0.0.1', '::1'];
 
     /**
      * The headers that should be used to detect proxies.
