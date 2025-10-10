@@ -10,41 +10,45 @@ class DetectCountryLocale
 {
     public function handle($request, Closure $next)
     {
-        // Si ya viene con un prefijo válido, seguir normal
+        // Si ya viene con un prefijo válido (slug), seguimos normal
         $first = $request->segment(1);
         if (in_array($first, ['us', 'sv', 'latin-es'], true)) {
             return $next($request);
         }
 
-        // Si ya tenés guardado el locale en sesión, redirigí a ese locale
-        if ($saved = Session::get('locale')) { // <-- guardar 'en'/'sv'/'es'
-            return redirect(LaravelLocalization::getLocalizedURL($saved));
+        // Si ya hay locale guardado en sesión, redirigimos al slug correcto
+        if ($saved = Session::get('locale')) { // <- debe guardar 'en', 'es' o 'sv'
+            // Normalizar: convertir locale a slug
+            $slugMap = [
+                'en' => 'us',
+                'es' => 'latin-es',
+                'sv' => 'sv',
+            ];
+            $slug = $slugMap[$saved] ?? 'latin-es';
+            return redirect(LaravelLocalization::getLocalizedURL($saved)); // usa el locale real
         }
 
         // --- Detección por IP ---
         try {
-            // SIMULAR: cambia esta IP para probar (US: 8.8.8.8, CA: 99.236.68.45, SV: 181.209.88.90)
-            // $loc = geoip()->getLocation($request->ip());
-            $loc = geoip()->getLocation('181.209.88.90'); // ← QUITA esto cuando termines de probar
-
+            $loc = geoip()->getLocation($request->ip());
             $country = strtoupper($loc->iso_code ?? '');
         } catch (\Throwable $e) {
             $country = '';
         }
 
-        // País -> LOCALE (no slug)
+        // País -> locale real
         $countryToLocale = [
             'SV' => 'sv', // español El Salvador
             'US' => 'en', // inglés
-            'CA' => 'en', // por ahora inglés (si quieres fr-CA luego lo cambiamos)
+            'CA' => 'en', // Canadá
         ];
 
         $locale = $countryToLocale[$country] ?? 'es'; // default: español LATAM
 
-        // Guardar LOCALE en sesión
+        // Guardar locale real (no slug)
         Session::put('locale', $locale);
 
-        // Redirigir a la URL localizada con LOCALE
+        // Redirigir a la URL localizada con el locale real
         return redirect(LaravelLocalization::getLocalizedURL($locale));
     }
 }
