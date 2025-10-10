@@ -24,8 +24,8 @@ class DetectCountryLocale
         // --- Detección por IP ---
         try {
             // SIMULAR: cambia esta IP para probar (US: 8.8.8.8, CA: 99.236.68.45, SV: 181.209.88.90)
-             $loc = geoip()->getLocation($request->ip());
-           // $loc = geoip()->getLocation('8.8.8.8'); // ← QUITA esto cuando termines de probar
+            // $loc = geoip()->getLocation($request->ip());
+            $loc = geoip()->getLocation('181.209.88.90'); // ← QUITA esto cuando termines de probar
 
             $country = strtoupper($loc->iso_code ?? '');
         } catch (\Throwable $e) {
