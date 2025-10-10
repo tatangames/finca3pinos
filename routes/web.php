@@ -77,7 +77,7 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
     Route::group([
         'prefix' => LaravelLocalization::setLocale(),
-        'middleware' => ['localeSessionRedirect','localizationRedirect','localeViewPath']
+        'middleware' => ['localeViewPath','localizationRedirect','localeViewPath']
     ], function () {
         Route::get('/', [FrontendController::class, 'vistaIndex'])->name('user.index');
 

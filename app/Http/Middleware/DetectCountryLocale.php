@@ -15,116 +15,95 @@ class DetectCountryLocale
      * Nota: el slug /latin-es lo genera LaravelLocalization desde el locale 'es'
      */
     private const COUNTRY_TO_LOCALE = [
-        'SV' => 'sv',
-        'US' => 'en',
+        'SV' => 'sv', // El Salvador -> /sv
+        'US' => 'en', // USA/Canadá -> /en
         'CA' => 'en',
-        'GB' => 'en',
-        'AU' => 'en',
-        'NZ' => 'en',
         // resto: 'es' (-> /latin-es por config)
     ];
 
     public function handle($request, Closure $next)
     {
-        // 0) Si ya viene con URL localizada, no hacer nada
+        // 0) Si ya viene con slug/locale en URL, seguimos
         $first       = $request->segment(1);
         $supported   = config('laravellocalization.supportedLocales', []);
-        $validLocales = array_keys($supported);                     // ['en','es','sv']
-        $validSlugs   = array_map(
-            fn ($k, $v) => $v['url'] ?? $k,
-            array_keys($supported),
-            $supported
-        ); // e.g. ['en','latin-es','sv']
+        $validLocales = array_keys($supported); // ['en','es','sv']
+        $validSlugs   = array_map(fn ($k, $v) => $v['url'] ?? $k, array_keys($supported), $supported); // ['en','latin-es','sv']
 
         if (in_array($first, $validLocales, true) || in_array($first, $validSlugs, true)) {
             return $next($request);
         }
 
-        // 1) Respetar preferencia guardada en sesión (locale: en/es/sv)
-        if ($saved = Session::get('locale')) {
+        // 1) Si el usuario eligió manualmente (flag), respeta su sesión
+        if (Session::get('locale_forced') && ($saved = Session::get('locale'))) {
             return redirect()->to(LaravelLocalization::getLocalizedURL($saved));
         }
 
-        // 2) Forzar en local (útil en Laragon)
-        if (App::environment('local')) {
-            if ($force = env('LOCALE_FORCE')) {           // valores: en | es | sv
+        // 2) Fuerzas locales solo en entorno local (dev)
+        if (app()->environment('local')) {
+            if ($force = env('LOCALE_FORCE')) {
                 Session::put('locale', $force);
+                Session::put('locale_forced', true);
                 return redirect()->to(LaravelLocalization::getLocalizedURL($force));
             }
-            if ($forceCountry = env('REGION_FORCE')) {    // valores: SV | US | CA | ...
+            if ($forceCountry = env('REGION_FORCE')) {
                 $guess = self::COUNTRY_TO_LOCALE[strtoupper($forceCountry)] ?? 'es';
                 Session::put('locale', $guess);
+                Session::put('locale_forced', true);
                 return redirect()->to(LaravelLocalization::getLocalizedURL($guess));
             }
         }
 
-        // 3) Si viene de Cloudflare, usar CF-IPCountry
-        if ($iso = strtoupper($request->header('CF-IPCountry', ''))) {
+        // 3) Cloudflare: CF-IPCountry (siempre primero)
+        $iso = strtoupper($request->header('CF-IPCountry', ''));
+        if ($iso && $iso !== 'XX' && $iso !== 'T1') {
             $locale = self::COUNTRY_TO_LOCALE[$iso] ?? 'es';
             Session::put('locale', $locale);
+            // no marcamos forced: es autodetección
             return redirect()->to(LaravelLocalization::getLocalizedURL($locale));
         }
 
-        // 4) Resolver IP real detrás de proxy/CDN
+        // 4) IP real (con TrustProxies ya funciona $request->ip())
         $ip = $this->clientIp($request);
 
-        // 5) GeoIP (con try/catch)
-        $loc = null;
+        // 5) GeoIP como fallback
         $country = '';
+        $city = 'N/A';
         try {
             $loc     = geoip()->getLocation($ip);
             $country = strtoupper($loc->iso_code ?? '');
-        } catch (\Throwable $e) {
-            // silencioso
-        }
+            $city    = $loc->city ?? 'N/A';
+        } catch (\Throwable $e) {}
+
+        $locale = self::COUNTRY_TO_LOCALE[$country] ?? 'es';
 
         Log::info('🌎 GEOIP detect', [
             'ip'      => $ip,
             'country' => $country ?: 'N/A',
-            'city'    => $loc->city ?? 'N/A',
-            'iso'     => $loc->iso_code ?? 'N/A',
+            'city'    => $city,
+            'cf_iso'  => $iso ?: 'N/A',
+            'picked'  => $locale,
+            'headers' => [
+                'X-Forwarded-For'   => $request->header('X-Forwarded-For'),
+                'CF-Connecting-IP'  => $request->header('CF-Connecting-IP'),
+                'X-Real-IP'         => $request->header('X-Real-IP'),
+            ],
         ]);
 
-        $locale = self::COUNTRY_TO_LOCALE[$country] ?? 'es'; // default -> ES => /latin-es
         Session::put('locale', $locale);
-
         return redirect()->to(LaravelLocalization::getLocalizedURL($locale));
     }
 
     private function clientIp($request): string
     {
-        // 1) Prioriza Cloudflare si llega
-        if ($cip = $request->header('CF-Connecting-IP')) {
-            return trim($cip);
-        }
+        // Con TrustProxies activo, $request->ip() ya es confiable
+        if ($cip = $request->header('CF-Connecting-IP')) return $cip;
 
-        // 2) X-Forwarded-For puede traer "ip1, ip2, ip3"
         if ($xff = $request->header('X-Forwarded-For')) {
             $parts = array_map('trim', explode(',', $xff));
-            foreach ($parts as $candidate) {
-                if ($this->isPublicIp($candidate)) {
-                    return $candidate;
-                }
-            }
-            // Si ninguna pública, usa la primera igual
             if (!empty($parts[0])) return $parts[0];
         }
+        if ($rip = $request->header('X-Real-IP')) return $rip;
 
-        // 3) X-Real-IP
-        if ($rip = $request->header('X-Real-IP')) {
-            return trim($rip);
-        }
-
-        // 4) Fallback
         return $request->ip();
-    }
-
-    private function isPublicIp(string $ip): bool
-    {
-        if (!filter_var($ip, FILTER_VALIDATE_IP)) return false;
-
-        // Excluye reservadas/privadas
-        $flags = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
-        return (bool) filter_var($ip, FILTER_VALIDATE_IP, $flags);
     }
 }
