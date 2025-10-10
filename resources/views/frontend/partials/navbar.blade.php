@@ -28,7 +28,7 @@
                 {{-- Main Menu --}}
                 <ul id="menu-main-menu" class="nav navbar-nav">
                     {{-- Keep placeholders (#) for Laravel routes you will wire later --}}
-                    <li><a href="{{ url('/' . session('region', config('region.default'))) }}"><span>{{ __('meta.home') }}</span></a></li>
+                    <li><a href="{{ LaravelLocalization::getLocalizedURL(session('region', config('region.default')), '/') }}"><span>{{ __('meta.home') }}</span></a></li>
 
                     <li class="menu-item menu-item-has-children">
                         <a href="#"><span>About us</span></a>

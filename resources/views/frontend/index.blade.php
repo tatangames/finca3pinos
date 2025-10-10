@@ -191,7 +191,7 @@
                                         <div class="wpb_text_column wpb_content_element "><div class="wpb_wrapper">
 
 
-                                            <p style="text-align:left;"><span class="text-large" style="color:#c0aa83;">{!! $aboutHistory !!}</span></p>
+                                            <p style="text-align:left;"><span class="text-large" style="color:#c0aa83;">xxxx</span></p>
 
 
 
