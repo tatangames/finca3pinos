@@ -18,13 +18,20 @@ class FrontendController extends Controller
         return view('frontend.index');
     }
 
-    public function vistaAbout(){
+    public function vistaOurCoffee(){
 
 
 
-        return view('frontend.pages.about', [
+        return view('frontend.pages.ourcoffee', [
             'aboutHistory' => getRegionContent('about.history'),
         ]);
+    }
+
+
+    public function vistaAboutUs()
+    {
+
+        return view('frontend.pages.about');
     }
 
 }

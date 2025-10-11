@@ -79,10 +79,17 @@ Route::middleware(['detect.country.locale'])->group(function () {
         'prefix' => LaravelLocalization::setLocale(),
         'middleware' => ['localeViewPath','localizationRedirect','localeViewPath']
     ], function () {
+
+
         Route::get('/', [FrontendController::class, 'vistaIndex'])->name('user.index');
 
-        Route::get(LaravelLocalization::transRoute('routes.about'), [FrontendController::class, 'vistaAbout'])
-            ->name('about');
+
+        Route::get(LaravelLocalization::transRoute('routes.our_coffee'), [FrontendController::class, 'vistaOurCoffee'])
+            ->name('user.ourcoffee');
+
+        Route::get(LaravelLocalization::transRoute('routes.about'), [FrontendController::class, 'vistaAboutUs'])
+            ->name('user.about');
+
 
 
         Route::get('/login',  [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');

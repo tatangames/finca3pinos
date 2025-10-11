@@ -28,4 +28,6 @@ return [
     'checkout' => 'Checkout',
     'my_account' => 'My Account',
     'my_order' => 'My Order',
+    'our_coffee' => 'Our Coffee',
+    'finca3pinos' => 'Finca 3 Pinos',
 ];

@@ -28,7 +28,8 @@ return [
     'checkout' => 'Verificar',
     'my_account' => 'Mi cuenta',
     'my_order' => 'Mi orden',
-
+    'our_coffee' => 'Nuestro Café',
+    'finca3pinos' => 'Finca 3 Pinos',
 
 
 ];
