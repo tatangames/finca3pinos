@@ -294,164 +294,190 @@
 
 
         /* ===== Sección general ===== */
-        .product-highlight.two-col {
-            background: #0a0a0a; /* 🔹 Fondo negro */
-            padding: 80px 20px;
-            text-align: center;
+        /* ===== Sección a ancho completo con líneas doradas ===== */
+        .geisha-product{
+            position:relative;
+            width:100vw;
+            left:50%; right:50%;
+            margin-left:-50vw; margin-right:-50vw;
+            background:#1a1a1a;
+            padding:60px 0 80px;
+            overflow:hidden;
         }
+        .geisha-product::before,
+        .geisha-product::after{
+            content:"";
+            position:absolute; left:0; width:100%; height:2px;
+            background:#D2AA6DFF;
+        }
+        .geisha-product::before{ top:0; }
+        .geisha-product::after{ bottom:0; }
 
-        .product-highlight.two-col .header {
-            font-weight: 800;
-            font-size: clamp(26px, 4vw, 40px);
-            color: #f9f9f9; /* 🔹 Blanco */
-            margin-bottom: 36px;
+        /* ===== Título ===== */
+        .geisha-product .header{
+            font-weight:800;
+            font-size:clamp(26px,4vw,40px);
+            color:#f9f9f9;
+            margin:0 0 36px;
+            text-align:center;
         }
 
         /* ===== Layout 2 columnas ===== */
-        .product-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 36px;
-            align-items: center;
-            justify-content: center;
-            max-width: 900px;
-            margin: 0 auto;
-            text-align: left;
+        .geisha-product .product-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:36px;
+            align-items:center;
+            justify-content:center;
+            max-width:900px;
+            margin:0 auto;
+            text-align:left;
         }
 
-        /* ===== Imagen izquierda ===== */
-        .product-media {
-            background: #ffffff; /* 🔹 Fondo oscuro dentro del card */
-            border-radius: 16px;
-            padding: 18px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* ===== Imagen izquierda (card) ===== */
+        .geisha-product .product-media{
+            background:#ffffff;
+            border-radius:16px;
+            padding:18px;
+            box-shadow:0 10px 30px rgba(0,0,0,.6);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            /* transición y rendimiento */
+            transition:transform .35s ease, box-shadow .35s ease, filter .35s ease;
+            will-change:transform;
+            transform:translateZ(0);
+        }
+        .geisha-product .product-media img{
+            display:block;
+            max-width:70%;
+            height:auto;
+            object-fit:contain;
+            border-radius:10px;
+            transition:transform .4s ease;
         }
 
-        .product-media img {
-            max-width: 70%;
-            height: auto;
-            object-fit: contain;
-            border-radius: 10px;
+        /* ===== Card de detalles (derecha) ===== */
+        .geisha-product .product-details.card{
+            background:#fff;
+            border-radius:14px;
+            padding:28px 32px;
+            box-shadow:0 8px 30px rgba(0,0,0,.25);
+
+            /* transición y rendimiento */
+            transition:transform .35s ease, box-shadow .35s ease, background-color .35s ease;
+            will-change:transform;
+            transform:translateZ(0);
         }
 
-        /* ===== Columna derecha ===== */
-        .product-details.card {
-            background: #fff; /* 🔹 Card blanco */
-            border-radius: 14px;
-            padding: 28px 32px;
-            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.05);
+        /* ===== Hover / Focus: Zoom suave en cada card ===== */
+        .geisha-product .product-media:hover,
+        .geisha-product .product-media:focus-within{
+            transform:scale(1.04);
+            box-shadow:0 18px 40px rgba(0,0,0,.55);
+            filter:brightness(1.02);
+        }
+        .geisha-product .product-media:hover img,
+        .geisha-product .product-media:focus-within img{
+            transform:scale(1.08);
         }
 
-        .excerpt {
-            color: #333;
-            line-height: 1.6;
-            margin-bottom: 16px;
+        .geisha-product .product-details.card:hover,
+        .geisha-product .product-details.card:focus-within{
+            transform:scale(1.04);
+            box-shadow:0 18px 44px rgba(0,0,0,.35);
         }
 
-        .product-info {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            color: #222;
-            font-weight: 600;
-            margin-bottom: 12px;
+        /* ===== Texto y bloques internos ===== */
+        .geisha-product .excerpt{
+            color:#333; line-height:1.6; margin-bottom:16px;
         }
-
-        .product-info .label {
-            color: #777;
-            font-weight: 700;
-            margin-right: 4px;
+        .geisha-product .product-info{
+            display:flex; gap:20px; flex-wrap:wrap;
+            color:#222; font-weight:600; margin-bottom:12px;
         }
-
-        .price {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #b8914b;
-            margin: 10px 0 16px;
+        .geisha-product .product-info .label{
+            color:#777; font-weight:700; margin-right:4px;
+        }
+        .geisha-product .price{
+            font-size:1.4rem; font-weight:800; color:#b8914b; margin:10px 0 16px;
         }
 
         /* ===== Botón ===== */
-        .btn-cart {
+        .geisha-product .btn-cart {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;                         /* espacio entre ícono y texto */
             background: #b8914b;
             color: #fff;
-            padding: 12px 22px;
-            border-radius: 8px;
-            font-weight: 700;
+            padding: 6px 12px;                /* 🔹 más compacto */
+            border-radius: 5px;               /* 🔹 esquinas más rectas */
+            font-weight: 600;
+            font-size: 0.8rem;                /* 🔹 texto más pequeño */
             text-decoration: none;
-            box-shadow: 0 4px 15px rgba(184, 145, 75, 0.3);
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(184,145,75,.25);
+            transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease;
         }
 
-        .btn-cart:hover {
+        .geisha-product .btn-cart:hover {
             background: #a37a30;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(184,145,75,.35);
         }
 
-        .btn-cart i {
-            margin-right: 6px;
+        .geisha-product .btn-cart i {
+            font-size: 0.8em;                 /* 🔹 ícono más pequeño */
+            margin-right: 3px;
         }
 
         /* ===== Responsive ===== */
+        @media (max-width:900px){
+            .geisha-product .product-grid{
+                grid-template-columns:1fr;
+                gap:28px;
+                text-align:center;
+            }
+            .geisha-product .product-media img{ max-width:60%; }
+            .geisha-product .product-details.card{ text-align:center; }
+            .geisha-product .product-info{ justify-content:center; }
+        }
+
+        /* Respeta usuarios con movimiento reducido */
+        @media (prefers-reduced-motion:reduce){
+            .geisha-product .product-media,
+            .geisha-product .product-details.card,
+            .geisha-product .product-media img,
+            .geisha-product .btn-cart{
+                transition:none !important;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        /* ===== Márgenes laterales en móviles/tablets ===== */
         @media (max-width: 900px) {
-            .product-grid {
-                grid-template-columns: 1fr;
-                gap: 28px;
-                text-align: center;
+            /* Aplica espacio lateral a toda la zona del producto */
+            .geisha-product .container {
+                padding-left: 24px;
+                padding-right: 24px;
             }
 
-            .product-media img {
-                max-width: 60%;
+            /* También un poco de margen interno en los cards */
+            .geisha-product .product-media,
+            .geisha-product .product-details.card {
+                margin-left: 8px;
+                margin-right: 8px;
             }
 
-            .product-details.card {
-                text-align: center;
-            }
-
-            .product-info {
-                justify-content: center;
+            /* Ajuste opcional para que la imagen no se vea tan grande */
+            .geisha-product .product-media img {
+                max-width: 75%;
             }
         }
-
-
-        .geisha-product {
-            position: relative;
-            width: 100vw;              /* ocupa todo el ancho de la ventana */
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;        /* elimina márgenes laterales del contenedor */
-            margin-right: -50vw;
-
-            background-color: #1a1a1a;
-            padding: 60px 0 80px;      /* espacio superior e inferior */
-            overflow: hidden;
-        }
-
-        /* Líneas doradas arriba y abajo */
-        .geisha-product::before,
-        .geisha-product::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: #D2AA6DFF;
-        }
-
-        .geisha-product::before {
-            top: 0;
-        }
-
-        .geisha-product::after {
-            bottom: 0;
-        }
-
-
 
     </style>
 
@@ -473,7 +499,12 @@
 
                                                 <div class="hidden-xl hidden-lg hidden-md hidden-xs"
                                                      style="height: 64px;"></div>
-                                                <div class="visible-xs" style="height: 64px;"></div>
+
+
+
+
+
+
                                             </div>
                                             <div id="like_sc_sliders_87130229">
                                                 <div class="slider-sc swiper-container" data-autoplay="4000"
@@ -499,10 +530,14 @@
                                                                             la esencia de nuestra tierra.
                                                                         </p>
                                                                         <div class="btn-group">
-                                                                            <a href="" class="btn btn-primary">Conoce
+                                                                            <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.ourcoffee', [], false)) }}" class="btn btn-primary" style="color: white">Conoce
                                                                                 más</a>
-                                                                            <a href="" class="btn btn-outline">Ver
-                                                                                productos</a>
+
+
+
+
+
+                                                                            <a href="#productos" class="btn btn-primary" style="color: white">Ver productos</a>
                                                                         </div>
                                                                     </div>
 
@@ -663,13 +698,9 @@
                             <div class="vc_row-full-width vc_clearfix"></div>
 
 
+                            <section id="productos" class="geisha-product" data-vc-full-width="true"
+                                     data-vc-full-width-init="false">
 
-
-
-
-
-
-                            <section class="geisha-product" data-vc-full-width="true" data-vc-full-width-init="false">
                                 <div class="vc_row wpb_row vc_row-fluid vc_row-has-fill">
                                     <div class="container">
                                         <div class="heading text-center">
@@ -685,15 +716,18 @@
 
                                             <div class="product-details card">
                                                 <p class="excerpt" itemprop="description">
-                                                    Café de especialidad cultivado en Metapán; notas <strong>florales</strong>,
+                                                    Café de especialidad cultivado en Metapán; notas
+                                                    <strong>florales</strong>,
                                                     <strong>cítricas</strong> y <strong>melocotón</strong>.
                                                 </p>
 
                                                 <div class="product-info">
-                                                    <div class="info-item"><span class="label">Molido:</span> Grano</div>
+                                                    <div class="info-item"><span class="label">Molido:</span> Grano
+                                                    </div>
                                                 </div>
 
-                                                <div class="price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                                                <div class="price" itemprop="offers" itemscope
+                                                     itemtype="https://schema.org/Offer">
                                                     <meta itemprop="priceCurrency" content="USD">
                                                     <span itemprop="price">$25.00</span>
                                                     <link itemprop="availability" href="https://schema.org/InStock">
@@ -707,20 +741,6 @@
                                     </div>
                                 </div>
                             </section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
                             <div class="vc_row-full-width vc_clearfix"></div>
