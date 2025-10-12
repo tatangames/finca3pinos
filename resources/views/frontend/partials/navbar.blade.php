@@ -34,18 +34,6 @@
 
 
 
-                    <li class="menu-item menu-item-has-children">
-                        <a href="#"><span>About us</span></a>
-                        <ul class="sub-menu">
-                            <li><a href="#"><span>About us</span></a></li>
-                            <li><a href="#"><span>Delivery</span></a></li>
-                            <li><a href="#"><span>Events</span></a></li>
-                            <li><a href="#"><span>Special Offers</span></a></li>
-                            <li><a href="#"><span>Testimonials</span></a></li>
-                            <li><a href="#"><span>Team</span></a></li>
-                            <li><a href="#"><span>FAQ</span></a></li>
-                        </ul>
-                    </li>
 
 
                     <li class="menu-item menu-item-has-children">
