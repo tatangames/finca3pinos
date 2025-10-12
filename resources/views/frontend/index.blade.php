@@ -215,11 +215,242 @@
                 justify-content: flex-start;
             }
         }
+
         .gold-separator {
             height: 3px;
             width: 100%;
             background-color: #c0aa83; /* dorado */
         }
+
+
+        /* === Separador dorado debajo de cada párrafo === */
+        .block-icon li.icon-image .gold-separator {
+            height: 3px;
+            width: 100%; /* ocupa todo el ancho del contenedor del texto */
+            max-width: 280px; /* límite opcional para que no sea demasiado largo */
+            background-color: #c0aa83; /* dorado */
+            margin-top: 10px;
+            border-radius: 2px;
+        }
+
+        /* === Alineación y espaciado uniforme de cada item === */
+        .block-icon.icon-top.align-left.i-transparent.layout-col1 {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .block-icon.icon-top.align-left.i-transparent.layout-col1 li.icon-image {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* todo a la izquierda */
+            text-align: left;
+            margin: 0 0 32px 0; /* separación entre items */
+        }
+
+        /* Ícono pegado a la izquierda y sin offsets raros */
+        .block-icon li.icon-image > span.icon-image {
+            display: inline-block;
+            margin: 0 0 10px 0; /* espacio bajo el ícono */
+            padding: 0;
+        }
+
+        .block-icon li.icon-image img {
+            display: block;
+            margin: 0;
+        }
+
+        /* Títulos y textos: normalizar márgenes para que las filas queden a la misma altura */
+        .block-icon li.icon-image h5 {
+            margin: 0 0 8px 0 !important;
+            line-height: 1.15;
+        }
+
+        .block-icon li.icon-image .descr {
+            margin: 0; /* evita saltos diferentes entre columnas */
+        }
+
+        /* Quitar espacios fantasma del tema en esta fila */
+        .vc_row.vc_custom_1506640683138 .vc_empty_space {
+            display: none !important;
+        }
+
+        /* Responsive: un poco menos de separación */
+        @media (max-width: 767px) {
+            .block-icon li.icon-image {
+                margin-bottom: 24px;
+            }
+
+            .block-icon li.icon-image .gold-separator {
+                width: 56px;
+            }
+        }
+
+
+
+
+
+
+
+
+        /* ===== Sección general ===== */
+        .product-highlight.two-col {
+            background: #0a0a0a; /* 🔹 Fondo negro */
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .product-highlight.two-col .header {
+            font-weight: 800;
+            font-size: clamp(26px, 4vw, 40px);
+            color: #f9f9f9; /* 🔹 Blanco */
+            margin-bottom: 36px;
+        }
+
+        /* ===== Layout 2 columnas ===== */
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 36px;
+            align-items: center;
+            justify-content: center;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        /* ===== Imagen izquierda ===== */
+        .product-media {
+            background: #ffffff; /* 🔹 Fondo oscuro dentro del card */
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .product-media img {
+            max-width: 70%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        /* ===== Columna derecha ===== */
+        .product-details.card {
+            background: #fff; /* 🔹 Card blanco */
+            border-radius: 14px;
+            padding: 28px 32px;
+            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.05);
+        }
+
+        .excerpt {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .product-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            color: #222;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .product-info .label {
+            color: #777;
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        .price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #b8914b;
+            margin: 10px 0 16px;
+        }
+
+        /* ===== Botón ===== */
+        .btn-cart {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #b8914b;
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(184, 145, 75, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-cart:hover {
+            background: #a37a30;
+            transform: translateY(-2px);
+        }
+
+        .btn-cart i {
+            margin-right: 6px;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 900px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 28px;
+                text-align: center;
+            }
+
+            .product-media img {
+                max-width: 60%;
+            }
+
+            .product-details.card {
+                text-align: center;
+            }
+
+            .product-info {
+                justify-content: center;
+            }
+        }
+
+
+        .geisha-product {
+            position: relative;
+            width: 100vw;              /* ocupa todo el ancho de la ventana */
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;        /* elimina márgenes laterales del contenedor */
+            margin-right: -50vw;
+
+            background-color: #1a1a1a;
+            padding: 60px 0 80px;      /* espacio superior e inferior */
+            overflow: hidden;
+        }
+
+        /* Líneas doradas arriba y abajo */
+        .geisha-product::before,
+        .geisha-product::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #D2AA6DFF;
+        }
+
+        .geisha-product::before {
+            top: 0;
+        }
+
+        .geisha-product::after {
+            bottom: 0;
+        }
+
 
 
     </style>
@@ -250,7 +481,6 @@
                                                     <div class="swiper-wrapper">
 
 
-                                                        {{-- Slide 1 --}}
                                                         {{-- Slide 1 --}}
                                                         <div class="swiper-slide">
                                                             <section class="hero-geisha">
@@ -289,23 +519,12 @@
                                                                 </div>
                                                             </section>
                                                         </div>
-
-
                                                     </div>
                                                     <div class="swiper-pagination"></div>
                                                 </div>
                                             </div>
-
-
                                             <div class="gold-separator"></div>
-
-
-
-
                                         </div>
-
-
-
                                     </div>
                                 </div>
                             </div>
@@ -333,17 +552,19 @@
                                                 <div class="wpb_text_column wpb_content_element ">
                                                     <div class="wpb_wrapper">
                                                         <p style="text-align:left;">
-                                                                <span class="text-large" style="color:#D2AA6D; text-align: justify">
+                                                                <span class="text-large"
+                                                                      style="color:#D2AA6D; text-align: justify">
                                                                     Producimos Café Geisha de altura en Metapán, El Salvador.
                                                                     Un café de origen único, cultivado con pasión, tecnología y respeto por la tierra.
                                                                 </span>
                                                         </p>
                                                     </div>
                                                 </div>
+                                                <!-- Separador dorado -->
+                                                <div class="gold-separator"></div>
 
                                                 <div class="vc_empty_space" style="height:20px"><span
                                                         class="vc_empty_space_inner"></span></div>
-
 
                                             </div>
                                         </div>
@@ -363,27 +584,31 @@
                                                 <ul class="block-icon icon-top align-left i-transparent layout-col1">
 
                                                     <li class="icon-image">
-                            <span class="icon-image bg-transparent">
-                                <img src="{{ asset('images/beans.png') }}" style="width: 60px; height: 60px"
-                                     class="icon-image" alt="Origen y prestigio">
-                            </span>
+                                                        <span class="icon-image bg-transparent">
+                                                            <img src="{{ asset('images/beans.png') }}"
+                                                                 style="width: 60px; height: 60px"
+                                                                 class="icon-image" alt="Origen y prestigio">
+                                                        </span>
                                                         <h5>Origen y prestigio</h5>
                                                         <div class="descr">
                                                             Cultivado en la Cordillera Alotepec–Metapán, cuna del mejor
                                                             café salvadoreño.
                                                         </div>
+                                                        <div class="gold-separator"></div>
                                                     </li>
 
                                                     <li class="icon-image">
-                            <span class="icon-image bg-transparent">
-                                <img src="{{ asset('images/sensorial.png') }}" style="width: 60px; height: 60px"
-                                     class="icon-image" alt="Perfil sensorial">
-                            </span>
+                                                        <span class="icon-image bg-transparent">
+                                                            <img src="{{ asset('images/sensorial.png') }}"
+                                                                 style="width: 60px; height: 55px"
+                                                                 class="icon-image" alt="Sostenibilidad">
+                                                        </span>
                                                         <h5>Perfil sensorial</h5>
                                                         <div class="descr">
-                                                            Notas florales, frutales y una acidez brillante con cuerpo
-                                                            sedoso.
+                                                            Respetamos la naturaleza y preservamos la biodiversidad de
+                                                            Metapán.
                                                         </div>
+                                                        <div class="gold-separator"></div>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -397,27 +622,31 @@
                                                 <ul class="block-icon icon-top align-left i-transparent layout-col1">
 
                                                     <li class="icon-image">
-                            <span class="icon-image bg-transparent">
-                                <img src="{{ asset('images/tuerca.png') }}" style="width: 60px" height="60px"
-                                     class="icon-image" alt="Tecnología y trazabilidad">
-                            </span>
+                                                        <span class="icon-image bg-transparent">
+                                                            <img src="{{ asset('images/tuerca.png') }}"
+                                                                 style="width: 60px" height="60px"
+                                                                 class="icon-image" alt="Tecnología y trazabilidad">
+                                                        </span>
                                                         <h5>Tecnología</h5>
                                                         <div class="descr">
                                                             Controlamos cada etapa para garantizar pureza y consistencia
                                                             en taza.
                                                         </div>
+                                                        <div class="gold-separator"></div>
                                                     </li>
 
                                                     <li class="icon-image">
-                            <span class="icon-image bg-transparent">
-                                <img src="{{ asset('images/hoja.png') }}" style="width: 50px; height: 55px"
-                                     class="icon-image" alt="Sostenibilidad">
-                            </span>
+                                                        <span class="icon-image bg-transparent">
+                                                            <img src="{{ asset('images/hoja.png') }}"
+                                                                 style="width: 50px; height: 55px"
+                                                                 class="icon-image" alt="Sostenibilidad">
+                                                        </span>
                                                         <h5>Sostenibilidad</h5>
                                                         <div class="descr">
                                                             Respetamos la naturaleza y preservamos la biodiversidad de
                                                             Metapán.
                                                         </div>
+                                                        <div class="gold-separator"></div>
                                                     </li>
                                                 </ul>
 
@@ -427,50 +656,74 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div style="margin-top: 3px"></div>
                             </section>
 
 
                             <div class="vc_row-full-width vc_clearfix"></div>
 
 
-                            {{-- Products header (static placeholder) --}}
-                            <section data-vc-full-width="true" data-vc-full-width-init="false"
-                                     class="vc_section bg-color-gray">
-                                <div class="vc_row wpb_row vc_row-fluid">
-                                    <div class="wpb_column vc_column_container vc_col-sm-12">
-                                        <div class="vc_column-inner">
-                                            <div class="wpb_wrapper">
-                                                <div class="es-resp">
-                                                    <div class="hidden-sm hidden-ms hidden-xs"
-                                                         style="height:16px;"></div>
-                                                    <div class="hidden-xl hidden-lg hidden-md hidden-xs"
-                                                         style="height:16px;"></div>
-                                                    <div class="visible-xs" style="height:16px;"></div>
-                                                </div>
-                                                <div
-                                                    class="heading head-subheader align-center subcolor-main text-bg transform-default">
-                                                    <h5 class="subheader">Choose your coffee</h5>
-                                                    <h2 class="header">Recent Products</h2>
-                                                    <p class="header-text">Products</p>
-                                                </div>
-                                                <div class="btn-wrap align-center"><a href="#"
-                                                                                      class="btn btn-default-bordered transform-default color-text-default color-hover-default align-center">view
-                                                        all products</a></div>
-                                                <div class="es-resp">
-                                                    <div class="hidden-sm hidden-ms hidden-xs"
-                                                         style="height:80px;"></div>
-                                                    <div class="hidden-xl hidden-lg hidden-md hidden-xs"
-                                                         style="height:50px;"></div>
-                                                    <div class="visible-xs" style="height:50px;"></div>
-                                                </div>
-                                            </div>
+
+
+
+
+
+
+                            <section class="geisha-product" data-vc-full-width="true" data-vc-full-width-init="false">
+                                <div class="vc_row wpb_row vc_row-fluid vc_row-has-fill">
+                                    <div class="container">
+                                        <div class="heading text-center">
+                                            <h2 class="header" style="color: #D2AA6DFF">Café Geisha</h2>
                                         </div>
+
+                                        <article class="product-grid" itemscope itemtype="https://schema.org/Product">
+                                            <div class="product-media">
+                                                <img src="{{ asset('images/productos/producto1.png') }}"
+                                                     width="400" height="500" loading="lazy" decoding="async"
+                                                     alt="Bolsa Café Geisha Finca 3 Pinos 250 g" itemprop="image">
+                                            </div>
+
+                                            <div class="product-details card">
+                                                <p class="excerpt" itemprop="description">
+                                                    Café de especialidad cultivado en Metapán; notas <strong>florales</strong>,
+                                                    <strong>cítricas</strong> y <strong>melocotón</strong>.
+                                                </p>
+
+                                                <div class="product-info">
+                                                    <div class="info-item"><span class="label">Molido:</span> Grano</div>
+                                                </div>
+
+                                                <div class="price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                                                    <meta itemprop="priceCurrency" content="USD">
+                                                    <span itemprop="price">$25.00</span>
+                                                    <link itemprop="availability" href="https://schema.org/InStock">
+                                                </div>
+
+                                                <a href="#" class="btn-cart" aria-label="Añadir Café Geisha al carrito">
+                                                    <i class="fa fa-shopping-cart"></i> Añadir al carrito
+                                                </a>
+                                            </div>
+                                        </article>
                                     </div>
                                 </div>
                             </section>
 
-                            <div class="vc_row-full-width vc_clearfix"></div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            <div class="vc_row-full-width vc_clearfix"></div>
 
 
                         </div>
