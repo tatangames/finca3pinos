@@ -22,6 +22,7 @@ class FrontendController extends Controller
 
 
 
+
         return view('frontend.pages.ourcoffee', [
             'aboutHistory' => getRegionContent('about.history'),
         ]);
