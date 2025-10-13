@@ -53,14 +53,14 @@
                 <!-- Header con logo -->
                 <tr>
                     <td align="center" style="padding:24px;">
-                        <img src="{{ asset('images/logoindex.png') }}" width="160" alt="{{ $marca }}" style="border:0; display:block; max-width:160px; height:auto;">
+                        <img src="{{ secure_asset('images/logoindex.png') }}" width="160" alt="{{ $marca }}" style="border:0; display:block; max-width:160px; height:auto;">
                     </td>
                 </tr>
 
                 <!-- Banda dorada con icono -->
                 <tr>
                     <td align="center" style="background:#000000; padding:24px 16px;">
-                        <img src="{{ asset('images/logos/candadoemail.png') }}" width="48" height="48" alt="Candado" style="border:0; display:block; margin:0 auto 8px;">
+                        <img src="{{ secure_asset('images/logos/candadoemail.png') }}" width="48" height="48" alt="Candado" style="border:0; display:block; margin:0 auto 8px;">
                         <div style="font-family:Arial,Helvetica,sans-serif; font-size:24px; line-height:1.3; color:#ffffff; font-weight:bold;">
                             Restablecer tu contraseña
                         </div>
@@ -132,7 +132,7 @@
                                 </td>
                                 <td align="right" valign="top" style="font-family:Arial,Helvetica,sans-serif;">
                                     <a href="https://facebook.com/" target="_blank" style="display:inline-block;">
-                                        <img src="{{ asset('images/logos/facebook.png') }}" width="28" height="28" alt="Facebook" style="border:0; display:block;">
+                                        <img src="{{ secure_asset('images/logos/facebook.png') }}" width="28" height="28" alt="Facebook" style="border:0; display:block;">
                                     </a>
                                 </td>
                             </tr>
