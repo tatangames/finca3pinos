@@ -537,8 +537,9 @@
 
 
 
-                                                                            <a href="#productos" class="btn btn-primary" style="color: white">Ver productos</a>
-                                                                        </div>
+                                                                            <a href="#productos" class="btn btn-primary js-scroll" style="color:white">
+                                                                                Ver productos
+                                                                            </a>                                                                        </div>
                                                                     </div>
 
                                                                     <!-- Derecha: Card con imagen -->
@@ -752,6 +753,42 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function getOffset() {
+                let off = 0;
+                const sticky = document.querySelector('.navbar-fixed-top, .site-header.sticky, .header-sticky');
+                const admin  = document.querySelector('#wpadminbar');
+                if (sticky) off += sticky.offsetHeight || 0;
+                if (admin)  off += admin.offsetHeight  || 0;
+                // fallback si no hay sticky
+                if (!off) off = 80; // ajusta a tu diseño
+                return off;
+            }
+
+            document.querySelectorAll('a.js-scroll[href^="#"]').forEach(function (a) {
+                a.addEventListener('click', function (e) {
+                    const id = this.getAttribute('href');
+                    if (!id || id === '#') return;
+                    const target = document.querySelector(id);
+                    if (!target) return;
+
+                    e.preventDefault();
+
+                    const offset = getOffset();
+                    const y = target.getBoundingClientRect().top + window.pageYOffset - offset;
+
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+
+                    // Actualiza el hash sin “saltar” (permite re-clics)
+                    history.pushState(null, '', id);
+                });
+            });
+        });
+    </script>
+
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')
