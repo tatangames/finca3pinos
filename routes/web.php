@@ -42,7 +42,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->name('password.reset.form');
 
 
-    Route::get('/preview-mail/reset', function () {
+    /*Route::get('/preview-mail/reset', function () {
         $data = [
             'nombre' => 'Juan Pérez',
             'marca'  => 'Finca 3 Pinos',
@@ -52,7 +52,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Renderiza con el motor de Markdown para correos
         return app(Markdown::class)->render('mail.admin.reset', $data);
-    });
+    });*/
 });
 
 
