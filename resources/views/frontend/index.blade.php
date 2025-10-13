@@ -699,52 +699,7 @@
                             <div class="vc_row-full-width vc_clearfix"></div>
 
 
-                            <section id="productos" class="geisha-product" data-vc-full-width="true"
-                                     data-vc-full-width-init="false">
 
-                                <div class="vc_row wpb_row vc_row-fluid vc_row-has-fill">
-                                    <div class="container">
-                                        <div class="heading text-center">
-                                            <h2 class="header" style="color: #D2AA6DFF">Café Geisha</h2>
-                                        </div>
-
-                                        <article class="product-grid" itemscope itemtype="https://schema.org/Product">
-                                            <div class="product-media">
-                                                <img src="{{ asset('images/productos/producto1.png') }}"
-                                                     width="400" height="500" loading="lazy" decoding="async"
-                                                     alt="Bolsa Café Geisha Finca 3 Pinos 250 g" itemprop="image">
-                                            </div>
-
-                                            <div class="product-details card">
-                                                <p class="excerpt" itemprop="description">
-                                                    Café de especialidad cultivado en Metapán; notas
-                                                    <strong>florales</strong>,
-                                                    <strong>cítricas</strong> y <strong>melocotón</strong>.
-                                                </p>
-
-                                                <div class="product-info">
-                                                    <div class="info-item"><span class="label">Molido:</span> Grano
-                                                    </div>
-                                                </div>
-
-                                                <div class="price" itemprop="offers" itemscope
-                                                     itemtype="https://schema.org/Offer">
-                                                    <meta itemprop="priceCurrency" content="USD">
-                                                    <span itemprop="price">$25.00</span>
-                                                    <link itemprop="availability" href="https://schema.org/InStock">
-                                                </div>
-
-                                                <a href="#" class="btn-cart" aria-label="Añadir Café Geisha al carrito">
-                                                    <i class="fa fa-shopping-cart"></i> Añadir al carrito
-                                                </a>
-                                            </div>
-                                        </article>
-                                    </div>
-                                </div>
-                            </section>
-
-
-                            <div class="vc_row-full-width vc_clearfix"></div>
 
 
                         </div>

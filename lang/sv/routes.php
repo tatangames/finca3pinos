@@ -4,4 +4,5 @@ return [
     'about' => 'nuestra-historia',
     'gallery' => 'galeria',
     'contact' => 'contacto',
+    'products' => 'productos',
 ];

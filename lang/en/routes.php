@@ -4,4 +4,5 @@ return [
     'about' => 'about',
     'gallery' => 'gallery',
     'contact' => 'contact',
+    'products' => 'products',
 ];

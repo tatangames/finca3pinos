@@ -30,6 +30,7 @@
                     {{-- Keep placeholders (#) for Laravel routes you will wire later --}}
                     <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.index', [], false)) }}"><span>{{ __('meta.home') }}</span></a></li>
                     <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.ourcoffee', [], false)) }}"><span>{{ __('meta.our_coffee') }}</span></a></li>
+                    <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.products', [], false)) }}"><span>{{ __('meta.products') }}</span></a></li>
                     <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.gallery', [], false)) }}"><span>{{ __('meta.gallery') }}</span></a></li>
                     <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}"><span>{{ __('meta.contact') }}</span></a></li>
 
@@ -37,61 +38,13 @@
 
 
 
-                    <li class="menu-item menu-item-has-children">
-                        <a href="#"><span>Products</span></a>
-                        <ul class="sub-menu">
-                            <li><a href="#"><span>Shop</span></a></li>
-                            <li><a href="#"><span>Cart</span></a></li>
-                            <li><a href="#"><span>Checkout</span></a></li>
-                            <li><a href="#"><span>My account</span></a></li>
-                        </ul>
-                    </li>
 
 
 
 
 
-                    <li class="menu-item menu-item-has-children">
-                        <a href="#"><span>Pages</span></a>
-                        <ul class="sub-menu">
-                            <li class="menu-item menu-item-has-children">
-                                <a><span>Typography</span></a>
-                                <ul class="sub-menu">
-                                    <li><a href="#"><span>Headers</span></a></li>
-                                    <li><a href="#"><span>Text</span></a></li>
-                                    <li><a href="#"><span>Text Columns</span></a></li>
-                                    <li><a href="#"><span>Table</span></a></li>
-                                    <li><a href="#"><span>Separators</span></a></li>
-                                </ul>
-                            </li>
-                            <li class="menu-item menu-item-has-children">
-                                <a><span>Form Elements</span></a>
-                                <ul class="sub-menu">
-                                    <li><a href="#"><span>Buttons</span></a></li>
-                                    <li><a href="#"><span>Forms</span></a></li>
-                                </ul>
-                            </li>
-                            <li class="menu-item menu-item-has-children">
-                                <a><span>Shortcodes</span></a>
-                                <ul class="sub-menu">
-                                    <li><a href="#"><span>Accordions</span></a></li>
-                                    <li><a href="#"><span>Alerts</span></a></li>
-                                    <li><a href="#"><span>Tabs</span></a></li>
-                                    <li><a href="#"><span>Shortcodes</span></a></li>
-                                </ul>
-                            </li>
-                            <li class="menu-item menu-item-has-children">
-                                <a><span>Lists</span></a>
-                                <ul class="sub-menu">
-                                    <li><a href="#"><span>Icons</span></a></li>
-                                    <li><a href="#"><span>Lists and Social Icons</span></a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#"><span>404 Page</span></a></li>
-                            <li><a href="#"><span>Cooming Soon</span></a></li>
-                            <li><a href="#"><span>Under Construction</span></a></li>
-                        </ul>
-                    </li>
+
+
 
                     <li class="ltx-fa-icon ltx-nav-search hidden-md hidden-sm hidden-ms hidden-xs">
                         <div id="top-search" class="top-search">

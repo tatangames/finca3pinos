@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Notifications\AdminResetPassword;
 
 class Administrador extends Authenticatable
 {
@@ -18,35 +19,10 @@ class Administrador extends Authenticatable
 
     protected $guard_name = 'api';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    /*protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];*/
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    /* protected $hidden = [
-         'password',
-         'remember_token',
-     ];*/
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    /*protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];*/
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new AdminResetPassword($token));
+    }
 
 
 }

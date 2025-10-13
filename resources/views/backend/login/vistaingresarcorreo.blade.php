@@ -47,7 +47,7 @@
 <body>
 
 {{-- Componente Livewire del login --}}
-@livewire('auth-admin.login-form')
+@livewire('auth-admin.forgot-password-form')
 
 {{-- JS base --}}
 <script src="{{ asset('js/jquery.min.js') }}"></script>

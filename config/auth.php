@@ -49,18 +49,17 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
-            'table' => 'password_reset_tokens',
-            'expire' => 60,
+            'table'    => 'password_reset_tokens',
+            'expire'   => 60,
             'throttle' => 60,
         ],
-
-        // Opcional: broker separado para admins
-        // 'admins' => [
-        //     'provider' => 'admin',
-        //     'table' => 'password_reset_tokens',
-        //     'expire' => 60,
-        //     'throttle' => 60,
-        // ],
+        // ✅ que el broker se llame 'admin' y apunte al provider 'admin'
+        'admin' => [
+            'provider' => 'admin',
+            'table'    => 'password_reset_tokens',
+            'expire'   => 60,
+            'throttle' => 60,
+        ],
     ],
 
     'password_timeout' => 10800,

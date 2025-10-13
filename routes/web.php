@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Route;
 
 // ======================== BACKEND =============================
@@ -27,11 +28,35 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 |--------------------------------------------------------------------------
 */
 
-/*Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/',        [AdminAuthController::class, 'showLoginFormAdmin'])->name('login');   // GET /admin
-    Route::post('/login',  [AdminAuthController::class, 'loginAdmin'])->name('login.process');   // POST /admin/login
-    Route::post('/logout', [AdminAuthController::class, 'logoutAdmin'])->name('logout');         // POST /admin/logout
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/',        [AdminAuthController::class, 'showLoginFormAdmin'])->name('login');
+    Route::post('/login',  [AdminAuthController::class, 'loginAdmin'])->name('login.process');
+    Route::post('/logout', [AdminAuthController::class, 'logoutAdmin'])->name('logout');
+
+    // formulario para ingresar el correo
+    Route::get('/contrasena-reset', [AdminAuthController::class, 'showPasswordReset'])
+        ->name('password.reset');
+
+    // formulario con token desde el correo
+    Route::get('/password/reset/{token}', [AdminAuthController::class, 'showResetForm'])
+        ->name('password.reset.form');
+
+
+    Route::get('/preview-mail/reset', function () {
+        $data = [
+            'nombre' => 'Juan Pérez',
+            'marca'  => 'Finca 3 Pinos',
+            'email'  => 'juan@example.com',
+            'url'    => 'https://finca3pinos.com/reset-password/123456',
+        ];
+
+        // Renderiza con el motor de Markdown para correos
+        return app(Markdown::class)->render('mail.admin.reset', $data);
+    });
 });
+
+
+
 
 
 // Rutas protegidas de admin (panel, etc.)
@@ -67,7 +92,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     // --- PERFIL ---
     Route::get('/perfil/index', [PerfilController::class,'indexEditarPerfil'])->name('perfil');
     Route::post('/perfil/actualizar/todot', [PerfilController::class, 'editarUsuario']);
-});*/
+});
 
 
 
@@ -86,6 +111,9 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
         Route::get(LaravelLocalization::transRoute('routes.our_coffee'), [FrontendController::class, 'vistaOurCoffee'])
             ->name('user.ourcoffee');
+
+        Route::get(LaravelLocalization::transRoute('routes.products'), [FrontendController::class, 'vistaProducts'])
+            ->name('user.products');
 
         Route::get(LaravelLocalization::transRoute('routes.gallery'), [FrontendController::class, 'vistaGallery'])
             ->name('user.gallery');

@@ -11,8 +11,10 @@ class AdminAuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:admin')->except(['showLoginFormAdmin', 'loginAdmin']);
+        $this->middleware('auth:admin')->except(['showLoginFormAdmin', 'loginAdmin', 'showPasswordReset', 'showResetForm']);
     }
+
+
 
     public function showLoginFormAdmin()
     {
@@ -61,4 +63,19 @@ class AdminAuthController extends Controller
 
         return redirect()->route('admin.login');
     }
+
+    public function showPasswordReset()
+    {
+        return view('backend.login.vistaingresarcorreo');
+    }
+
+    public function showResetForm($token)
+    {
+        $email = request('email'); // viene por query string
+
+        return "correo recibido: $email";
+
+       // return view('auth-admin.reset-password', compact('token', 'email'));
+    }
+
 }

@@ -28,6 +28,8 @@ class FrontendController extends Controller
     }
 
 
+
+
     public function vistaGallery()
     {
 
@@ -40,6 +42,12 @@ class FrontendController extends Controller
 
 
         return view('frontend.pages.contact');
+    }
+
+
+    public function vistaProducts(){
+
+        return view('frontend.pages.products');
     }
 
 }
