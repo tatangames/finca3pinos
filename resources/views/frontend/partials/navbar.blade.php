@@ -30,7 +30,8 @@
                     {{-- Keep placeholders (#) for Laravel routes you will wire later --}}
                     <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.index', [], false)) }}"><span>{{ __('meta.home') }}</span></a></li>
                     <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.ourcoffee', [], false)) }}"><span>{{ __('meta.our_coffee') }}</span></a></li>
-                    <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.about', [], false)) }}"><span>{{ __('meta.about_us') }}</span></a></li>
+                    <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.gallery', [], false)) }}"><span>{{ __('meta.gallery') }}</span></a></li>
+                    <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}"><span>{{ __('meta.contact') }}</span></a></li>
 
 
 
@@ -45,23 +46,11 @@
                             <li><a href="#"><span>My account</span></a></li>
                         </ul>
                     </li>
-                    <li class="menu-item menu-item-has-children">
-                        <a><span>Blog</span></a>
-                        <ul class="sub-menu">
-                            <li><a href="#"><span>Blog One Column</span></a></li>
-                            <li><a href="#"><span>Blog Two Columns</span></a></li>
-                            <li><a href="#"><span>Blog Three Columns</span></a></li>
-                        </ul>
-                    </li>
-                    <li class="menu-item menu-item-has-children">
-                        <a><span>Gallery</span></a>
-                        <ul class="sub-menu">
-                            <li><a href="#"><span>Gallery 2-columns</span></a></li>
-                            <li><a href="#"><span>Gallery 3-columns</span></a></li>
-                            <li><a href="#"><span>Gallery 4-columns</span></a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#"><span>Contacts</span></a></li>
+
+
+
+
+
                     <li class="menu-item menu-item-has-children">
                         <a href="#"><span>Pages</span></a>
                         <ul class="sub-menu">

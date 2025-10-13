@@ -22,17 +22,21 @@ class FrontendController extends Controller
 
 
 
-
         return view('frontend.pages.ourcoffee', [
             'aboutHistory' => getRegionContent('about.history'),
         ]);
     }
 
 
-    public function vistaAboutUs()
+    public function vistaGallery()
     {
 
-        return view('frontend.pages.about');
+        return view('frontend.pages.gallery');
+    }
+
+
+    public function vistaContact(){
+        return view('frontend.pages.contact');
     }
 
 }

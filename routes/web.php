@@ -87,9 +87,10 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.our_coffee'), [FrontendController::class, 'vistaOurCoffee'])
             ->name('user.ourcoffee');
 
-        Route::get(LaravelLocalization::transRoute('routes.about'), [FrontendController::class, 'vistaAboutUs'])
-            ->name('user.about');
-
+        Route::get(LaravelLocalization::transRoute('routes.gallery'), [FrontendController::class, 'vistaGallery'])
+            ->name('user.gallery');
+        Route::get(LaravelLocalization::transRoute('routes.contact'), [FrontendController::class, 'vistaContact'])
+            ->name('user.contact');
 
 
         Route::get('/login',  [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');
