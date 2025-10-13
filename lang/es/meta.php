@@ -30,4 +30,13 @@ return [
     'my_order' => 'Mi orden',
     'our_coffee' => 'Nuestro Café',
     'finca3pinos' => 'Finca 3 Pinos',
+    'page_404' => 'Página no encontrada',
+    'page_404_v1' => 'La página que estás buscando fue movida, eliminada,',
+    'page_404_v2' => 'renombrada o puede que nunca haya existido.',
+    'page_500' => 'Error interno del servidor',
+    'page_500_v1' => 'Algo salió mal en nuestro sistema. Estamos trabajando para solucionarlo.',
+    'page_403' => 'Acceso prohibido',
+    'page_403_v1' => 'No tienes permiso para acceder a esta página.',
+
+
 ];

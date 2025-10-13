@@ -1,209 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('frontend.layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+@section('title', __('meta.title'))
 
-    <title>Página no encontrada</title>
+@section('content')
 
-    <!-- Google font -->
-    <link href="https://fonts.googleapis.com/css?family=Muli:400" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Passion+One" rel="stylesheet">
+    <style>
 
-    <link type="text/css" rel="stylesheet" href="{{ asset('fontawesome-free/css/fontawesome.min.css') }}" />
-</head>
+        body {
+            background-image: url('{{ asset('images/404.png') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .btn-round {
+            border-radius: 50px !important; /* bordes redondeados */
+            padding: 10px 24px !important;  /* más espacio interno */
+            transition: all .3s ease;
+        }
 
-<body>
-<div id="notfound">
-    <div class="notfound-bg"></div>
-    <div class="notfound">
-        <div class="notfound-404">
-            <h1>500</h1>
-        </div>
-        <h2 style="font-family: 'Arial Black'">Ops.. Error Interno!</h2>
+        .btn-round:hover {
+            background-color: #d2aa6d; /* ejemplo: color dorado al pasar el mouse */
+            color: #fff !important;
+        }
+    </style>
+
+    <div class="container">
+        <section class="vc_section vc_custom_1502109771712 vc_section-has-fill">
+            <div data-vc-full-width="true" data-vc-full-width-init="false" data-vc-stretch-content="true"
+                 class="vc_row wpb_row vc_row-fluid vc_custom_1502108370252 vc_row-has-fill vc_row-no-padding">
+                <div class="wpb_column vc_column_container vc_col-sm-12">
+                    <div class="vc_column-inner">
+                        <div class="wpb_wrapper">
+                            <div class="vc_empty_space" style="height: 240px"><span class="vc_empty_space_inner"></span>
+                            </div>
+                            <div class="heading  heading-xl align-center color-white subcolor-main transform-header-up"
+                                 id="like_sc_header_1417972635"><h1 class="header">500</h1></div>
+                            <div
+                                class="heading  heading-large align-center color-main subcolor-second transform-header-up"
+                                id="like_sc_header_1082839314"><h4 class="header">{{ __('meta.page_500') }}</h4></div>
+                            <div class="vc_empty_space" style="height: 32px"><span class="vc_empty_space_inner"></span>
+                            </div>
+                            <div class="wpb_text_column wpb_content_element">
+                                <div class="wpb_wrapper">
+                                    <p style="text-align: center; color: white"><strong>{{ __('meta.page_500_v1') }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="vc_empty_space" style="height: 16px"><span class="vc_empty_space_inner"></span>
+                            </div>
+                            <div class="btn-wrap align-center">
+                                <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.index', [], false)) }}"
+                                   class="btn btn-xs btn-default transform-uppercase color-text-default color-hover-white align-center btn-round"
+                                   id="like_sc_button_774096535">
+                                    {{ __('meta.home') }}
+                                </a>
+                            </div>
+                            <div class="vc_empty_space" style="height: 240px"><span class="vc_empty_space_inner"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="vc_row-full-width vc_clearfix"></div>
+        </section>
     </div>
-</div>
-</body>
-</html>
 
-<style>
 
-    * {
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-    }
 
-    body {
-        padding: 0;
-        margin: 0;
-    }
 
-    #notfound {
-        position: relative;
-        height: 100vh;
-    }
 
-    #notfound .notfound-bg {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-image: url({{ asset('/images/fondo.jpg') }});
-        background-size: cover;
-    }
 
-    #notfound .notfound-bg:after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.25);
-    }
 
-    #notfound .notfound {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        -webkit-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
-    }
 
-    #notfound .notfound:after {
-        content: '';
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        -webkit-transform: translate(-50% , -50%);
-        -ms-transform: translate(-50% , -50%);
-        transform: translate(-50% , -50%);
-        width: 100%;
-        height: 600px;
-        background-color: rgba(255, 255, 255, 0.7);
-        -webkit-box-shadow: 0px 0px 0px 30px rgba(255, 255, 255, 0.7) inset;
-        box-shadow: 0px 0px 0px 30px rgba(255, 255, 255, 0.7) inset;
-        z-index: -1;
-    }
+    @include('frontend.partials.superior')
+@endsection
 
-    .notfound {
-        max-width: 600px;
-        width: 100%;
-        text-align: center;
-        padding: 30px;
-        line-height: 1.4;
-    }
-
-    .notfound .notfound-404 {
-        position: relative;
-        height: 200px;
-    }
-
-    .notfound .notfound-404 h1 {
-        font-family: 'Passion One', cursive;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        -webkit-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
-        font-size: 180px;
-        margin: 0px;
-        color: #222225;
-        text-transform: uppercase;
-    }
-
-    .notfound h2 {
-        font-family: 'Muli', sans-serif;
-        font-size: 26px;
-        font-weight: 400;
-        text-transform: uppercase;
-        color: #222225;
-        margin-top: 26px;
-        margin-bottom: 20px;
-    }
-
-    .notfound-search {
-        position: relative;
-        padding-right: 120px;
-        max-width: 420px;
-        width: 100%;
-        margin: 30px auto 20px;
-    }
-
-    .notfound-search input {
-        font-family: 'Muli', sans-serif;
-        width: 100%;
-        height: 40px;
-        padding: 3px 15px;
-        color: #fff;
-        font-weight: 400;
-        font-size: 18px;
-        background: #222225;
-        border: none;
-    }
-
-    .notfound-search button {
-        font-family: 'Muli', sans-serif;
-        position: absolute;
-        right: 0px;
-        top: 0px;
-        width: 120px;
-        height: 40px;
-        text-align: center;
-        border: none;
-        background: #ff00b4;
-        cursor: pointer;
-        padding: 0;
-        color: #fff;
-        font-weight: 400;
-        font-size: 16px;
-        text-transform: uppercase;
-    }
-
-    .notfound a {
-        font-family: 'Muli', sans-serif;
-        display: inline-block;
-        font-weight: 400;
-        text-decoration: none;
-        background-color: transparent;
-        color: #222225;
-        text-transform: uppercase;
-        font-size: 14px;
-    }
-
-    .notfound-social {
-        margin-bottom: 15px;
-    }
-    .notfound-social>a {
-        display: inline-block;
-        height: 40px;
-        line-height: 40px;
-        width: 40px;
-        font-size: 14px;
-        color: #fff;
-        background-color: #222225;
-        margin: 3px;
-        -webkit-transition: 0.2s all;
-        transition: 0.2s all;
-    }
-    .notfound-social>a:hover {
-        color: #fff;
-        background-color: #ff00b4;
-    }
-
-    @media only screen and (max-width: 480px) {
-        .notfound .notfound-404 {
-            height: 146px;
-        }
-
-        .notfound .notfound-404 h1 {
-            font-size: 146px;
-        }
-
-        .notfound h2 {
-            font-size: 22px;
-        }
-    }
-
-</style>

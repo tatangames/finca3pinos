@@ -30,4 +30,12 @@ return [
     'my_order' => 'My Order',
     'our_coffee' => 'Our Coffee',
     'finca3pinos' => 'Finca 3 Pinos',
+    'page_404' => 'Page Not Found',
+    'page_404_v1' => 'The page you are looking for was moved, removed,',
+    'page_404_v2' => 'renamed or might never existed.',
+    'page_500' => 'Internal Server Error',
+    'page_500_v1' => 'Something went wrong on our system. We’re working to fix it.',
+    'page_403' => 'Forbidden Access',
+    'page_403_v1' => 'You don’t have permission to access this page.',
+
 ];

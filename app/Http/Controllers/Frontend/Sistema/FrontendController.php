@@ -36,6 +36,9 @@ class FrontendController extends Controller
 
 
     public function vistaContact(){
+
+
+
         return view('frontend.pages.contact');
     }
 
