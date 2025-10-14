@@ -12,7 +12,7 @@
                     {{-- Formulario Livewire --}}
                     <form id="resetForm" wire:submit.prevent="sendResetLink" novalidate>
                         <div class="input-group form-group" style="margin-top: 25px">
-                            <div class="input-group-prepend">
+                            <div class="input-group-prepend" style="width: 35px">
                             <span class="input-group-text" style="background:#D2AA6DFF;color:#fff;border:none;">
                                 <i class="fas fa-envelope"></i>
                             </span>

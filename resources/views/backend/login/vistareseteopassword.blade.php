@@ -42,7 +42,19 @@
         .form-control:focus{ border-color:#D2AA6DFF; box-shadow:0 0 5px rgba(210,170,109,.6); }
         .btn-lg{ padding:12px 26px; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; transition:all .3s ease; }
         .btn-lg:hover{ opacity:.9; }
+
+        /* Evita borde/halo negro al enfocar los botones ojo */
+        #toggle-new-password:focus,
+        #toggle-confirm-password:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
     </style>
+
+
+
+
 </head>
 <body>
 
