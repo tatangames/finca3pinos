@@ -35,11 +35,15 @@ class LoginForm extends Component
     }
 
     /**
-     * Valida solo el campo modificado y recalcula si el formulario ya es válido.
+     * Limpia errores del campo editado, valida solo ese campo
+     * y recalcula si el formulario está listo.
      */
     public function updated($property, $value): void
     {
-        // Valida solo el campo editado (email o password)
+        // Limpia errores SOLO del campo que cambió
+        $this->resetErrorBag($property);
+        $this->resetValidation($property);
+
         $this->validateOnly($property, $this->rules, $this->messages);
         $this->recomputeCanSubmit();
     }
@@ -49,6 +53,7 @@ class LoginForm extends Component
         $this->validateOnly('email', $this->rules, $this->messages);
         $this->recomputeCanSubmit();
     }
+
     public function updatedPassword(): void
     {
         $this->validateOnly('password', $this->rules, $this->messages);
@@ -71,13 +76,22 @@ class LoginForm extends Component
 
     public function login()
     {
+        // 🔹 Limpia cualquier error previo ANTES de validar/enviar
+        $this->resetErrorBag();
+        $this->resetValidation();
+
         $this->validate();
 
         $key = 'login:'.strtolower($this->email).'|'.request()->ip();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
+            // Limpia password y recalcula disponibilidad
+            $this->password = '';
+            $this->recomputeCanSubmit();
+
             $this->dispatch('toast', type:'error', message:"Demasiados intentos. Intenta en {$seconds}s.");
+            $this->addError('email', "Demasiados intentos. Intenta en {$seconds}s.");
             return;
         }
 
@@ -87,13 +101,20 @@ class LoginForm extends Component
             $this->remember
         )) {
             RateLimiter::hit($key, 60);
+
+            // 🔹 En fallo: limpiar password y errores anteriores
+            $this->password = '';
+            $this->resetErrorBag();
+            $this->resetValidation();
             $this->addError('email', 'Credenciales inválidas.');
             $this->dispatch('toast', type:'error', message:'Correo o contraseña incorrectos.');
+            $this->recomputeCanSubmit();
             return;
         }
 
         RateLimiter::clear($key);
-
+        $this->resetErrorBag();
+        $this->resetValidation();
         session()->regenerate();
 
         return redirect()->intended(route('admin.panel'));

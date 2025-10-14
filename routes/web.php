@@ -19,9 +19,7 @@ use App\Http\Controllers\Frontend\Sistema\DashboardController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 
-
-
-
+use Illuminate\Support\Str;
 /*
 |--------------------------------------------------------------------------
 | 1) ADMIN – fuera del prefijo {region}
@@ -53,6 +51,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Renderiza con el motor de Markdown para correos
         return app(Markdown::class)->render('mail.admin.reset', $data);
     });*/
+    Route::get('/test-reset-form/{token}', function ($token) {
+        // Opción 1: Mostrar siempre la vista (para pruebas)
+        return view('livewire.auth-admin.reset-password-form', ['token' => $token]);
+    });
+
 });
 
 

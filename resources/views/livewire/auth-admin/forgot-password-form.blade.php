@@ -9,9 +9,8 @@
 
                     <p class="text-center lead" style="font-weight: bold">Recuperar contraseña</p>
 
-                    {{-- Form Livewire --}}
-                    <form wire:submit.prevent="sendResetLink" class="validate-form">
-
+                    {{-- Formulario Livewire --}}
+                    <form wire:submit.prevent="sendResetLink">
                         {{-- EMAIL --}}
                         <div class="input-group form-group" style="margin-top: 25px">
                             <div class="input-group-prepend">
@@ -20,13 +19,16 @@
                                 </span>
                             </div>
                             <input
-                                wire:model.debounce.500ms="email"
+                                id="email"
+                                name="email"
+                                wire:model.lazy="email"
+                                wire:keydown.enter.prevent="sendResetLink"
                                 type="email"
                                 maxlength="100"
                                 class="form-control @error('email') is-invalid @enderror"
                                 placeholder="Correo electrónico"
-                                autocomplete="off"
-                                aria-invalid="@error('email') true @else false @enderror"
+                                autocomplete="email"
+                                required
                             >
                         </div>
                         @error('email')
@@ -53,7 +55,7 @@
                                     x-transition
                                     class="alert alert-success mt-3 text-center"
                                     style="background:#e9f7ef;border:1px solid #cfe9d8;color:#1e7e34;
-                   border-radius:10px;padding:12px;">
+                                           border-radius:10px;padding:12px;">
                                     {{ session('message') }}
                                 </div>
                             @endif
