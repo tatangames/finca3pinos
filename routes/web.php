@@ -20,11 +20,9 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 
 use Illuminate\Support\Str;
-/*
-|--------------------------------------------------------------------------
-| 1) ADMIN – fuera del prefijo {region}
-|--------------------------------------------------------------------------
-*/
+
+
+// === RUTAS ADMIN SIN AUTH ===
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/',        [AdminAuthController::class, 'showLoginFormAdmin'])->name('login');
@@ -47,8 +45,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 
 
+// === RUTAS ADMIN CON AUTH ===
 
-// Rutas protegidas de admin (panel, etc.)
 Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
     // --- CONTROL WEB ---
     Route::get('/panel', [ControlRolController::class,'indexRedireccionamiento'])->name('panel');

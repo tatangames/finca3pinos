@@ -13,10 +13,14 @@ class AdminAuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:admin')->except(['showLoginFormAdmin', 'loginAdmin', 'showPasswordReset', 'showResetForm',
-            'linkInvalid']);
-    }
+        $this->middleware('auth:admin')->except([
+            'showLoginFormAdmin',
 
+            'showPasswordReset',
+            'showResetForm',
+            'linkInvalid'
+        ]);
+    }
 
     public function showLoginFormAdmin()
     {
@@ -27,36 +31,6 @@ class AdminAuthController extends Controller
         return view('backend.login.vistaloginadmin');
     }
 
-    public function loginAdmin(Request $request){
-        $rules = [
-            'email' => 'required|email',
-            'password' => 'required',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => 0, 'errors' => $validator->errors()]);
-        }
-
-        $credentials = $request->only('email', 'password');
-
-        // Guard admin (usa el provider 'admin' del auth.php)
-        if (Auth::guard('admin')->attempt($credentials)) {
-
-            // Regenera la sesión por seguridad
-            $request->session()->regenerate();
-
-            // Puedes redirigir o devolver JSON
-            return response()->json([
-                'success' => 1,
-                'ruta' => route('admin.panel'),
-                'admin' => Auth::guard('admin')->user(),
-            ]);
-        }
-
-        return response()->json(['success' => 2, 'message' => 'Credenciales incorrectas']);
-    }
 
     public function logoutAdmin(Request $request){
         Auth::guard('admin')->logout();
