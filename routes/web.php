@@ -78,7 +78,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
 
     // --- PERFIL ---
     Route::get('/perfil/index', [PerfilController::class,'indexEditarPerfil'])->name('perfil');
-    Route::post('/perfil/actualizar/todot', [PerfilController::class, 'editarUsuario']);
+    Route::post('/perfil/actualizar/todo', [PerfilController::class, 'editarUsuario']);
 });
 
 

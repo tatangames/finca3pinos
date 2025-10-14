@@ -21,7 +21,7 @@
                 <h1>Todos los Permisos</h1>
             </div>
             <br>
-            <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalAgregar()" class="button button-3d button-rounded button-pill button-small">
+            <button type="button" style="font-weight: bold; background-color: #343a3f; color: white !important;" onclick="modalAgregar()" class="button button-3d button-rounded button-pill button-small">
                 <i class="fas fa-pencil-alt"></i>
                 Agregar Permiso
             </button>
