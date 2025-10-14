@@ -5,15 +5,17 @@ namespace App\Http\Controllers\Backend\Sistema;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class AdminAuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:admin')->except(['showLoginFormAdmin', 'loginAdmin', 'showPasswordReset', 'showResetForm']);
+        $this->middleware('auth:admin')->except(['showLoginFormAdmin', 'loginAdmin', 'showPasswordReset', 'showResetForm',
+            'linkInvalid']);
     }
-
 
 
     public function showLoginFormAdmin()
@@ -71,11 +73,29 @@ class AdminAuthController extends Controller
 
     public function showResetForm($token)
     {
-        $email = request('email'); // viene por query string
+        $email  = request('email');
+        $broker = Password::broker('admin'); // <-- tu broker para admins
+        $user   = $broker->getUser(['email' => $email]);
 
-        return "correo recibido: $email";
+        $tokenIsValid = $user && (
+            method_exists($broker, 'tokenExists')
+                ? $broker->tokenExists($user, $token)
+                : $broker->getRepository()->exists($user, $token)
+            );
 
-       // return view('auth-admin.reset-password', compact('token', 'email'));
+        if (!$tokenIsValid) {
+            return redirect()
+                ->route('admin.password.invalid') // o la ruta de tu "Olvidé mi contraseña"
+                ->with('error', 'El enlace para restablecer contraseña ha expirado o no es válido.');
+        }
+
+        return view('backend.login.vistareseteopassword', compact('token', 'email'));
+    }
+
+
+    public function linkInvalid()
+    {
+        return view('backend.login.vistaenlaceinvalido');
     }
 
 }

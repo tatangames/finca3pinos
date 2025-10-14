@@ -39,23 +39,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/password/reset/{token}', [AdminAuthController::class, 'showResetForm'])
         ->name('password.reset.form');
 
-
-    /*Route::get('/preview-mail/reset', function () {
-        $data = [
-            'nombre' => 'Juan Pérez',
-            'marca'  => 'Finca 3 Pinos',
-            'email'  => 'juan@example.com',
-            'url'    => 'https://finca3pinos.com/reset-password/123456',
-        ];
-
-        // Renderiza con el motor de Markdown para correos
-        return app(Markdown::class)->render('mail.admin.reset', $data);
-    });*/
-    Route::get('/test-reset-form/{token}', function ($token) {
-        // Opción 1: Mostrar siempre la vista (para pruebas)
-        return view('livewire.auth-admin.reset-password-form', ['token' => $token]);
-    });
-
+    // enlace vencido o inválido
+    Route::get('/password/enlace-invalido', [AdminAuthController::class, 'linkInvalid'])
+        ->name('password.invalid');
 });
 
 
