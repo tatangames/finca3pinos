@@ -2,7 +2,7 @@
     <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title>Finca 3 Pinos - Panel</title>
+    <title>Finca 3 Pinos</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -12,7 +12,7 @@
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
     {{-- Favicon --}}
-    <link href="{{ asset('images/icono-sistema.png') }}" rel="icon">
+    <link href="{{ asset('images/logopestana.jpg') }}" rel="icon">
 
     {{-- FontAwesome --}}
     <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
