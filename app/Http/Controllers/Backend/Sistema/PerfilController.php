@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Backend\Sistema;
 use App\Http\Controllers\Controller;
 use App\Models\Administrador;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 class PerfilController extends Controller
 {
 
 
     public function indexEditarPerfil(){
+
         $usuario = auth()->user();
 
         return view('backend.admin.perfil.vistaperfil', compact('usuario'));

@@ -48,8 +48,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // === RUTAS ADMIN CON AUTH ===
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
-    // --- CONTROL WEB ---
-    Route::get('/panel', [ControlRolController::class,'indexRedireccionamiento'])->name('panel');
+
+    Route::get('/panel', function () {
+        return to_route('admin.dashboard');   // o redirect()->route('admin.dashboard')
+    })->name('panel');
+
+    Route::get('/dashboard', [ControlRolController::class,'indexDashboard'])->name('dashboard');
+
+
 
     // --- SIN PERMISOS VISTA 403 ---
     Route::get('/sin-permisos', [ControlRolController::class,'indexSinPermiso'])->name('no.permisos.index');
@@ -77,7 +83,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/permisos/extra-borrar', [PermisoController::class, 'borrarPermisoGlobal']);
 
     // --- PERFIL ---
-    Route::get('/perfil/index', [PerfilController::class,'indexEditarPerfil'])->name('perfil');
+    Route::get('/perfil/index', [PerfilController::class, 'indexEditarPerfil'])->name('perfil');
+
+
     Route::post('/perfil/actualizar/todo', [PerfilController::class, 'editarUsuario']);
 });
 
