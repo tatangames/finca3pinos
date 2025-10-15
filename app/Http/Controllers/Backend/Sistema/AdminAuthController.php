@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Sistema;
 
 use App\Http\Controllers\Controller;
+use App\Models\Galeria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
@@ -15,7 +16,6 @@ class AdminAuthController extends Controller
     {
         $this->middleware('auth:admin')->except([
             'showLoginFormAdmin',
-
             'showPasswordReset',
             'showResetForm',
             'linkInvalid'
@@ -66,10 +66,42 @@ class AdminAuthController extends Controller
         return view('backend.login.vistareseteopassword', compact('token', 'email'));
     }
 
-
     public function linkInvalid()
     {
         return view('backend.login.vistaenlaceinvalido');
     }
+
+
+
+    // ==== GALERIA ====
+
+    public function indexGaleria()
+    {
+        return view('backend.admin.galeria.vistagaleria');
+    }
+
+
+    public function tablaGaleria()
+    {
+        $arrayGaleria = Galeria::orderBy('posicion', 'ASC')->get();
+
+
+        return view('backend.admin.galeria.tablagaleria', compact('arrayGaleria'));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

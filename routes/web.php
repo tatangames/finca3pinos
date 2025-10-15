@@ -83,6 +83,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     // --- PERFIL ---
     Route::get('/perfil/index', [PerfilController::class, 'indexEditarPerfil'])->name('perfil');
     Route::post('/perfil/actualizar/todo', [PerfilController::class, 'editarUsuario']);
+
+
+    // GALERIA
+    Route::get('/galeria/index', [AdminAuthController::class, 'indexGaleria'])->name('galeria');
+    Route::get('/galeria/index/tabla', [AdminAuthController::class, 'tablaGaleria']);
+
+
 });
 
 
