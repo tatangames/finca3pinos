@@ -49,21 +49,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
 
-    Route::get('/panel', function () {
-        return to_route('admin.dashboard');   // o redirect()->route('admin.dashboard')
-    })->name('panel');
-
-    Route::get('/dashboard', [ControlRolController::class,'indexDashboard'])->name('dashboard');
-
-
-
     // --- SIN PERMISOS VISTA 403 ---
     Route::get('/sin-permisos', [ControlRolController::class,'indexSinPermiso'])->name('no.permisos.index');
 
-
     // --- ROLES ---
+
     Route::get('/roles/index', [RolesController::class,'index'])->name('roles.index');
     Route::get('/roles/tabla', [RolesController::class,'tablaRoles']);
+
+
     Route::get('/roles/lista/permisos/{id}', [RolesController::class,'vistaPermisos']);
     Route::get('/roles/permisos/tabla/{id}', [RolesController::class,'tablaRolesPermisos']);
     Route::post('/roles/permiso/borrar', [RolesController::class, 'borrarPermiso']);
@@ -82,10 +76,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/permisos/extra-nuevo', [PermisoController::class, 'nuevoPermisoExtra']);
     Route::post('/permisos/extra-borrar', [PermisoController::class, 'borrarPermisoGlobal']);
 
+    // --- CONTROL WEB ---
+    Route::get('/panel', [ControlRolController::class,'indexRedireccionamiento'])->name('panel');
+
+
     // --- PERFIL ---
     Route::get('/perfil/index', [PerfilController::class, 'indexEditarPerfil'])->name('perfil');
-
-
     Route::post('/perfil/actualizar/todo', [PerfilController::class, 'editarUsuario']);
 });
 

@@ -16,21 +16,15 @@ class ControlRolController extends Controller
 
         // ADMINISTRADOR
         if($user->hasRole('admin')){
-            $ruta = 'admin.dashboard';
+            $ruta = 'admin.roles.index';
         }
         else{
             $ruta = 'no.permisos.index';
         }
 
-        return view('backend.layouts.app', compact( 'ruta'));
+        return view('backend.index', compact( 'ruta', 'user'));
     }
 
-
-    public function indexDashboard()
-    {
-
-        return view('backend.admin.dashboard');
-    }
 
     public function indexSinPermiso(){
         return view('errors.403');

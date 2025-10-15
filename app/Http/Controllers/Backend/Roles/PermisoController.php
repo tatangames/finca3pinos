@@ -126,8 +126,10 @@ class PermisoController extends Controller
 
     public function borrarPermisoGlobal(Request $request){
 
-        // buscamos el permiso el cual queremos eliminar
-        $permission = Permission::findById($request->idpermiso)->delete();
+        $permission = Permission::find($request->idpermiso);
+        if ($permission) {
+            $permission->delete();
+        }
 
         return ['success' => 1];
     }
