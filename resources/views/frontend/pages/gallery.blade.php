@@ -26,28 +26,30 @@
         /* === GRID === */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 👈 cuatro columnas */
-            gap: 20px; /* espacio entre imágenes */
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
             max-width: 1000px;
             margin: 0 auto;
         }
 
-        /* === ITEM === */
         .gallery-item {
             position: relative;
             overflow: hidden;
             border-radius: 16px;
             cursor: pointer;
             transition: transform .3s ease;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
         }
 
         .gallery-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 16px;
             transition: transform .4s ease;
         }
-
         .gallery-item:hover img {
             transform: scale(1.05);
         }
@@ -198,6 +200,9 @@
         }
 
 
+
+
+
     </style>
 
     <header class="page-header like-parallax"
@@ -208,7 +213,7 @@
         <div class="container" bis_skin_checked="1"><h1>{{ __('meta.gallery') }}</h1>
             <ul class="breadcrumbs" typeof="BreadcrumbList" vocab="https://schema.org/">
                 <li class="home"><span property="itemListElement" typeof="ListItem"><a property="item" typeof="WebPage"
-                                                                                       title="Go to Finca3pinos.com"
+                                                                                       title="{{ __('meta.go_to_finca3pinos') }}"
                                                                                        href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), '/') }}"
                                                                                        class="home"
                                                                                        bis_skin_checked="1">
@@ -222,16 +227,11 @@
     </header>
 
 
-
     <section class="gallery-section">
         <div class="container">
-            <h2 class="gallery-title">Galería Finca 3 Pinos</h2>
+            <h2 class="gallery-title">{{ __('meta.gallery_finca3pinos') }}</h2>
 
-
-
-
-            <div class="gallery-grid">
-
+            <div id="galleryGrid" class="gallery-grid">
                 @foreach($arrayGaleria as $dato)
                     <div class="gallery-item" onclick="openModal(this)">
                         <img
@@ -240,16 +240,23 @@
                             data-caption="{{ $dato->nombre }}"
                             loading="lazy"
                             decoding="async"
-                            itemprop="image"
-                        >
+                            itemprop="image">
                         <div class="overlay"><i class="fa fa-eye"></i></div>
                     </div>
-
                 @endforeach
+            </div>
 
+            {{-- Sentinel para carga infinita --}}
+            <div id="gallerySentinel" style="height: 1px;"></div>
+
+            {{-- Loader opcional --}}
+            <div id="galleryLoading" style="display:none; margin:16px 0; color:#bbb;">
+                <i class="fa fa-spinner fa-spin"></i> {{ __('meta.loading') }}
             </div>
         </div>
     </section>
+
+
 
     <!-- ===== MODAL ===== -->
     <div id="imageModal" class="modal" onclick="closeModalOutside(event)">
@@ -296,6 +303,72 @@
 
 
     </script>
+
+
+
+    <script>
+        (() => {
+            const grid = document.getElementById('galleryGrid');
+            const sentinel = document.getElementById('gallerySentinel');
+            const loader = document.getElementById('galleryLoading');
+
+            // Cantidad ya renderizada por el servidor:
+            let offset = {{ count($arrayGaleria) }};
+            const limit = 24;              // tamaño de lote
+            let cargando = false;
+            let terminado = false;
+
+            async function cargarMas() {
+                if (cargando || terminado) return;
+                cargando = true;
+                loader.style.display = 'block';
+
+                try {
+                    const url = `{{ route('galeria.cargar') }}?offset=${offset}&limit=${limit}`;
+                    const resp = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+                    if (!resp.ok) throw new Error('Network error');
+                    const data = await resp.json();
+
+                    if (data.count > 0 && data.html) {
+                        grid.insertAdjacentHTML('beforeend', data.html);
+                        offset += data.count;
+                    } else {
+                        terminado = true; // no hay más
+                        observer.unobserve(sentinel);
+                    }
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    cargando = false;
+                    loader.style.display = 'none';
+                }
+            }
+
+            // Observer: cuando el sentinel entra en viewport, cargamos más
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) cargarMas();
+                });
+            }, {
+                root: null,           // viewport global (scroll de la página)
+                rootMargin: '0px 0px 600px 0px', // pre-carga ~600px antes del fondo
+                threshold: 0
+            });
+
+            observer.observe(sentinel);
+
+            // Fallback simple por si el observer no existe
+            if (!('IntersectionObserver' in window)) {
+                window.addEventListener('scroll', () => {
+                    if (terminado || cargando) return;
+                    const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 400;
+                    if (nearBottom) cargarMas();
+                });
+            }
+        })();
+    </script>
+
+
 
 
 

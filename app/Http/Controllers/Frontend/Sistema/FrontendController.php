@@ -38,6 +38,22 @@ class FrontendController extends Controller
         return view('frontend.pages.gallery', compact('arrayGaleria'));
     }
 
+    public function cargarGaleria(Request $request)
+    {
+        abort_unless($request->ajax(), 403);
+
+        $offset = (int) $request->input('offset', 0);
+        $limit  = (int) $request->input('limit', 24);
+
+        $galeria = Galeria::orderBy('id', 'desc')->skip($offset)->take($limit)->get();
+
+        $html = view('frontend.partials.galeria_items', ['galeria' => $galeria])->render();
+
+        return response()->json([
+            'html'  => $html,
+            'count' => $galeria->count(),
+        ]);
+    }
 
     public function vistaContact(){
 

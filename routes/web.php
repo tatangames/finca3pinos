@@ -121,8 +121,14 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
         Route::get(LaravelLocalization::transRoute('routes.gallery'), [FrontendController::class, 'vistaGallery'])
             ->name('user.gallery');
+
+
+
         Route::get(LaravelLocalization::transRoute('routes.contact'), [FrontendController::class, 'vistaContact'])
             ->name('user.contact');
+
+
+
 
 
         Route::get('/login',  [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');
@@ -133,7 +139,9 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
 });
 
-
+// CARGA IMAGENES PARA GALERIA SIN LOCALIZACION
+Route::get('/galeria/cargar', [FrontendController::class, 'cargarGaleria'])
+    ->name('galeria.cargar');
 
 
 

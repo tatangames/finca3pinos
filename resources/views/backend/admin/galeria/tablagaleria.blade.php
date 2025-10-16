@@ -32,13 +32,19 @@
                                 <td style="font-weight: bold">{{ $dato->posicion }}</td>
                                 <td>{{ $dato->nombre }}</td>
                                 <td>
-                                    <center><img alt="finca3pinos" src="{{ url('storage/archivos/'.$dato->imagen) }}"  width="150px" height="150px" /></center>
+                                    <img
+                                        src="{{ url('storage/archivos/'.$dato->imagen) }}"
+                                        alt="{{ $dato->alt_seo }}"
+                                        width="190"
+                                        height="176"
+                                        style="border-radius:12px; object-fit:cover; display:block; margin:0 auto;"
+                                    >
                                 </td>
                                 <td>
                                     @if($dato->activo == 1)
-                                        <small class="badge badge-success"><i class="far fa-check"></i> Activo</small>
+                                        <small class="badge badge-success"><i class="far fa-check"></i>Activo</small>
                                     @else
-                                        <small class="badge badge-danger"><i class="far fa-close"></i> Desactivado</small>
+                                        <small class="badge badge-danger"><i class="far fa-close"></i>Desactivado</small>
                                     @endif
                                 </td>
                                 <td>

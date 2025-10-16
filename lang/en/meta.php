@@ -37,5 +37,12 @@ return [
     'page_500_v1' => 'Something went wrong on our system. We’re working to fix it.',
     'page_403' => 'Forbidden Access',
     'page_403_v1' => 'You don’t have permission to access this page.',
+    'go_to_finca3pinos' => 'Go To Finca3Pinos.com',
+    'gallery_finca3pinos' => 'Gallery Finca3Pinos',
+    'loading' => 'Loading...',
+
+
+
+
 
 ];

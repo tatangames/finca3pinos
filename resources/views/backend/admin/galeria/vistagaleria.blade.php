@@ -167,11 +167,13 @@
                                          src=""
                                          alt="Vista previa"
                                          style="
-                                        max-width:200px !important;
-                                        border-radius:10px !important;
-                                        display:none !important;
+                                        width: 190px !important;
+                                        height: 176px !important;
+                                        border-radius:12px !important;
+                                        object-fit:cover;
+                                        display:block !important;
                                         border:1px solid #ccc !important;
-                                        margin-top:10px !important;
+                                        margin:0 auto;
                                         box-shadow:0 2px 6px rgba(0,0,0,.2) !important;
                                      ">
                                 </div>

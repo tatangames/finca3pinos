@@ -37,4 +37,11 @@ return [
     'page_500_v1' => 'Algo salió mal en nuestro sistema. Estamos trabajando para solucionarlo.',
     'page_403' => 'Acceso prohibido',
     'page_403_v1' => 'No tienes permiso para acceder a esta página.',
+    'go_to_finca3pinos' => 'Ir a Finca3Pinos.com',
+    'gallery_finca3pinos' => 'Galería Finca3Pinos',
+    'loading' => 'Cargando...',
+
+
+
+
 ];

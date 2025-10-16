@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\ImageManager;
 
 class AdminAuthController extends Controller
@@ -87,7 +89,6 @@ class AdminAuthController extends Controller
     public function tablaGaleria()
     {
         $arrayGaleria = Galeria::orderBy('posicion', 'ASC')->get();
-
 
         return view('backend.admin.galeria.tablagaleria', compact('arrayGaleria'));
     }
