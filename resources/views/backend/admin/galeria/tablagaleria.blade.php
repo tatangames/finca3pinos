@@ -1,3 +1,14 @@
+<style>
+    .btn-activar {
+        background-color: #007bff !important;     /* fondo blanco */
+        color: #ffffff !important;             /* texto dorado */
+        border: 1px solid #ffffff !important;  /* borde dorado */
+        font-weight: 600;
+    }
+
+
+</style>
+
 <!-- Main content -->
 <section class="content">
     <div class="row">
@@ -7,22 +18,49 @@
                     <table id="table" class="table table-bordered">
                         <thead>
                         <tr>
-                            <th>Posición</th>
-                            <th>Nombre</th>
-                            <th>Opciones</th>
+                            <th style="width: 5%">Posición</th>
+                            <th style="width: 15%">Nombre</th>
+                            <th style="width: 8%">Imagen</th>
+                            <th style="width: 5%">Estado</th>
+                            <th style="width: 8%">Opciones</th>
                         </tr>
                         </thead>
                         <tbody id="tablecontents">
-                        @foreach($listado as $dato)
+                        @foreach($arrayGaleria as $dato)
                             <tr class="row1" data-id="{{ $dato->id }}">
 
-                                <td>{{ $dato->posicion }}</td>
+                                <td style="font-weight: bold">{{ $dato->posicion }}</td>
                                 <td>{{ $dato->nombre }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-danger btn-xs" onclick="modalBorrar({{ $dato->id }})">
+                                    <center><img alt="finca3pinos" src="{{ url('storage/archivos/'.$dato->imagen) }}"  width="150px" height="150px" /></center>
+                                </td>
+                                <td>
+                                    @if($dato->activo == 1)
+                                        <small class="badge badge-success"><i class="far fa-check"></i> Activo</small>
+                                    @else
+                                        <small class="badge badge-danger"><i class="far fa-close"></i> Desactivado</small>
+                                    @endif
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-info btn-xs" onclick="informacionEditar({{ $dato->id }})">
+                                        <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
+                                    </button>
+
+                                    <button type="button" style="margin: 2px" class="btn btn-danger btn-xs" onclick="modalBorrar({{ $dato->id }})">
                                         <i class="fas fa-eye" title="Borrar"></i>&nbsp; Borrar
                                     </button>
 
+
+
+                                   @if($dato->activo == 1)
+                                        <button type="button" style="margin: 2px" class="btn btn-warning btn-xs" onclick="modalDesactivar({{ $dato->id }})">
+                                            <i class="fas fa-edit" title="Desactivar"></i>&nbsp; Desactivar
+                                        </button>
+                                    @else
+                                        <button type="button" style="margin: 2px" class="btn btn-activar btn-xs" onclick="modalActivar({{ $dato->id }})">
+                                            <i class="fas fa-edit" title="Activar"></i>&nbsp; Activar
+                                        </button>
+                                    @endif
                                 </td>
 
                             </tr>
@@ -59,7 +97,7 @@
 
             openLoading();
 
-            axios.post('/admin/lugaresinicio/posicion',  {
+            axios.post('/admin/galeria/posicion',  {
                 'order': order
             })
                 .then((response) => {

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('galeria', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 300)->nullable();
+            $table->string('alt_seo', 300)->nullable();
             $table->string('imagen', 100);
             $table->integer('posicion');
             $table->boolean('activo');

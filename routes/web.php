@@ -88,6 +88,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     // GALERIA
     Route::get('/galeria/index', [AdminAuthController::class, 'indexGaleria'])->name('galeria');
     Route::get('/galeria/index/tabla', [AdminAuthController::class, 'tablaGaleria']);
+    Route::post('/galeria/posicion', [AdminAuthController::class,'actualizarPosicionGaleria']);
+    Route::post('/galeria/nuevo', [AdminAuthController::class,'nuevaGaleria']);
+    Route::post('/galeria/desactivar', [AdminAuthController::class,'desactivarGaleria']);
+    Route::post('/galeria/activar', [AdminAuthController::class,'activarGaleria']);
+    Route::post('/galeria/borrar', [AdminAuthController::class,'borrarGaleria']);
+    Route::post('/galeria/informacion', [AdminAuthController::class,'informacionGaleria']);
+    Route::post('/galeria/editar', [AdminAuthController::class,'editarGaleria']);
 
 
 });
@@ -102,7 +109,6 @@ Route::middleware(['detect.country.locale'])->group(function () {
         'prefix' => LaravelLocalization::setLocale(),
         'middleware' => ['localeViewPath','localizationRedirect','localeViewPath']
     ], function () {
-
 
         Route::get('/', [FrontendController::class, 'vistaIndex'])->name('user.index');
 

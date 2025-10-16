@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend\Sistema;
 
 use App\Http\Controllers\Controller;
+use App\Models\Galeria;
 use Illuminate\Http\Request;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Models\Region;
@@ -32,8 +33,9 @@ class FrontendController extends Controller
 
     public function vistaGallery()
     {
+        $arrayGaleria = Galeria::orderBy('posicion', 'ASC')->get();
 
-        return view('frontend.pages.gallery');
+        return view('frontend.pages.gallery', compact('arrayGaleria'));
     }
 
 

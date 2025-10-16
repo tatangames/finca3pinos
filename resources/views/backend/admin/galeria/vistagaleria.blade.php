@@ -13,6 +13,11 @@
         /*Ajustar tablas*/
         table-layout:fixed;
     }
+
+
+
+
+
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -59,7 +64,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nuevo</h4>
+                    <h4 class="modal-title">Registro</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -70,12 +75,29 @@
                             <div class="row">
                                 <div class="col-md-12">
 
-                                    <div class="form-group">
-                                        <label class="control-label">Lugares</label>
-                                        <select class="form-control" id="select-lugares">
-                                            <option value="0">Seleccionar Opción</option>
 
-                                        </select>
+                                    <div class="form-group">
+                                        <label>Nombre (Opcional)</label>
+                                        <input type="text" maxlength="300" id="nombre" class="form-control">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>ALT SEO (Opcional)</label>
+                                        <small style="font-size: 15px">Describe la imagen si esta no se puede mostrar (por ejemplo, si hay un error de carga)</small>
+                                        <input type="text" maxlength="300" id="altseo" class="form-control">
+                                    </div>
+
+
+
+
+                                    <div class="form-group">
+                                        <div>
+                                            <label>Imagen</label>
+                                        </div>
+                                        <br>
+                                        <div class="col-md-10">
+                                            <input type="file" style="color:#191818" id="imagen-nuevo" accept="image/jpeg, image/jpg, image/png"/>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -93,6 +115,91 @@
 </div>
 
 
+<div class="modal fade" id="modalEditar">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Actualizar</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-editar">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+
+
+                                <div class="form-group">
+                                    <label>Nombre (Opcional)</label>
+                                    <input type="hidden" id="id-editar">
+                                    <input type="text" maxlength="300" id="nombre-editar" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>ALT SEO (Opcional)</label>
+                                    <small style="font-size: 15px">Describe la imagen si esta no se puede mostrar (por ejemplo, si hay un error de carga)</small>
+                                    <input type="text" maxlength="300" id="altseo-editar" class="form-control">
+                                </div>
+
+
+                                <!-- 👇 Vista previa centrada -->
+                                <div class="mt-3"
+                                     style="
+                                    display:flex !important;
+                                    flex-direction:column !important;
+                                    justify-content:center !important;
+                                    align-items:center !important;
+                                    text-align:center !important;
+                                    width:100% !important;
+                                 ">
+
+                                    <h6 style="
+                                    font-weight:600 !important;
+                                    color:#333 !important;
+                                    margin-bottom:10px !important;
+                                ">
+                                        Vista previa de la imagen actual
+                                    </h6>
+
+                                    <img id="preview-editar"
+                                         src=""
+                                         alt="Vista previa"
+                                         style="
+                                        max-width:200px !important;
+                                        border-radius:10px !important;
+                                        display:none !important;
+                                        border:1px solid #ccc !important;
+                                        margin-top:10px !important;
+                                        box-shadow:0 2px 6px rgba(0,0,0,.2) !important;
+                                     ">
+                                </div>
+
+                                <br>
+
+                                <div class="form-group">
+                                    <div>
+                                        <label>Actualizar Imagen</label>
+                                    </div>
+                                    <br>
+                                    <div class="col-md-10">
+                                        <input type="file" style="color:#191818" id="imagen-editar" accept="image/jpeg, image/jpg, image/png"/>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 @extends('backend.menus.footerjs')
@@ -133,25 +240,42 @@
         }
 
         function nuevo(){
-            var idlugar = document.getElementById('select-lugares').value;
+            var nombre = document.getElementById('nombre').value;
+            var altseo = document.getElementById('altseo').value;
+            var imagen = document.getElementById('imagen-nuevo');
 
-            if(idlugar == '0'){
-                toastr.error('Seleccionar Lugar')
+            if(nombre.length > 300){
+                toastr.error('Nombre 300 caracteres maxímo')
+                return;
+            }
+
+            if(altseo.length > 300){
+                toastr.error('ALT SEO 300 caracteres maxímo')
+                return;
+            }
+
+            if(imagen.files && imagen.files[0]){ // si trae imagen
+                if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
+                    toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
+                    return;
+                }
+            }else{
+                toastr.error('Imagen es Requerida')
                 return;
             }
 
             openLoading();
             let formData = new FormData();
-            formData.append('idlugar', idlugar);
+            formData.append('nombre', nombre);
+            formData.append('altseo', altseo);
+            formData.append('imagen', imagen.files[0]);
 
-            axios.post('/admin/lugaresinicio/registrar', formData, {
+            axios.post('/admin/galeria/nuevo', formData, {
             })
                 .then((response) => {
                     closeLoading();
 
-                    if(response.data.success === 1) {
-                        toastr.error('Ubicación ya registrada');
-                    }else if(response.data.success === 2){
+                    if(response.data.success === 1){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();
@@ -169,7 +293,7 @@
 
         function modalBorrar(idfila){
             Swal.fire({
-                title: 'Borrar?',
+                title: '¿Borrar?',
                 text: "",
                 icon: 'info',
                 showCancelButton: true,
@@ -188,7 +312,7 @@
 
             openLoading();
 
-            axios.post('/admin/lugaresinicio/borrar',{
+            axios.post('/admin/galeria/borrar',{
                 'id': idfila
             })
                 .then((response) => {
@@ -206,6 +330,165 @@
                     closeLoading();
                 });
         }
+
+        function modalDesactivar(idfila){
+            Swal.fire({
+                title: '¿Desactivar?',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    desactivarFila(idfila);
+                }
+            })
+        }
+
+        function desactivarFila(idfila){
+            openLoading();
+
+            axios.post('/admin/galeria/desactivar',{
+                'id': idfila
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado');
+                        recargar();
+                    }else{
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+        function modalActivar(idfila){
+            Swal.fire({
+                title: '¿Activar?',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    activarFila(idfila);
+                }
+            })
+        }
+
+        function activarFila(idfila){
+            openLoading();
+
+            axios.post('/admin/galeria/activar',{
+                'id': idfila
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado');
+                        recargar();
+                    }else{
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+        function informacionEditar(id){
+            openLoading();
+            document.getElementById("formulario-editar").reset();
+
+            axios.post('/admin/galeria/informacion',{
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        $('#modalEditar').modal('show');
+                        $('#id-editar').val(id);
+                        $('#nombre-editar').val(response.data.info.nombre);
+                        $('#altseo-editar').val(response.data.info.alt_seo);
+
+                        // ✅ Mostrar imagen actual
+                        const imagenUrl = '/storage/archivos/' + response.data.info.imagen;
+
+                        const preview = document.getElementById('preview-editar');
+                        preview.src = imagenUrl;
+                        preview.style.display = 'block';
+
+                    }else{
+                        toastr.error('Información no encontrada');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Información no encontrada');
+                });
+        }
+
+        function editar(){
+            var id = document.getElementById('id-editar').value;
+            var nombre = document.getElementById('nombre-editar').value;
+            var altseo = document.getElementById('altseo-editar').value;
+            var imagen = document.getElementById('imagen-editar');
+
+            if(nombre.length > 300){
+                toastr.error('Nombre 300 caracteres maxímo')
+                return;
+            }
+
+            if(altseo.length > 300){
+                toastr.error('ALT SEO 300 caracteres maxímo')
+                return;
+            }
+
+            if(imagen.files && imagen.files[0]){ // si trae imagen
+                if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
+                    toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
+                    return;
+                }
+            }
+
+            openLoading();
+            let formData = new FormData();
+            formData.append('id', id);
+            formData.append('nombre', nombre);
+            formData.append('altseo', altseo);
+            formData.append('imagen', imagen.files[0]);
+
+            axios.post('/admin/galeria/editar', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado correctamente');
+                        $('#modalEditar').modal('hide');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
 
 
 

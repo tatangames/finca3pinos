@@ -26,9 +26,9 @@
         /* === GRID === */
         .gallery-grid {
             display: grid;
-            grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
+            grid-template-columns: repeat(4, 1fr); /* 👈 cuatro columnas */
+            gap: 20px; /* espacio entre imágenes */
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -227,31 +227,26 @@
         <div class="container">
             <h2 class="gallery-title">Galería Finca 3 Pinos</h2>
 
+
+
+
             <div class="gallery-grid">
-                <div class="gallery-item" onclick="openModal(this)">
-                    <img src="{{ asset('images/finca.jpg') }}" alt="Finca 3 Pinos - Café Geisha">
-                    <div class="overlay"><i class="fa fa-eye"></i></div>
-                </div>
-                <div class="gallery-item" onclick="openModal(this)">
-                    <img src="{{ asset('images/finca.jpg') }}" alt="Plantaciones de café">
-                    <div class="overlay"><i class="fa fa-search"></i></div>
-                </div>
-                <div class="gallery-item" onclick="openModal(this)">
-                    <img src="{{ asset('images/finca.jpg') }}" alt="Proceso de secado del café">
-                    <div class="overlay"><i class="fa fa-search"></i></div>
-                </div>
-                <div class="gallery-item" onclick="openModal(this)">
-                    <img src="{{ asset('images/finca.jpg') }}" alt="Granos Geisha">
-                    <div class="overlay"><i class="fa fa-search"></i></div>
-                </div>
-                <div class="gallery-item" onclick="openModal(this)">
-                    <img src="{{ asset('images/finca.jpg') }}" alt="Taza de café artesanal">
-                    <div class="overlay"><i class="fa fa-search"></i></div>
-                </div>
-                <div class="gallery-item" onclick="openModal(this)">
-                    <img src="{{ asset('images/finca3.jpg') }}" alt="Montañas de Metapán">
-                    <div class="overlay"><i class="fa fa-search"></i></div>
-                </div>
+
+                @foreach($arrayGaleria as $dato)
+                    <div class="gallery-item" onclick="openModal(this)">
+                        <img
+                            src="{{ url('storage/archivos/'.$dato->imagen) }}"
+                            alt="{{ $dato->alt_seo }}"
+                            data-caption="{{ $dato->nombre }}"
+                            loading="lazy"
+                            decoding="async"
+                            itemprop="image"
+                        >
+                        <div class="overlay"><i class="fa fa-eye"></i></div>
+                    </div>
+
+                @endforeach
+
             </div>
         </div>
     </section>
@@ -266,12 +261,7 @@
     </div>
 
 
-
-
-
-
     <script>
-
 
         function openModal(el) {
             const modal = document.getElementById('imageModal');
@@ -280,7 +270,10 @@
             const img = el.querySelector('img');
 
             modalImg.src = img.dataset.full || img.src;
-            caption.textContent = img.alt || '';
+
+            const text = img.getAttribute('data-caption') || '';
+            caption.textContent = text;
+
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; // bloquea scroll fondo
         }
