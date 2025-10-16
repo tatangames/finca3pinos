@@ -129,8 +129,6 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
 
 
-
-
         Route::get('/login',  [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');
         Route::post('/login', [UsuarioAuthController::class, 'loginUsuario'])->name('user.login.process');
 

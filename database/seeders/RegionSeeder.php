@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\RegionContentTranslation;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Region;
@@ -14,17 +15,42 @@ class RegionSeeder extends Seeder
     public function run(): void
     {
         $regions = [
-            ['slug' => 'sv',       'name' => 'El Salvador',       'locale' => 'es'],
-            ['slug' => 'us',       'name' => 'United States',     'locale' => 'en'],
-            ['slug' => 'latin-es', 'name' => 'Latinoamérica (ES)','locale' => 'es'],
+            ['slug' => 'sv',       'name' => 'El Salvador',        'locale' => 'es'],
+            ['slug' => 'us',       'name' => 'United States',      'locale' => 'en'],
+            ['slug' => 'latin-es', 'name' => 'Latinoamérica (ES)', 'locale' => 'es'],
+
+            // 👇 Nueva región
+            ['slug'=>'kr','name'=>'South Korea','locale'=>'ko'],
         ];
+
         foreach ($regions as $r) {
+            // 1️⃣ Crea o busca la región
             $region = Region::firstOrCreate(['slug' => $r['slug']], $r);
 
-            // Ejemplo de un contenido por región:
-            RegionContent::updateOrCreate(
-                ['region_id' => $region->id, 'key' => 'about.history'],
-                ['title' => 'Nuestra Historia', 'body' => '<p>HTML específico para '.$r['slug'].'</p>', 'status' => 'published']
+            // 2️⃣ Crea o busca el contenido base (una fila por región + key)
+            $content = RegionContent::firstOrCreate([
+                'region_id' => $region->id,
+                'key'       => 'about.history',
+            ]);
+
+            // 3️⃣ Crea o actualiza la traducción según el idioma de la región
+            RegionContentTranslation::updateOrCreate(
+                [
+                    'content_id' => $content->id,
+                    'locale'     => $r['locale'],
+                ],
+                [
+                    'title' => match($r['locale']) {
+                        'en' => 'Our Story',
+                        'ko' => '우리의 이야기',
+                        default => 'Nuestra Historia',
+                    },
+                    'body'  => match($r['locale']) {
+                        'ko' => '<p>한국어 전용 HTML (kr)</p>',
+                        'en' => '<p>English HTML (us)</p>',
+                        default => "<p>HTML específico para {$r['slug']}</p>",
+                    },
+                ]
             );
         }
     }

@@ -23,6 +23,15 @@ return [
             'regional' => 'es_SV',
             'url' => 'sv',          // ← SEGMENTO /sv
         ],
+
+        // 👇 Nuevo idioma
+        'ko' => [
+            'name'    => 'Korean',
+            'script'  => 'Kore',
+            'native'  => '한국어',
+            'regional'=> 'ko_KR',
+            'url'     => 'kr', // metadato tuyo; no cambia el prefijo /ko
+        ],
     ],
 
     'useAcceptLanguageHeader' => false,

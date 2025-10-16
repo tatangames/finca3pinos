@@ -10,4 +10,6 @@ class Galeria extends Model
     use HasFactory;
     protected $table = 'galeria';
     public $timestamps = false;
+
+    protected $fillable = ['posicion'];
 }

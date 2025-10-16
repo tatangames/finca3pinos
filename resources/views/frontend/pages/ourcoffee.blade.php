@@ -334,6 +334,7 @@
                     <span class="eyebrow">Café Geisha Finca 3 Pinos — Metapán</span>
                     <h1 id="geisha-title" class="title-xl">Excelencia desde la Cordillera Alotepec-Metapán</h1>
                     <p class="lead">
+                        {!! $aboutHistory !!}
                         Una de las regiones más altas y reconocidas de El Salvador, ubicada en la frontera con
                         Honduras y Guatemala; ideal para cafés de especialidad con acidez brillante y aromas florales.
                     </p>

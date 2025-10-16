@@ -1,45 +1,58 @@
 <?php
 
+use App\Models\RegionContentTranslation;
 use Illuminate\Support\Facades\Cache;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Models\Region;
 use App\Models\RegionContent;
 
 if (!function_exists('getRegionContent')) {
-    /**
-     * Obtiene contenido dinámico por región y clave.
-     * Cachea 30 minutos por región + key.
-     */
     function getRegionContent(string $key): string
     {
-        // Detecta slug real (de la URL o del locale)
-        $slug = request()->segment(1) ?? LaravelLocalization::getCurrentLocale();
+        // 1) Idioma actual: /sv /en /es
+        $locale = LaravelLocalization::getCurrentLocale(); // 'sv' | 'en' | 'es'
 
-        // Fallback: si entra sin prefijo o slug inválido
-        if (!in_array($slug, ['sv','en','es'], true)) {
-            $slug = 'sv';
+        // 2) Región elegida: primero sesión (si la seteas en middleware), si no, mapeo por locale
+        $regionSlug = session('region_slug'); // opcional
+        if (!$regionSlug) {
+            // Ajusta a tu preferencia:
+            $regionByLocale = [
+                'sv' => 'sv',        // ES (El Salvador)
+                'en' => 'us',        // EN (USA)
+                'es' => 'latin-es',  // ES (LatAm)  ← si quieres que 'es' apunte a SV, cambia a 'sv'
+                'ko' => 'kr',
+            ];
+            $regionSlug = $regionByLocale[$locale] ?? 'sv';
         }
 
-        // Clave única de caché por región y clave
-        $cacheKey = "rc:$slug:$key";
+        // 3) Cache por región+key+idioma
+        $cacheKey = "rc:$regionSlug:$key:$locale";
 
-        return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($slug, $key) {
-            $region = Region::where('slug', $slug)->first();
+        return Cache::remember($cacheKey, 30 * 60, function () use ($regionSlug, $key, $locale) {
+            $region = Region::where('slug', $regionSlug)->first();
             if (!$region) return '';
 
-            $body = RegionContent::where('region_id', $region->id)
+            $content = RegionContent::where('region_id', $region->id)
                 ->where('key', $key)
-                ->where('status', 'published')
-                ->value('body');
+                ->first();
 
-            if ($body) return $body;
+            if (!$content) return '';
 
-            // Fallback a contenido en español
-            $fallbackId = Region::where('slug', 'es')->value('id');
-            return RegionContent::where('region_id', $fallbackId)
-                ->where('key', $key)
-                ->where('status', 'published')
-                ->value('body') ?? '';
+            // Traducción en el idioma actual
+            $tr = RegionContentTranslation::where('content_id', $content->id)
+                ->where('locale', $locale)
+                ->first();
+
+            if ($tr?->body) return $tr->body;
+
+            // Fallback: idioma por defecto de la región o fallback global
+            $fallback = $region->locale ?: config('app.fallback_locale', 'es');
+
+            $trFallback = RegionContentTranslation::where('content_id', $content->id)
+                ->where('locale', $fallback)
+                ->first();
+
+            return $trFallback?->body ?? '';
         });
     }
 }

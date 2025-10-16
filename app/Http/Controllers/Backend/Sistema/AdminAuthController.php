@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Encoders\JpegEncoder;
+use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
 
 class AdminAuthController extends Controller
@@ -126,12 +127,12 @@ class AdminAuthController extends Controller
             }
 
             // ── Opción A: guarda como JPEG optimizado ────────────────────────────
-            $encoded   = $img->encode(new JpegEncoder(quality: 80)); // 70–85 suele bien
-            $nombreOut = $nombreBase . '.jpg';
+            //$encoded   = $img->encode(new JpegEncoder(quality: 80)); // 70–85 suele bien
+            //$nombreOut = $nombreBase . '.jpg';
 
             // ── Opción B (recomendada para web): guarda como WebP ───────────────
-            // $encoded   = $img->encode(new WebpEncoder(quality: 82));
-            // $nombreOut = $nombreBase . '.webp';
+             $encoded   = $img->encode(new WebpEncoder(quality: 82));
+             $nombreOut = $nombreBase . '.webp';
 
             // Guarda al disco 'archivos' (config/filesystems.php)
             if(Storage::disk('archivos')->put($nombreOut, $encoded)){
@@ -259,23 +260,34 @@ class AdminAuthController extends Controller
             $infoGaleria = Galeria::where('id', $request->id)->first();
             $imagenOld = $infoGaleria->imagen;
 
-            $cadena = Str::random(15);
-            $tiempo = microtime();
-            $union = $cadena . $tiempo;
-            $nombre = str_replace(' ', '_', $union);
+            // Nombre único
+            $nombreBase  = Str::slug(Str::random(15) . '-' . microtime(true), '_');
 
-            $extension = '.' . $request->imagen->getClientOriginalExtension();
-            $nombreFoto = $nombre . strtolower($extension);
-            $avatar = $request->file('imagen');
-            $upload = Storage::disk('archivos')->put($nombreFoto, \File::get($avatar));
+            // Lee archivo con Intervention v3
+            $manager = new ImageManager(new Driver());
+            $img     = $manager->read($request->file('imagen')->getPathname());
 
-            if ($upload) {
+            // (Opcional) Redimensiona si es muy grande: ancho máx 1600px manteniendo proporción
+            if ($img->width() > 1600) {
+                $img->scale(width: 1600); // altura se ajusta automáticamente manteniendo aspecto
+            }
+
+            // ── Opción A: guarda como JPEG optimizado ────────────────────────────
+            //$encoded   = $img->encode(new JpegEncoder(quality: 80)); // 70–85 suele bien
+            //$nombreOut = $nombreBase . '.jpg';
+
+            // ── Opción B (recomendada para web): guarda como WebP ───────────────
+            $encoded   = $img->encode(new WebpEncoder(quality: 82));
+            $nombreOut = $nombreBase . '.webp';
+
+            // Guarda al disco 'archivos' (config/filesystems.php)
+            if(Storage::disk('archivos')->put($nombreOut, $encoded)){
 
                 Galeria::where('id', $request->id)
                     ->update([
                         'nombre' => $request->nombre,
                         'alt_seo' => $request->altseo,
-                        'imagen' => $nombreFoto,
+                        'imagen' => $nombreOut,
                     ]);
 
                 if(Storage::disk('archivos')->exists($imagenOld)){

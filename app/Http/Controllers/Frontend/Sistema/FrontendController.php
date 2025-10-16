@@ -21,8 +21,6 @@ class FrontendController extends Controller
 
     public function vistaOurCoffee(){
 
-
-
         return view('frontend.pages.ourcoffee', [
             'aboutHistory' => getRegionContent('about.history'),
         ]);

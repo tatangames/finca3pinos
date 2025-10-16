@@ -14,14 +14,8 @@ return new class extends Migration
         Schema::create('region_contents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('region_id')->constrained()->cascadeOnDelete();
-            $table->string('key', 100);                  // ej: 'home.description', 'about.history'
-            $table->string('title', 200)->nullable();    // opcional
-            $table->longText('body');                    // HTML largo
-            $table->string('status', 20)->default('published'); // draft/published
-            $table->timestamp('published_at')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable(); // opcional (usuario admin)
-
-            $table->unique(['region_id', 'key']);       // clave única por región+key
+            $table->string('key', 100); // ← faltaba este campo
+            $table->unique(['region_id', 'key']); // clave única por región+key
             $table->index('key');
         });
     }
