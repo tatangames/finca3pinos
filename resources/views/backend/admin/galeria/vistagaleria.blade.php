@@ -76,28 +76,47 @@
                                 <div class="col-md-12">
 
 
+                                    <!-- Key global -->
                                     <div class="form-group">
-                                        <label>Nombre (Opcional)</label>
-                                        <input type="text" maxlength="300" id="nombre" class="form-control">
+                                        <label>Key para todos los idiomas</label>
+                                        <input type="text" maxlength="200" id="key" class="form-control"
+                                               placeholder="Ej: about.history">
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>ALT SEO (Opcional)</label>
-                                        <small style="font-size: 15px">Describe la imagen si esta no se puede mostrar (por ejemplo, si hay un error de carga)</small>
-                                        <input type="text" maxlength="300" id="altseo" class="form-control">
-                                    </div>
+                                    <!-- Campos por idioma -->
+                                    @foreach($arrayRegiones as $region)
+                                        <div class="card mt-3 border">
+                                            <div class="card-header" style="background:#f4f4f4;">
+                                                <strong>{{ $region->name }}</strong> ({{ strtoupper($region->locale) }})
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label>Título ({{ $region->locale }})</label>
+                                                    <input type="text"
+                                                           name="title_{{ $region->locale }}"
+                                                           id="title_{{ $region->locale }}"
+                                                           maxlength="200"
+                                                           class="form-control"
+                                                           placeholder="Título para {{ $region->name }}">
+                                                </div>
 
-
-
-
-                                    <div class="form-group">
-                                        <div>
-                                            <label>Imagen</label>
+                                                <div class="form-group">
+                                                    <label>Contenido HTML ({{ $region->locale }})</label>
+                                                    <textarea name="body_{{ $region->locale }}"
+                                                              id="body_{{ $region->locale }}"
+                                                              rows="4"
+                                                              class="form-control"
+                                                              placeholder="<p>Texto o HTML...</p>"></textarea>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <br>
-                                        <div class="col-md-10">
-                                            <input type="file" style="color:#191818" id="imagen-nuevo" accept="image/jpeg, image/jpg, image/png"/>
-                                        </div>
+                                    @endforeach
+
+                                    <!-- Imagen -->
+                                    <div class="form-group mt-4">
+                                        <label>Imagen</label>
+                                        <input type="file" id="imagen-nuevo" class="form-control"
+                                               accept="image/jpeg,image/png">
                                     </div>
 
                                 </div>

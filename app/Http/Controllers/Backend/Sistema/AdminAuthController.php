@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Sistema;
 
 use App\Http\Controllers\Controller;
 use App\Models\Galeria;
+use App\Models\Region;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
@@ -83,7 +84,9 @@ class AdminAuthController extends Controller
 
     public function indexGaleria()
     {
-        return view('backend.admin.galeria.vistagaleria');
+        $arrayRegiones = Region::orderBy('id', 'ASC')->get();
+
+        return view('backend.admin.galeria.vistagaleria', compact('arrayRegiones'));
     }
 
 
