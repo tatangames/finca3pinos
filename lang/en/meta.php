@@ -41,8 +41,11 @@ return [
     'gallery_finca3pinos' => 'Gallery Finca3Pinos',
     'loading' => 'Loading...',
 
-
-
+    // === VISTA CONTACTO ===
+    'contact_v1' => 'Do you have any questions about our coffees or would you like to place a special order? At Finca 3 Pinos, we’re here to assist you. Send us a message, and one of our specialists will get back to you as soon as possible.',
+    'contact_v2' => 'Contact us',
+    'contact_v3' => 'El Pinar, Montenegro Hamlet, Metapán, North Santa Ana, El Salvador',
+    'contact_v4' => 'Social',
 
 
 ];

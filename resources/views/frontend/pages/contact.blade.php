@@ -220,7 +220,7 @@
         <div class="container" bis_skin_checked="1"><h1>{{ __('meta.contact') }}</h1>
             <ul class="breadcrumbs" typeof="BreadcrumbList" vocab="https://schema.org/">
                 <li class="home"><span property="itemListElement" typeof="ListItem"><a property="item" typeof="WebPage"
-                                                                                       title="Go to Finca3pinos.com"
+                                                                                       title="{{ __('meta.go_to_finca3pinos') }}"
                                                                                        href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), '/') }}"
                                                                                        class="home"
                                                                                        bis_skin_checked="1">
@@ -232,12 +232,6 @@
             </ul>
         </div>
     </header>
-
-
-
-
-
-
 
 
     <div class="container">
@@ -253,14 +247,11 @@
                                         <div class="vc_column-inner">
                                             <div class="wpb_wrapper">
                                                 <div class="heading  transform-header-up   vc_custom_1505581880747"
-                                                     id="like_sc_header_1005731420"><h4 class="header">Contáctanos</h4>
+                                                     id="like_sc_header_1005731420"><h4 class="header">{{ __('meta.contact_v2') }}</h4>
                                                 </div>
                                                 <div class="wpb_text_column wpb_content_element ">
                                                     <div class="wpb_wrapper">
-                                                        <p>¿Tienes preguntas sobre nuestros cafés o deseas realizar un
-                                                            pedido especial?
-                                                            En Finca 3 Pinos estamos para atenderte. Escríbenos y uno de
-                                                            nuestros especialistas te responderá lo antes posible.</p>
+                                                        <p>{{ __('meta.contact_v1') }}</p>
 
                                                     </div>
                                                 </div>
@@ -270,21 +261,19 @@
                                                         <li class=""><span class="fa fa-phone"></span><span
                                                                 class="head">(+503) 7620-6851</span></li>
                                                         <li class=""><span class="fa fa-envelope"></span><span
-                                                                    class="head">info@finca3pinos.com</span></li>
+                                                                    class="head" style="text-transform: lowercase">info@finca3pinos.com</span></li>
                                                         <li class=""><span class="fa fa-map-marker"></span><span
-                                                                class="head">El Pinar, Cantón Montenegro Metapán, Santa Ana Norte.</span>
+                                                                class="head">{{ __('meta.contact_v3') }}</span>
                                                         </li>
                                                     </ul>
                                                 </div>
                                                 <div
                                                     class="heading  color-black transform-header-up   vc_custom_1502236442786"
-                                                    id="like_sc_header_1764788083"><h6 class="header">Social:</h6></div>
+                                                    id="like_sc_header_1764788083"><h6 class="header">{{ __('meta.contact_v4') }}</h6></div>
                                                 <div class="align-default ">
                                                     <ul class="social-big icon-weight-bold"
                                                         id="like_sc_header_1697844067">
                                                         <li><a href="#" class="fa fa-facebook"></a></li>
-                                                        <li><a href="#" class="fa fa-twitter"></a></li>
-                                                        <li><a href="#" class="fa fa-youtube"></a></li>
                                                         <li><a href="#" class="fa fa-instagram"></a></li>
                                                     </ul>
                                                 </div>
@@ -325,25 +314,25 @@
                                                                 <!-- …tus hidden fields… -->
                                                                 <p><label> Your Name<br>
                                                                         <span class="wpcf7-form-control-wrap" data-name="your-name">
-        <input size="40" maxlength="400"
-               class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
-               aria-required="true" type="text" name="your-name">
-      </span>
+                                                                    <input size="40" maxlength="400"
+                                                                           class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
+                                                                           aria-required="true" type="text" name="your-name">
+                                                                  </span>
                                                                     </label></p>
 
                                                                 <p><label> Your Email<br>
-                                                                        <span class="wpcf7-form-control-wrap" data-name="your-email">
-        <input size="40" maxlength="400"
-               class="wpcf7-form-control wpcf7-email wpcf7-validates-as-required wpcf7-text wpcf7-validates-as-email"
-               aria-required="true" type="email" name="your-email">
-      </span>
+                                                                      <span class="wpcf7-form-control-wrap" data-name="your-email">
+                                                                <input size="40" maxlength="400"
+                                                                       class="wpcf7-form-control wpcf7-email wpcf7-validates-as-required wpcf7-text wpcf7-validates-as-email"
+                                                                       aria-required="true" type="email" name="your-email">
+                                                                </span>
                                                                     </label></p>
 
                                                                 <p><label> Your Message<br>
                                                                         <span class="wpcf7-form-control-wrap" data-name="your-message">
-        <textarea cols="40" rows="6" maxlength="2000"
-                  class="wpcf7-form-control wpcf7-textarea" name="your-message"></textarea>
-      </span>
+                                                                    <textarea cols="40" rows="6" maxlength="2000"
+                                                                              class="wpcf7-form-control wpcf7-textarea" name="your-message"></textarea>
+                                                                  </span>
                                                                     </label></p>
 
                                                                 <p class="contact-card__actions">
@@ -352,11 +341,6 @@
                                                                 <div class="wpcf7-response-output" aria-hidden="true"></div>
                                                             </form>
                                                         </section>
-
-
-
-
-
 
 
                                                     </div>
