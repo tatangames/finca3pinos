@@ -308,38 +308,41 @@
                                                         <!-- CARD CONTACT -->
                                                         <section class="contact-card">
                                                             <!-- Pega aquí tu formulario CF7 tal cual -->
-                                                            <form
-                                                                action="/wordpress/contacts/?simply_static_page=11518#wpcf7-f1551-p25-o1"
-                                                                method="post" class="wpcf7-form init" aria-label="Contact form" novalidate data-status="init">
-                                                                <!-- …tus hidden fields… -->
-                                                                <p><label> Your Name<br>
-                                                                        <span class="wpcf7-form-control-wrap" data-name="your-name">
-                                                                    <input size="40" maxlength="400"
-                                                                           class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
-                                                                           aria-required="true" type="text" name="your-name">
-                                                                  </span>
+
+
+
+
+                                                            <form id="contact-form"
+                                                               >
+                                                                @csrf
+
+                                                                <p><label> {{ __('meta.contact_v5') }}<br>
+                                                                        <input size="40" maxlength="400"
+                                                                               class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
+                                                                               aria-required="true" type="text" name="your-name">
                                                                     </label></p>
 
-                                                                <p><label> Your Email<br>
-                                                                      <span class="wpcf7-form-control-wrap" data-name="your-email">
-                                                                <input size="40" maxlength="400"
-                                                                       class="wpcf7-form-control wpcf7-email wpcf7-validates-as-required wpcf7-text wpcf7-validates-as-email"
-                                                                       aria-required="true" type="email" name="your-email">
-                                                                </span>
+                                                                <p><label> {{ __('meta.contact_v6') }}<br>
+                                                                        <input size="40" maxlength="400"
+                                                                               class="wpcf7-form-control wpcf7-email wpcf7-validates-as-required wpcf7-text wpcf7-validates-as-email"
+                                                                               aria-required="true" type="email" name="your_email" style="text-transform: lowercase;">
                                                                     </label></p>
 
-                                                                <p><label> Your Message<br>
-                                                                        <span class="wpcf7-form-control-wrap" data-name="your-message">
-                                                                    <textarea cols="40" rows="6" maxlength="2000"
-                                                                              class="wpcf7-form-control wpcf7-textarea" name="your-message"></textarea>
-                                                                  </span>
+                                                                <p><label> {{ __('meta.contact_v7') }}<br>
+                                                                        <textarea cols="40" rows="6" maxlength="2000"
+                                                                                  class="wpcf7-form-control wpcf7-textarea" name="your-message"></textarea>
                                                                     </label></p>
 
                                                                 <p class="contact-card__actions">
-                                                                    <input class="wpcf7-form-control wpcf7-submit has-spinner" type="submit" value="Enviar">
+                                                                    <input class="wpcf7-form-control wpcf7-submit has-spinner"
+                                                                           type="button" onclick="enviarFormulario()" value="{{ __('meta.contact_v8') }}">
                                                                 </p>
+
+                                                                {{-- zona de mensajes --}}
                                                                 <div class="wpcf7-response-output" aria-hidden="true"></div>
                                                             </form>
+
+
                                                         </section>
 
 
@@ -370,18 +373,27 @@
         </div>
 
     </div>
-    </div>
+
+    <script>
+
+        const currentLocale = "{{ app()->getLocale() }}"; // 'sv', 'en', 'es', etc.
+
+        function enviarFormulario() {
+            if (currentLocale === 'sv') {
+                console.log("{{ __('meta.contact_v5') }}"); // Traducción en sv
+            } else if (currentLocale === 'en') {
+                console.log("{{ __('meta.contact_v5') }}"); // Traducción en en
+            } else {
+                console.log("{{ __('meta.contact_v5') }}"); // Traducción en es
+            }
+        }
 
 
-
-
-
-
-
-
-
+    </script>
 
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')
 @endsection
+
+

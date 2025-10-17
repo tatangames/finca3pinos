@@ -46,7 +46,14 @@ return [
     'contact_v2' => 'Contáctanos',
     'contact_v3' => 'El Pinar, Cantón Montenegro Metapán, Santa Ana Norte.',
     'contact_v4' => 'Social',
+    'contact_v5' => 'Nombre',
+    'contact_v6' => 'Correo',
+    'contact_v7' => 'Mensaje',
+    'contact_v8' => 'Enviar',
 
-
+    'contact_ok'    => '¡Gracias! Hemos recibido tu mensaje y te responderemos pronto.',
+    'sending'       => 'Enviando...',
+    'unknown_error' => 'Ocurrió un error inesperado. Intenta de nuevo.',
+    'network_error' => 'No fue posible conectar con el servidor. Verifica tu conexión.',
 
 ];

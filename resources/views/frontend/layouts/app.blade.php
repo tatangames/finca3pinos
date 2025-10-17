@@ -16,6 +16,10 @@
     <link rel="stylesheet" id="post-views-counter-frontend-css" href="{{ asset('frontend/css/frontend.min.css') }}" media="all">
     <link rel="stylesheet" id="wp-block-library-css" href="{{ asset('frontend/css/style.min.css') }}" media="all">
 
+    {{-- en tu <head> --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+
     <style id="classic-theme-styles-inline-css" type="text/css">
         .wp-block-button__link {
             color: #fff; background-color: #32373c; border-radius: 9999px; box-shadow: none; text-decoration: none;

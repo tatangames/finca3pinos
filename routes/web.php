@@ -139,6 +139,9 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.contact'), [FrontendController::class, 'vistaContact'])
             ->name('user.contact');
 
+        Route::post(LaravelLocalization::transRoute('routes.contact'), [FrontendController::class, 'send'])
+            ->name('contact.send');
+
 
 
         Route::get('/login',  [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');

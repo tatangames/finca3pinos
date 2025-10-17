@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Frontend\Sistema;
 use App\Http\Controllers\Controller;
 use App\Models\Galeria;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Validator;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Models\Region;
 use App\Models\RegionContent;
@@ -70,11 +72,42 @@ class FrontendController extends Controller
     }
 
     public function vistaContact(){
-
-
-
         return view('frontend.pages.contact');
     }
+
+
+    public function send(Request $request)
+    {
+        $rules = [
+            'name'    => ['required', 'string', 'max:200'],
+            'email'   => ['required', 'email', 'max:200'],
+            'message' => ['required', 'string', 'max:2000'],
+        ];
+
+        $attributes = [
+            'name'    => __('meta.contact_v5'),
+            'email'   => __('meta.contact_v6'),
+            'message' => __('meta.contact_v7'),
+        ];
+
+        $validator = Validator::make($request->all(), $rules, [], $attributes);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'ok'     => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // Aquí podrías enviar correo, guardar en BD, etc.
+
+        return response()->json([
+            'ok'      => true,
+            'message' => __('meta.contact_ok'),
+        ]);
+    }
+
+
 
 
     public function vistaProducts(){

@@ -46,6 +46,14 @@ return [
     'contact_v2' => 'Contact us',
     'contact_v3' => 'El Pinar, Montenegro Hamlet, Metapán, North Santa Ana, El Salvador',
     'contact_v4' => 'Social',
+    'contact_v5' => 'Your name',
+    'contact_v6' => 'Your email',
+    'contact_v7' => 'Your message',
+    'contact_v8' => 'Send',
 
+    'contact_ok'    => 'Thanks! We received your message and will get back to you soon.',
+    'sending'       => 'Sending...',
+    'unknown_error' => 'An unexpected error occurred. Please try again.',
+    'network_error' => 'Could not reach the server. Check your connection.',
 
 ];
