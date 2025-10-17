@@ -31,10 +31,18 @@ class FrontendController extends Controller
 
     public function vistaGallery()
     {
-        $arrayGaleria = Galeria::orderBy('posicion', 'ASC')->get();
+        $arrayGaleria = Galeria::orderBy('posicion', 'ASC')
+            ->get()
+            ->map(function ($item) {
+                // Usa tu helper global (automáticamente detecta locale y región)
+                $item->texto_idioma = getRegionContent($item->content_key);
+                return $item;
+            });
+
 
         return view('frontend.pages.gallery', compact('arrayGaleria'));
     }
+
 
     public function cargarGaleria(Request $request)
     {
@@ -43,7 +51,15 @@ class FrontendController extends Controller
         $offset = (int) $request->input('offset', 0);
         $limit  = (int) $request->input('limit', 24);
 
-        $galeria = Galeria::orderBy('id', 'desc')->skip($offset)->take($limit)->get();
+        $galeria = Galeria::orderBy('id', 'desc')
+            ->skip($offset)
+            ->take($limit)
+            ->get()
+            ->map(function ($item) {
+                // Asigna la traducción según su key y el idioma/región actual
+                $item->texto_idioma = getRegionContent($item->content_key);
+                return $item;
+            });
 
         $html = view('frontend.partials.galeria_items', ['galeria' => $galeria])->render();
 

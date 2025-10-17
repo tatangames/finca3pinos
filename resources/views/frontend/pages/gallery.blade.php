@@ -237,7 +237,7 @@
                         <img
                             src="{{ url('storage/archivos/'.$dato->imagen) }}"
                             alt="{{ $dato->alt_seo }}"
-                            data-caption="{{ $dato->nombre }}"
+                            data-caption="{{ $dato->texto_idioma }}"
                             loading="lazy"
                             decoding="async"
                             itemprop="image">

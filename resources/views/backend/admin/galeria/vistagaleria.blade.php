@@ -529,7 +529,7 @@
                 formData.append('imagen', imagen.files[0]);
             }
 
-            // Enviar como arrays: title[en], body[en], title[sv], body[sv], ...
+            // Enviar como arrays: body[en], title[sv], body[sv], ...
             locales.forEach(loc => {
                 const b = document.getElementById(`body_${loc}_editar`)?.value ?? '';
                 formData.append(`body[${loc}]`,  b);

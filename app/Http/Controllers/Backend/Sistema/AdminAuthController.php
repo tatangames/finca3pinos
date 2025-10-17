@@ -320,7 +320,6 @@ class AdminAuthController extends Controller
                     'r.id as region_id',
                     'r.name as region_name',
                     'r.locale as region_locale',
-                    'rct.title',
                     'rct.body'
                 )
                 ->get()
@@ -333,7 +332,6 @@ class AdminAuthController extends Controller
                 'region_id' => $region->id,
                 'name'      => $region->name,
                 'locale'    => $region->locale,
-                'title'     => $data->title ?? '',
                 'body'      => $data->body ?? '',
             ];
         })->values();
