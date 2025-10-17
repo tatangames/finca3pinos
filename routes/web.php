@@ -99,6 +99,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     // NUEVO IDIOMA
     Route::get('/idiomas/index', [AdminAuthController::class, 'indexIdiomas'])->name('idiomas');
     Route::get('/idiomas/index/tabla', [AdminAuthController::class, 'tablaIdiomas']);
+
+    // Mostrar formulario (region destino dinámica)
+    Route::get('/idiomas', [AdminAuthController::class, 'indexIdiomas'])->name('idiomas');
+    Route::get('/idiomas/{region}', [AdminAuthController::class, 'indexIdiomas'])->whereNumber('region');
+    Route::post('/idiomas/guardar', [AdminAuthController::class, 'guardarIdiomas']);
+
 });
 
 

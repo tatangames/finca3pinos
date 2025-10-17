@@ -32,6 +32,14 @@ return [
             'regional'=> 'ko_KR',
             'url'     => 'kr', // metadato tuyo; no cambia el prefijo /ko
         ],
+
+        'pt' => [
+            'name'     => 'Portuguese',
+            'script'   => 'Latn',
+            'native'   => 'Português',
+            'regional' => 'pt_PT', // o 'pt_BR' según el público objetivo
+            'url'      => 'pt',
+        ],
     ],
 
     'useAcceptLanguageHeader' => false,

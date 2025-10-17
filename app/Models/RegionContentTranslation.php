@@ -9,6 +9,11 @@ class RegionContentTranslation extends Model
 {
     protected $table = 'region_content_translation'; // ← singular
     public $timestamps = false; // porque no los creaste
-    protected $fillable = ['content_id','locale','title','body'];
+    protected $fillable = ['content_id','locale','body'];
+
+    public function content()
+    {
+        return $this->belongsTo(RegionContent::class, 'content_id');
+    }
 
 }

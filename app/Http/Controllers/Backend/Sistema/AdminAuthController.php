@@ -460,10 +460,66 @@ class AdminAuthController extends Controller
 
     public function indexIdiomas()
     {
-        // Trae las regiones disponibles para el select
-        $regiones = Region::orderBy('name')->get(['id','slug','name','locale']);
 
-        return view('backend.admin.idiomas.vistanuevoidioma', compact('regiones'));
+        // === Config ===
+        $regionBaseSlug = 'sv';   // referencia (arriba)
+        $regionNuevaId  = 5;      // Brasil (pt) — tu nuevo ID
+        // ==============
+
+        $regionBase  = Region::where('slug', $regionBaseSlug)->firstOrFail(); // SV
+        $regionNueva = Region::findOrFail($regionNuevaId);                    // BR
+        $nuevoLocale = $regionNueva->locale;                                  // 'pt'
+
+        // 1) Asegurar que existan en region_contents las mismas keys para la región nueva
+        $keysBase = RegionContent::where('region_id', $regionBase->id)
+            ->pluck('key')
+            ->unique();
+
+        foreach ($keysBase as $k) {
+            RegionContent::firstOrCreate([
+                'region_id' => $regionNueva->id,
+                'key'       => $k,
+            ]);
+        }
+
+        // 2) Armar listado SOLO de faltantes (sin traducción pt)
+        $faltantes = [];
+
+        foreach ($keysBase as $key) {
+            // content SV y su texto base (usamos 'es' como locale del contenido SV)
+            $contentSVId = RegionContent::where('region_id', $regionBase->id)
+                ->where('key', $key)
+                ->value('id');
+
+            $svTexto = RegionContentTranslation::where('content_id', $contentSVId)
+                ->where('locale', 'es')   // tu SV guarda en 'es'
+                ->value('body');
+
+            // content BR (pt) equivalente por key
+            $contentBR = RegionContent::where('region_id', $regionNueva->id)
+                ->where('key', $key)
+                ->first();
+
+            // ¿ya existe traducción pt?
+            $existePT = RegionContentTranslation::where('content_id', $contentBR->id)
+                ->where('locale', $nuevoLocale) // 'pt'
+                ->exists();
+
+            if (! $existePT) {
+                $faltantes[] = [
+                    'key'               => $key,
+                    'sv_body'           => $svTexto ?? '',
+                    'target_content_id' => $contentBR->id, // para guardar después
+                ];
+            }
+        }
+
+        return view('backend.admin.idiomas.vistanuevoidioma', [
+            'idiomaReferencia' => 'sv',
+            'regionNueva'      => $regionNueva,  // name = Brasil
+            'nuevoLocale'      => $nuevoLocale,  // 'pt'
+            'faltantes'        => $faltantes,    // [{key, sv_body, target_content_id}, ...]
+        ]);
     }
 
     public function tablaIdiomas()
@@ -472,6 +528,88 @@ class AdminAuthController extends Controller
     }
 
 
+    public function guardarIdiomas(Request $request)
+    {
+        // Estructura esperada: traduccion[content_id][body|title|locale]
+        $reglas = [
+            'traduccion'            => 'required|array',
+            'traduccion.*.body'     => 'nullable|string',
+            'traduccion.*.title'    => 'nullable|string|max:255',
+            'traduccion.*.locale'   => 'nullable|string|size:2', // ej. 'pt'
+            'locale'                => 'nullable|string|size:2', // fallback global opcional
+        ];
+
+        $val = \Validator::make($request->all(), $reglas);
+        if ($val->fails()) {
+            return ['success' => 0, 'msg' => 'Datos inválidos', 'errors' => $val->errors()];
+        }
+
+        $items        = $request->input('traduccion', []);
+        $fallbackLoc  = $request->input('locale', 'pt'); // si no viene por-item, usa 'pt'
+
+        DB::beginTransaction();
+        try {
+            $creados = 0;
+            $actualizados = 0;
+            $omitidos = 0;
+            $invalidos = 0;
+
+            foreach ($items as $contentId => $vals) {
+                // Validar que el content exista
+                $content = RegionContent::find($contentId);
+                if (! $content) {
+                    $invalidos++;
+                    continue;
+                }
+
+                $locale = $vals['locale'] ?? $fallbackLoc;
+                $title  = array_key_exists('title', $vals) ? trim((string)$vals['title']) : null;
+                $body   = array_key_exists('body',  $vals) ? (string)$vals['body'] : null;
+
+                // Si no enviaron nada (title ni body), omitir
+                if (($title === null || $title === '') && ($body === null || $body === '')) {
+                    $omitidos++;
+                    continue;
+                }
+
+                // Crear/actualizar
+                $existing = RegionContentTranslation::where('content_id', $contentId)
+                    ->where('locale', $locale)
+                    ->first();
+
+                if ($existing) {
+                    // Solo sobreescribe campos enviados (permite actualizaciones parciales)
+                    if ($title !== null) $existing->title = $title;
+                    if ($body  !== null) $existing->body  = $body;
+                    $existing->save();
+                    $actualizados++;
+                } else {
+                    RegionContentTranslation::create([
+                        'content_id' => $contentId,
+                        'locale'     => $locale,
+                        'title'      => $title ?? '',
+                        'body'       => $body  ?? '',
+                    ]);
+                    $creados++;
+                }
+            }
+
+            DB::commit();
+
+            return [
+                'success'      => 1,
+                'msg'          => 'Traducciones guardadas',
+                'creados'      => $creados,
+                'actualizados' => $actualizados,
+                'omitidos'     => $omitidos,
+                'invalidos'    => $invalidos,
+            ];
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            \Log::error('Error guardando traducciones: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ['success' => 99, 'msg' => 'Error interno al guardar traducciones'];
+        }
+    }
 
 
 

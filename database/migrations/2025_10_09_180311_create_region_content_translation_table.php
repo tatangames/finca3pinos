@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('locale', 8);
 
             // Traducción del título y cuerpo
-            $table->string('title', 200)->nullable();
             $table->longText('body')->nullable();
 
             // Índices y unicidad

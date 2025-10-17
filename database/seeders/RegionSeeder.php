@@ -40,11 +40,6 @@ class RegionSeeder extends Seeder
                     'locale'     => $r['locale'],
                 ],
                 [
-                    'title' => match($r['locale']) {
-                        'en' => 'Our Story',
-                        'ko' => '우리의 이야기',
-                        default => 'Nuestra Historia',
-                    },
                     'body'  => match($r['locale']) {
                         'ko' => '<p>한국어 전용 HTML (kr)</p>',
                         'en' => '<p>English HTML (us)</p>',

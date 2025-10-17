@@ -101,16 +101,6 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="form-group">
-                                                    <label>Título ({{ $region->locale }})</label>
-                                                    <input type="text"
-                                                           name="title_{{ $region->locale }}"
-                                                           id="title_{{ $region->locale }}"
-                                                           maxlength="200"
-                                                           class="form-control"
-                                                           placeholder="Título para {{ $region->name }}">
-                                                </div>
-
-                                                <div class="form-group">
                                                     <label>Contenido HTML ({{ $region->locale }})</label>
                                                     <textarea name="body_{{ $region->locale }}"
                                                               id="body_{{ $region->locale }}"
@@ -311,10 +301,8 @@
 
             regiones.forEach(region => {
                 let locale = region.locale;
-                let title = document.getElementById(`title_${locale}`).value.trim();
                 let body = document.getElementById(`body_${locale}`).value.trim();
 
-                formData.append(`translations[${locale}][title]`, title);
                 formData.append(`translations[${locale}][body]`, body);
             });
 
@@ -459,7 +447,7 @@
         }
 
         function cardIdiomaHTML(item) {
-            // item = { name, locale, title, body }
+            // item = { name, locale, body }
             const loc = item.locale;
             return `
       <div class="card mt-3 border">
@@ -468,16 +456,7 @@
         </div>
         <div class="card-body">
           <div class="form-group">
-            <label>Título (${loc})</label>
-            <input type="text"
-                   id="title_${loc}_editar"
-                   maxlength="200"
-                   class="form-control"
-                   placeholder="Título para ${item.name}"
-                   value="${(item.title || '').replace(/"/g, '&quot;')}">
-          </div>
-          <div class="form-group">
-            <label>Contenido HTML (${loc})</label>
+            <label>Contenido (${loc})</label>
             <textarea id="body_${loc}_editar"
                       rows="4"
                       class="form-control"
@@ -552,9 +531,7 @@
 
             // Enviar como arrays: title[en], body[en], title[sv], body[sv], ...
             locales.forEach(loc => {
-                const t = document.getElementById(`title_${loc}_editar`)?.value ?? '';
                 const b = document.getElementById(`body_${loc}_editar`)?.value ?? '';
-                formData.append(`title[${loc}]`, t);
                 formData.append(`body[${loc}]`,  b);
             });
 

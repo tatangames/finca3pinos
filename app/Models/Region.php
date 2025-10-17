@@ -12,4 +12,9 @@ class Region extends Model
     public function contents() {
         return $this->hasMany(RegionContent::class);
     }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'region_id');
+    }
 }

@@ -1,120 +1,104 @@
 @extends('backend.menus.superior')
 
 @section('content-admin-css')
-    <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
-    <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
-    <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-    <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
-    <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/adminlte.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/dataTables.bootstrap4.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" rel="stylesheet">
 @stop
 
 <style>
-    table{
-        /*Ajustar tablas*/
-        table-layout:fixed;
-    }
-
-
+    .text-gold { color: #D2AA6D; }
+    .card-body label { font-weight: 600; color: #555; }
+    .border { border-color: #ddd !important; }
 </style>
 
 <div class="card mb-3">
     <div class="card-body">
-        <form id="form-crear-traducciones" onsubmit="event.preventDefault(); crearTraducciones();">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">Región</label>
-                    <select id="region_slug" class="form-control" required>
-                        @foreach($regiones as $r)
-                            <option value="{{ $r->slug }}">
-                                {{ $r->name }} ({{ $r->slug }}) – locale base: {{ $r->locale }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+        <h4 class="mb-3">Traducir a: <strong>{{ strtoupper($nuevoLocale) }}</strong></h4>
 
-                <div class="col-md-4">
-                    <label class="form-label">Nuevo idioma (locale)</label>
-                    <input id="new_locale"
-                           class="form-control"
-                           placeholder="ej: pt o es-MX"
-                           pattern="^[a-z]{2}(-[A-Z]{2})?$"
-                           required>
-                    <small class="text-muted">Formato: es, en, pt, es-MX, en-GB…</small>
-                </div>
+        <form id="form-crear-traducciones">
+            @csrf
+            <input type="hidden" name="locale" value="{{ $nuevoLocale }}">
 
-                <div class="col-md-4">
-                    <label class="form-label d-block">Modo</label>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="mode" id="mode_copy" value="copy" checked>
-                        <label class="form-check-label" for="mode_copy">Copiar desde ES</label>
+            @foreach($faltantes as $row)
+                <div class="mb-3 p-3 border rounded bg-light">
+                    <div class="mb-2">
+                        <span class="badge bg-dark">Key: {{ $row['key'] }}</span>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="mode" id="mode_empty" value="empty">
-                        <label class="form-check-label" for="mode_empty">Crear vacías</label>
-                    </div>
-                </div>
 
-                <div class="col-12 mt-2">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-language"></i> Crear traducciones
-                    </button>
+                    <label>Texto base (SV)</label>
+                    <div class="form-control mb-2" style="background:#f7f7f7">{{ $row['sv_body'] ?: '—' }}</div>
+
+                    <label>Traducción al {{ $regionNueva->name }}</label>
+                    <textarea
+                        name="traduccion[{{ $row['target_content_id'] }}][body]"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Escribe la traducción en {{ $regionNueva->name }} ({{ strtoupper($nuevoLocale) }})..."
+                    ></textarea>
+
+                    <input type="hidden"
+                           name="traduccion[{{ $row['target_content_id'] }}][locale]"
+                           value="{{ $nuevoLocale }}">
                 </div>
-            </div>
+            @endforeach
+
+            <button type="submit" class="btn btn-dark mt-3">Guardar traducciones</button>
         </form>
-
-        <hr>
-
-        <div id="resultado" class="mt-2 text-muted" style="display:none;"></div>
     </div>
 </div>
 
 
-
-
-
 @extends('backend.menus.footerjs')
 @section('archivos-js')
-
-    <script src="{{ asset('js/jquery-ui-drag.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('js/datatables-drag.min.js') }}" type="text/javascript"></script>
-
-    <script src="{{ asset('js/toastr.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/toastr.min.js') }}"></script>
+    <script src="{{ asset('js/axios.min.js') }}"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
 
-
-    <script type="text/javascript">
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            document.getElementById("divcontenedor").style.display = "block";
+            const form = document.getElementById('form-crear-traducciones');
 
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const url = "{{ url('/admin/idiomas/guardar') }}";
+
+                try {
+                    const res = await axios.post(url, formData);
+                    const data = res.data;
+
+                    if (data.success === 1) {
+                        toastr.success('Traducciones guardadas correctamente');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Guardado',
+                            html: `
+                            <b>${data.creados}</b> nuevas<br>
+                            <b>${data.actualizados}</b> actualizadas<br>
+                            <b>${data.omitidos}</b> omitidas
+                        `,
+                            timer: 2500,
+                            showConfirmButton: false
+                        });
+
+                        // Limpia los textarea después de guardar
+                        form.querySelectorAll('textarea').forEach(t => t.value = '');
+                    } else if (data.success === 0) {
+                        toastr.error('Datos inválidos, revisa los campos');
+                    } else {
+                        toastr.error(data.msg || 'Error al guardar');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    toastr.error('Error inesperado en el servidor');
+                }
+            });
         });
     </script>
-
-    <script>
-
-        // recarga tabla
-        function recargar(){
-            var ruta = "{{ URL::to('/admin/idiomas/index/tabla') }}";
-            $('#tablaDatatable').load(ruta);
-        }
-
-
-        // abre modal para agregar nuevo pais
-        function modalAgregar(){
-            document.getElementById("formulario-nuevo").reset();
-            $('#modalAgregar').modal('show');
-        }
-
-        function nuevo(){
-
-        }
-
-
-
-
-    </script>
-
-
 @endsection
