@@ -97,13 +97,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/galeria/editar', [AdminAuthController::class,'editarGaleria']);
 
     // NUEVO IDIOMA
-    Route::get('/idiomas/index', [AdminAuthController::class, 'indexIdiomas'])->name('idiomas');
-    Route::get('/idiomas/index/tabla', [AdminAuthController::class, 'tablaIdiomas']);
-
     // Mostrar formulario (region destino dinámica)
-    Route::get('/idiomas', [AdminAuthController::class, 'indexIdiomas'])->name('idiomas');
-    Route::get('/idiomas/{region}', [AdminAuthController::class, 'indexIdiomas'])->whereNumber('region');
-    Route::post('/idiomas/guardar', [AdminAuthController::class, 'guardarIdiomas']);
+    Route::get('/idiomas', [AdminAuthController::class, 'indexIdiomas'])
+        ->name('idiomas');
+
+    Route::get('/idiomas/{region}', [AdminAuthController::class, 'indexIdiomas'])
+        ->whereNumber('region')   // <-- CORREGIDO (antes decía 'admin.region')
+        ->name('idiomas.region');
+
+    // Guardar
+    Route::post('/idiomas/guardar', [AdminAuthController::class, 'guardarIdiomas'])
+        ->name('idiomas.guardar');
 
 });
 

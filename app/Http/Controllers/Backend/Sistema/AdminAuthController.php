@@ -458,23 +458,23 @@ class AdminAuthController extends Controller
 
     // === NUEVOS IDIOMAS ====
 
-    public function indexIdiomas()
+    public function indexIdiomas(Request $request, $regionParam = null)
     {
+        $regionBaseSlug = 'sv';
 
-        // === Config ===
-        $regionBaseSlug = 'sv';   // referencia (arriba)
-        $regionNuevaId  = 5;      // Brasil (pt) — tu nuevo ID
-        // ==============
+        $regiones = Region::orderBy('name')->get();
 
-        $regionBase  = Region::where('slug', $regionBaseSlug)->firstOrFail(); // SV
-        $regionNueva = Region::findOrFail($regionNuevaId);                    // BR
-        $nuevoLocale = $regionNueva->locale;                                  // 'pt'
+        $regionNuevaId = $regionParam ?? $request->integer('region_id');
+        if (!$regionNuevaId) {
+            $regionNuevaId = optional($regiones->firstWhere('slug', '!=', $regionBaseSlug))->id;
+        }
 
-        // 1) Asegurar que existan en region_contents las mismas keys para la región nueva
-        $keysBase = RegionContent::where('region_id', $regionBase->id)
-            ->pluck('key')
-            ->unique();
+        $regionBase  = Region::where('slug', $regionBaseSlug)->firstOrFail();
+        $regionNueva = Region::findOrFail($regionNuevaId);
+        $nuevoLocale = $regionNueva->locale;
 
+        // asegurar keys espejo en la región destino
+        $keysBase = RegionContent::where('region_id', $regionBase->id)->pluck('key')->unique();
         foreach ($keysBase as $k) {
             RegionContent::firstOrCreate([
                 'region_id' => $regionNueva->id,
@@ -482,50 +482,40 @@ class AdminAuthController extends Controller
             ]);
         }
 
-        // 2) Armar listado SOLO de faltantes (sin traducción pt)
+        // armar faltantes
         $faltantes = [];
-
         foreach ($keysBase as $key) {
-            // content SV y su texto base (usamos 'es' como locale del contenido SV)
             $contentSVId = RegionContent::where('region_id', $regionBase->id)
-                ->where('key', $key)
-                ->value('id');
+                ->where('key', $key)->value('id');
 
             $svTexto = RegionContentTranslation::where('content_id', $contentSVId)
-                ->where('locale', 'es')   // tu SV guarda en 'es'
-                ->value('body');
+                ->where('locale', 'es')->value('body');
 
-            // content BR (pt) equivalente por key
-            $contentBR = RegionContent::where('region_id', $regionNueva->id)
-                ->where('key', $key)
-                ->first();
+            $contentDest = RegionContent::where('region_id', $regionNueva->id)
+                ->where('key', $key)->first();
 
-            // ¿ya existe traducción pt?
-            $existePT = RegionContentTranslation::where('content_id', $contentBR->id)
-                ->where('locale', $nuevoLocale) // 'pt'
-                ->exists();
+            $existe = RegionContentTranslation::where('content_id', $contentDest->id)
+                ->where('locale', $nuevoLocale)->exists();
 
-            if (! $existePT) {
+            if (!$existe) {
                 $faltantes[] = [
                     'key'               => $key,
                     'sv_body'           => $svTexto ?? '',
-                    'target_content_id' => $contentBR->id, // para guardar después
+                    'target_content_id' => $contentDest->id,
                 ];
             }
         }
 
         return view('backend.admin.idiomas.vistanuevoidioma', [
-            'idiomaReferencia' => 'sv',
-            'regionNueva'      => $regionNueva,  // name = Brasil
-            'nuevoLocale'      => $nuevoLocale,  // 'pt'
-            'faltantes'        => $faltantes,    // [{key, sv_body, target_content_id}, ...]
+            'idiomaReferencia'  => $regionBaseSlug,
+            'regionNueva'       => $regionNueva,
+            'nuevoLocale'       => $nuevoLocale,
+            'faltantes'         => $faltantes,
+            'regiones'          => $regiones,
+            'regionSeleccionada'=> $regionNuevaId,
         ]);
     }
 
-    public function tablaIdiomas()
-    {
-        return view('backend.admin.idiomas.tablanuevoidioma');
-    }
 
 
     public function guardarIdiomas(Request $request)
