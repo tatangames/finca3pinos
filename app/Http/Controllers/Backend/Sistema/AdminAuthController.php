@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Backend\Sistema;
 use App\Http\Controllers\Controller;
 use App\Models\Galeria;
 use App\Models\Region;
+use App\Models\RegionContent;
+use App\Models\RegionContentTranslation;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -84,7 +88,9 @@ class AdminAuthController extends Controller
 
     public function indexGaleria()
     {
-        $arrayRegiones = Region::orderBy('id', 'ASC')->get();
+        $arrayRegiones = Region::where('slug', '!=', 'latin-es')
+            ->orderBy('id')
+            ->get();
 
         return view('backend.admin.galeria.vistagaleria', compact('arrayRegiones'));
     }
@@ -115,52 +121,92 @@ class AdminAuthController extends Controller
 
     public function nuevaGaleria(Request $request)
     {
-        if ($request->hasFile('imagen')) {
+        $regla = array(
+            'key' => 'required',
+        );
 
-            // Nombre único
+        // imagen, altseo
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        DB::beginTransaction();
+
+        try {
+            $keySinEspacios = trim($request->key);
+
+            // EVITAR KEY REPETIDAS
+            if(RegionContent::where('key', $keySinEspacios)->first()){
+                return ['success' => 1];
+            }
+
+            // ===== 1) Imagen =====
             $nombreBase  = Str::slug(Str::random(15) . '-' . microtime(true), '_');
-
-            // Lee archivo con Intervention v3
             $manager = new ImageManager(new Driver());
             $img     = $manager->read($request->file('imagen')->getPathname());
+            if ($img->width() > 1200) { $img->scale(width: 1200); }
 
-            // (Opcional) Redimensiona si es muy grande: ancho máx 1600px manteniendo proporción
-            if ($img->width() > 1600) {
-                $img->scale(width: 1600); // altura se ajusta automáticamente manteniendo aspecto
-            }
-
-            // ── Opción A: guarda como JPEG optimizado ────────────────────────────
-            //$encoded   = $img->encode(new JpegEncoder(quality: 80)); // 70–85 suele bien
-            //$nombreOut = $nombreBase . '.jpg';
-
-            // ── Opción B (recomendada para web): guarda como WebP ───────────────
-             $encoded   = $img->encode(new WebpEncoder(quality: 82));
-             $nombreOut = $nombreBase . '.webp';
-
-            // Guarda al disco 'archivos' (config/filesystems.php)
-            if(Storage::disk('archivos')->put($nombreOut, $encoded)){
-
-                // Posición
-                $nuevaPosicion = optional(\App\Models\Galeria::orderByDesc('posicion')->first())->posicion + 1 ?? 1;
-
-
-                $nuevo = new Galeria();
-                $nuevo->nombre = $request->nombre;
-                $nuevo->imagen = $nombreOut;
-                $nuevo->posicion = $nuevaPosicion;
-                $nuevo->activo = 1;
-                $nuevo->alt_seo = $request->altseo;
-                $nuevo->save();
-
-                return ['success' => 1];
-
-            } else {
-                // error al subir imagen
+            $encoded   = $img->encode(new WebpEncoder(quality: 82));
+            $nombreOut = $nombreBase . '.webp';
+            if (!Storage::disk('archivos')->put($nombreOut, $encoded)) {
                 return ['success' => 99, 'message' => 'No se pudo guardar la imagen'];
             }
-        } else {
-            // imagen no encontrada
-            return ['success' => 99, 'message' => 'No se pudo guardar la imagen'];
+
+            // ===== 2) Galería =====
+            $nuevaPosicion = optional(Galeria::orderByDesc('posicion')->first())->posicion + 1 ?? 1;
+
+            $gal = new Galeria();
+            $gal->imagen      = $nombreOut;
+            $gal->posicion    = $nuevaPosicion;
+            $gal->activo      = 1;
+            $gal->alt_seo = $request->altseo;
+            $gal->content_key = $keySinEspacios;     // ← única
+            $gal->save();
+
+            // ===== 3) i18n =====
+            // Espera formato: translations[<locale>][title|body]
+            $translations = $request->input('translations', []);
+            $trES = $translations['es'] ?? null;       // 👈 base para ES
+
+            // Trae regiones y crea RegionContent por cada una
+            $regiones = Region::select('id','slug','locale')->get();
+
+            foreach ($regiones as $region) {
+                // Crea/obtiene el contenedor por region_id + key
+                $content = RegionContent::firstOrCreate(
+                    ['region_id' => $region->id, 'key' => $keySinEspacios],
+                    []
+                );
+
+                // Traducción a aplicar para esta región:
+                // - Si la región es 'sv' (El Salvador) o 'latin-es', usa SIEMPRE la misma (ES)
+                // - Para otras, usa lo que venga por su locale.
+                if ($region->slug === 'sv' || $region->slug === 'latin-es') {
+                    if ($trES) {
+                        RegionContentTranslation::updateOrCreate(
+                            ['content_id' => $content->id, 'locale' => 'es'],
+                            ['title' => $trES['title'] ?? '', 'body' => $trES['body'] ?? '']
+                        );
+                    }
+                } else {
+                    $tr = $translations[$region->locale] ?? null;
+                    if ($tr) {
+                        RegionContentTranslation::updateOrCreate(
+                            ['content_id' => $content->id, 'locale' => $region->locale],
+                            ['title' => $tr['title'] ?? '', 'body' => $tr['body'] ?? '']
+                        );
+                    }
+                }
+            }
+
+            DB::commit();
+            return ['success' => 2];
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+            return ['success' => 0, 'message' => 'Excepción al guardar'];
         }
     }
 
@@ -202,117 +248,228 @@ class AdminAuthController extends Controller
 
     public function borrarGaleria(Request $request)
     {
-        $regla = array(
-            'id' => 'required',
-        );
-
+        $regla = ['id' => 'required|exists:galerias,id'];
         $validar = Validator::make($request->all(), $regla);
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
 
-        if ($validar->fails()){ return ['success' => 0];}
+        DB::beginTransaction();
+        try {
+            $galeria = Galeria::find($request->id);
+            if (!$galeria) {
+                return ['success' => 1]; // ya borrada
+            }
 
-        if($info = Galeria::where('id', $request->id)->first()){
+            $imagenOld = $galeria->imagen;
+            $contentKey = $galeria->content_key;
 
-            $imagenOld = $info->imagen;
-
-            if(Storage::disk('archivos')->exists($imagenOld)){
+            // 🧹 1) Eliminar imagen del disco
+            if ($imagenOld && Storage::disk('archivos')->exists($imagenOld)) {
                 Storage::disk('archivos')->delete($imagenOld);
             }
 
-            Galeria::where('id', $info->id)->delete();
+            // 🧹 2) Eliminar traducciones i18n asociadas
+            if ($contentKey) {
+                // Buscar todos los region_contents con esa key
+                $contents = RegionContent::where('key', $contentKey)->get();
 
-            // fue borrada
+                foreach ($contents as $c) {
+                    // Borrar sus traducciones
+                    RegionContentTranslation::where('content_id', $c->id)->delete();
+                    // Borrar el contenido base
+                    $c->delete();
+                }
+            }
+
+            // 🧹 3) Borrar galería
+            $galeria->delete();
+
+            DB::commit();
             return ['success' => 1];
-        }else{
-            // decir que fue borrado
-            return ['success' => 1];
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            // \Log::error($e->getMessage());
+            return ['success' => 0, 'message' => 'Error al eliminar'];
         }
     }
 
 
     public function informacionGaleria(Request $request)
     {
-        $regla = array(
-            'id' => 'required',
-        );
-
+        $regla = ['id' => 'required|exists:galerias,id'];
         $validar = Validator::make($request->all(), $regla);
+        if ($validar->fails()) { return ['success' => 0]; }
 
-        if ($validar->fails()){ return ['success' => 0];}
+        $galeria = Galeria::find($request->id);
+        if (!$galeria) { return ['success' => 2]; }
 
-        if($info = Galeria::where('id', $request->id)->first()){
+        // ⚠️ Excluye latinoamérica (latin-es)
+        $regiones = Region::select('id','name','locale','slug')
+            ->where('slug','!=','latin-es')
+            ->orderBy('id')
+            ->get();
 
-            return ['success' => 1, 'info' => $info];
-        }else{
-            // decir que fue borrado
-            return ['success' => 2];
+        $traducciones = collect();
+        if ($galeria->content_key) {
+            $traducciones = DB::table('region_contents as rc')
+                ->join('region_content_translation as rct', 'rct.content_id', '=', 'rc.id')
+                ->join('regions as r', 'r.id', '=', 'rc.region_id')
+                ->where('rc.key', $galeria->content_key)
+                ->select(
+                    'r.id as region_id',
+                    'r.name as region_name',
+                    'r.locale as region_locale',
+                    'rct.title',
+                    'rct.body'
+                )
+                ->get()
+                ->keyBy('region_locale');
         }
+
+        $langs = $regiones->map(function ($region) use ($traducciones) {
+            $data = $traducciones->get($region->locale);
+            return [
+                'region_id' => $region->id,
+                'name'      => $region->name,
+                'locale'    => $region->locale,
+                'title'     => $data->title ?? '',
+                'body'      => $data->body ?? '',
+            ];
+        })->values();
+
+        return [
+            'success' => 1,
+            'info' => [
+                'id'          => $galeria->id,
+                'imagen'      => $galeria->imagen,
+                'alt_seo'     => $galeria->alt_seo,
+                'content_key' => $galeria->content_key,
+            ],
+            'langs' => $langs,
+        ];
     }
+
 
     public function editarGaleria(Request $request)
     {
-        $regla = array(
-            'id' => 'required',
-        );
+        // 1) Validación
+        $reglas = [
+            'id'        => 'required|exists:galerias,id',
+            'alt_seo'   => 'nullable|string|max:300',
+            'imagen'    => 'nullable|image|mimes:jpeg,jpg,png|max:5120',
+            'title'     => 'nullable|array',
+            'title.*'   => 'nullable|string|max:200',
+            'body'      => 'nullable|array',
+            'body.*'    => 'nullable|string',
+        ];
+        $validar = Validator::make($request->all(), $reglas);
+        if ($validar->fails()) {
+            return response()->json([
+                'success' => 0,
+                'errors'  => $validar->errors()
+            ], 422);
+        }
 
-        $validar = Validator::make($request->all(), $regla);
+        $galeria = Galeria::find($request->id);
+        if (!$galeria) {
+            return ['success' => 2]; // borrada/no existe
+        }
 
-        if ($validar->fails()){ return ['success' => 0];}
+        DB::beginTransaction();
+        try {
+            // 2) Actualiza ALT SEO
+            $galeria->alt_seo = $request->input('alt_seo');
 
-        if ($request->hasFile('imagen')) {
+            // 3) Imagen opcional → WebP
+            if ($request->hasFile('imagen')) {
+                $old = $galeria->imagen;
 
-            $infoGaleria = Galeria::where('id', $request->id)->first();
-            $imagenOld = $infoGaleria->imagen;
+                $manager = new ImageManager(new Driver());
+                $img     = $manager->read($request->file('imagen')->getPathname());
 
-            // Nombre único
-            $nombreBase  = Str::slug(Str::random(15) . '-' . microtime(true), '_');
-
-            // Lee archivo con Intervention v3
-            $manager = new ImageManager(new Driver());
-            $img     = $manager->read($request->file('imagen')->getPathname());
-
-            // (Opcional) Redimensiona si es muy grande: ancho máx 1600px manteniendo proporción
-            if ($img->width() > 1600) {
-                $img->scale(width: 1600); // altura se ajusta automáticamente manteniendo aspecto
-            }
-
-            // ── Opción A: guarda como JPEG optimizado ────────────────────────────
-            //$encoded   = $img->encode(new JpegEncoder(quality: 80)); // 70–85 suele bien
-            //$nombreOut = $nombreBase . '.jpg';
-
-            // ── Opción B (recomendada para web): guarda como WebP ───────────────
-            $encoded   = $img->encode(new WebpEncoder(quality: 82));
-            $nombreOut = $nombreBase . '.webp';
-
-            // Guarda al disco 'archivos' (config/filesystems.php)
-            if(Storage::disk('archivos')->put($nombreOut, $encoded)){
-
-                Galeria::where('id', $request->id)
-                    ->update([
-                        'nombre' => $request->nombre,
-                        'alt_seo' => $request->altseo,
-                        'imagen' => $nombreOut,
-                    ]);
-
-                if(Storage::disk('archivos')->exists($imagenOld)){
-                    Storage::disk('archivos')->delete($imagenOld);
+                if ($img->width() > 1600) {
+                    $img->scale(width: 1600);
                 }
 
-                return ['success' => 1];
-            } else {
-                // error al subir imagen
-                return ['success' => 99];
-            }
-        } else {
-            Galeria::where('id', $request->id)
-                ->update([
-                    'nombre' => $request->nombre,
-                    'alt_seo' => $request->altseo
-                ]);
+                $nombreBase = Str::slug(Str::random(15) . '-' . microtime(true), '_');
+                $nombreOut  = $nombreBase . '.webp';
+                $encoded    = $img->encode(new WebpEncoder(quality: 82));
 
+                if (!Storage::disk('archivos')->put($nombreOut, $encoded)) {
+                    DB::rollBack();
+                    return ['success' => 99, 'message' => 'No se pudo guardar la imagen'];
+                }
+
+                $galeria->imagen = $nombreOut;
+
+                if ($old && Storage::disk('archivos')->exists($old)) {
+                    Storage::disk('archivos')->delete($old);
+                }
+            }
+
+            // 4) Garantiza content_key
+            if (empty($galeria->content_key)) {
+                $galeria->content_key = 'galeria.' . $galeria->id;
+            }
+
+            $galeria->save();
+
+            // 5) Upsert de contenidos por región y traducciones por locale
+            $titles = $request->input('title', []);   // ej: ['es' => '...', 'en'=>'...']
+            $bodies = $request->input('body',  []);   // ej: ['es' => '...', 'en'=>'...']
+
+            // Para cada región del sistema, garantizamos region_contents (region_id + key)
+            $regiones = Region::select('id', 'locale', 'name')->get();
+
+            foreach ($regiones as $region) {
+                // Crea/obtiene el row base por región+key
+                $content = RegionContent::firstOrCreate(
+                    ['region_id' => $region->id, 'key' => $galeria->content_key],
+                    [] // no hay más columnas en region_contents
+                );
+
+                // Usamos el locale de la región para tomar los campos del request
+                $loc  = $region->locale; // p.ej 'es', 'en', 'ko'...
+                $tit  = $titles[$loc] ?? null;
+                $bod  = $bodies[$loc] ?? null;
+
+                // Si no hay nada para este locale, puedes saltar o limpiar. Aquí upsert si hay algo.
+                if ($tit !== null || $bod !== null) {
+                    RegionContentTranslation::updateOrCreate(
+                        ['content_id' => $content->id, 'locale' => $loc],
+                        ['title' => $tit, 'body' => $bod]
+                    );
+                }
+            }
+
+            DB::commit();
             return ['success' => 1];
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            // \Log::error($e->getMessage());
+            return ['success' => 0, 'message' => 'Error al actualizar'];
         }
     }
 
+
+
+
+
+    // === NUEVOS IDIOMAS ====
+
+    public function indexIdiomas()
+    {
+        // Trae las regiones disponibles para el select
+        $regiones = Region::orderBy('name')->get(['id','slug','name','locale']);
+
+        return view('backend.admin.idiomas.vistanuevoidioma', compact('regiones'));
+    }
+
+    public function tablaIdiomas()
+    {
+        return view('backend.admin.idiomas.tablanuevoidioma');
+    }
 
 
 

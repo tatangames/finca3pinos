@@ -76,6 +76,15 @@
                                 <div class="col-md-12">
 
 
+                                    <div class="form-group">
+                                        <label>ALT SEO</label>
+                                        <small style="font-size: 15px">Describe la imagen si esta no se puede mostrar (por ejemplo, si hay un error de carga)</small>
+                                        <input type="text" maxlength="300" id="altseo-nuevo" class="form-control">
+                                    </div>
+
+
+                                    <hr>
+
                                     <!-- Key global -->
                                     <div class="form-group">
                                         <label>Key para todos los idiomas</label>
@@ -85,6 +94,7 @@
 
                                     <!-- Campos por idioma -->
                                     @foreach($arrayRegiones as $region)
+
                                         <div class="card mt-3 border">
                                             <div class="card-header" style="background:#f4f4f4;">
                                                 <strong>{{ $region->name }}</strong> ({{ strtoupper($region->locale) }})
@@ -149,19 +159,21 @@
                         <div class="row">
                             <div class="col-md-12">
 
-
                                 <div class="form-group">
-                                    <label>Nombre (Opcional)</label>
                                     <input type="hidden" id="id-editar">
-                                    <input type="text" maxlength="300" id="nombre-editar" class="form-control">
-                                </div>
-
-                                <div class="form-group">
                                     <label>ALT SEO (Opcional)</label>
                                     <small style="font-size: 15px">Describe la imagen si esta no se puede mostrar (por ejemplo, si hay un error de carga)</small>
                                     <input type="text" maxlength="300" id="altseo-editar" class="form-control">
                                 </div>
+                                <br>
+                                <hr>
 
+                                <!-- Campos dinámicos por idioma -->
+                                <div id="langs-editar"></div>
+
+
+                                <br>
+                                <hr>
 
                                 <!-- 👇 Vista previa centrada -->
                                 <div class="mt-3"
@@ -261,17 +273,18 @@
         }
 
         function nuevo(){
-            var nombre = document.getElementById('nombre').value;
-            var altseo = document.getElementById('altseo').value;
+            var key = document.getElementById('key').value.trim();
+            var altseo = document.getElementById('altseo-nuevo').value;
             var imagen = document.getElementById('imagen-nuevo');
 
-            if(nombre.length > 300){
-                toastr.error('Nombre 300 caracteres maxímo')
+            if (altseo === '') {
+                toastr.error('ALT SEO es requerido');
                 return;
             }
 
-            if(altseo.length > 300){
-                toastr.error('ALT SEO 300 caracteres maxímo')
+
+            if (key === '') {
+                toastr.error('Debe ingresar la key global');
                 return;
             }
 
@@ -285,18 +298,35 @@
                 return;
             }
 
-            openLoading();
+            openLoading()
+
+            // 🔹 Creamos el FormData
             let formData = new FormData();
-            formData.append('nombre', nombre);
             formData.append('altseo', altseo);
+            formData.append('key', key);
             formData.append('imagen', imagen.files[0]);
 
+            // 🔹 Recorremos las regiones en un array JSON generado por Blade
+            let regiones = @json($arrayRegiones);
+
+            regiones.forEach(region => {
+                let locale = region.locale;
+                let title = document.getElementById(`title_${locale}`).value.trim();
+                let body = document.getElementById(`body_${locale}`).value.trim();
+
+                formData.append(`translations[${locale}][title]`, title);
+                formData.append(`translations[${locale}][body]`, body);
+            });
+
             axios.post('/admin/galeria/nuevo', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             })
                 .then((response) => {
                     closeLoading();
 
-                    if(response.data.success === 1){
+                    if(response.data.success === 1) {
+                        toastr.error('KEY repetida');
+                    }else if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();
@@ -428,85 +458,140 @@
                 });
         }
 
+        function cardIdiomaHTML(item) {
+            // item = { name, locale, title, body }
+            const loc = item.locale;
+            return `
+      <div class="card mt-3 border">
+        <div class="card-header" style="background:#f4f4f4;">
+          <strong>${item.name}</strong> (${loc.toUpperCase()})
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Título (${loc})</label>
+            <input type="text"
+                   id="title_${loc}_editar"
+                   maxlength="200"
+                   class="form-control"
+                   placeholder="Título para ${item.name}"
+                   value="${(item.title || '').replace(/"/g, '&quot;')}">
+          </div>
+          <div class="form-group">
+            <label>Contenido HTML (${loc})</label>
+            <textarea id="body_${loc}_editar"
+                      rows="4"
+                      class="form-control"
+                      placeholder="<p>Texto o HTML...</p>">${item.body || ''}</textarea>
+          </div>
+        </div>
+      </div>
+    `;
+        }
+
         function informacionEditar(id){
             openLoading();
             document.getElementById("formulario-editar").reset();
 
-            axios.post('/admin/galeria/informacion',{
-                'id': id
-            })
+            axios.post('/admin/galeria/informacion', { id })
                 .then((response) => {
                     closeLoading();
-                    if(response.data.success === 1){
+                    if (response.data.success === 1) {
+                        const { info, langs } = response.data;
+
                         $('#modalEditar').modal('show');
-                        $('#id-editar').val(id);
-                        $('#nombre-editar').val(response.data.info.nombre);
-                        $('#altseo-editar').val(response.data.info.alt_seo);
+                        $('#id-editar').val(info.id);
+                        $('#altseo-editar').val(info.alt_seo || '');
 
-                        // ✅ Mostrar imagen actual
-                        const imagenUrl = '/storage/archivos/' + response.data.info.imagen;
-
+                        // ✅ Imagen
+                        const imagenUrl = '/storage/archivos/' + info.imagen;
                         const preview = document.getElementById('preview-editar');
                         preview.src = imagenUrl;
                         preview.style.display = 'block';
 
-                    }else{
+                        // ✅ Idiomas dinámicos
+                        const cont = document.getElementById('langs-editar');
+                        cont.innerHTML = langs.map(cardIdiomaHTML).join('');
+                        cont.dataset.locales = langs.map(l => l.locale).join(',');
+                    } else {
                         toastr.error('Información no encontrada');
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     closeLoading();
-                    toastr.error('Información no encontrada');
+                    toastr.error('Error al obtener la información');
                 });
         }
 
         function editar(){
-            var id = document.getElementById('id-editar').value;
-            var nombre = document.getElementById('nombre-editar').value;
-            var altseo = document.getElementById('altseo-editar').value;
-            var imagen = document.getElementById('imagen-editar');
+            const id     = document.getElementById('id-editar').value;
+            let alt_seo  = document.getElementById('altseo-editar').value || '';
+            const imagen = document.getElementById('imagen-editar');
 
-            if(nombre.length > 300){
-                toastr.error('Nombre 300 caracteres maxímo')
-                return;
-            }
+            // Normaliza alt
+            alt_seo = alt_seo.trim();
 
-            if(altseo.length > 300){
-                toastr.error('ALT SEO 300 caracteres maxímo')
-                return;
-            }
-
-            if(imagen.files && imagen.files[0]){ // si trae imagen
+            // Validación de imagen (si hay)
+            if (imagen.files && imagen.files[0]) {
                 if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
                     toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
                     return;
                 }
             }
 
-            openLoading();
-            let formData = new FormData();
-            formData.append('id', id);
-            formData.append('nombre', nombre);
-            formData.append('altseo', altseo);
-            formData.append('imagen', imagen.files[0]);
+            // Recolectar traducciones dinámicas
+            const cont = document.getElementById('langs-editar');
+            const locales = (cont.dataset.locales || '').split(',').filter(Boolean);
 
-            axios.post('/admin/galeria/editar', formData, {
-            })
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('alt_seo', alt_seo); // ← usa snake_case igual que en backend
+
+            if (imagen.files && imagen.files[0]) {
+                formData.append('imagen', imagen.files[0]);
+            }
+
+            // Enviar como arrays: title[en], body[en], title[sv], body[sv], ...
+            locales.forEach(loc => {
+                const t = document.getElementById(`title_${loc}_editar`)?.value ?? '';
+                const b = document.getElementById(`body_${loc}_editar`)?.value ?? '';
+                formData.append(`title[${loc}]`, t);
+                formData.append(`body[${loc}]`,  b);
+            });
+
+            openLoading();
+
+            axios.post('/admin/galeria/editar', formData)
                 .then((response) => {
                     closeLoading();
 
-                    if(response.data.success === 1){
+                    if (response.data.success === 1) {
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
                         recargar();
+                        return;
                     }
-                    else {
-                        toastr.error('Error al actualizar');
+
+                    // Si el backend devolvió validación (422) con errores
+                    if (response.data.success === 0 && response.data.errors) {
+                        const errs = response.data.errors;
+                        const first = Object.values(errs)[0]?.[0] || 'Error de validación';
+                        toastr.error(first);
+                        return;
                     }
+
+                    toastr.error('Error al actualizar');
                 })
                 .catch((error) => {
-                    toastr.error('Error al actualizar');
                     closeLoading();
+
+                    // Muestra primer error si viene de validación Laravel
+                    if (error.response && error.response.status === 422 && error.response.data?.errors) {
+                        const errs = error.response.data.errors;
+                        const first = Object.values(errs)[0]?.[0] || 'Error de validación';
+                        toastr.error(first);
+                    } else {
+                        toastr.error('Error al actualizar');
+                    }
                 });
         }
 

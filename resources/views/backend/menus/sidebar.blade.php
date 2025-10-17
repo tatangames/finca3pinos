@@ -34,6 +34,13 @@
                                 </a>
                             </li>
 
+                            <li class="nav-item">
+                                <a href="{{ route('admin.idiomas') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Nuevo Idioma</p>
+                                </a>
+                            </li>
+
                         </ul>
                     </li>
                 @endcan

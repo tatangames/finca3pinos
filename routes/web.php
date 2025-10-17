@@ -96,7 +96,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/galeria/informacion', [AdminAuthController::class,'informacionGaleria']);
     Route::post('/galeria/editar', [AdminAuthController::class,'editarGaleria']);
 
-
+    // NUEVO IDIOMA
+    Route::get('/idiomas/index', [AdminAuthController::class, 'indexIdiomas'])->name('idiomas');
+    Route::get('/idiomas/index/tabla', [AdminAuthController::class, 'tablaIdiomas']);
 });
 
 

@@ -7,15 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * LISTA DE GALERIA DE IMAGENES
+     * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('galeria', function (Blueprint $table) {
+        Schema::create('galerias', function (Blueprint $table) {
             $table->id();
             $table->string('imagen', 100);
             $table->integer('posicion');
             $table->boolean('activo');
+            $table->string('alt_seo', 300)->nullable();
+            $table->string('content_key', 300)->nullable();
         });
     }
 
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('galeria');
+        Schema::dropIfExists('galerias');
     }
 };

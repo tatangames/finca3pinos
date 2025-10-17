@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Galeria extends Model
 {
     use HasFactory;
-    protected $table = 'galeria';
+    protected $table = 'galerias';
     public $timestamps = false;
 
     protected $fillable = ['posicion'];
