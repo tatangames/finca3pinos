@@ -278,8 +278,7 @@
 
             modalImg.src = img.dataset.full || img.src;
 
-            const text = img.getAttribute('data-caption') || '';
-            caption.textContent = text;
+            caption.textContent = img.getAttribute('data-caption') || '';
 
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; // bloquea scroll fondo

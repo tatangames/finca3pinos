@@ -40,6 +40,9 @@ return [
     'go_to_finca3pinos' => 'Go To Finca3Pinos.com',
     'gallery_finca3pinos' => 'Gallery Finca3Pinos',
     'loading' => 'Loading...',
+    'siguenos' => 'Follow us',
+
+
 
     // === VISTA NUESTRO CAFE ===
     'coffee_v1' => 'Geisha Coffee Finca 3 Pinos — Metapán',
@@ -97,9 +100,9 @@ return [
     'coffee_v53' => 'Innovation',
     'coffee_v54' => 'Respect for the land',
     'coffee_v55' => 'Our commitment is to produce the best Geisha in El Salvador. We combine tradition, technology, and sustainability so that every cup expresses the best of Metapán.',
-    'coffee_v56' => '',
-    'coffee_v57' => '',
-    'coffee_v58' => '',
+    'coffee_v56' => 'Geisha Coffee from the Alotepec–Metapán Mountain Range.',
+    'coffee_v57' => 'Tradition, innovation, and respect for the land in every cup.',
+    'coffee_v58' => 'Explore',
 
 
 
@@ -124,5 +127,6 @@ return [
     'sending'       => 'Sending...',
     'unknown_error' => 'An unexpected error occurred. Please try again.',
     'network_error' => 'Could not reach the server. Check your connection.',
+    'derechos' => 'Finca 3 Pinos — All rights reserved.'
 
 ];

@@ -162,8 +162,8 @@
                                      loading="lazy" decoding="async">
                             </a>
                         </div>
-                        <p>Café Geisha de la Cordillera Alotepec–Metapán.<br>
-                            Tradición, innovación y respeto por la tierra en cada taza.</p>
+                        <p>{{ __('meta.coffee_v56') }}<br>
+                            {{ __('meta.coffee_v57') }}</p>
                     </div>
                 </div>
             </div>
@@ -172,12 +172,12 @@
             <div class="col-md-4 col-sm-6 col-ms-12 hidden-xs hidden-ms">
                 <div class="footer-widget-area">
                     <div class="widget widget_nav_menu">
-                        <h4 class="header-widget">Explorar</h4>
+                        <h4 class="header-widget">{{ __('meta.coffee_v58') }}</h4>
                         <ul class="menu">
-                            <li><a href="#">Inicio</a></li>
-                            <li><a href="#">Sobre Nosotros</a></li>
-                            <li><a href="#">Productos</a></li>
-                            <li><a href="#">Contacto</a></li>
+                            <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), '/') }}">{{ __('meta.home') }}</a></li>
+                            <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.ourcoffee', [], false)) }}">{{ __('meta.about_us') }}</a></li>
+                            <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.products', [], false)) }}">{{ __('meta.products') }}</a></li>
+                            <li><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}">{{ __('meta.contact') }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -187,7 +187,7 @@
             <div class="col-md-4 col-sm-6 col-ms-12">
                 <div class="footer-widget-area">
                     <div class="widget widget_coffeeking_icons">
-                        <h4 class="header-widget">Síguenos</h4>
+                        <h4 class="header-widget">{{ __('meta.siguenos') }}</h4>
                         <ul class="social-icons-list">
                             <li>
                                 <a href="https://facebook.com/finca3pinos" target="_blank">
@@ -199,11 +199,7 @@
                                     <span class="fa fa-instagram"></span> Instagram
                                 </a>
                             </li>
-                            <li>
-                                <a href="https://tiktok.com/@finca3pinos" target="_blank">
-                                    <span class="fa fa-music"></span> TikTok
-                                </a>
-                            </li>
+
                         </ul>
                     </div>
                 </div>
@@ -215,7 +211,7 @@
 
 <footer class="footer-block footer-dark-bottom">
     <div class="container">
-        <p>© {{ date('Y') }} Finca 3 Pinos — Todos los derechos reservados.</p>
+        <p>© {{ date('Y') }} {{ __('meta.derechos') }}</p>
         <a href="#" class="go-top hidden-xs hidden-ms" style="color: white !important;"><span class="fa fa-arrow-up"></span> TOP</a>
     </div>
 </footer>

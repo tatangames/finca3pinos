@@ -40,6 +40,10 @@ return [
     'go_to_finca3pinos' => 'Finca3Pinos.com으로 이동',
     'gallery_finca3pinos' => '핀카 3 피노스 갤러리',
     'loading' => '로딩 중...',
+    'siguenos' => '팔로우하기',
+
+
+
 
     // === VISTA NUESTRO CAFE ===
     'coffee_v0' => '게이샤 커피 • 메타판, 엘살바도르',
@@ -98,9 +102,9 @@ return [
     'coffee_v53' => '혁신',
     'coffee_v54' => '땅에 대한 존중',
     'coffee_v55' => '우리의 사명은 엘살바도르 최고의 게이샤 커피를 생산하는 것입니다. 전통, 기술, 그리고 지속 가능성을 결합하여, 한 잔의 커피마다 메타판의 진정한 가치를 담아냅니다.',
-    'coffee_v56' => '',
-    'coffee_v57' => '',
-    'coffee_v58' => '',
+    'coffee_v56' => '알로테펙–메타판 산맥의 게이샤 커피.',
+    'coffee_v57' => '모든 한 잔에 전통, 혁신, 그리고 땅에 대한 존중을 담았습니다.',
+    'coffee_v58' => '탐험하기',
 
 
 
@@ -124,6 +128,6 @@ return [
     'sending'       => '전송 중...',
     'unknown_error' => '예기치 않은 오류가 발생했습니다. 다시 시도해 주세요.',
     'network_error' => '서버에 연결할 수 없습니다. 인터넷 연결을 확인하세요.',
-
+    'derechos' => '핀카 3 피노스 — 모든 권리 보유.'
 
 ];
