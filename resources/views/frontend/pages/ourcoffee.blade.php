@@ -12,7 +12,7 @@
         <div class="container" bis_skin_checked="1"><h1>{{ __('meta.our_coffee') }}</h1>
             <ul class="breadcrumbs" typeof="BreadcrumbList" vocab="https://schema.org/">
                 <li class="home"><span property="itemListElement" typeof="ListItem"><a property="item" typeof="WebPage"
-                                                                                       title="Go to Finca3pinos.com"
+                                                                                       title="{{ __('meta.go_to_finca3pinos') }}"
                                                                                        href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), '/') }}"
                                                                                        class="home"
                                                                                        bis_skin_checked="1">
@@ -331,23 +331,21 @@
             <!-- HERO / INTRO -->
             <header class="grid grid-2">
                 <div>
-                    <span class="eyebrow">Café Geisha Finca 3 Pinos — Metapán</span>
-                    <h1 id="geisha-title" class="title-xl">Excelencia desde la Cordillera Alotepec-Metapán</h1>
+                    <span class="eyebrow">{{ __('meta.coffee_v1') }}</span>
+                    <h1 id="geisha-title" class="title-xl">{{ __('meta.coffee_v2') }}</h1>
                     <p class="lead">
-                        {!! $aboutHistory !!}
-                        Una de las regiones más altas y reconocidas de El Salvador, ubicada en la frontera con
-                        Honduras y Guatemala; ideal para cafés de especialidad con acidez brillante y aromas florales.
+                        {{ __('meta.coffee_v3') }}
                     </p>
                     <div class="cta">
-                        <a href="" class="btn primary">Comprar Geisha</a>
+                        <a href="" class="btn primary">{{ __('meta.coffee_v19') }}</a>
                     </div>
                     <div class="badge" style="margin-top:14px">
-                        <span class="pill">Trazabilidad total</span>
-                        <span>Del árbol a la exportación</span>
+                        <span class="pill">{{ __('meta.coffee_v4') }}</span>
+                        <span>{{ __('meta.coffee_v20') }}</span>
                     </div>
                 </div>
 
-                <figure class="media" aria-label="Finca 3 Pinos — Vista de montaña">
+                <figure class="media" aria-label="{{ __('meta.coffee_v21') }}">
                     <picture>
                         <!-- Móvil pequeño -->
                         <source
@@ -382,7 +380,7 @@
                         <!-- Fallback (por compatibilidad) -->
                         <img
                             src="{{ asset('images/finca3pinos/montana-1920.webp') }}"
-                            alt="Nubes y cordillera en Metapán — Café Geisha Finca 3 Pinos"
+                            alt="{{ __('meta.coffee_v22') }}"
                             fetchpriority="high"
                             loading="eager"
                             decoding="async"
@@ -398,64 +396,68 @@
             <!-- ORIGEN Y PRESTIGIO + PERFIL SENSORIAL -->
             <section class="grid grid-2">
                 <article class="card prose">
-                    <span class="eyebrow">Origen y prestigio</span>
-                    <h2>La variedad Geisha</h2>
+                    <span class="eyebrow">{{ __('meta.coffee_v23') }}</span>
+                    <h2>{{ __('meta.coffee_v24') }}</h2>
                     <ul>
-                        <li>Descubierta en Gori Gesha, Etiopía (década de 1930).</li>
-                        <li>Alcanzó fama mundial en 2004 al ganar <em>Best of Panama</em>.</li>
-                        <li>Entre los cafés más cotizados en subastas internacionales.</li>
+                        <li>{{ __('meta.coffee_v25') }}</li>
+                        <li>{{ __('meta.coffee_v26') }} <em>{{ __('meta.coffee_v27') }}</em>.</li>
+                        <li>{{ __('meta.coffee_v28') }}</li>
                     </ul>
                 </article>
                 <article class="card prose">
-                    <span class="eyebrow">Perfil sensorial</span>
-                    <h2>Una taza inolvidable</h2>
+                    <span class="eyebrow">{{ __('meta.coffee_v15') }}</span>
+                    <h2>{{ __('meta.coffee_v29') }}</h2>
                     <ul>
-                        <li>Aromas florales: jazmín, lavanda, bergamota.</li>
-                        <li>Frutas: melocotón, mango, frutos rojos y cítricos.</li>
-                        <li>Acidez brillante, cuerpo sedoso y retrogusto prolongado.</li>
-                        <li>Experiencia refinada, compleja y memorable.</li>
+                        <li>{{ __('meta.coffee_v30') }}</li>
+                        <li>{{ __('meta.coffee_v31') }}</li>
+                        <li>{{ __('meta.coffee_v32') }}</li>
+                        <li>{{ __('meta.coffee_v33') }}</li>
                     </ul>
                 </article>
             </section>
 
             <!-- EXPERIENCIA Y TECNOLOGÍA -->
             <section class="card" style="margin-top:20px">
-                <span class="eyebrow">Experiencia y tecnología</span>
-                <h2>Cómo cuidamos cada lote</h2>
+                <span class="eyebrow">{{ __('meta.coffee_v34') }}</span>
+                <h2>{{ __('meta.coffee_v35') }}</h2>
                 <div class="features" style="margin-top:10px">
                     <div class="feat">
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a9 9 0 100 18 9 9 0 000-18zm0 2a7 7 0 110 14A7 7 0 0112 4zm1 3h-2v5l4 2 .8-1.8-2.8-1.2V7z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M12 2a9 9 0 100 18 9 9 0 000-18zm0 2a7 7 0 110 14A7 7 0 0112 4zm1 3h-2v5l4 2 .8-1.8-2.8-1.2V7z"/></svg>
                         <div>
-                            <h3>Monitoreo climático y de suelos</h3>
-                            <p class="muted">Sensores y análisis para ajustar riego, nutrición y sombra con precisión.</p>
+                            <h3>{{ __('meta.coffee_v36') }}</h3>
+                            <p class="muted">{{ __('meta.coffee_v37') }}</p>
                         </div>
                     </div>
                     <div class="feat">
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4h16v4H4V4zm0 6h16v10H4V10zm2 2v6h12v-6H6z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M4 4h16v4H4V4zm0 6h16v10H4V10zm2 2v6h12v-6H6z"/></svg>
                         <div>
-                            <h3>Beneficio controlado</h3>
-                            <p class="muted">Fermentaciones naturales y lavadas con control de temperatura y pH.</p>
+                            <h3>{{ __('meta.coffee_v38') }}</h3>
+                            <p class="muted">{{ __('meta.coffee_v39') }}</p>
                         </div>
                     </div>
                     <div class="feat">
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 7h18v2H3V7zm0 4h12v2H3v-2zm0 4h18v2H3v-2z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M3 7h18v2H3V7zm0 4h12v2H3v-2zm0 4h18v2H3v-2z"/></svg>
                         <div>
-                            <h3>Secado estable</h3>
-                            <p class="muted">Camas africanas y sistemas híbridos para preservar compuestos aromáticos.</p>
+                            <h3>{{ __('meta.coffee_v40') }}</h3>
+                            <p class="muted">{{ __('meta.coffee_v41') }}</p>
                         </div>
                     </div>
                     <div class="feat">
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l9 4v6c0 5-3.8 9.7-9 10-5.2-.3-9-5-9-10V7l9-4zm0 2.2L5 7.5v5.4c0 4.1 3 7.9 7 8.1 4-.2 7-4 7-8.1V7.5l-7-2.3zM7 12h10v2H7v-2z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M12 3l9 4v6c0 5-3.8 9.7-9 10-5.2-.3-9-5-9-10V7l9-4zm0 2.2L5 7.5v5.4c0 4.1 3 7.9 7 8.1 4-.2 7-4 7-8.1V7.5l-7-2.3zM7 12h10v2H7v-2z"/></svg>
                         <div>
-                            <h3>Trazabilidad digital</h3>
-                            <p class="muted">Cada lote puede rastrearse desde la planta hasta la exportación.</p>
+                            <h3>{{ __('meta.coffee_v42') }}</h3>
+                            <p class="muted">{{ __('meta.coffee_v43') }}</p>
                         </div>
                     </div>
                     <div class="feat">
                         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l4 8h8l-6 5 2 9-8-5-8 5 2-9-6-5h8z"/></svg>
                         <div>
-                            <h3>Prácticas sostenibles</h3>
-                            <p class="muted">Rotación de cultivos, fertilización orgánica y conservación de la biodiversidad.</p>
+                            <h3>{{ __('meta.coffee_v44') }}</h3>
+                            <p class="muted">{{ __('meta.coffee_v45') }}</p>
                         </div>
                     </div>
                 </div>
@@ -463,13 +465,12 @@
 
             <!-- ESTADÍSTICAS / PRUEBAS SOCIALES -->
             <section class="stats" style="margin-top:20px">
-                <div class="stat card"><h3>12</h3><p>Años cultivando especialidad</p></div>
-                <div class="stat card"><h3>Café Geisha</h3><p>Café Geisha de Metapán</p></div>
-                <div class="stat card"><h3>1,400–1,700</h3><p>msnm altitud de cultivo</p></div>
-                <div class="stat card"><h3>90+</h3><p>Puntajes en catas internas</p></div>
+                <div class="stat card"><h3>12</h3><p>{{ __('meta.coffee_v46') }}</p></div>
+                <div class="stat card"><h3>{{ __('meta.coffee_v47') }}</h3><p>{{ __('meta.coffee_v48') }}</p></div>
+                <div class="stat card"><h3>1,400–1,700</h3><p>{{ __('meta.coffee_v49') }}</p></div>
+                <div class="stat card"><h3>90+</h3><p>{{ __('meta.coffee_v50') }}</p></div>
             </section>
 
-            <!-- MAPA / UBICACIÓN + COMPROMISO (lado a lado) -->
             <!-- MAPA / UBICACIÓN + COMPROMISO (lado a lado) -->
             <section class="grid grid-2 reverse" style="margin-top:20px">
                 <figure class="map is-stretch">
@@ -481,7 +482,7 @@
                         <source media="(min-width: 1921px)" srcset="{{ asset('images/finca3pinos/montana2-2560.webp') }}" type="image/webp" />
                         <img
                             src="{{ asset('images/finca3pinos/montana2-1920.webp') }}"
-                            alt="Vista de la Cordillera Alotepec–Metapán, zona cafetalera de Finca 3 Pinos"
+                            alt="{{ __('meta.coffee_v51') }}"
                             loading="lazy" decoding="async"
                             style="width:100%;height:100%;object-fit:cover;border-radius:16px;">
                     </picture>
@@ -489,13 +490,12 @@
 
                 <article class="card is-stretch">
                     <div class="grid" style="gap:10px">
-                        <div class="chip"><span>🌿</span><span>Tradición</span></div>
-                        <div class="chip"><span>⚙️</span><span>Innovación</span></div>
-                        <div class="chip"><span>☕</span><span>Respeto por la tierra</span></div>
+                        <div class="chip"><span>🌿</span><span>{{ __('meta.coffee_v52') }}</span></div>
+                        <div class="chip"><span>⚙️</span><span>{{ __('meta.coffee_v53') }}</span></div>
+                        <div class="chip"><span>☕</span><span>{{ __('meta.coffee_v54') }}</span></div>
                     </div>
                     <p class="lead" style="margin-top:10px">
-                        Nuestro compromiso es producir el mejor Geisha de El Salvador.
-                        Unimos tradición, tecnología y sostenibilidad para que cada taza exprese lo mejor de Metapán.
+                        {{ __('meta.coffee_v55') }}
                     </p>
                 </article>
             </section>

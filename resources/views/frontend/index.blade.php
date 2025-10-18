@@ -501,10 +501,6 @@
                                                      style="height: 64px;"></div>
 
 
-
-
-
-
                                             </div>
                                             <div id="like_sc_sliders_87130229">
                                                 <div class="slider-sc swiper-container" data-autoplay="4000"
@@ -518,27 +514,22 @@
                                                                 <div class="hero-container">
                                                                     <!-- Izquierda: Card de texto -->
                                                                     <div class="hero-card hero-text">
-                                                                        <span class="eyebrow">Café Geisha • Metapán, El Salvador</span>
-                                                                        <h1>Finca 3 Pinos</h1>
-                                                                        <h2>Coffee family</h2>
+                                                                        <span class="eyebrow">{{ __('meta.coffee_v0') }}</span>
+                                                                        <h1>{{ __('meta.finca3pinos') }}</h1>
+                                                                        <h2>{{ __('meta.coffee_v14') }}</h2>
                                                                         <p>
-                                                                            En la Cordillera Alotepec–Metapán cultivamos
-                                                                            una de las variedades más
-                                                                            exclusivas del mundo: el Café Geisha. Un
-                                                                            café de altura con notas florales,
-                                                                            frutales y un carácter elegante que refleja
-                                                                            la esencia de nuestra tierra.
+                                                                            {{ __('meta.coffee_v13') }}
                                                                         </p>
                                                                         <div class="btn-group">
-                                                                            <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.ourcoffee', [], false)) }}" class="btn btn-primary" style="color: white">Conoce
-                                                                                más</a>
+                                                                            <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(),
+                route('user.ourcoffee', [], false)) }}" class="btn btn-primary" style="color: white">{{ __('meta.coffee_v6') }}</a>
 
 
 
 
 
                                                                             <a href="#productos" class="btn btn-primary js-scroll" style="color:white">
-                                                                                Ver productos
+                                                                                {{ __('meta.coffee_v5') }}
                                                                             </a>                                                                        </div>
                                                                     </div>
 
@@ -581,8 +572,8 @@
                                             <div class="wpb_wrapper">
                                                 <div
                                                     class="heading head-subheader align-left color-white subcolor-main transform-default">
-                                                    <h5 class="subheader" style="color: #D2AA6DFF">Quiénes somos</h5>
-                                                    <h2 class="header">Finca 3 Pinos</h2>
+                                                    <h5 class="subheader" style="color: #D2AA6DFF">{{ __('meta.coffee_v7') }}</h5>
+                                                    <h2 class="header">{{ __('meta.finca3pinos') }}</h2>
                                                 </div>
 
                                                 <div class="wpb_text_column wpb_content_element ">
@@ -590,8 +581,7 @@
                                                         <p style="text-align:left;">
                                                                 <span class="text-large"
                                                                       style="color:#D2AA6D; text-align: justify">
-                                                                    Producimos Café Geisha de altura en Metapán, El Salvador.
-                                                                    Un café de origen único, cultivado con pasión, tecnología y respeto por la tierra.
+                                                                    {{ __('meta.coffee_v8') }}
                                                                 </span>
                                                         </p>
                                                     </div>
@@ -623,12 +613,11 @@
                                                         <span class="icon-image bg-transparent">
                                                             <img src="{{ asset('images/beans.png') }}"
                                                                  style="width: 60px; height: 60px"
-                                                                 class="icon-image" alt="Origen y prestigio">
+                                                                 class="icon-image" alt="{{ __('meta.coffee_v9') }}">
                                                         </span>
-                                                        <h5>Origen y prestigio</h5>
+                                                        <h5>{{ __('meta.coffee_v9') }}</h5>
                                                         <div class="descr">
-                                                            Cultivado en la Cordillera Alotepec–Metapán, cuna del mejor
-                                                            café salvadoreño.
+                                                            {{ __('meta.coffee_v10') }}
                                                         </div>
                                                         <div class="gold-separator"></div>
                                                     </li>
@@ -637,12 +626,11 @@
                                                         <span class="icon-image bg-transparent">
                                                             <img src="{{ asset('images/sensorial.png') }}"
                                                                  style="width: 60px; height: 55px"
-                                                                 class="icon-image" alt="Sostenibilidad">
+                                                                 class="icon-image" alt="{{ __('meta.coffee_v17') }}">
                                                         </span>
-                                                        <h5>Perfil sensorial</h5>
+                                                        <h5>{{ __('meta.coffee_v15') }}</h5>
                                                         <div class="descr">
-                                                            Respetamos la naturaleza y preservamos la biodiversidad de
-                                                            Metapán.
+                                                            {{ __('meta.coffee_v16') }}
                                                         </div>
                                                         <div class="gold-separator"></div>
                                                     </li>
@@ -661,12 +649,11 @@
                                                         <span class="icon-image bg-transparent">
                                                             <img src="{{ asset('images/tuerca.png') }}"
                                                                  style="width: 60px" height="60px"
-                                                                 class="icon-image" alt="Tecnología y trazabilidad">
+                                                                 class="icon-image" alt="{{ __('meta.coffee_v11') }}">
                                                         </span>
-                                                        <h5>Tecnología</h5>
+                                                        <h5>{{ __('meta.coffee_v11') }}</h5>
                                                         <div class="descr">
-                                                            Controlamos cada etapa para garantizar pureza y consistencia
-                                                            en taza.
+                                                            {{ __('meta.coffee_v12') }}
                                                         </div>
                                                         <div class="gold-separator"></div>
                                                     </li>
@@ -675,12 +662,11 @@
                                                         <span class="icon-image bg-transparent">
                                                             <img src="{{ asset('images/hoja.png') }}"
                                                                  style="width: 50px; height: 55px"
-                                                                 class="icon-image" alt="Sostenibilidad">
+                                                                 class="icon-image" alt="{{ __('meta.coffee_v17') }}">
                                                         </span>
-                                                        <h5>Sostenibilidad</h5>
+                                                        <h5>{{ __('meta.coffee_v17') }}</h5>
                                                         <div class="descr">
-                                                            Respetamos la naturaleza y preservamos la biodiversidad de
-                                                            Metapán.
+                                                            {{ __('meta.coffee_v18') }}
                                                         </div>
                                                         <div class="gold-separator"></div>
                                                     </li>

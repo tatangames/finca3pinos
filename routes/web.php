@@ -102,7 +102,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
         ->name('idiomas');
 
     Route::get('/idiomas/{region}', [AdminAuthController::class, 'indexIdiomas'])
-        ->whereNumber('region')   // <-- CORREGIDO (antes decía 'admin.region')
+        ->whereNumber('region')
         ->name('idiomas.region');
 
     // Guardar
