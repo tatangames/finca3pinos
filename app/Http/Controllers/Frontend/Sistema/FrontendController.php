@@ -79,8 +79,8 @@ class FrontendController extends Controller
     public function send(Request $request)
     {
         $rules = [
-            'name'    => ['required', 'string', 'max:200'],
-            'email'   => ['required', 'email', 'max:200'],
+            'name'    => ['required', 'string', 'max:100'],
+            'email'   => ['required', 'email', 'max:100'],
             'message' => ['required', 'string', 'max:2000'],
         ];
 

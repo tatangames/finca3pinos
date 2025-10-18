@@ -50,6 +50,11 @@ return [
     'contact_v6' => 'Your email',
     'contact_v7' => 'Your message',
     'contact_v8' => 'Send',
+    'contact_v9' => 'Required field',
+    'contact_v10' => 'Invalid email',
+    'contact_v11' => 'Email sent',
+
+
 
     'contact_ok'    => 'Thanks! We received your message and will get back to you soon.',
     'sending'       => 'Sending...',

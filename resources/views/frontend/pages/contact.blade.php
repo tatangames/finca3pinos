@@ -6,10 +6,6 @@
 
     <style>
 
-        /* =========================
-       CONTACTO — FIX DE LAYOUT
-       ========================= */
-
         /* ---- Quita fondo/padding del wrapper de CF7 ---- */
         #like_sc_contact_form_7_122453212,
         #like_sc_contact_form_7_122453212.form-bg-default,
@@ -36,7 +32,7 @@
             border-radius: 16px;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
             padding: 22px;
-            overflow: hidden; /* recorta cualquier fondo interno */
+            overflow: hidden;
         }
 
         /* Limpia fondos de envoltorios CF7 */
@@ -48,22 +44,44 @@
         }
 
         /* =========================
+           Tipografía base inputs
+           ========================= */
+        .contact-card .wpcf7-form-control {
+            font-weight: 400 !important;    /* quita negrita */
+            font-family: "Roboto", system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+            color: #333;
+            letter-spacing: 0.2px;
+        }
+
+        /* =========================
            Inputs y Textareas
            ========================= */
         .contact-card input[type="text"],
         .contact-card input[type="email"],
         .contact-card textarea {
             width: 100%;
-            background: #f7f7f7;
+            background: #fafafa;
             border: 1px solid rgba(0, 0, 0, 0.12);
             border-radius: 10px;
             padding: 10px 12px;
             outline: none;
             font-size: 15px;
-            color: #333;
             transition: all 0.2s ease;
         }
 
+        /* Placeholders más suaves */
+        .contact-card input::placeholder,
+        .contact-card textarea::placeholder {
+            color: #9a9a9a;
+            font-weight: 400;
+        }
+
+        /* Forzar minúsculas en email sin inline */
+        #correo-form {
+            text-transform: lowercase;
+        }
+
+        /* Foco elegante */
         .contact-card input[type="text"]:focus,
         .contact-card input[type="email"]:focus,
         .contact-card textarea:focus {
@@ -72,38 +90,47 @@
             box-shadow: 0 0 0 3px rgba(198, 164, 113, 0.15);
         }
 
+        /* Ajuste textarea */
         .contact-card textarea {
             min-height: 160px;
             resize: vertical;
         }
 
+        /* Autofill (Chrome) */
+        .contact-card input:-webkit-autofill,
+        .contact-card textarea:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px #fff inset;
+            box-shadow: 0 0 0 1000px #fff inset;
+            -webkit-text-fill-color: #333;
+        }
+
         /* =========================
-           Botón Enviar (redondo)
+           Botón Enviar (aplica a submit y button)
            ========================= */
-
-
-        .contact-card input[type="submit"] {
+        .contact-card input[type="submit"],
+        .contact-card input[type="button"],
+        .contact-card .wpcf7-submit {
             background: #c6a471 !important;
             color: #fff !important;
             border: none !important;
             font-weight: 700 !important;
             padding: 12px 28px !important;
-            border-radius: 10px !important; /* 🔸 fuerza las esquinas redondeadas */
+            border-radius: 10px !important;
             cursor: pointer !important;
             transition: all 0.25s ease !important;
             display: inline-block !important;
         }
 
-        .contact-card input[type="submit"]:hover {
+        .contact-card input[type="submit"]:hover,
+        .contact-card input[type="button"]:hover,
+        .contact-card .wpcf7-submit:hover {
             background: #b8935e !important;
             transform: translateY(-2px);
             box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
         }
 
-
-
         /* =========================
-           Mensaje de éxito / error
+           Mensaje de éxito / error CF7
            ========================= */
         .contact-card .wpcf7-response-output {
             margin: 14px 0 0 !important;
@@ -164,7 +191,7 @@
         }
 
         /* =========================
-           Mini botones redes (si los usas)
+           Mini botones redes
            ========================= */
         .contact-card .social-cta {
             display: flex;
@@ -199,17 +226,61 @@
         .contact-card .social-cta .tt .tt-ico { width: 16px; height: 16px; fill: #111; }
 
         /* =========================
-           Botón Enviar (esquinas redondeadas)
+           Acciones
            ========================= */
-
         .contact-card__actions {
             margin-top: 10px;
             display: flex;
             justify-content: center;
         }
 
+        /* =========================
+           Errores de campo
+           ========================= */
+        .field-error {
+            color: #d93025;
+            font-size: .85rem;
+            margin-top: 6px;
+            line-height: 1.3;
+        }
+        .field-error:empty { display: none; }
 
+        .is-invalid {
+            border-color: #d93025 !important;
+            box-shadow: none !important;
+        }
 
+        /* =========================
+           Contador de caracteres
+           ========================= */
+        .char-counter {
+            font-size: .85rem;
+            text-align: right;
+            opacity: .85;
+            margin-top: 4px;
+        }
+        .char-counter.warning { color: #c77d00; }
+        .char-counter.danger  { color: #d93025; }
+
+        /* Reafirmar bordes/colores del form */
+        #contact-form input[type="text"],
+        #contact-form input[type="email"],
+        #contact-form textarea {
+            border: 1px solid rgba(0,0,0,0.12);
+            background: #fafafa;
+            transition: all 0.2s ease;
+        }
+
+        #contact-form input:focus,
+        #contact-form textarea:focus {
+            border-color: #c6a471;
+            background: #fff;
+        }
+
+        #btn-enviar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 
     <header class="page-header like-parallax"
@@ -247,7 +318,8 @@
                                         <div class="vc_column-inner">
                                             <div class="wpb_wrapper">
                                                 <div class="heading  transform-header-up   vc_custom_1505581880747"
-                                                     id="like_sc_header_1005731420"><h4 class="header">{{ __('meta.contact_v2') }}</h4>
+                                                     id="like_sc_header_1005731420"><h4
+                                                        class="header">{{ __('meta.contact_v2') }}</h4>
                                                 </div>
                                                 <div class="wpb_text_column wpb_content_element ">
                                                     <div class="wpb_wrapper">
@@ -261,7 +333,8 @@
                                                         <li class=""><span class="fa fa-phone"></span><span
                                                                 class="head">(+503) 7620-6851</span></li>
                                                         <li class=""><span class="fa fa-envelope"></span><span
-                                                                    class="head" style="text-transform: lowercase">info@finca3pinos.com</span></li>
+                                                                class="head" style="text-transform: lowercase">info@finca3pinos.com</span>
+                                                        </li>
                                                         <li class=""><span class="fa fa-map-marker"></span><span
                                                                 class="head">{{ __('meta.contact_v3') }}</span>
                                                         </li>
@@ -269,7 +342,8 @@
                                                 </div>
                                                 <div
                                                     class="heading  color-black transform-header-up   vc_custom_1502236442786"
-                                                    id="like_sc_header_1764788083"><h6 class="header">{{ __('meta.contact_v4') }}</h6></div>
+                                                    id="like_sc_header_1764788083"><h6
+                                                        class="header">{{ __('meta.contact_v4') }}</h6></div>
                                                 <div class="align-default ">
                                                     <ul class="social-big icon-weight-bold"
                                                         id="like_sc_header_1697844067">
@@ -302,44 +376,60 @@
                                                             <ul></ul>
                                                         </div>
 
-
-
-
                                                         <!-- CARD CONTACT -->
                                                         <section class="contact-card">
-                                                            <!-- Pega aquí tu formulario CF7 tal cual -->
 
-
-
-
-                                                            <form id="contact-form"
-                                                               >
+                                                            <form id="contact-form">
                                                                 @csrf
 
-                                                                <p><label> {{ __('meta.contact_v5') }}<br>
-                                                                        <input size="40" maxlength="400"
+                                                                <p>
+                                                                    <label>{{ __('meta.contact_v5') }}<br>
+                                                                        <input size="40" maxlength="100"
+                                                                               id="nombre-form"
                                                                                class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
-                                                                               aria-required="true" type="text" name="your-name">
-                                                                    </label></p>
+                                                                               aria-required="true" type="text">
+                                                                    </label>
+                                                                    <label class="field-error"
+                                                                           data-error-for="your-name"></label>
+                                                                </p>
 
-                                                                <p><label> {{ __('meta.contact_v6') }}<br>
-                                                                        <input size="40" maxlength="400"
+                                                                <p>
+                                                                    <label>{{ __('meta.contact_v6') }}<br>
+                                                                        <input size="40" maxlength="100"
+                                                                               id="correo-form"
                                                                                class="wpcf7-form-control wpcf7-email wpcf7-validates-as-required wpcf7-text wpcf7-validates-as-email"
-                                                                               aria-required="true" type="email" name="your_email" style="text-transform: lowercase;">
-                                                                    </label></p>
+                                                                               aria-required="true" type="email"
+                                                                               style="text-transform: lowercase;">
+                                                                    </label>
+                                                                    <label class="field-error"
+                                                                           data-error-for="your_email"></label>
+                                                                </p>
 
-                                                                <p><label> {{ __('meta.contact_v7') }}<br>
+
+                                                                <p>
+                                                                    <label>{{ __('meta.contact_v7') }}<br>
                                                                         <textarea cols="40" rows="6" maxlength="2000"
-                                                                                  class="wpcf7-form-control wpcf7-textarea" name="your-message"></textarea>
-                                                                    </label></p>
+                                                                                  id="mensaje-form"
+                                                                                  class="wpcf7-form-control wpcf7-textarea"
+                                                                        ></textarea>
+                                                                    </label>
+                                                                <div class="char-counter"><span id="msg-count">0</span>/2000
+                                                                </div>
+                                                                <label class="field-error"
+                                                                       data-error-for="your-message"></label>
+                                                                </p>
 
                                                                 <p class="contact-card__actions">
-                                                                    <input class="wpcf7-form-control wpcf7-submit has-spinner"
-                                                                           type="button" onclick="enviarFormulario()" value="{{ __('meta.contact_v8') }}">
+                                                                    <input
+                                                                        class="wpcf7-form-control wpcf7-submit has-spinner"
+                                                                        type="button" onclick="enviarFormulario()"
+                                                                        id="btn-enviar"
+                                                                        value="{{ __('meta.contact_v8') }}">
                                                                 </p>
 
                                                                 {{-- zona de mensajes --}}
-                                                                <div class="wpcf7-response-output" aria-hidden="true"></div>
+                                                                <div class="wpcf7-response-output"
+                                                                     aria-hidden="true"></div>
                                                             </form>
 
 
@@ -374,20 +464,179 @@
 
     </div>
 
+    <script src="{{ asset('js/toastr.min.js') }}"></script>
+    <script src="{{ asset('js/axios.min.js') }}"></script>
+    <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
+
     <script>
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const textarea = document.getElementById("mensaje-form");
+            const counter = document.getElementById("msg-count");
+            const maxChars = 2000;
+
+            textarea.addEventListener("input", function () {
+                let currentLength = textarea.value.length;
+
+                // Evita que supere el límite
+                if (currentLength > maxChars) {
+                    textarea.value = textarea.value.substring(0, maxChars);
+                    currentLength = maxChars;
+                }
+
+                // Actualiza contador
+                counter.textContent = currentLength;
+
+                // Opcional: cambia color cuando se acerca al límite
+                if (currentLength > maxChars * 0.9) {
+                    counter.style.color = "#d9534f"; // rojo
+                } else {
+                    counter.style.color = "#666"; // gris normal
+                }
+            });
+        });
 
         const currentLocale = "{{ app()->getLocale() }}"; // 'sv', 'en', 'es', etc.
 
-        function enviarFormulario() {
-            if (currentLocale === 'sv') {
-                console.log("{{ __('meta.contact_v5') }}"); // Traducción en sv
-            } else if (currentLocale === 'en') {
-                console.log("{{ __('meta.contact_v5') }}"); // Traducción en en
-            } else {
-                console.log("{{ __('meta.contact_v5') }}"); // Traducción en es
-            }
+        function showError(el, msg) {
+            el.textContent = msg || '';
+            el.style.display = msg ? 'block' : 'none';
         }
 
+        function getContactMessages() {
+            let msgCampoRequerido = "";
+            let msgCorreoNoValido = "";
+            let msgEnviado = "";
+
+            switch (currentLocale) {
+                case 'sv':
+                    msgCampoRequerido = "{{ __('meta.contact_v9') }}"; // 'Campo requerido' en sv
+                    msgCorreoNoValido = "{{ __('meta.contact_v10') }}"; // 'Correo no válido' en sv
+                    msgEnviado = "{{ __('meta.contact_v11') }}";
+                    break;
+                case 'en':
+                    msgCampoRequerido = "{{ __('meta.contact_v9', [], 'en') }}";
+                    msgCorreoNoValido = "{{ __('meta.contact_v10', [], 'en') }}";
+                    msgEnviado = "{{ __('meta.contact_v11', [], 'en') }}";
+                    break;
+                case 'ko':
+                    msgCampoRequerido = "{{ __('meta.contact_v9', [], 'ko') }}";
+                    msgCorreoNoValido = "{{ __('meta.contact_v10', [], 'ko') }}";
+                    msgEnviado = "{{ __('meta.contact_v11', [], 'ko') }}";
+                    break;
+                default: // español u otro
+                    msgCampoRequerido = "{{ __('meta.contact_v9', [], 'es') }}";
+                    msgCorreoNoValido = "{{ __('meta.contact_v10', [], 'es') }}";
+                    msgEnviado = "{{ __('meta.contact_v11', [], 'es') }}";
+                    break;
+            }
+
+            return { msgCampoRequerido, msgCorreoNoValido, msgEnviado };
+        }
+
+        function enviarFormulario() {
+            const nameInput  = document.getElementById('nombre-form');
+            const emailInput = document.getElementById('correo-form');
+            const msgInput   = document.getElementById('mensaje-form');
+
+            const errorName  = document.querySelector('[data-error-for="your-name"]');
+            const errorEmail = document.querySelector('[data-error-for="your_email"]');
+            const errorMsg   = document.querySelector('[data-error-for="your-message"]');
+
+            // limpia mensajes previos
+            errorName.textContent  = '';
+            errorEmail.textContent = '';
+            errorMsg.textContent   = '';
+
+            const { msgCampoRequerido, msgCorreoNoValido, msgEnviado } = getContactMessages();
+
+            let valido = true;
+
+            // --- Validar nombre ---
+            if (!nameInput.value.trim()) {
+                showError(errorName, msgCampoRequerido);
+                valido = false;
+            }
+
+            // --- Validar correo ---
+            if (!emailInput.value.trim()) {
+                showError(errorEmail, msgCampoRequerido);
+                valido = false;
+            } else {
+                const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!regexCorreo.test(emailInput.value.trim())) {
+                    showError(errorEmail, msgCorreoNoValido);
+                    valido = false;
+                }
+            }
+
+            // --- Validar mensaje ---
+            if (!msgInput.value.trim()) {
+                showError(errorMsg, msgCampoRequerido);
+                valido = false;
+            }
+
+            // Si no es válido, no continúa
+            if (!valido) return;
+
+
+            // Desactiva botón (opcional)
+            const btn = document.querySelector('#btn-enviar');
+            btn.disabled = true;
+
+            // Prepara datos
+            const data = {
+                name: nameInput.value.trim(),
+                email: emailInput.value.trim(),
+                message: msgInput.value.trim(),
+            };
+
+            // Limpia mensajes previos
+            errorName.textContent  = '';
+            errorEmail.textContent = '';
+            errorMsg.textContent   = '';
+
+
+            // Enviar con Axios
+            axios.post('{{ route('contact.send') }}', data)
+                .then(response => {
+                    if (response.data.ok) {
+                        nameInput.value = '';
+                        emailInput.value = '';
+                        msgInput.value = '';
+
+                        mensajeEnviado(msgEnviado)
+                    }
+                })
+                .catch(error => {
+                    if (error.response && error.response.status === 422) {
+                        const errores = error.response.data.errors;
+                        if (errores.name)    showError(errorName, errores.name[0]);
+                        if (errores.email)   showError(errorEmail, errores.email[0]);
+                        if (errores.message) showError(errorMsg, errores.message[0]);
+
+                    } else {
+                        console.error(error);
+                        alert('Error');
+                    }
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                });
+        }
+
+        function mensajeEnviado(mensaje){
+
+            Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: mensaje,
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
 
     </script>
 

@@ -50,6 +50,12 @@ return [
     'contact_v6' => 'Correo',
     'contact_v7' => 'Mensaje',
     'contact_v8' => 'Enviar',
+    'contact_v9' => 'Campo requerido',
+    'contact_v10' => 'Correo no valido',
+    'contact_v11' => 'Correo enviado',
+
+
+
 
     'contact_ok'    => '¡Gracias! Hemos recibido tu mensaje y te responderemos pronto.',
     'sending'       => 'Enviando...',

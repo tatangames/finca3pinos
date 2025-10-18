@@ -38,8 +38,8 @@ return [
     // ============== NOTAS =================
     // Aqui se agrega el nuevo idioma
     // en App/Helpers/RegionHelper  tambien se agregara el nuevo IDIOMA
-    // tambien en Lang/ y sus carpetas
-
+    // en Lang/ y sus carpetas
+    // en vista contacto
 
 
 

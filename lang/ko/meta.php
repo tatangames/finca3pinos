@@ -50,6 +50,10 @@ return [
     'contact_v6' => '이메일',
     'contact_v7' => '메시지',
     'contact_v8' => '보내기',
+    'contact_v9' => '필수 항목입니다',
+    'contact_v10' => '잘못된 이메일입니다',
+    'contact_v11' => '이메일이 전송되었습니다',
+
 
     'contact_ok'    => '감사합니다! 문의가 접수되었습니다. 곧 연락드리겠습니다.',
     'sending'       => '전송 중...',
