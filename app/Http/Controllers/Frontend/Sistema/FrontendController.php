@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Frontend\Sistema;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ContactMail;
 use App\Models\Galeria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Models\Region;
@@ -99,16 +102,31 @@ class FrontendController extends Controller
             ], 422);
         }
 
-        // Aquí podrías enviar correo, guardar en BD, etc.
+        // ✅ Datos del formulario
+        $data = [
+            'name'    => $request->name,
+            'email'   => $request->email,
+            'message' => $request->message,
+        ];
 
-        return response()->json([
-            'ok'      => true,
-            'message' => __('meta.contact_ok'),
-        ]);
+        try {
+            // ✅ Envía el correo a tu Gmail (por ejemplo)
+           // Mail::to('tatangamess@gmail.com')->send(new ContactMail($data));
+
+            return response()->json([
+                'ok'      => true,
+                'message' => __('meta.contact_ok'),
+            ]);
+        } catch (\Exception $e) {
+            // ✅ En caso de error, puedes registrar el fallo
+            Log::error('Error al enviar correo: ' . $e->getMessage());
+
+            return response()->json([
+                'ok'      => false,
+                'message' => 'No se pudo enviar el correo. Intente más tarde.',
+            ], 500);
+        }
     }
-
-
-
 
     public function vistaProducts(){
 

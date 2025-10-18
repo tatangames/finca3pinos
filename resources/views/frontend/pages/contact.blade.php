@@ -281,6 +281,64 @@
             opacity: 0.6;
             cursor: not-allowed;
         }
+
+        .spinner {
+            border: 3px solid #f3f3f3;         /* gris claro */
+            border-top: 3px solid #d2aa6d;     /* dorado marca */
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        button[disabled] {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+
+
+        .social-list {
+            display: flex;
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .social-list li a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: #ffffff;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+
+        .social-list li a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .social-icon {
+            width: 35px;
+            height: 35px;
+            object-fit: contain;
+        }
+
+
     </style>
 
     <header class="page-header like-parallax"
@@ -345,10 +403,17 @@
                                                     id="like_sc_header_1764788083"><h6
                                                         class="header">{{ __('meta.contact_v4') }}</h6></div>
                                                 <div class="align-default ">
-                                                    <ul class="social-big icon-weight-bold"
-                                                        id="like_sc_header_1697844067">
-                                                        <li><a href="#" class="fa fa-facebook"></a></li>
-                                                        <li><a href="#" class="fa fa-instagram"></a></li>
+                                                    <ul class="social-list">
+                                                        <li>
+                                                            <a href="https://www.facebook.com/finca3pinos" target="_blank" rel="noopener">
+                                                                <img src="{{ asset('images/facebook.png') }}" alt="Facebook" class="social-icon">
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="https://www.instagram.com/finca3pinos" target="_blank" rel="noopener">
+                                                                <img src="{{ asset('images/instagram.png') }}" alt="Instagram" class="social-icon">
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -420,11 +485,13 @@
                                                                 </p>
 
                                                                 <p class="contact-card__actions">
-                                                                    <input
-                                                                        class="wpcf7-form-control wpcf7-submit has-spinner"
-                                                                        type="button" onclick="enviarFormulario()"
-                                                                        id="btn-enviar"
-                                                                        value="{{ __('meta.contact_v8') }}">
+                                                                    <button type="button"
+                                                                            class="wpcf7-form-control wpcf7-submit has-spinner"
+                                                                            id="btn-enviar"
+                                                                            onclick="enviarFormulario()">
+                                                                        <span class="spinner" id="spinner" style="display:none;"></span>
+                                                                        <span id="btn-text">{{ __('meta.contact_v8') }}</span>
+                                                                    </button>
                                                                 </p>
 
                                                                 {{-- zona de mensajes --}}
@@ -581,10 +648,18 @@
             // Si no es válido, no continúa
             if (!valido) return;
 
+            // --- Botón y spinner ---
+            const btn = document.querySelector('#btn-enviar');
+            const spinner = document.querySelector('#spinner');
+            const btnText = document.querySelector('#btn-text');
 
             // Desactiva botón (opcional)
-            const btn = document.querySelector('#btn-enviar');
             btn.disabled = true;
+
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            btnText.textContent = "{{ __('meta.loading') ?? 'loading...' }}"; // puedes traducir "Enviando..."
+
 
             // Prepara datos
             const data = {
@@ -624,6 +699,8 @@
                 })
                 .finally(() => {
                     btn.disabled = false;
+                    spinner.style.display = 'none';
+                    btnText.textContent = "{{ __('meta.contact_v8') }}"; // vuelve a "Enviar"
                 });
         }
 
