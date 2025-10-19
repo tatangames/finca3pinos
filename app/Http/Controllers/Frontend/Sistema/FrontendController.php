@@ -39,8 +39,11 @@ class FrontendController extends Controller
         $arrayGaleria = Galeria::orderBy('posicion', 'ASC')
             ->get()
             ->map(function ($item) {
+
                 // Usa tu helper global (automáticamente detecta locale y región)
-                $item->texto_idioma = getRegionContent($item->content_key);
+                $arrayRegion = getRegionContent($item->content_key);
+                $item->textoIdioma = $arrayRegion['body'];
+                $item->altseo = $arrayRegion['altseo'];
                 return $item;
             });
 

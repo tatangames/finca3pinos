@@ -123,7 +123,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/categoria/editar', [CategoriasController::class,'editarCategoria']);
 
 
-
+    // === PRODUCTOS ===
+    Route::get('/producto/{idcategoria}', [CategoriasController::class, 'indexProductos'])
+        ->name('producto');
+    Route::get('/producto/index/tabla/{idcategoria}', [CategoriasController::class, 'tablaProductos']);
 
 });
 

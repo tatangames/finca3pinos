@@ -14,10 +14,6 @@
         table-layout:fixed;
     }
 
-
-
-
-
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -75,16 +71,6 @@
                             <div class="row">
                                 <div class="col-md-12">
 
-
-                                    <div class="form-group">
-                                        <label>ALT SEO</label>
-                                        <small style="font-size: 15px">Describe la imagen si esta no se puede mostrar (por ejemplo, si hay un error de carga)</small>
-                                        <input type="text" maxlength="300" id="altseo-nuevo" class="form-control">
-                                    </div>
-
-
-                                    <hr>
-
                                     <!-- Key global -->
                                     <div class="form-group">
                                         <label>Key para todos los idiomas</label>
@@ -101,7 +87,17 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="form-group">
-                                                    <label>Contenido HTML ({{ $region->locale }})</label>
+
+
+                                                    <label>ALT SEO para imagen ({{ $region->locale }})</label>
+                                                    <input name="altseo_{{ $region->locale }}"
+                                                           id="altseo_{{ $region->locale }}"
+                                                           class="form-control"
+                                                           maxlength="300"
+                                                           placeholder="ALT SEO">
+
+                                                    <br>
+                                                    <label>Descripción ({{ $region->locale }})</label>
                                                     <textarea name="body_{{ $region->locale }}"
                                                               id="body_{{ $region->locale }}"
                                                               rows="4"
@@ -149,18 +145,9 @@
                         <div class="row">
                             <div class="col-md-12">
 
-                                <div class="form-group">
-                                    <input type="hidden" id="id-editar">
-                                    <label>ALT SEO (Opcional)</label>
-                                    <small style="font-size: 15px">Describe la imagen si esta no se puede mostrar (por ejemplo, si hay un error de carga)</small>
-                                    <input type="text" maxlength="300" id="altseo-editar" class="form-control">
-                                </div>
-                                <br>
-                                <hr>
-
+                                <input type="hidden" id="id-editar">
                                 <!-- Campos dinámicos por idioma -->
                                 <div id="langs-editar"></div>
-
 
                                 <br>
                                 <hr>
@@ -264,14 +251,7 @@
 
         function nuevo(){
             var key = document.getElementById('key').value.trim();
-            var altseo = document.getElementById('altseo-nuevo').value;
             var imagen = document.getElementById('imagen-nuevo');
-
-            if (altseo === '') {
-                toastr.error('ALT SEO es requerido');
-                return;
-            }
-
 
             if (key === '') {
                 toastr.error('Debe ingresar la key global');
@@ -288,23 +268,34 @@
                 return;
             }
 
-            openLoading()
+
 
             // 🔹 Creamos el FormData
             let formData = new FormData();
-            formData.append('altseo', altseo);
             formData.append('key', key);
             formData.append('imagen', imagen.files[0]);
 
             // 🔹 Recorremos las regiones en un array JSON generado por Blade
             let regiones = @json($arrayRegiones);
 
-            regiones.forEach(region => {
+            const error = regiones.some(region => {
                 let locale = region.locale;
+
                 let body = document.getElementById(`body_${locale}`).value.trim();
+                let altseo = document.getElementById(`altseo_${locale}`).value.trim();
+                if (!altseo) {
+                    toastr.error('ALT SEO es requerido');
+                    return true; // detiene el ciclo
+                }
 
                 formData.append(`translations[${locale}][body]`, body);
+                formData.append(`translations[${locale}][altseo]`, altseo);
+                return false;
             });
+
+            if (error) return;
+
+            openLoading()
 
             axios.post('/admin/galeria/nuevo', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
@@ -447,7 +438,7 @@
         }
 
         function cardIdiomaHTML(item) {
-            // item = { name, locale, body }
+            // item = { name, locale, body, altseo }
             const loc = item.locale;
             return `
       <div class="card mt-3 border">
@@ -456,6 +447,16 @@
         </div>
         <div class="card-body">
           <div class="form-group">
+
+            <label>ALT SEO (${loc})</label>
+            <input id="altseo_${loc}_editar"
+                      class="form-control"
+                      value="${item.altseo || ''}"
+                      maxlength="300"
+                      placeholder="ALT SEO">
+
+            <br>
+
             <label>Contenido (${loc})</label>
             <textarea id="body_${loc}_editar"
                       rows="4"
@@ -479,7 +480,6 @@
 
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(info.id);
-                        $('#altseo-editar').val(info.alt_seo || '');
 
                         // ✅ Imagen
                         const imagenUrl = '/storage/archivos/' + info.imagen;
@@ -503,11 +503,9 @@
 
         function editar(){
             const id     = document.getElementById('id-editar').value;
-            let alt_seo  = document.getElementById('altseo-editar').value || '';
             const imagen = document.getElementById('imagen-editar');
 
-            // Normaliza alt
-            alt_seo = alt_seo.trim();
+
 
             // Validación de imagen (si hay)
             if (imagen.files && imagen.files[0]) {
@@ -523,7 +521,6 @@
 
             const formData = new FormData();
             formData.append('id', id);
-            formData.append('alt_seo', alt_seo); // ← usa snake_case igual que en backend
 
             if (imagen.files && imagen.files[0]) {
                 formData.append('imagen', imagen.files[0]);
@@ -532,7 +529,15 @@
             // Enviar como arrays: body[en], title[sv], body[sv], ...
             locales.forEach(loc => {
                 const b = document.getElementById(`body_${loc}_editar`)?.value ?? '';
+                const s = document.getElementById(`altseo_${loc}_editar`)?.value ?? '';
                 formData.append(`body[${loc}]`,  b);
+
+                if(!s){
+                    toastr.error('ALT SEO es requerido');
+                    return
+                }
+
+                formData.append(`altseo[${loc}]`,  s);
             });
 
             openLoading();

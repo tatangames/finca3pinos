@@ -236,8 +236,8 @@
                     <div class="gallery-item" onclick="openModal(this)">
                         <img
                             src="{{ url('storage/archivos/'.$dato->imagen) }}"
-                            alt="{{ $dato->alt_seo }}"
-                            data-caption="{{ $dato->texto_idioma }}"
+                            alt="{{ $dato->altseo }}"
+                            data-caption="{{ $dato->textoIdioma }}"
                             loading="lazy"
                             decoding="async"
                             itemprop="image">

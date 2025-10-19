@@ -18,7 +18,6 @@ return new class extends Migration
             $table->boolean('activo');
 
             // Campos requeridos
-            $table->string('alt_seo', 300);
             $table->string('content_key', 300)->unique();
         });
     }

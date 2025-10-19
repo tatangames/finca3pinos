@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Sistema;
 
 use App\Http\Controllers\Controller;
 use App\Models\Categoria;
+use App\Models\Producto;
 use App\Models\Region;
 use App\Models\RegionContent;
 use App\Models\RegionContentTranslation;
@@ -235,8 +236,6 @@ class CategoriasController extends Controller
     public function editarCategoria(Request $request)
     {
 
-        Log::info($request->all());
-
         // 1) Validación
         $reglas = [
             'id'        => 'required',
@@ -298,6 +297,52 @@ class CategoriasController extends Controller
             return ['success' => 0, 'message' => 'Error al actualizar'];
         }
     }
+
+
+
+
+
+
+
+    // ================ PRODUCTOS  ===================================
+
+    public function indexProductos($idcategoria)
+    {
+        $arrayRegiones = Region::where('slug', '!=', 'latin-es')
+            ->orderBy('id')
+            ->get();
+
+        return view('backend.admin.categorias.productos.vistaproductos', compact('arrayRegiones', 'idcategoria'));
+    }
+
+
+    public function tablaProductos($idcategoria)
+    {
+        $arrayProducto = Producto::where('id_categorias', $idcategoria)
+            ->orderBy('posicion', 'ASC')
+            ->get();
+
+        foreach ($arrayProducto as $dato) {
+            $nombreSV = "";
+            if($infoRegion = RegionContent::where('key', $dato->content_key)
+                ->where('region_id', 1)->first()){
+                if($infoIdioma = RegionContentTranslation::where('content_id', $infoRegion->id)->first()){
+                    $nombreSV = $infoIdioma->title;
+                }
+            }
+            $dato->nombreSV = $nombreSV;
+        }
+        return view('backend.admin.categorias.productos.tablaproductos', compact('arrayProducto'));
+    }
+
+
+
+
+
+
+
+
+
 
 
 }

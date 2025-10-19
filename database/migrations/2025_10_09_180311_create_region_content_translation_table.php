@@ -24,6 +24,10 @@ return new class extends Migration
             $table->longText('body')->nullable();
             $table->longText('title')->nullable();
 
+            // Utilizado para Productos
+            $table->string('slug', 300)->nullable()->unique();
+            $table->string('altseo', 300)->nullable();
+
             // Índices y unicidad
             $table->unique(['content_id', 'locale']); // una traducción por idioma
             $table->index('locale');

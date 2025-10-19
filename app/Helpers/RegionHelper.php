@@ -7,7 +7,7 @@ use App\Models\Region;
 use App\Models\RegionContent;
 
 if (!function_exists('getRegionContent')) {
-    function getRegionContent(string $key): string
+    function getRegionContent(string $key): array
     {
         // 1) Idioma actual: /sv /en /es
         $locale = LaravelLocalization::getCurrentLocale(); // 'sv' | 'en' | 'es'
@@ -52,7 +52,12 @@ if (!function_exists('getRegionContent')) {
                 ->where('locale', $fallback)
                 ->first();
 
-            return $trFallback?->body ?? '';
+            return [
+                'title'  => $trFallback->title ?? '',
+                'body'   => $trFallback->body ?? '',
+                'slug'   => $trFallback->slug ?? '',
+                'altseo' => $trFallback->altseo ?? '',
+            ];
         });
     }
 }

@@ -6,7 +6,6 @@
         font-weight: 600;
     }
 
-
 </style>
 
 <!-- Main content -->
@@ -17,15 +16,15 @@
                 <div class="card-body">
                     <table id="table" class="table table-bordered">
                         <thead>
-                        <tr>
-                            <th style="width: 5%">Posición</th>
-                            <th style="width: 15%">Nombre (SV)</th>
-                            <th style="width: 5%">Estado</th>
-                            <th style="width: 8%">Opciones</th>
-                        </tr>
+                            <tr>
+                                <th style="width: 5%">Posición</th>
+                                <th style="width: 15%">Nombre (SV)</th>
+                                <th style="width: 5%">Estado</th>
+                                <th style="width: 8%">Opciones</th>
+                            </tr>
                         </thead>
                         <tbody id="tablecontents">
-                        @foreach($arrayCategoria as $dato)
+                        @foreach($arrayProducto as $dato)
                             <tr class="row1" data-id="{{ $dato->id }}">
 
                                 <td style="font-weight: bold">{{ $dato->posicion }}</td>
@@ -56,11 +55,6 @@
                                             <i class="fas fa-edit" title="Activar"></i>&nbsp; Activar
                                         </button>
                                     @endif
-
-                                    <button type="button" style="margin: 2px" class="btn btn-success btn-xs" onclick="vistaProductos({{ $dato->id }})">
-                                        <i class="fas fa-file-alt" title="Productos"></i>&nbsp; Productos
-                                    </button>
-
 
 
                                 </td>
@@ -99,7 +93,7 @@
 
             openLoading();
 
-            axios.post('/admin/categoria/posicion',  {
+            axios.post('/admin/producto/posicion',  {
                 'order': order
             })
                 .then((response) => {

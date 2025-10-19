@@ -15,9 +15,6 @@
     }
 
 
-
-
-
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -27,14 +24,14 @@
             <div class="col-sm-6">
                 <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus-square"></i>
-                    Nueva Categoría
+                    Nuevo Producto
                 </button>
             </div>
 
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Categoría</li>
-                    <li class="breadcrumb-item active">Listado de Categorias</li>
+                    <li class="breadcrumb-item">Producto</li>
+                    <li class="breadcrumb-item active">Listado de Productos</li>
                 </ol>
             </div>
 
@@ -45,7 +42,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Categoría</h3>
+                    <h3 class="card-title">Producto</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -92,8 +89,26 @@
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label>Contenido HTML ({{ $region->locale }})</label>
+
+                                                    <input name="slug_{{ $region->locale }}"
+                                                              id="slug_{{ $region->locale }}"
+                                                              class="form-control"
+                                                              maxlength="300"
+                                                              required
+                                                              placeholder="Ruta WEB (Slug. No debe llevar espacios o simbolos)">
+
+                                                    <br>
+                                                    <p>Título del Producto</p>
                                                     <textarea name="title_{{ $region->locale }}"
                                                               id="title_{{ $region->locale }}"
+                                                              rows="4"
+                                                              class="form-control"
+                                                              required
+                                                              placeholder="<p>Texto o HTML...</p>"></textarea>
+                                                    <br>
+                                                    <p>Descripción del Producto</p>
+                                                    <textarea name="body_{{ $region->locale }}"
+                                                              id="body_{{ $region->locale }}"
                                                               rows="4"
                                                               class="form-control"
                                                               placeholder="<p>Texto o HTML...</p>"></textarea>
@@ -170,7 +185,8 @@
     <script type="text/javascript">
         $(document).ready(function(){
 
-            var ruta = "{{ URL::to('/admin/categoria/index/tabla') }}";
+            var idcategoria = {{ $idcategoria }};
+            var ruta = "{{ URL::to('/admin/producto/index/tabla') }}/" + idcategoria;
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -181,10 +197,10 @@
 
         // recarga tabla
         function recargar(){
-            var ruta = "{{ URL::to('/admin/categoria/index/tabla') }}";
+            var idcategoria = {{ $idcategoria }};
+            var ruta = "{{ URL::to('/admin/categoria/index/tabla') }}/" + idcategoria;
             $('#tablaDatatable').load(ruta);
         }
-
 
         // abre modal para agregar nuevo pais
         function modalAgregar(){
@@ -200,6 +216,8 @@
                 return;
             }
 
+            openLoading()
+
             // 🔹 Creamos el FormData
             let formData = new FormData();
             formData.append('key', key);
@@ -207,22 +225,14 @@
             // 🔹 Recorremos las regiones en un array JSON generado por Blade
             let regiones = @json($arrayRegiones);
 
-            const error = regiones.some(region => {
+            regiones.forEach(region => {
                 let locale = region.locale;
                 let title = document.getElementById(`title_${locale}`).value.trim();
+                let body = document.getElementById(`body_${locale}`).value.trim();
 
-                if (!title) {
-                    toastr.error(`Título es requerido para ${locale.toUpperCase()}`);
-                    return true; // ✅ corta el ciclo aquí
-                }
 
                 formData.append(`translations[${locale}][title]`, title);
-                return false; // sigue al siguiente
             });
-
-            if (error) return;
-
-            openLoading()
 
             axios.post('/admin/categoria/nuevo', formData, {
             })
@@ -463,9 +473,6 @@
 
 
 
-        function vistaProductos(idcategoria){
-            window.location.href="{{ url('/admin/producto') }}/" + idcategoria;
-        }
 
 
 

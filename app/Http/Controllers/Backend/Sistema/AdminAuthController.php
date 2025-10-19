@@ -132,15 +132,6 @@ class AdminAuthController extends Controller
 
     public function nuevaGaleria(Request $request)
     {
-        $regla = array(
-            'key' => 'required',
-        );
-
-        // imagen, altseo
-
-        $validar = Validator::make($request->all(), $regla);
-
-        if ($validar->fails()){ return ['success' => 0];}
 
         DB::beginTransaction();
 
@@ -171,7 +162,6 @@ class AdminAuthController extends Controller
             $gal->imagen      = $nombreOut;
             $gal->posicion    = $nuevaPosicion;
             $gal->activo      = 1;
-            $gal->alt_seo = $request->altseo;
             $gal->content_key = $keySinEspacios;     // ← única
             $gal->save();
 
@@ -197,7 +187,9 @@ class AdminAuthController extends Controller
                     if ($trES) {
                         RegionContentTranslation::updateOrCreate(
                             ['content_id' => $content->id, 'locale' => 'es'],
-                            ['body' => $trES['body'] ?? '']
+                            ['body' => $trES['body'] ?? '',
+                            'altseo' => $trES['altseo'] ?? ''
+                            ],
                         );
                     }
                 } else {
@@ -205,7 +197,9 @@ class AdminAuthController extends Controller
                     if ($tr) {
                         RegionContentTranslation::updateOrCreate(
                             ['content_id' => $content->id, 'locale' => $region->locale],
-                            ['body' => $tr['body'] ?? '']
+                            ['body' => $tr['body'] ?? '',
+                             'altseo' => $tr['altseo'] ?? ''
+                            ]
                         );
                     }
                 }
@@ -308,12 +302,8 @@ class AdminAuthController extends Controller
 
     public function informacionGaleria(Request $request)
     {
-        $regla = ['id' => 'required|exists:galerias,id'];
-        $validar = Validator::make($request->all(), $regla);
-        if ($validar->fails()) { return ['success' => 0]; }
-
         $galeria = Galeria::find($request->id);
-        if (!$galeria) { return ['success' => 2]; }
+        if (!$galeria) { return ['success' => 0]; }
 
         // ⚠️ Excluye latinoamérica (latin-es)
         $regiones = Region::select('id','name','locale','slug')
@@ -331,7 +321,8 @@ class AdminAuthController extends Controller
                     'r.id as region_id',
                     'r.name as region_name',
                     'r.locale as region_locale',
-                    'rct.body'
+                    'rct.body',
+                    'rct.altseo',
                 )
                 ->get()
                 ->keyBy('region_locale');
@@ -344,6 +335,7 @@ class AdminAuthController extends Controller
                 'name'      => $region->name,
                 'locale'    => $region->locale,
                 'body'      => $data->body ?? '',
+                'altseo'    => $data->altseo ?? '',
             ];
         })->values();
 
@@ -352,7 +344,6 @@ class AdminAuthController extends Controller
             'info' => [
                 'id'          => $galeria->id,
                 'imagen'      => $galeria->imagen,
-                'alt_seo'     => $galeria->alt_seo,
                 'content_key' => $galeria->content_key,
             ],
             'langs' => $langs,
@@ -362,19 +353,15 @@ class AdminAuthController extends Controller
 
     public function editarGaleria(Request $request)
     {
-        // 1) Validación
-        $reglas = [
-            'id'        => 'require',
-        ];
+        Log::info($request->all());
 
-        $validar = Validator::make($request->all(), $reglas);
+        $regla = array(
+            'id' => 'required'
+        );
 
-        if ($validar->fails()) {
-            return response()->json([
-                'success' => 0,
-                'errors'  => $validar->errors()
-            ], 422);
-        }
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
 
         $galeria = Galeria::find($request->id);
         if (!$galeria) {
@@ -383,18 +370,15 @@ class AdminAuthController extends Controller
 
         DB::beginTransaction();
         try {
-            // 2) Actualiza ALT SEO
-            $galeria->alt_seo = $request->input('alt_seo');
-
-            // 3) Imagen opcional → WebP
+            // Imagen opcional → WebP
             if ($request->hasFile('imagen')) {
                 $old = $galeria->imagen;
 
                 $manager = new ImageManager(new Driver());
                 $img     = $manager->read($request->file('imagen')->getPathname());
 
-                if ($img->width() > 1600) {
-                    $img->scale(width: 1600);
+                if ($img->width() > 1200) {
+                    $img->scale(width: 1200);
                 }
 
                 $nombreBase = Str::slug(Str::random(15) . '-' . microtime(true), '_');
@@ -422,6 +406,7 @@ class AdminAuthController extends Controller
 
             // 5) Upsert de contenidos por región y traducciones por locale
             $bodies = $request->input('body',  []);   // ej: ['es' => '...', 'en'=>'...']
+            $altseo = $request->input('altseo', []);   // ej: ['es' => '...', 'en'=>'...']
 
             // Para cada región del sistema, garantizamos region_contents (region_id + key)
             $regiones = Region::select('id', 'locale', 'name')->get();
@@ -435,13 +420,14 @@ class AdminAuthController extends Controller
 
                 // Usamos el locale de la región para tomar los campos del request
                 $loc  = $region->locale; // p.ej 'es', 'en', 'ko'...
+                $alt  = $altseo[$loc] ?? null;
                 $bod  = $bodies[$loc] ?? null;
 
                 // Si no hay nada para este locale, puedes saltar o limpiar. Aquí upsert si hay algo.
                 if ($bod !== null) {
                     RegionContentTranslation::updateOrCreate(
                         ['content_id' => $content->id, 'locale' => $loc],
-                        ['body' => $bod]
+                        ['body' => $bod, 'altseo' => $alt]
                     );
                 }
             }
@@ -450,7 +436,7 @@ class AdminAuthController extends Controller
             return ['success' => 1];
         } catch (\Throwable $e) {
             DB::rollBack();
-            // \Log::error($e->getMessage());
+             Log::error($e->getMessage());
             return ['success' => 0, 'message' => 'Error al actualizar'];
         }
     }
