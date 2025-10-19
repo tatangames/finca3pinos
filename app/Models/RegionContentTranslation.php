@@ -9,7 +9,7 @@ class RegionContentTranslation extends Model
 {
     protected $table = 'region_content_translation'; // ← singular
     public $timestamps = false; // porque no los creaste
-    protected $fillable = ['content_id','locale','body'];
+    protected $fillable = ['content_id','locale','body', 'title'];
 
     public function content()
     {

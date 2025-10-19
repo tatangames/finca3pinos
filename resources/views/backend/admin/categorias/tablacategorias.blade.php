@@ -20,26 +20,17 @@
                         <tr>
                             <th style="width: 5%">Posición</th>
                             <th style="width: 15%">Nombre (SV)</th>
-                            <th style="width: 8%">Imagen</th>
                             <th style="width: 5%">Estado</th>
                             <th style="width: 8%">Opciones</th>
                         </tr>
                         </thead>
                         <tbody id="tablecontents">
-                        @foreach($arrayGaleria as $dato)
+                        @foreach($arrayCategoria as $dato)
                             <tr class="row1" data-id="{{ $dato->id }}">
 
                                 <td style="font-weight: bold">{{ $dato->posicion }}</td>
                                 <td>{{ $dato->nombreSV }}</td>
-                                <td>
-                                    <img
-                                        src="{{ url('storage/archivos/'.$dato->imagen) }}"
-                                        alt="{{ $dato->alt_seo }}"
-                                        width="190"
-                                        height="176"
-                                        style="border-radius:12px; object-fit:cover; display:block; margin:0 auto;"
-                                    >
-                                </td>
+
                                 <td>
                                     @if($dato->activo == 1)
                                         <small class="badge badge-success"><i class="far fa-check"></i>Activo</small>
@@ -56,9 +47,7 @@
                                         <i class="fas fa-eye" title="Borrar"></i>&nbsp; Borrar
                                     </button>
 
-
-
-                                   @if($dato->activo == 1)
+                                    @if($dato->activo == 1)
                                         <button type="button" style="margin: 2px" class="btn btn-warning btn-xs" onclick="modalDesactivar({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Desactivar"></i>&nbsp; Desactivar
                                         </button>
@@ -103,7 +92,7 @@
 
             openLoading();
 
-            axios.post('/admin/galeria/posicion',  {
+            axios.post('/admin/categoria/posicion',  {
                 'order': order
             })
                 .then((response) => {

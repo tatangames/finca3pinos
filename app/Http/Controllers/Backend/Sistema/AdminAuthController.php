@@ -100,6 +100,17 @@ class AdminAuthController extends Controller
     {
         $arrayGaleria = Galeria::orderBy('posicion', 'ASC')->get();
 
+        foreach ($arrayGaleria as $dato) {
+            $nombreSV = "";
+            if($infoRegion = RegionContent::where('key', $dato->content_key)
+                ->where('region_id', 1)->first()){
+                if($infoIdioma = RegionContentTranslation::where('content_id', $infoRegion->id)->first()){
+                    $nombreSV = $infoIdioma->body;
+                }
+            }
+            $dato->nombreSV = $nombreSV;
+        }
+
         return view('backend.admin.galeria.tablagaleria', compact('arrayGaleria'));
     }
 
@@ -186,7 +197,7 @@ class AdminAuthController extends Controller
                     if ($trES) {
                         RegionContentTranslation::updateOrCreate(
                             ['content_id' => $content->id, 'locale' => 'es'],
-                            ['title' => $trES['title'] ?? '', 'body' => $trES['body'] ?? '']
+                            ['body' => $trES['body'] ?? '']
                         );
                     }
                 } else {
@@ -194,7 +205,7 @@ class AdminAuthController extends Controller
                     if ($tr) {
                         RegionContentTranslation::updateOrCreate(
                             ['content_id' => $content->id, 'locale' => $region->locale],
-                            ['title' => $tr['title'] ?? '', 'body' => $tr['body'] ?? '']
+                            ['body' => $tr['body'] ?? '']
                         );
                     }
                 }
@@ -353,15 +364,11 @@ class AdminAuthController extends Controller
     {
         // 1) Validación
         $reglas = [
-            'id'        => 'required|exists:galerias,id',
-            'alt_seo'   => 'nullable|string|max:300',
-            'imagen'    => 'nullable|image|mimes:jpeg,jpg,png|max:5120',
-            'title'     => 'nullable|array',
-            'title.*'   => 'nullable|string|max:200',
-            'body'      => 'nullable|array',
-            'body.*'    => 'nullable|string',
+            'id'        => 'require',
         ];
+
         $validar = Validator::make($request->all(), $reglas);
+
         if ($validar->fails()) {
             return response()->json([
                 'success' => 0,
@@ -408,13 +415,12 @@ class AdminAuthController extends Controller
 
             // 4) Garantiza content_key
             if (empty($galeria->content_key)) {
-                $galeria->content_key = 'galeria.' . $galeria->id;
+                $galeria->content_key = $galeria->id;
             }
 
             $galeria->save();
 
             // 5) Upsert de contenidos por región y traducciones por locale
-            $titles = $request->input('title', []);   // ej: ['es' => '...', 'en'=>'...']
             $bodies = $request->input('body',  []);   // ej: ['es' => '...', 'en'=>'...']
 
             // Para cada región del sistema, garantizamos region_contents (region_id + key)
@@ -429,14 +435,13 @@ class AdminAuthController extends Controller
 
                 // Usamos el locale de la región para tomar los campos del request
                 $loc  = $region->locale; // p.ej 'es', 'en', 'ko'...
-                $tit  = $titles[$loc] ?? null;
                 $bod  = $bodies[$loc] ?? null;
 
                 // Si no hay nada para este locale, puedes saltar o limpiar. Aquí upsert si hay algo.
-                if ($tit !== null || $bod !== null) {
+                if ($bod !== null) {
                     RegionContentTranslation::updateOrCreate(
                         ['content_id' => $content->id, 'locale' => $loc],
-                        ['title' => $tit, 'body' => $bod]
+                        ['body' => $bod]
                     );
                 }
             }
@@ -594,10 +599,13 @@ class AdminAuthController extends Controller
             ];
         } catch (\Throwable $e) {
             DB::rollBack();
-            \Log::error('Error guardando traducciones: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Error guardando traducciones: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return ['success' => 99, 'msg' => 'Error interno al guardar traducciones'];
         }
     }
+
+
+
 
 
 

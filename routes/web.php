@@ -9,6 +9,7 @@ use App\Http\Controllers\Backend\Roles\RolesController;
 use App\Http\Controllers\Backend\Roles\PermisoController;
 use App\Http\Controllers\Backend\Sistema\PerfilController;
 use App\Http\Controllers\Controles\ControlRolController;
+use App\Http\Controllers\Backend\Sistema\CategoriasController;
 
 
 // ======================== FRONTEND =============================
@@ -108,6 +109,21 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     // Guardar
     Route::post('/idiomas/guardar', [AdminAuthController::class, 'guardarIdiomas'])
         ->name('idiomas.guardar');
+
+
+    // === CATEGORIAS ===
+    Route::get('/categoria', [CategoriasController::class, 'indexCategorias'])
+        ->name('categoria');
+    Route::get('/categoria/index/tabla', [CategoriasController::class, 'tablaCategorias']);
+    Route::post('/categoria/posicion', [CategoriasController::class,'actualizarPosicionCategorias']);
+    Route::post('/categoria/nuevo', [CategoriasController::class,'nuevaCategoria']);
+    Route::post('/categoria/desactivar', [CategoriasController::class,'desactivarCategoria']);
+    Route::post('/categoria/activar', [CategoriasController::class,'activarCategoria']);
+    Route::post('/categoria/informacion', [CategoriasController::class,'informacionCategoria']);
+    Route::post('/categoria/editar', [CategoriasController::class,'editarCategoria']);
+
+
+
 
 });
 

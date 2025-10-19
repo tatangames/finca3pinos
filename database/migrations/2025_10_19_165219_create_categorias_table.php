@@ -7,18 +7,16 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * GALERIAS
+     * CATEGORIAS
      */
     public function up(): void
     {
-        Schema::create('galerias', function (Blueprint $table) {
+        Schema::create('categorias', function (Blueprint $table) {
             $table->id();
-            $table->string('imagen', 100);
             $table->integer('posicion');
             $table->boolean('activo');
 
-            // Campos requeridos
-            $table->string('alt_seo', 300);
+            // nombre de categoria
             $table->string('content_key', 300)->unique();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('galerias');
+        Schema::dropIfExists('categorias');
     }
 };
