@@ -16,6 +16,8 @@ return new class extends Migration
             $table->bigInteger('id_productos')->unsigned();
             $table->string('content_key', 300)->unique();
 
+            $table->boolean('activo');
+
             // NOMBRE POR IDIOMA
 
             $table->foreign('id_productos')->references('id')->on('productos');

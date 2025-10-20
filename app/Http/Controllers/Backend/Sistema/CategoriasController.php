@@ -700,16 +700,52 @@ class CategoriasController extends Controller
 
     public function indexProductosPresentacion($idproducto)
     {
-        return view('backend.admin.categorias.productos.presentacion.vistapresentacion');
+        $arrayRegiones = Region::where('slug', '!=', 'latin-es')
+            ->orderBy('id')
+            ->get();
+
+
+        return view('backend.admin.categorias.productos.presentacion.vistapresentacion', compact('arrayRegiones', 'idproducto'));
     }
 
 
 
     public function tablaProductosPresentacion($idproducto)
     {
-        return view('backend.admin.categorias.productos.presentacion.tablapresentacion');
+        $arrayPresentaciones = ProductosPresentacion::where('id_productos', $idproducto)
+            ->orderBy('posicion', 'ASC')
+            ->get();
+
+        foreach ($arrayPresentaciones as $dato) {
+            $nombreSV = "";
+            if($infoRegion = RegionContent::where('key', $dato->content_key)
+                ->where('region_id', 1)->first()){
+                if($infoIdioma = RegionContentTranslation::where('content_id', $infoRegion->id)->first()){
+                    $nombreSV = $infoIdioma->title;
+                }
+            }
+            $dato->nombreSV = $nombreSV;
+        }
+
+        return view('backend.admin.categorias.productos.presentacion.tablapresentacion', compact('arrayPresentaciones'));
     }
 
+
+    public function actualizarPosicionProductoPresentacion(Request $request)
+    {
+        $tasks = ProductosPresentacion::where('id_productos', $request->id)->get();
+
+        foreach ($tasks as $task) {
+            $id = $task->id;
+
+            foreach ($request->order as $order) {
+                if ($order['id'] == $id) {
+                    $task->update(['posicion' => $order['posicion']]);
+                }
+            }
+        }
+        return ['success' => 1];
+    }
 
 
 }

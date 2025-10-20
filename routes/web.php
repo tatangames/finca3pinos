@@ -137,6 +137,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
 
     Route::get('/producto/presentacion/{idproducto}', [CategoriasController::class, 'indexProductosPresentacion']);
     Route::get('/producto/presentacion/index/tabla/{idproducto}', [CategoriasController::class, 'tablaProductosPresentacion']);
+    Route::post('/producto/posicion', [CategoriasController::class,'actualizarPosicionProductoPresentacion']);
 
 
 
