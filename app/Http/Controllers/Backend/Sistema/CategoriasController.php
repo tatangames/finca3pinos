@@ -542,12 +542,9 @@ class CategoriasController extends Controller
 
             // VERIFICAR QUE SLUG NO ESTE REPETIDO PRIMERO
 
-            $bodies = $request->input('body',  []);
-            $title = $request->input('title', []);
-            $slug = $request->input('slug', []);
-
-
-
+            $bodiesArray = $request->input('body',  []);
+            $titleArray = $request->input('title', []);
+            $slugArray = $request->input('slug', []);
 
 
             // Para cada región del sistema, garantizamos region_contents (region_id + key)
@@ -560,7 +557,7 @@ class CategoriasController extends Controller
                     []
                 );
                 $loc = $region->locale; // 'es', 'en', 'ko', etc.
-                $slu = $slug[$loc] ?? null;
+                $slu = $slugArray[$loc] ?? null;
 
                 $slugVerificar = Str::slug(trim($slu), '-');
 
@@ -575,44 +572,15 @@ class CategoriasController extends Controller
                 if ($duplicado) {
                     return [
                         'success' => 10,
-                        'message' => "El slug '{$slugVerificar}' ya existe en la región '{$region->slug}'.",
+                        'message' => "El slug '{$slugVerificar}' ya existe en la región '{$region->locale}'.",
                     ];
                 }
             }
 
-
-
-
-
-
             // YA VERIFICADO SLUG, PROCEDER A GUARDAR
 
             // Imagen opcional → WebP
-            if ($request->hasFile('imagen')) {
-                $old = $producto->imagen;
 
-                $manager = new ImageManager(new Driver());
-                $img     = $manager->read($request->file('imagen')->getPathname());
-
-                if ($img->width() > 1200) {
-                    $img->scale(width: 1200);
-                }
-
-                $nombreBase = Str::slug(Str::random(15) . '-' . microtime(true), '_');
-                $nombreOut  = $nombreBase . '.webp';
-                $encoded    = $img->encode(new WebpEncoder(quality: 82));
-
-                if (!Storage::disk('archivos')->put($nombreOut, $encoded)) {
-                    DB::rollBack();
-                    return ['success' => 99, 'message' => 'No se pudo guardar la imagen'];
-                }
-
-                $producto->imagen = $nombreOut;
-
-                if ($old && Storage::disk('archivos')->exists($old)) {
-                    Storage::disk('archivos')->delete($old);
-                }
-            }
 
             // 4) Garantiza content_key
             if (empty($producto->content_key)) {
@@ -630,9 +598,9 @@ class CategoriasController extends Controller
                 );
 
                 $loc = $region->locale; // 'es', 'en', 'ko', etc.
-                $tit = $title[$loc] ?? null;
-                $bod = $bodies[$loc] ?? null;
-                $slu = $slug[$loc] ?? null;
+                $tit = $titleArray[$loc] ?? null;
+                $bod = $bodiesArray[$loc] ?? null;
+                $slu = $slugArray[$loc] ?? null;
 
                 // 4) (Opcional) Evitar guardar slug vacío; si querés forzarlo, corta aquí
                 if ($tit !== null && trim($tit) === '') {
@@ -671,6 +639,57 @@ class CategoriasController extends Controller
             Log::error($e->getMessage());
             return ['success' => 0, 'message' => 'Error al actualizar'];
         }
+    }
+
+
+
+
+    public function actualizarImagenProducto(Request $request)
+    {
+        $regla = array(
+            'id' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        $producto = Producto::find($request->id);
+        if (!$producto) {
+            return ['success' => 2]; // borrada/no existe
+        }
+
+        if ($request->hasFile('imagen')) {
+            $old = $producto->imagen;
+
+            $manager = new ImageManager(new Driver());
+            $img     = $manager->read($request->file('imagen')->getPathname());
+
+            if ($img->width() > 1200) {
+                $img->scale(width: 1200);
+            }
+
+            $nombreBase = Str::slug(Str::random(15) . '-' . microtime(true), '_');
+            $nombreOut  = $nombreBase . '.webp';
+            $encoded    = $img->encode(new WebpEncoder(quality: 82));
+
+            if (!Storage::disk('archivos')->put($nombreOut, $encoded)) {
+                DB::rollBack();
+                return ['success' => 99, 'message' => 'No se pudo guardar la imagen'];
+            }
+
+            $producto->imagen = $nombreOut;
+            $producto->save();
+
+            if ($old && Storage::disk('archivos')->exists($old)) {
+                Storage::disk('archivos')->delete($old);
+            }
+
+
+
+        }
+
+        return ['success' => 1];
     }
 
 

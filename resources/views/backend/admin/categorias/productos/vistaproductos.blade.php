@@ -138,45 +138,87 @@
             </div>
         </div>
     </div>
-</div>
 
 
-<div class="modal fade" id="modalEditar">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Actualizar</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-editar">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-12">
 
-                                <div class="form-group">
-                                    <input type="hidden" id="id-editar">
+    <div class="modal fade" id="modalEditar">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Actualizar</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-editar">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" id="id-editar">
+                                    </div>
+
+                                    <!-- Campos dinámicos por idioma -->
+                                    <div id="langs-editar"></div>
+
                                 </div>
-
-                                <!-- Campos dinámicos por idioma -->
-                                <div id="langs-editar"></div>
-
                             </div>
                         </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="modalImagen">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Cambiar Imagen</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-imagen">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" id="id-editar-imagen">
+                                    </div>
+
+                                    <!-- Imagen -->
+                                    <div class="form-group mt-4">
+                                        <label>Imagen</label>
+                                        <input type="file" id="imagen-editar" class="form-control"
+                                               accept="image/jpeg,image/png">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="actualizarImagen()">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 </div>
-
-
 @extends('backend.menus.footerjs')
 @section('archivos-js')
 
@@ -275,8 +317,6 @@
             })
                 .then((response) => {
                     closeLoading();
-
-                    console.log(response);
 
                     if(response.data.success === 1){
                         // KEY repetida
@@ -544,6 +584,58 @@
                     toastr.error('Error al actualizar');
                 });
         }
+
+        function modalImagen(id){
+            document.getElementById("formulario-imagen").reset();
+            $('#modalImagen').modal('show');
+            $('#id-editar-imagen').val(id);
+        }
+
+        function actualizarImagen(){
+            const id     = document.getElementById('id-editar-imagen').value;
+            var imagen = document.getElementById('imagen-editar');
+
+            if(id === ''){
+                toastr.error('Debes completar el id');
+                return
+            }
+
+            if(imagen.files && imagen.files[0]){ // si trae imagen
+                if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
+                    toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
+                    return;
+                }
+            }else{
+                toastr.error('Imagen es Requerida')
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('id', id);
+            formData.append('imagen', imagen.files[0]);
+
+            openLoading()
+
+            axios.post('/admin/producto/editarimagen', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado correctamente');
+                        $('#modalImagen').modal('hide');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al registrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al registrar');
+                    closeLoading();
+                });
+        }
+
 
 
         function vistaPresentacion(idproducto){

@@ -133,9 +133,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/producto/activar', [CategoriasController::class,'activarProducto']);
     Route::post('/producto/informacion', [CategoriasController::class,'informacionProducto']);
     Route::post('/producto/editar', [CategoriasController::class,'editarProducto']);
+    Route::post('/producto/editarimagen', [CategoriasController::class,'actualizarImagenProducto']);
 
     Route::get('/producto/presentacion/{idproducto}', [CategoriasController::class, 'indexProductosPresentacion']);
     Route::get('/producto/presentacion/index/tabla/{idproducto}', [CategoriasController::class, 'tablaProductosPresentacion']);
+
+
 
 
 });

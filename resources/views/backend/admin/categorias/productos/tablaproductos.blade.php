@@ -65,7 +65,11 @@
                                         </button>
                                     @endif
 
-                                    <button type="button" class="btn btn-info btn-xs" onclick="vistaPresentacion({{ $dato->id }})">
+                                    <button type="button" style="margin: 3px" class="btn btn-warning btn-xs" onclick="modalImagen({{ $dato->id }})">
+                                        <i class="fas fa-edit" title="Editar Imagen"></i>&nbsp; Editar Imagen
+                                    </button>
+
+                                    <button type="button" style="margin: 3px" class="btn btn-info btn-xs" onclick="vistaPresentacion({{ $dato->id }})">
                                         <i class="fas fa-edit" title="Presentacion"></i>&nbsp; Presentación
                                     </button>
                                 </td>
