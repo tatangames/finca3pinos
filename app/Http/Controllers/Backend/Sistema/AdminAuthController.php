@@ -168,7 +168,6 @@ class AdminAuthController extends Controller
             // ===== 3) i18n =====
             // Espera formato: translations[<locale>][title|body]
             $translations = $request->input('translations', []);
-            $trES = $translations['es'] ?? null;       // 👈 base para ES
 
             // Trae regiones y crea RegionContent por cada una
             $regiones = Region::select('id','slug','locale')->get();
@@ -180,28 +179,14 @@ class AdminAuthController extends Controller
                     []
                 );
 
-                // Traducción a aplicar para esta región:
-                // - Si la región es 'sv' (El Salvador) o 'latin-es', usa SIEMPRE la misma (ES)
-                // - Para otras, usa lo que venga por su locale.
-                if ($region->slug === 'sv' || $region->slug === 'latin-es') {
-                    if ($trES) {
-                        RegionContentTranslation::updateOrCreate(
-                            ['content_id' => $content->id, 'locale' => 'es'],
-                            ['body' => $trES['body'] ?? '',
-                            'altseo' => $trES['altseo'] ?? ''
-                            ],
-                        );
-                    }
-                } else {
-                    $tr = $translations[$region->locale] ?? null;
-                    if ($tr) {
-                        RegionContentTranslation::updateOrCreate(
-                            ['content_id' => $content->id, 'locale' => $region->locale],
-                            ['body' => $tr['body'] ?? '',
-                             'altseo' => $tr['altseo'] ?? ''
-                            ]
-                        );
-                    }
+                $tr = $translations[$region->locale] ?? null;
+                if ($tr) {
+                    RegionContentTranslation::updateOrCreate(
+                        ['content_id' => $content->id, 'locale' => $region->locale],
+                        ['body' => $tr['body'] ?? '',
+                            'altseo' => $tr['altseo'] ?? ''
+                        ]
+                    );
                 }
             }
 

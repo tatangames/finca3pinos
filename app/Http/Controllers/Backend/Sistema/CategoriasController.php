@@ -100,7 +100,6 @@ class CategoriasController extends Controller
             $gal->save();
 
             $translations = $request->input('translations', []);
-            $trES = $translations['es'] ?? null;       // 👈 base para ES
 
             // Trae regiones y crea RegionContent por cada una
             $regiones = Region::select('id','slug','locale')->get();
@@ -112,29 +111,17 @@ class CategoriasController extends Controller
                     []
                 );
 
-                // Traducción a aplicar para esta región:
-                // - Si la región es 'sv' (El Salvador) o 'latin-es', usa SIEMPRE la misma (ES)
-                // - Para otras, usa lo que venga por su locale.
-                if ($region->slug === 'sv' || $region->slug === 'latin-es') {
-                    if ($trES) {
-                        RegionContentTranslation::updateOrCreate(
-                            ['content_id' => $content->id, 'locale' => 'es'],
-                            ['title' => $trES['title'] ?? '']
-                        );
-                    }
-                } else {
-                    $tr = $translations[$region->locale] ?? null;
-                    if ($tr) {
-                        RegionContentTranslation::updateOrCreate(
-                            ['content_id' => $content->id, 'locale' => $region->locale],
-                            ['title' => $tr['title'] ?? '']
-                        );
-                    }
+                $tr = $translations[$region->locale] ?? null;
+                if ($tr) {
+                    RegionContentTranslation::updateOrCreate(
+                        ['content_id' => $content->id, 'locale' => $region->locale],
+                        ['title' => $tr['title'] ?? '']
+                    );
                 }
             }
 
             DB::commit();
-            return ['success' => 1];
+            return ['success' => 2];
 
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -294,7 +281,7 @@ class CategoriasController extends Controller
             return ['success' => 1];
         } catch (\Throwable $e) {
             DB::rollBack();
-            // \Log::error($e->getMessage());
+            Log::error($e->getMessage());
             return ['success' => 0, 'message' => 'Error al actualizar'];
         }
     }
@@ -350,6 +337,24 @@ class CategoriasController extends Controller
                 return ['success' => 1];
             }
 
+            $translations = $request->input('translations', []);
+            $tr = $translations[$region->locale] ?? null;
+
+            // VERIFICAR SI SLUG NO ESTA REPETIDO
+            $regiones = Region::select('id','slug','locale')->get();
+
+            foreach ($regiones as $region) {
+
+                $tr = $translations[$region->locale] ?? null;
+
+                if(RegionContentTranslation::where('slug', $tr['slug'])->first()){
+                    return [
+                        'success' => 2,
+                        'message' => "El slug '{$tr['slug']}' ya existe",
+                    ];
+                }
+            }
+
             // ===== 1) Imagen =====
             $nombreBase  = Str::slug(Str::random(15) . '-' . microtime(true), '_');
             $manager = new ImageManager(new Driver());
@@ -374,12 +379,6 @@ class CategoriasController extends Controller
             $gal->save();
 
             // ===== 3) i18n =====
-            // Espera formato: translations[<locale>][title|body]
-            $translations = $request->input('translations', []);
-            $trES = $translations['es'] ?? null;       // 👈 base para ES
-
-            // Trae regiones y crea RegionContent por cada una
-            $regiones = Region::select('id','slug','locale')->get();
 
             foreach ($regiones as $region) {
                 // Crea/obtiene el contenedor por region_id + key
@@ -388,61 +387,25 @@ class CategoriasController extends Controller
                     []
                 );
 
-                // Decide el slug que vas a usar en ESTA región:
-                $slugFuente = ($region->slug === 'sv' || $region->slug === 'latin-es')
-                    ? ($trES['slug'] ?? '')
-                    : (($translations[$region->locale]['slug'] ?? '') ?: ($trES['slug'] ?? ''));
 
-                $slugVerificar = Str::slug(trim($slugFuente), '-');
-
-                // 1) Validar duplicado por REGIÓN, excluyendo el propio content_id
-                $duplicado = RegionContentTranslation::where('slug', $slugVerificar)
-                    ->where('content_id', '!=', $content->id)              // no me compares contra mí
-                    ->whereHas('content', function ($q) use ($region) {    // solo en esta región
-                        $q->where('region_id', $region->id);
-                    })
-                    ->exists();
-
-                if ($duplicado) {
-                    return [
-                        'success' => 1,
-                        'message' => "El slug '{$slugVerificar}' ya existe en la región '{$region->slug}'.",
-                    ];
-                }
-
-                // 2) Guardar/actualizar la traducción
-                if ($region->slug === 'sv' || $region->slug === 'latin-es') {
-                    if ($trES) {
-                        RegionContentTranslation::updateOrCreate(
-                            ['content_id' => $content->id, 'locale' => 'es'],
-                            [
-                                'title' => $trES['title'] ?? '',
-                                'body'  => $trES['body']  ?? '',
-                                'slug'  => $slugVerificar,
-                            ]
-                        );
-                    }
-                } else {
-                    $tr = $translations[$region->locale] ?? null;
-                    if ($tr) {
-                        RegionContentTranslation::updateOrCreate(
-                            ['content_id' => $content->id, 'locale' => $region->locale],
-                            [
-                                'title' => $tr['title'] ?? '',
-                                'body'  => $tr['body']  ?? '',
-                                'slug'  => $slugVerificar,
-                            ]
-                        );
-                    }
+                if ($tr) {
+                    RegionContentTranslation::updateOrCreate(
+                        ['content_id' => $content->id, 'locale' => $region->locale],
+                        [
+                            'title' => $tr['title'] ?? '',
+                            'body'  => $tr['body']  ?? '',
+                            'slug'  => $tr['slug']  ?? '',
+                        ]
+                    );
                 }
             }
 
             DB::commit();
-            return ['success' => 2];
+            return ['success' => 3];
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            report($e);
+            Log::error($e->getMessage());
             return ['success' => 0, 'message' => 'Excepción al guardar'];
         }
     }
@@ -579,9 +542,12 @@ class CategoriasController extends Controller
 
             // VERIFICAR QUE SLUG NO ESTE REPETIDO PRIMERO
 
-            $bodies = $request->input('body',  []);   // ej: ['es' => '...', 'en'=>'...']
-            $title = $request->input('title', []);   // ej: ['es' => '...', 'en'=>'...']
-            $slug = $request->input('slug', []);   // ej: ['es' => '...', 'en'=>'...']
+            $bodies = $request->input('body',  []);
+            $title = $request->input('title', []);
+            $slug = $request->input('slug', []);
+
+
+
 
 
             // Para cada región del sistema, garantizamos region_contents (region_id + key)
@@ -613,6 +579,11 @@ class CategoriasController extends Controller
                     ];
                 }
             }
+
+
+
+
+
 
             // YA VERIFICADO SLUG, PROCEDER A GUARDAR
 

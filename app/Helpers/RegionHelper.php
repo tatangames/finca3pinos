@@ -19,7 +19,6 @@ if (!function_exists('getRegionContent')) {
             $regionByLocale = [
                 'sv' => 'sv',        // ES (El Salvador)
                 'en' => 'us',        // EN (USA)
-                'es' => 'latin-es',  // ES (LatAm)  ← si quieres que 'es' apunte a SV, cambia a 'sv'
                 'ko' => 'kr',
             ];
             $regionSlug = $regionByLocale[$locale] ?? 'sv';

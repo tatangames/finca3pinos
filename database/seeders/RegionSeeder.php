@@ -17,10 +17,7 @@ class RegionSeeder extends Seeder
         $regions = [
             ['slug' => 'sv',       'name' => 'El Salvador',        'locale' => 'es'],
             ['slug' => 'us',       'name' => 'United States',      'locale' => 'en'],
-            ['slug' => 'latin-es', 'name' => 'Latinoamérica (ES)', 'locale' => 'es'],
-
-            // 👇 Nueva región
-            ['slug'=>'kr','name'=>'South Korea','locale'=>'ko'],
+            ['slug' => 'kr',       'name'=>  'South Korea',        'locale' => 'ko'],
         ];
 
         foreach ($regions as $r) {

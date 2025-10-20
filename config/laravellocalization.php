@@ -9,13 +9,6 @@ return [
             'regional' => 'en_US',
             'url' => 'us',          // ← SEGMENTO /us
         ],
-        'es' => [
-            'name' => 'Español (LatAm)',
-            'script' => 'Latn',
-            'native' => 'español',
-            'regional' => 'es_ES',
-            'url' => 'latin-es',    // ← SEGMENTO /latin-es
-        ],
         'sv' => [
             'name' => 'Español (El Salvador)',
             'script' => 'Latn',
@@ -23,7 +16,6 @@ return [
             'regional' => 'es_SV',
             'url' => 'sv',          // ← SEGMENTO /sv
         ],
-
         // 👇 Nuevo idioma
         'ko' => [
             'name'    => 'Korean',

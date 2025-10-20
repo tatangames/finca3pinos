@@ -18,8 +18,6 @@ class UsuarioSeeder extends Seeder
             'nombre' => 'Jonathan',
             'password' => Hash::make('1234'),
             'email' => 'tatan@gmail.com',
-            'token_correo' => null,
-            'token_fecha' => null
         ]);
     }
 }

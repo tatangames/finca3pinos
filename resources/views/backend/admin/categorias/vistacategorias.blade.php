@@ -228,8 +228,10 @@
             })
                 .then((response) => {
                     closeLoading();
-
                     if(response.data.success === 1){
+                        toastr.error('KEY Repetida');
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();

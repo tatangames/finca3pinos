@@ -25,7 +25,7 @@ return new class extends Migration
             $table->longText('title')->nullable();
 
             // SLUG PRODUCTO UNICAMENTE
-            $table->string('slug', 300)->nullable()->unique();
+            $table->string('slug', 300)->nullable();
             $table->string('altseo', 300)->nullable();
 
             // Índices y unicidad

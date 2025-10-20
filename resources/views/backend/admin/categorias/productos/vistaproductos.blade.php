@@ -276,10 +276,17 @@
                 .then((response) => {
                     closeLoading();
 
+                    console.log(response);
+
                     if(response.data.success === 1){
+                        // KEY repetida
                         toastr.error(response.data.message);
                     }
                     else if(response.data.success === 2){
+                        // SLUG ya existe
+                        toastr.error(response.data.message);
+                    }
+                    else if(response.data.success === 3){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();
