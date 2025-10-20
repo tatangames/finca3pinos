@@ -269,7 +269,6 @@
             }
 
 
-
             // 🔹 Creamos el FormData
             let formData = new FormData();
             formData.append('key', key);
@@ -505,8 +504,6 @@
             const id     = document.getElementById('id-editar').value;
             const imagen = document.getElementById('imagen-editar');
 
-
-
             // Validación de imagen (si hay)
             if (imagen.files && imagen.files[0]) {
                 if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
@@ -527,18 +524,19 @@
             }
 
             // Enviar como arrays: body[en], title[sv], body[sv], ...
-            locales.forEach(loc => {
-                const b = document.getElementById(`body_${loc}_editar`)?.value ?? '';
-                const s = document.getElementById(`altseo_${loc}_editar`)?.value ?? '';
-                formData.append(`body[${loc}]`,  b);
+            for (const loc of locales) {
+                const b = document.getElementById(`body_${loc}_editar`)?.value.trim() ?? '';
+                const s = document.getElementById(`altseo_${loc}_editar`)?.value.trim() ?? '';
 
-                if(!s){
-                    toastr.error('ALT SEO es requerido');
-                    return
+                formData.append(`body[${loc}]`, b);
+
+                if (!s) {
+                    toastr.error(`ALT SEO es requerido para ${loc.toUpperCase()}`);
+                    return; // 🔴 corta toda la función aquí
                 }
 
-                formData.append(`altseo[${loc}]`,  s);
-            });
+                formData.append(`altseo[${loc}]`, s);
+            }
 
             openLoading();
 
@@ -551,29 +549,13 @@
                         $('#modalEditar').modal('hide');
                         recargar();
                         return;
+                    }else{
+                        toastr.error('Error al actualizar');
                     }
-
-                    // Si el backend devolvió validación (422) con errores
-                    if (response.data.success === 0 && response.data.errors) {
-                        const errs = response.data.errors;
-                        const first = Object.values(errs)[0]?.[0] || 'Error de validación';
-                        toastr.error(first);
-                        return;
-                    }
-
-                    toastr.error('Error al actualizar');
                 })
                 .catch((error) => {
                     closeLoading();
-
-                    // Muestra primer error si viene de validación Laravel
-                    if (error.response && error.response.status === 422 && error.response.data?.errors) {
-                        const errs = error.response.data.errors;
-                        const first = Object.values(errs)[0]?.[0] || 'Error de validación';
-                        toastr.error(first);
-                    } else {
-                        toastr.error('Error al actualizar');
-                    }
+                    toastr.error('Error al actualizar');
                 });
         }
 

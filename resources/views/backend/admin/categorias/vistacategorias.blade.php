@@ -409,7 +409,7 @@
         }
 
         function editar(){
-            const id     = document.getElementById('id-editar').value;
+            const id = document.getElementById('id-editar').value;
 
             // Recolectar traducciones dinámicas
             const cont = document.getElementById('langs-editar');
@@ -419,10 +419,16 @@
             formData.append('id', id);
 
             // Enviar como arrays: title[en], title[sv], title[sv], ...
-            locales.forEach(loc => {
-                const b = document.getElementById(`title_${loc}_editar`)?.value ?? '';
-                formData.append(`title[${loc}]`,  b);
-            });
+            for (const loc of locales) {
+                const b = document.getElementById(`title_${loc}_editar`)?.value.trim() ?? '';
+
+                if (!b) {
+                    toastr.error(`Título es requerido para ${loc.toUpperCase()}`);
+                    return; // 🔴 corta toda la función
+                }
+
+                formData.append(`title[${loc}]`, b);
+            }
 
             openLoading();
 
@@ -435,29 +441,13 @@
                         $('#modalEditar').modal('hide');
                         recargar();
                         return;
+                    }else{
+                        toastr.error('Error al actualizar');
                     }
-
-                    // Si el backend devolvió validación (422) con errores
-                    if (response.data.success === 0 && response.data.errors) {
-                        const errs = response.data.errors;
-                        const first = Object.values(errs)[0]?.[0] || 'Error de validación';
-                        toastr.error(first);
-                        return;
-                    }
-
-                    toastr.error('Error al actualizar');
                 })
                 .catch((error) => {
                     closeLoading();
-
-                    // Muestra primer error si viene de validación Laravel
-                    if (error.response && error.response.status === 422 && error.response.data?.errors) {
-                        const errs = error.response.data.errors;
-                        const first = Object.values(errs)[0]?.[0] || 'Error de validación';
-                        toastr.error(first);
-                    } else {
-                        toastr.error('Error al actualizar');
-                    }
+                    toastr.error('Error al actualizar');
                 });
         }
 

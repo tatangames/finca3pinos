@@ -353,8 +353,6 @@ class AdminAuthController extends Controller
 
     public function editarGaleria(Request $request)
     {
-        Log::info($request->all());
-
         $regla = array(
             'id' => 'required'
         );

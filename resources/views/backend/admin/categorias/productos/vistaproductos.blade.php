@@ -88,7 +88,7 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="form-group">
-                                                    <label>Contenido HTML ({{ $region->locale }})</label>
+                                                    <label>SLUG (RUTA WEB - no debe llevar espacios)</label>
 
                                                     <input name="slug_{{ $region->locale }}"
                                                               id="slug_{{ $region->locale }}"
@@ -96,7 +96,6 @@
                                                               maxlength="300"
                                                               required
                                                               placeholder="Ruta WEB (Slug. No debe llevar espacios o simbolos)">
-
                                                     <br>
                                                     <p>Título del Producto</p>
                                                     <textarea name="title_{{ $region->locale }}"
@@ -116,6 +115,16 @@
                                             </div>
                                         </div>
                                     @endforeach
+
+                                    <br>
+                                    <hr>
+
+                                    <!-- Imagen -->
+                                    <div class="form-group mt-4">
+                                        <label>Imagen</label>
+                                        <input type="file" id="imagen-nuevo" class="form-control"
+                                               accept="image/jpeg,image/png">
+                                    </div>
 
                                 </div>
                             </div>
@@ -153,8 +162,6 @@
 
                                 <!-- Campos dinámicos por idioma -->
                                 <div id="langs-editar"></div>
-
-
 
                             </div>
                         </div>
@@ -198,7 +205,7 @@
         // recarga tabla
         function recargar(){
             var idcategoria = {{ $idcategoria }};
-            var ruta = "{{ URL::to('/admin/categoria/index/tabla') }}/" + idcategoria;
+            var ruta = "{{ URL::to('/admin/producto/index/tabla') }}/" + idcategoria;
             $('#tablaDatatable').load(ruta);
         }
 
@@ -210,36 +217,69 @@
 
         function nuevo(){
             var key = document.getElementById('key').value.trim();
+            var imagen = document.getElementById('imagen-nuevo');
 
             if (key === '') {
                 toastr.error('Debe ingresar la key global');
                 return;
             }
 
-            openLoading()
+            if(imagen.files && imagen.files[0]){ // si trae imagen
+                if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
+                    toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
+                    return;
+                }
+            }else{
+                toastr.error('Imagen es Requerida')
+                return;
+            }
+            var idcategoria = {{ $idcategoria }};
 
             // 🔹 Creamos el FormData
             let formData = new FormData();
+            formData.append('idcategoria', idcategoria);
             formData.append('key', key);
+            formData.append('imagen', imagen.files[0]);
 
             // 🔹 Recorremos las regiones en un array JSON generado por Blade
             let regiones = @json($arrayRegiones);
 
-            regiones.forEach(region => {
+            const error = regiones.some(region => {
                 let locale = region.locale;
+                let slug = document.getElementById(`slug_${locale}`).value.trim().replace(/\s+/g, '');
                 let title = document.getElementById(`title_${locale}`).value.trim();
                 let body = document.getElementById(`body_${locale}`).value.trim();
 
+                if (!slug) {
+                    toastr.error(`SLUG es requerido para ${locale.toUpperCase()}`);
+                    return true; // detiene el ciclo
+                }
 
+                if (!title) {
+                    toastr.error(`Título es requerido para ${locale.toUpperCase()}`);
+                    return true; // detiene el ciclo
+                }
+
+                formData.append(`translations[${locale}][slug]`, slug);
+                formData.append(`translations[${locale}][body]`, body);
                 formData.append(`translations[${locale}][title]`, title);
+                return false;
             });
 
-            axios.post('/admin/categoria/nuevo', formData, {
+
+            if (error) return;
+
+            openLoading()
+
+            axios.post('/admin/producto/nuevo', formData, {
             })
                 .then((response) => {
                     closeLoading();
 
                     if(response.data.success === 1){
+                        toastr.error(response.data.message);
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();
@@ -276,7 +316,7 @@
 
             openLoading();
 
-            axios.post('/admin/categoria/borrar',{
+            axios.post('/admin/producto/borrar',{
                 'id': idfila
             })
                 .then((response) => {
@@ -314,7 +354,7 @@
         function desactivarFila(idfila){
             openLoading();
 
-            axios.post('/admin/categoria/desactivar',{
+            axios.post('/admin/producto/desactivar',{
                 'id': idfila
             })
                 .then((response) => {
@@ -352,7 +392,7 @@
         function activarFila(idfila){
             openLoading();
 
-            axios.post('/admin/categoria/activar',{
+            axios.post('/admin/producto/activar',{
                 'id': idfila
             })
                 .then((response) => {
@@ -360,7 +400,10 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         recargar();
-                    }else{
+                    }else if(response.data.success === 2){
+                        toastr.error('Presentación es requerido para Activar');
+                    }
+                    else{
                         toastr.error('Error al actualizar');
                     }
                 })
@@ -374,20 +417,36 @@
             // item = { name, locale, title }
             const loc = item.locale;
             return `
-      <div class="card mt-3 border">
-        <div class="card-header" style="background:#f4f4f4;">
-          <strong>${item.name}</strong> (${loc.toUpperCase()})
-        </div>
-        <div class="card-body">
-          <div class="form-group">
-            <label>Contenido (${loc})</label>
-            <textarea id="title_${loc}_editar"
-                      rows="4"
-                      class="form-control"
-                      placeholder="<p>Texto o HTML...</p>">${item.title || ''}</textarea>
-          </div>
-        </div>
-      </div>
+              <div class="card mt-3 border">
+                <div class="card-header" style="background:#f4f4f4;">
+                  <strong>${item.name}</strong> (${loc.toUpperCase()})
+                </div>
+                <div class="card-body">
+                  <div class="form-group">
+
+
+                     <label>SLUG (${loc})</label>
+                            <input id="slug_${loc}_editar"
+                              maxlength="300"
+                              class="form-control"
+                              value="${item.slug || ''}">
+
+                    <label>Título (${loc})</label>
+                    <textarea id="title_${loc}_editar"
+                              rows="4"
+                              class="form-control"
+                              placeholder="<p>Texto o HTML...</p>">${item.title || ''}</textarea>
+
+
+                    <label>Descripción (${loc})</label>
+                    <textarea id="body_${loc}_editar"
+                              rows="4"
+                              class="form-control"
+                              placeholder="<p>Texto o HTML...</p>">${item.body || ''}</textarea>
+
+                  </div>
+                </div>
+              </div>
     `;
         }
 
@@ -395,7 +454,7 @@
             openLoading();
             document.getElementById("formulario-editar").reset();
 
-            axios.post('/admin/categoria/informacion', { id })
+            axios.post('/admin/producto/informacion', { id })
                 .then((response) => {
                     closeLoading();
                     if (response.data.success === 1) {
@@ -428,15 +487,30 @@
             const formData = new FormData();
             formData.append('id', id);
 
+            let valido = true;
             // Enviar como arrays: title[en], title[sv], title[sv], ...
             locales.forEach(loc => {
-                const b = document.getElementById(`title_${loc}_editar`)?.value ?? '';
-                formData.append(`title[${loc}]`,  b);
+                const title = document.getElementById(`title_${loc}_editar`)?.value ?? '';
+                const body = document.getElementById(`body_${loc}_editar`)?.value ?? '';
+                const slug = document.getElementById(`slug_${loc}_editar`)?.value ?? '';
+
+                if (!title || !slug) {
+                    valido = false;
+                }
+
+                formData.append(`title[${loc}]`,  title);
+                formData.append(`body[${loc}]`,  body);
+                formData.append(`slug[${loc}]`,  slug);
             });
+
+            if (!valido) {
+                toastr.error('Debes completar el título y slug en todos los idiomas.');
+                return;
+            }
 
             openLoading();
 
-            axios.post('/admin/categoria/editar', formData)
+            axios.post('/admin/producto/editar', formData)
                 .then((response) => {
                     closeLoading();
 
@@ -444,33 +518,30 @@
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
                         recargar();
-                        return;
                     }
-
-                    // Si el backend devolvió validación (422) con errores
-                    if (response.data.success === 0 && response.data.errors) {
-                        const errs = response.data.errors;
-                        const first = Object.values(errs)[0]?.[0] || 'Error de validación';
-                        toastr.error(first);
-                        return;
+                    else if (response.data.success === 3 || response.data.success === 4
+                       ) {
+                        toastr.error(response.data.message);
+                        return
                     }
-
-                    toastr.error('Error al actualizar');
+                    else if (response.data.success === 10) {
+                        toastr.error(response.data.message);
+                        return
+                    }
+                    else{
+                        toastr.error('Error al actualizar');
+                    }
                 })
                 .catch((error) => {
                     closeLoading();
-
-                    // Muestra primer error si viene de validación Laravel
-                    if (error.response && error.response.status === 422 && error.response.data?.errors) {
-                        const errs = error.response.data.errors;
-                        const first = Object.values(errs)[0]?.[0] || 'Error de validación';
-                        toastr.error(first);
-                    } else {
-                        toastr.error('Error al actualizar');
-                    }
+                    toastr.error('Error al actualizar');
                 });
         }
 
+
+        function vistaPresentacion(idproducto){
+            window.location.href="{{ url('/admin/producto/presentacion') }}/" + idproducto;
+        }
 
 
 

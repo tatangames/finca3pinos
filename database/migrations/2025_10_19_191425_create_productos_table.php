@@ -14,15 +14,13 @@ return new class extends Migration
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_categorias')->unsigned();
+            $table->string('content_key', 300)->unique();
 
             $table->string('imagen', 100);
-            $table->string('slug', 300)->unique();
-            $table->string('alt_seo', 300)->nullable();
             $table->integer('posicion')->default(0);
             $table->boolean('activo');
 
             // titulo y Descripcion por Idioma
-
 
             $table->foreign('id_categorias')->references('id')->on('categorias');
         });
