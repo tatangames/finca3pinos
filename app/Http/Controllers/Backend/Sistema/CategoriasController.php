@@ -82,7 +82,7 @@ class CategoriasController extends Controller
         DB::beginTransaction();
 
         try {
-            $keySinEspacios = trim($request->key);
+            $keySinEspacios = preg_replace('/\s+/', '', (string) $request->key);
 
             // EVITAR KEY REPETIDAS
             if(RegionContent::where('key', $keySinEspacios)->first()){
@@ -328,7 +328,7 @@ class CategoriasController extends Controller
     {
         DB::beginTransaction();
         try {
-            $keySinEspacios = trim($request->key);
+            $keySinEspacios = preg_replace('/\s+/', '', (string) $request->key);
 
             // EVITAR KEY REPETIDAS
             if(RegionContent::where('key', $keySinEspacios)->first()){
@@ -750,7 +750,7 @@ class CategoriasController extends Controller
 
             // idproducto
 
-            $keySinEspacios = trim($request->key);
+            $keySinEspacios = preg_replace('/\s+/', '', (string) $request->key);
 
             // EVITAR KEY REPETIDAS
             if(RegionContent::where('key', $keySinEspacios)->first()){

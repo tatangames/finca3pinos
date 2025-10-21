@@ -63,7 +63,7 @@
                                         </button>
                                     @endif
 
-                                    <button type="button" style="margin: 3px" class="btn btn-warning btn-xs" onclick="modalImagen({{ $dato->id }})">
+                                    <button type="button" style="margin: 3px" class="btn btn-success btn-xs" onclick="modalImagen({{ $dato->id }})">
                                         <i class="fas fa-edit" title="Editar Imagen"></i>&nbsp; Editar Imagen
                                     </button>
 

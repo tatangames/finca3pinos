@@ -74,7 +74,7 @@
 
                                     <!-- Key global -->
                                     <div class="form-group">
-                                        <label>Key para todos los idiomas</label>
+                                        <label>Key para todos los idiomas (NO ESPACIOS)</label>
                                         <input type="text" maxlength="200" id="key" class="form-control"
                                                placeholder="Ej: about.history">
                                     </div>
