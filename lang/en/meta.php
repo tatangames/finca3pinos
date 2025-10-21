@@ -127,6 +127,17 @@ return [
     'sending'       => 'Sending...',
     'unknown_error' => 'An unexpected error occurred. Please try again.',
     'network_error' => 'Could not reach the server. Check your connection.',
-    'derechos' => 'Finca 3 Pinos — All rights reserved.'
+    'derechos' => 'Finca 3 Pinos — All rights reserved.',
+
+
+
+    'product_v1' => 'Select your coffee',
+    'product_v2' => 'Add to cart',
+    'product_v3' => 'Presentation',
+    'product_v4' => '',
+
+
+
+
 
 ];

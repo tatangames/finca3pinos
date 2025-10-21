@@ -131,9 +131,10 @@
                             </div>
                             <div
                                 class="heading  head-subheader align-center subcolor-main text-bg transform-default   vc_custom_1508507992778"
-                                id="like_sc_header_1945088938"><h5 class="subheader">Choose your coffee</h5>
-                                <h2 class="header">Recent Products</h2>
-                                <p class="header-text">Products</p></div>
+                                id="like_sc_header_1945088938"><h5 class="subheader" style="font-size: 35px">{{ __('meta.product_v1') }}</h5>
+                            </div>
+
+
 
 
                             <div class="woocommerce">
@@ -314,10 +315,21 @@
                                 <div class="hidden-xl hidden-lg hidden-md hidden-xs" style="height: 50px;"></div>
                                 <div class="visible-xs" style="height: 50px;"></div>
                             </div>
-
-
                         </div>
                     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                 </div>

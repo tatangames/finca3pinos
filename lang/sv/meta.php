@@ -122,13 +122,21 @@ return [
     'contact_v11' => 'Correo enviado',
 
 
-
-
     'contact_ok'    => '¡Gracias! Hemos recibido tu mensaje y te responderemos pronto.',
     'sending'       => 'Enviando...',
     'unknown_error' => 'Ocurrió un error inesperado. Intenta de nuevo.',
     'network_error' => 'No fue posible conectar con el servidor. Verifica tu conexión.',
-    'derechos' => 'Finca 3 Pinos — Todos los derechos reservados.'
+    'derechos' => 'Finca 3 Pinos — Todos los derechos reservados.',
+
+
+    'product_v1' => 'Selecciona tu café',
+    'product_v2' => 'Agregar al carrito',
+    'product_v3' => 'Presentación',
+    'product_v4' => '',
+
+
+
+
 
 
 ];

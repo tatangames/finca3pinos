@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Frontend\Sistema;
 use App\Http\Controllers\Controller;
 use App\Mail\ContactMail;
 use App\Models\Galeria;
+use App\Models\Producto;
+use App\Models\ProductosPresentacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
@@ -40,7 +42,7 @@ class FrontendController extends Controller
 
         $arrayGaleria = Galeria::where('activo', 1)
             ->orderBy('posicion', 'ASC')
-            ->orderBy('id', 'ASC')
+            //->orderBy('id', 'ASC')
             ->take($limitFirst)
             ->get()
             ->map(function ($item) {
@@ -161,7 +163,37 @@ class FrontendController extends Controller
 
     public function vistaProducts(){
 
-        return view('frontend.pages.products');
+        $arrayProductos = Producto::where('activo', 1)
+            ->orderBy('posicion', 'ASC')
+            ->get()
+            ->map(function ($item) {
+
+                $arrayRegion = getRegionContent($item->content_key);
+                $item->titulo = $arrayRegion['title'];
+                $item->descripcion = $arrayRegion['body'];
+                $item->slug = $arrayRegion['slug'];
+
+                $item->precioFormat = '$' . number_format((float)$item->precio, 2, '.', '');
+
+                $arrayPresentaciones = ProductosPresentacion::where('id_productos', $item->id)
+                    ->where('activo', 1)
+                    ->orderBy('posicion', 'ASC')
+                    ->get();
+
+                foreach ($arrayPresentaciones as $presentacion) {
+                    $arrayRegion2 = getRegionContent($presentacion->content_key);
+                    $presentacion->titulo = $arrayRegion2['title'];
+                }
+
+                $item->presentaciones = $arrayPresentaciones;
+
+                return $item;
+            });
+
+
+        return $arrayProductos;
+
+        return view('frontend.pages.products', compact('arrayProductos'));
     }
 
 }
