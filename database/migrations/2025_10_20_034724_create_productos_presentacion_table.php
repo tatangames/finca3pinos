@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('id_productos')->unsigned();
             $table->string('content_key', 300)->unique();
-
+            $table->integer('posicion')->default(0);
             $table->boolean('activo');
 
             // NOMBRE POR IDIOMA

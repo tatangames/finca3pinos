@@ -19,6 +19,7 @@
                         <tr>
                             <th style="width: 5%">Posición</th>
                             <th style="width: 15%">Nombre (SV)</th>
+                            <th style="width: 15%">Activo</th>
                             <th style="width: 8%">Opciones</th>
                         </tr>
                         </thead>

@@ -103,16 +103,6 @@
                                         </div>
                                     @endforeach
 
-                                    <br>
-                                    <hr>
-
-                                    <!-- Imagen -->
-                                    <div class="form-group mt-4">
-                                        <label>Imagen</label>
-                                        <input type="file" id="imagen-nuevo" class="form-control"
-                                               accept="image/jpeg,image/png">
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
@@ -128,6 +118,40 @@
 
 
 
+    <div class="modal fade" id="modalEditar">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Actualizar</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-editar">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" id="id-editar">
+                                    </div>
+
+                                    <!-- Campos dinámicos por idioma -->
+                                    <div id="langs-editar"></div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
@@ -163,6 +187,253 @@
             var ruta = "{{ URL::to('/admin/producto/presentacion/index/tabla') }}/" + idproducto;
             $('#tablaDatatable').load(ruta);
         }
+
+
+        function modalAgregar(){
+            document.getElementById("formulario-nuevo").reset();
+            $('#modalAgregar').modal('show');
+        }
+
+        function nuevo(){
+            var key = document.getElementById('key').value.trim();
+
+            if (key === '') {
+                toastr.error('Debe ingresar la key global');
+                return;
+            }
+
+            var idproducto = {{ $idproducto }};
+
+            // 🔹 Creamos el FormData
+            let formData = new FormData();
+            formData.append('idproducto', idproducto);
+            formData.append('key', key);
+
+            // 🔹 Recorremos las regiones en un array JSON generado por Blade
+            let regiones = @json($arrayRegiones);
+
+            const error = regiones.some(region => {
+                let locale = region.locale;
+                let title = document.getElementById(`title_${locale}`).value.trim();
+
+                if (!title) {
+                    toastr.error(`Título es requerido para ${locale.toUpperCase()}`);
+                    return true; // detiene el ciclo
+                }
+
+                formData.append(`translations[${locale}][title]`, title);
+                return false;
+            });
+
+
+            if (error) return;
+
+            openLoading()
+
+            axios.post('/admin/producto/presentacion/nuevo', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        // KEY repetida
+                        toastr.error("LA KEY esta repetida");
+                    }
+                    else if(response.data.success === 2){
+                        toastr.success('Registrado correctamente');
+                        $('#modalAgregar').modal('hide');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al registrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al registrar');
+                    closeLoading();
+                });
+        }
+
+        function modalDesactivar(idfila){
+            Swal.fire({
+                title: '¿Desactivar?',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    desactivarFila(idfila);
+                }
+            })
+        }
+
+        function desactivarFila(idfila){
+            openLoading();
+
+            axios.post('/admin/producto/presentacion/desactivar',{
+                'id': idfila
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado');
+                        recargar();
+                    }else{
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+        function modalActivar(idfila){
+            Swal.fire({
+                title: '¿Activar?',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    activarFila(idfila);
+                }
+            })
+        }
+
+        function activarFila(idfila){
+            openLoading();
+
+            axios.post('/admin/producto/presentacion/activar',{
+                'id': idfila
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado');
+                        recargar();
+                    }
+                    else{
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+
+
+        function cardIdiomaHTML(item) {
+            // item = { name, locale, title }
+            const loc = item.locale;
+            return `
+              <div class="card mt-3 border">
+                <div class="card-header" style="background:#f4f4f4;">
+                  <strong>${item.name}</strong> (${loc.toUpperCase()})
+                </div>
+                <div class="card-body">
+                  <div class="form-group">
+
+
+                    <label>Título (${loc})</label>
+                    <textarea id="title_${loc}_editar"
+                              rows="4"
+                              class="form-control"
+                              placeholder="<p>Texto o HTML...</p>">${item.title || ''}</textarea>
+
+                  </div>
+                </div>
+              </div>
+    `;
+        }
+
+        function informacionEditar(id){
+            openLoading();
+            document.getElementById("formulario-editar").reset();
+
+            axios.post('/admin/producto/presentacion/informacion', { id })
+                .then((response) => {
+                    closeLoading();
+                    if (response.data.success === 1) {
+                        const { info, langs } = response.data;
+
+                        $('#modalEditar').modal('show');
+                        $('#id-editar').val(info.id);
+
+                        // ✅ Idiomas dinámicos
+                        const cont = document.getElementById('langs-editar');
+                        cont.innerHTML = langs.map(cardIdiomaHTML).join('');
+                        cont.dataset.locales = langs.map(l => l.locale).join(',');
+                    } else {
+                        toastr.error('Información no encontrada');
+                    }
+                })
+                .catch(() => {
+                    closeLoading();
+                    toastr.error('Error al obtener la información');
+                });
+        }
+
+
+
+        function editar(){
+            const id     = document.getElementById('id-editar').value;
+
+            // Recolectar traducciones dinámicas
+            const cont = document.getElementById('langs-editar');
+            const locales = (cont.dataset.locales || '').split(',').filter(Boolean);
+
+            const formData = new FormData();
+            formData.append('id', id);
+
+            let valido = true;
+            // Enviar como arrays: title[en], title[sv], title[sv], ...
+            locales.forEach(loc => {
+                const title = document.getElementById(`title_${loc}_editar`)?.value ?? '';
+
+                if (!title) {
+                    valido = false;
+                }
+
+                formData.append(`title[${loc}]`,  title);
+            });
+
+            if (!valido) {
+                toastr.error('Debes completar el título en todos los idiomas.');
+                return;
+            }
+
+            openLoading();
+
+            axios.post('/admin/producto/presentacion/editar', formData)
+                .then((response) => {
+                    closeLoading();
+
+                    if (response.data.success === 1) {
+                        toastr.success('Actualizado correctamente');
+                        $('#modalEditar').modal('hide');
+                        recargar();
+                    }
+                    else{
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Error al actualizar');
+                });
+        }
+
 
 
 

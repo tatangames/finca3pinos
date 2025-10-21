@@ -137,8 +137,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
 
     Route::get('/producto/presentacion/{idproducto}', [CategoriasController::class, 'indexProductosPresentacion']);
     Route::get('/producto/presentacion/index/tabla/{idproducto}', [CategoriasController::class, 'tablaProductosPresentacion']);
-    Route::post('/producto/posicion', [CategoriasController::class,'actualizarPosicionProductoPresentacion']);
-
+    Route::post('/producto/presentacion/posicion', [CategoriasController::class,'actualizarPosicionProductoPresentacion']);
+    Route::post('/producto/presentacion/nuevo', [CategoriasController::class,'nuevoProductoPresentacion']);
+    Route::post('/producto/presentacion/desactivar', [CategoriasController::class,'desactivarProductoPresentacion']);
+    Route::post('/producto/presentacion/activar', [CategoriasController::class,'activarProductoPresentacion']);
+    Route::post('/producto/presentacion/informacion', [CategoriasController::class,'informacionProductoPresentacion']);
+    Route::post('/producto/presentacion/editar', [CategoriasController::class,'editarProductoPresentacion']);
 
 
 

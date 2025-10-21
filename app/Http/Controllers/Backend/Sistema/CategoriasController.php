@@ -28,9 +28,7 @@ class CategoriasController extends Controller
 
     public function indexCategorias()
     {
-        $arrayRegiones = Region::where('slug', '!=', 'latin-es')
-            ->orderBy('id')
-            ->get();
+        $arrayRegiones = Region::orderBy('id')->get();
 
         return view('backend.admin.categorias.vistacategorias', compact('arrayRegiones'));
     }
@@ -178,9 +176,7 @@ class CategoriasController extends Controller
         $galeria = Categoria::find($request->id);
         if (!$galeria) { return ['success' => 2]; }
 
-        // ⚠️ Excluye latinoamérica (latin-es)
         $regiones = Region::select('id','name','locale','slug')
-            ->where('slug','!=','latin-es')
             ->orderBy('id')
             ->get();
 
@@ -296,9 +292,7 @@ class CategoriasController extends Controller
 
     public function indexProductos($idcategoria)
     {
-        $arrayRegiones = Region::where('slug', '!=', 'latin-es')
-            ->orderBy('id')
-            ->get();
+        $arrayRegiones = Region::orderBy('id')->get();
 
         return view('backend.admin.categorias.productos.vistaproductos', compact('arrayRegiones', 'idcategoria'));
     }
@@ -338,7 +332,6 @@ class CategoriasController extends Controller
             }
 
             $translations = $request->input('translations', []);
-            $tr = $translations[$region->locale] ?? null;
 
             // VERIFICAR SI SLUG NO ESTA REPETIDO
             $regiones = Region::select('id','slug','locale')->get();
@@ -475,9 +468,7 @@ class CategoriasController extends Controller
         $producto = Producto::find($request->id);
         if (!$producto) { return ['success' => 2]; }
 
-        // ⚠️ Excluye latinoamérica (latin-es)
         $regiones = Region::select('id','name','locale','slug')
-            ->where('slug','!=','latin-es')
             ->orderBy('id')
             ->get();
 
@@ -700,9 +691,7 @@ class CategoriasController extends Controller
 
     public function indexProductosPresentacion($idproducto)
     {
-        $arrayRegiones = Region::where('slug', '!=', 'latin-es')
-            ->orderBy('id')
-            ->get();
+        $arrayRegiones = Region::orderBy('id')->get();
 
 
         return view('backend.admin.categorias.productos.presentacion.vistapresentacion', compact('arrayRegiones', 'idproducto'));
@@ -733,7 +722,7 @@ class CategoriasController extends Controller
 
     public function actualizarPosicionProductoPresentacion(Request $request)
     {
-        $tasks = ProductosPresentacion::where('id_productos', $request->id)->get();
+        $tasks = ProductosPresentacion::all();
 
         foreach ($tasks as $task) {
             $id = $task->id;
@@ -746,6 +735,215 @@ class CategoriasController extends Controller
         }
         return ['success' => 1];
     }
+
+
+    public function nuevoProductoPresentacion(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+
+            // idproducto
+
+            $keySinEspacios = trim($request->key);
+
+            // EVITAR KEY REPETIDAS
+            if(RegionContent::where('key', $keySinEspacios)->first()){
+                return ['success' => 1];
+            }
+
+            $translations = $request->input('translations', []);
+
+            // VERIFICAR SI SLUG NO ESTA REPETIDO
+            $regiones = Region::select('id','slug','locale')->get();
+
+            // ===== 2) Galería =====
+            $nuevaPosicion = optional(ProductosPresentacion::where('id_productos', $request->idproducto)
+            ->orderByDesc('posicion')->first())->posicion + 1 ?? 1;
+
+            $gal = new ProductosPresentacion();
+            $gal->id_productos = $request->idproducto;
+            $gal->posicion    = $nuevaPosicion;
+            $gal->activo      = 1;
+            $gal->content_key = $keySinEspacios;     // ← única
+            $gal->save();
+
+            // ===== 3) i18n =====
+
+            foreach ($regiones as $region) {
+                // Crea/obtiene el contenedor por region_id + key
+                $content = RegionContent::firstOrCreate(
+                    ['region_id' => $region->id, 'key' => $keySinEspacios],
+                    []
+                );
+
+                // Traducción específica para el locale de ESTA región
+                $tr = $translations[$region->locale] ?? null;
+
+                if ($tr) {
+                    RegionContentTranslation::updateOrCreate(
+                        ['content_id' => $content->id, 'locale' => $region->locale],
+                        [
+                            'title' => $tr['title'] ?? '',
+                        ]
+                    );
+                }
+            }
+
+            DB::commit();
+            return ['success' => 2];
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return ['success' => 0, 'message' => 'Excepción al guardar'];
+        }
+    }
+
+
+
+
+    public function desactivarProductoPresentacion(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        ProductosPresentacion::where('id', $request->id)
+            ->update([
+                'activo' => 0,
+            ]);
+
+        return ['success' => 1];
+    }
+
+    public function activarProductoPresentacion(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        ProductosPresentacion::where('id', $request->id)
+            ->update([
+                'activo' => 1,
+            ]);
+
+        return ['success' => 1];
+    }
+
+
+
+    public function informacionProductoPresentacion(Request $request)
+    {
+
+        $producto = ProductosPresentacion::find($request->id);
+        if (!$producto) { return ['success' => 2]; }
+
+        $regiones = Region::select('id','name','locale','slug')
+            ->orderBy('id')
+            ->get();
+
+        $traducciones = collect();
+        if ($producto->content_key) {
+            $traducciones = DB::table('region_contents as rc')
+                ->join('region_content_translation as rct', 'rct.content_id', '=', 'rc.id')
+                ->join('regions as r', 'r.id', '=', 'rc.region_id')
+                ->where('rc.key', $producto->content_key)
+                ->select(
+                    'r.id as region_id',
+                    'r.name as region_name',
+                    'r.locale as region_locale',
+                    'rct.title',
+                    'rct.body',
+                    'rct.slug',
+                )
+                ->get()
+                ->keyBy('region_locale');
+        }
+
+        $langs = $regiones->map(function ($region) use ($traducciones) {
+            $data = $traducciones->get($region->locale);
+            return [
+                'region_id' => $region->id,
+                'name'      => $region->name,
+                'locale'    => $region->locale,
+                'title'      => $data->title ?? '',
+                'body'      => $data->body ?? '',
+                'slug'      => $data->slug ?? '',
+            ];
+        })->values();
+
+        return [
+            'success' => 1,
+            'info' => [
+                'id'          => $producto->id,
+                'content_key' => $producto->content_key,
+            ],
+            'langs' => $langs,
+        ];
+    }
+
+
+    public function editarProductoPresentacion(Request $request)
+    {
+        $regla = array(
+            'id' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        $producto = ProductosPresentacion::find($request->id);
+        if (!$producto) {
+            return ['success' => 2]; // borrada/no existe
+        }
+
+        DB::beginTransaction();
+        try {
+
+            $titleArray = $request->input('title', []);
+
+            // Para cada región del sistema, garantizamos region_contents (region_id + key)
+            $regiones = Region::select('id', 'locale', 'name')->get();
+
+            foreach ($regiones as $region) {
+                // 1) Asegurar RegionContent por región + key
+                $content = RegionContent::firstOrCreate(
+                    ['region_id' => $region->id, 'key' => $producto->content_key],
+                    []
+                );
+
+                $loc = $region->locale; // 'es', 'en', 'ko', etc.
+                $tit = $titleArray[$loc] ?? null;
+
+                // 5) Upsert final (usa slug normalizado)
+                RegionContentTranslation::updateOrCreate(
+                    ['content_id' => $content->id, 'locale' => $loc],
+                    [
+                        'title' => $tit ?? ($trActual->title ?? ''),
+                    ]
+                );
+            }
+
+            DB::commit();
+            return ['success' => 1];
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return ['success' => 0, 'message' => 'Error al actualizar'];
+        }
+    }
+
+
+
 
 
 }
