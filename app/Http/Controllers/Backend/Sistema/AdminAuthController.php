@@ -136,7 +136,8 @@ class AdminAuthController extends Controller
         DB::beginTransaction();
 
         try {
-            $keySinEspacios = trim($request->key);
+            // 1) Normaliza la key: quita todos los espacios internos y bordes
+            $keySinEspacios = preg_replace('/\s+/', '', (string) $request->key); // "galeria 1" -> "galeria1"
 
             // EVITAR KEY REPETIDAS
             if(RegionContent::where('key', $keySinEspacios)->first()){

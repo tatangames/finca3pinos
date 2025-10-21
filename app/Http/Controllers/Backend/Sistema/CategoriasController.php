@@ -305,6 +305,10 @@ class CategoriasController extends Controller
             ->get();
 
         foreach ($arrayProducto as $dato) {
+
+            $dato->precioFormat = '$' . number_format((float)$dato->precio, 2, '.', '');
+
+
             $nombreSV = "";
             if($infoRegion = RegionContent::where('key', $dato->content_key)
                 ->where('region_id', 1)->first()){
@@ -368,6 +372,7 @@ class CategoriasController extends Controller
             $gal->imagen      = $nombreOut;
             $gal->posicion    = $nuevaPosicion;
             $gal->activo      = 0; // CREAR LA PRESENTACION
+            $gal->precio = $request->precio;
             $gal->content_key = $keySinEspacios;     // ← única
             $gal->save();
 
@@ -379,7 +384,6 @@ class CategoriasController extends Controller
                     ['region_id' => $region->id, 'key' => $keySinEspacios],
                     []
                 );
-
 
                 if ($tr) {
                     RegionContentTranslation::updateOrCreate(
@@ -507,6 +511,7 @@ class CategoriasController extends Controller
             'info' => [
                 'id'          => $producto->id,
                 'content_key' => $producto->content_key,
+                'precio'      => $producto->precio
             ],
             'langs' => $langs,
         ];
@@ -578,6 +583,7 @@ class CategoriasController extends Controller
                 $producto->content_key = $producto->id;
             }
 
+            $producto->precio = $request->precio;
             $producto->save();
 
 

@@ -1,13 +1,16 @@
 
-@foreach($galeria as $dato)
-    <div class="gallery-item" onclick="openModal(this)">
+@foreach($galeria as $g)
+    <div class="gallery-item" data-id="{{ $g->id }}" onclick="openModal(this)">
         <img
-            src="{{ url('storage/archivos/'.$dato->imagen) }}"
-            alt="{{ $dato->alt_seo }}"
-            data-caption="{{ $dato->nombre }}"
+            src="{{ url('storage/archivos/'.$g->imagen) }}"
+            alt="{{ $g->altseo }}"
+            data-caption="{{ $g->textoIdioma ?? '' }}"
             loading="lazy"
             decoding="async"
             itemprop="image">
         <div class="overlay"><i class="fa fa-eye"></i></div>
     </div>
 @endforeach
+
+
+

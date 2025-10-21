@@ -72,6 +72,14 @@
                             <div class="row">
                                 <div class="col-md-12">
 
+
+                                    <div class="form-group">
+                                        <label>Precio</label>
+                                        <input type="number" id="precio-nuevo" class="form-control" min="0" max="1000">
+                                    </div>
+
+                                    <hr>
+
                                     <!-- Key global -->
                                     <div class="form-group">
                                         <label>Key para todos los idiomas</label>
@@ -159,6 +167,14 @@
                                     <div class="form-group">
                                         <input type="hidden" id="id-editar">
                                     </div>
+
+                                    <div class="form-group">
+                                        <label>Precio</label>
+                                        <input type="number" id="precio-editar" class="form-control" min="0" max="1000">
+                                    </div>
+
+                                    <hr>
+
 
                                     <!-- Campos dinámicos por idioma -->
                                     <div id="langs-editar"></div>
@@ -259,12 +275,37 @@
 
         function nuevo(){
             var key = document.getElementById('key').value.trim();
+            var precio = document.getElementById('precio-nuevo').value;
             var imagen = document.getElementById('imagen-nuevo');
 
             if (key === '') {
                 toastr.error('Debe ingresar la key global');
                 return;
             }
+
+
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+            if(precio === ''){
+                toastr.error('Precio es requerido');
+                return;
+            }
+
+            if(!precio.match(reglaNumeroDecimal)) {
+                toastr.error('Precio debe ser número decimal');
+                return;
+            }
+
+            if(precio < 0){
+                toastr.error('Precio no debe ser negativo');
+                return;
+            }
+
+            if(precio > 1000){
+                toastr.error('Máximo 1000');
+                return;
+            }
+
 
             if(imagen.files && imagen.files[0]){ // si trae imagen
                 if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
@@ -281,6 +322,7 @@
             let formData = new FormData();
             formData.append('idcategoria', idcategoria);
             formData.append('key', key);
+            formData.append('precio', precio);
             formData.append('imagen', imagen.files[0]);
 
             // 🔹 Recorremos las regiones en un array JSON generado por Blade
@@ -509,6 +551,7 @@
 
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(info.id);
+                        $('#precio-editar').val(info.precio);
 
                         // ✅ Idiomas dinámicos
                         const cont = document.getElementById('langs-editar');
@@ -526,6 +569,33 @@
 
         function editar(){
             const id     = document.getElementById('id-editar').value;
+            var precio = document.getElementById('precio-editar').value;
+
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+            if(precio === ''){
+                toastr.error('Precio es requerido');
+                return;
+            }
+
+            if(!precio.match(reglaNumeroDecimal)) {
+                toastr.error('Precio debe ser número decimal');
+                return;
+            }
+
+            if(precio < 0){
+                toastr.error('Precio no debe ser negativo');
+                return;
+            }
+
+            if(precio > 1000){
+                toastr.error('Máximo 1000');
+                return;
+            }
+
+
+
+
 
             // Recolectar traducciones dinámicas
             const cont = document.getElementById('langs-editar');
@@ -533,6 +603,7 @@
 
             const formData = new FormData();
             formData.append('id', id);
+            formData.append('precio', precio);
 
             let valido = true;
             // Enviar como arrays: title[en], title[sv], title[sv], ...

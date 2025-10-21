@@ -20,6 +20,8 @@ return new class extends Migration
             $table->integer('posicion')->default(0);
             $table->boolean('activo');
 
+            $table->decimal('precio', 8, 2)->default(0);
+
             // titulo y Descripcion por Idioma
 
             $table->foreign('id_categorias')->references('id')->on('categorias');

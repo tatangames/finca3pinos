@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('region_contents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('region_id')->constrained()->cascadeOnDelete();
-            $table->string('key', 100); // ← faltaba este campo
-            $table->unique(['region_id', 'key']); // clave única por región+key
+            $table->string('key', 300);
+            $table->unique(['region_id', 'key']);
             $table->index('key');
         });
     }

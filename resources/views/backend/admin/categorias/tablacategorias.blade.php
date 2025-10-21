@@ -43,10 +43,6 @@
                                         <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
                                     </button>
 
-                                    <button type="button" style="margin: 2px" class="btn btn-danger btn-xs" onclick="modalBorrar({{ $dato->id }})">
-                                        <i class="fas fa-eye" title="Borrar"></i>&nbsp; Borrar
-                                    </button>
-
                                     @if($dato->activo == 1)
                                         <button type="button" style="margin: 2px" class="btn btn-warning btn-xs" onclick="modalDesactivar({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Desactivar"></i>&nbsp; Desactivar
@@ -61,10 +57,7 @@
                                         <i class="fas fa-file-alt" title="Productos"></i>&nbsp; Productos
                                     </button>
 
-
-
                                 </td>
-
                             </tr>
                         @endforeach
                         </tbody>

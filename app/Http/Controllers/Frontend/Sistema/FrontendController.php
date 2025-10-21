@@ -36,19 +36,28 @@ class FrontendController extends Controller
 
     public function vistaGallery()
     {
-        $arrayGaleria = Galeria::orderBy('posicion', 'ASC')
+        $limitFirst = 24;
+
+        $arrayGaleria = Galeria::where('activo', 1)
+            ->orderBy('posicion', 'ASC')
+            ->orderBy('id', 'ASC')
+            ->take($limitFirst)
             ->get()
             ->map(function ($item) {
 
-                // Usa tu helper global (automáticamente detecta locale y región)
                 $arrayRegion = getRegionContent($item->content_key);
                 $item->textoIdioma = $arrayRegion['body'];
                 $item->altseo = $arrayRegion['altseo'];
                 return $item;
             });
 
+        // Cursor inicial basado en el ÚLTIMO del grid
+        $last = optional($arrayGaleria->last());
+        $lastPos = $last?->posicion ?? 0;
+        $lastId  = $last?->id ?? 0;
 
-        return view('frontend.pages.gallery', compact('arrayGaleria'));
+
+        return view('frontend.pages.gallery', compact('arrayGaleria', 'limitFirst', 'lastPos', 'lastId'));
     }
 
 
@@ -56,24 +65,43 @@ class FrontendController extends Controller
     {
         abort_unless($request->ajax(), 403);
 
-        $offset = (int) $request->input('offset', 0);
-        $limit  = (int) $request->input('limit', 24);
+        $lastPos = (int) $request->input('last_pos', 0);
+        $lastId  = (int) $request->input('last_id', 0);
+        $limit   = (int) $request->input('limit', 24);
 
-        $galeria = Galeria::orderBy('id', 'desc')
-            ->skip($offset)
-            ->take($limit)
-            ->get()
-            ->map(function ($item) {
-                // Asigna la traducción según su key y el idioma/región actual
-                $item->texto_idioma = getRegionContent($item->content_key);
-                return $item;
-            });
+        $q = Galeria::where('activo', 1)
+            ->where(function ($qq) use ($lastPos, $lastId) {
+                // (posicion, id) > (lastPos, lastId)
+                $qq->where('posicion', '>', $lastPos)
+                    ->orWhere(function ($q2) use ($lastPos, $lastId) {
+                        $q2->where('posicion', $lastPos)
+                            ->where('id', '>', $lastId);
+                    });
+            })
+            ->orderBy('posicion', 'ASC')
+            ->orderBy('id', 'ASC')
+            ->take($limit);
+
+        $galeria = $q->get()->map(function ($g) {
+            // Si getRegionContent devuelve un array ['body' => ..., 'altseo' => ...]
+            // mapea a los campos que usas en Blade:
+            $rc = getRegionContent($g->content_key);
+            $g->textoIdioma = $rc['body']  ?? '';
+            $g->altseo      = $rc['altseo'] ?? '';
+            return $g;
+        });
+
+        $last = optional($galeria->last());
+        $nextPos = $last?->posicion ?? 0;
+        $nextId  = $last?->id ?? 0;
 
         $html = view('frontend.partials.galeria_items', ['galeria' => $galeria])->render();
 
         return response()->json([
-            'html'  => $html,
-            'count' => $galeria->count(),
+            'html'       => $html,
+            'count'      => $galeria->count(),
+            'next_pos'   => $nextPos,
+            'next_id'    => $nextId,
         ]);
     }
 

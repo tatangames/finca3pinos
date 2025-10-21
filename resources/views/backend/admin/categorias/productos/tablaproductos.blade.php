@@ -18,10 +18,11 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%">Posición</th>
-                                <th style="width: 15%">Nombre (SV)</th>
+                                <th style="width: 10%">Nombre (SV)</th>
+                                <th style="width: 5%">Precio</th>
                                 <th style="width: 10%">Imagen</th>
-                                <th style="width: 5%">Estado</th>
-                                <th style="width: 8%">Opciones</th>
+                                <th style="width: 6%">Estado</th>
+                                <th style="width: 10%">Opciones</th>
                             </tr>
                         </thead>
                         <tbody id="tablecontents">
@@ -30,6 +31,7 @@
 
                                 <td style="font-weight: bold">{{ $dato->posicion }}</td>
                                 <td>{{ $dato->nombreSV }}</td>
+                                <td>{{ $dato->precioFormat }}</td>
                                 <td>
                                     <img
                                         src="{{ url('storage/archivos/'.$dato->imagen) }}"
@@ -49,10 +51,6 @@
                                 <td>
                                     <button type="button" class="btn btn-info btn-xs" onclick="informacionEditar({{ $dato->id }})">
                                         <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
-                                    </button>
-
-                                    <button type="button" style="margin: 2px" class="btn btn-danger btn-xs" onclick="modalBorrar({{ $dato->id }})">
-                                        <i class="fas fa-eye" title="Borrar"></i>&nbsp; Borrar
                                     </button>
 
                                     @if($dato->activo == 1)
