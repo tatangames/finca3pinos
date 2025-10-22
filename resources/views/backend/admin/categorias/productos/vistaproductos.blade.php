@@ -129,7 +129,7 @@
 
                                     <!-- Imagen -->
                                     <div class="form-group mt-4">
-                                        <label>Imagen</label>
+                                        <label>Imagen (625x625 px)</label>
                                         <input type="file" id="imagen-nuevo" class="form-control"
                                                accept="image/jpeg,image/png">
                                     </div>
@@ -214,7 +214,7 @@
 
                                     <!-- Imagen -->
                                     <div class="form-group mt-4">
-                                        <label>Imagen</label>
+                                        <label>Imagen (625x625 px)</label>
                                         <input type="file" id="imagen-editar" class="form-control"
                                                accept="image/jpeg,image/png">
                                     </div>

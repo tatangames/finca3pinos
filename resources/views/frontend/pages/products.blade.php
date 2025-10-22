@@ -5,111 +5,276 @@
 @section('content')
 
     <style>
-        /* Fondo full-bleed ya lo tienes; aquí limitamos SOLO el contenido */
+        /* ===== Sección y contenedor (pegado al top) ===== */
+        .vc_section.bg-color-black {
+            background: #0e0e0e;
+            color: #fff;
+            padding: 6px 0 20px !important;
+        }
+
         #products-full .products-container {
-            max-width: 1200px; /* ajusta 1100–1280 si prefieres */
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 16px;
+            padding: 6px 16px 20px;
         }
 
-        /* Espaciados suaves en la grilla */
-        #products-full .products-sc .row {
-            margin-left: -8px;
-            margin-right: -8px;
+        /* ===== Tabs de categorías (compactos) ===== */
+        ul.cats.tabs-cats.slider-filter,
+        .tabs-cats {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            margin: 2px auto 10px;
+            padding: 0;
+            list-style: none;
+            text-align: center;
         }
 
-        #products-full .products-sc .swiper-slide {
-            padding-left: 8px;
-            padding-right: 8px;
+        .tabs-cats li {
+            list-style: none;
         }
 
-        /* Forzar # de columnas sin tocar JS de Swiper */
-        @media (min-width: 1200px) {
-            #products-full .swiper-wrapper {
-                display: flex;
-                flex-wrap: wrap;
-            }
-
-            #products-full .swiper-slide {
-                width: 25% !important;
-            }
-
-            /* 4 por fila */
+        .tabs-cats .cat {
+            position: relative;
+            cursor: pointer;
+            color: #fff;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 300;
+            font-size: 18px;
+            line-height: 28px;
+            letter-spacing: .2px;
+            text-transform: none;
+            padding-bottom: 2px;
+            transition: color .2s;
         }
 
-        @media (min-width: 992px) and (max-width: 1199.98px) {
-            #products-full .swiper-wrapper {
-                display: flex;
-                flex-wrap: wrap;
-            }
-
-            #products-full .swiper-slide {
-                width: 33.3333% !important;
-            }
-
-            /* 3 por fila */
+        .tabs-cats .cat::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background: #C0AA83;
+            transition: width .25s;
         }
 
-        @media (min-width: 576px) and (max-width: 991.98px) {
-            #products-full .swiper-wrapper {
-                display: flex;
-                flex-wrap: wrap;
-            }
+        .tabs-cats .cat.cat-active::after, .tabs-cats .cat:hover::after {
+            width: 100%;
+        }
 
-            #products-full .swiper-slide {
-                width: 50% !important;
-            }
+        /* ===== Grid ===== */
+        .products-grid {
+            display: grid;
+            grid-template-columns:repeat(3, 1fr);
+            gap: 20px;
+        }
 
-            /* 2 por fila */
+       /* .products-grid {
+            display: grid;
+            place-items: center;          /* 🔹 centra horizontal y verticalmente si hay espacio extra */
+            grid-template-columns: repeat(auto-fit, 350px); /* 🔹 mismo ancho del card */
+            justify-content: center;      /* 🔹 centra las columnas */
+            gap: 20px;
+        }*/
+
+
+
+
+
+        @media (max-width: 1199.98px) {
+            .products-grid {
+                grid-template-columns:repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .products-grid {
+                grid-template-columns:repeat(2, 1fr);
+            }
         }
 
         @media (max-width: 575.98px) {
-            #products-full .swiper-wrapper {
-                display: flex;
-                flex-wrap: wrap;
+            .products-grid {
+                grid-template-columns:1fr;
             }
-
-            #products-full .swiper-slide {
-                width: 100% !important;
-            }
-
-            /* 1 por fila */
         }
 
-        /* Reducir tamaño visual de la card e imagen */
-        #products-full article.product {
-            border-radius: 14px;
-            padding: 16px 12px !important;
+        /* ===== Card compacta ===== */
+        article.product {
+            background: #fff;
+            padding: 20px 16px;   /* antes 12px 10px */
+            border-radius: 18px;  /* esquinas más suaves */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
-        #products-full article.product .photo {
+        /* Imagen más compacta */
+        .product .photo {
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 220px; /* mantiene altura pareja */
+            min-height: 0;
         }
 
-        #products-full article.product .photo img {
-            max-width: 220px; /* antes eran 300px */
+        .product .img-box {
+            width: 320px;
+            height: 320px;
+            max-width: 100%;
+            border-radius: 10px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 6px;
+            overflow: hidden;
+        }
+
+        @media (min-width: 1400px) {
+            .product .img-box {
+                width: 280px;
+                height: 280px;
+            }
+        }
+
+        .product .img-box img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: contain;
+            display: block;
         }
 
-        #products-full article.product .description {
-            padding-top: 8px !important;
+        .product .description {
+            padding-top: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
-        #products-full .price {
-            font-size: 1.05rem;
+        /* Título: 2 líneas exactas */
+        .product h5{
+            font-size:1rem; font-weight:700; color:#1a1a1a; text-align:center;
+            margin:0; line-height:1.25;
+            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+            min-height:2.5em;        /* 1.25 * 2 líneas */
         }
 
-        /* baja un poco el precio */
-        #products-full h5,
-        #products-full .header h5 {
-            font-size: 1.05rem;
+        /* Descripción: 2 líneas exactas (aunque esté vacía mantiene el alto) */
+        .product .post_content{
+            font-size:0.92rem; color:#666; text-align:center; line-height:1.4; margin:0;
+            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+            min-height:2.8em;        /* 1.4 * 2 líneas */
+        }
+        /* si el div viene vacío, mantiene el espacio igualmente */
+        .product .post_content:empty::before{ content:""; display:block; }
+
+        /* Select presentaciones compacto */
+        .select-label {
+            font-size: .85rem;
+            color: #777;
+            margin: 2px 0 4px;
+            display: block;
+            text-align: left;
         }
 
-        /* baja el título */
+        .form-select {
+            width: 100%;
+            height: 44px;
+            padding: 0 42px 0 12px;
+            border-radius: 10px;
+            border: 1px solid #dcdcdc;
+            background: #fff
+            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>")
+            no-repeat right 12px center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            color: #222;
+            font-weight: 400;  /* 🔹 normal en lugar de bold */
+            font-size: 0.95rem; /* 🔹 tamaño cómodo y legible */
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #d2aa6d;
+            box-shadow: 0 0 0 2px rgba(210, 170, 109, .15);
+        }
+
+        .form-select option {
+            font-weight: 400;
+            color: #222;
+        }
+
+        /* Precio (más chico y pegado) */
+        .price {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #C0AA83;;
+            text-align: center;
+            line-height: 1;
+            margin: 8px 0 8px;
+        }
+
+        /* Botón carrito compacto */
+        .btn-cart {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            height: 46px;
+            padding: 0 16px;
+            border: none;
+            border-radius: 6px;
+            background: #d2aa6d;
+            color: #fff;
+            font-weight: 500;     /* 🔹 antes era 800 — ahora más suave */
+            font-size: 1rem;
+            text-transform: none;
+            letter-spacing: .2px;
+            transition: transform .1s ease, filter .15s ease;
+            margin-top: 12px;
+        }
+
+        .btn-cart i {
+            color: #fff;
+        }
+
+        .btn-cart:hover {
+            filter: brightness(.95);
+            transform: translateY(-1px);
+        }
+
+        .btn-cart:active {
+            transform: translateY(0);
+        }
+
+        /* Bloque categoría */
+        .category-block {
+            margin-bottom: 26px;
+        }
+
+        .category-title {
+            display: none;
+        }
+
+
+
+
+        /* Bloque que contiene Título + Descripción */
+        .product .meta-block{
+            display:flex;
+            flex-direction:column;
+            gap:6px;                 /* separación interna */
+            min-height: 100px;       /* asegura mismo alto en todas (ajusta 92–108 si quieres) */
+        }
+
+
+
+
+
+
 
     </style>
 
@@ -119,234 +284,145 @@
         <div class="vc_row wpb_row vc_row-fluid">
             <div class="wpb_column vc_column_container vc_col-sm-12">
                 <div class="vc_column-inner">
-
-
                     <div class="wpb_wrapper">
 
                         <div class="products-container">
-                            <div class="es-resp">
-                                <div class="hidden-sm hidden-ms hidden-xs" style="height: 48px;"></div>
-                                <div class="hidden-xl hidden-lg hidden-md hidden-xs" style="height: 0px;"></div>
-                                <div class="visible-xs" style="height: 0px;"></div>
-                            </div>
-                            <div
-                                class="heading  head-subheader align-center subcolor-main text-bg transform-default   vc_custom_1508507992778"
-                                id="like_sc_header_1945088938"><h5 class="subheader" style="font-size: 35px">{{ __('meta.product_v1') }}</h5>
-                            </div>
 
+                            {{-- ======= Tabs de categorías ======= --}}
+                            @if(isset($arrayCategorias) && $arrayCategorias->count())
+                                <ul class="tabs-cats" role="tablist">
+                                    @foreach($arrayCategorias as $i => $cat)
+                                        <li>
+                                            <a href="javascript:void(0)"
+                                               class="cat {{ $i === 0 ? 'cat-active' : '' }}"
+                                               data-cat="{{ $cat->id }}"
+                                               role="tab" aria-selected="{{ $i === 0 ? 'true' : 'false' }}">
+                                                {{ $cat->titulo }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
 
+                            {{-- ======= Bloques por categoría ======= --}}
+                            @if(isset($arrayCategorias) && $arrayCategorias->count())
+                                @foreach ($arrayCategorias as $i => $categoria)
+                                    <div class="category-block js-cat-block"
+                                         data-cat="{{ $categoria->id }}"
+                                         style="{{ $i === 0 ? '' : 'display:none' }}">
+                                        {{-- Título oculto (dejado por accesibilidad) --}}
+                                        <h2 class="category-title">{{ $categoria->titulo }}</h2>
 
+                                        <div class="products-grid">
+                                            @foreach ($categoria->productos as $prod)
+                                                <article class="product">
+                                                    <a class="photo"
+                                                       href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), '/producto/' . $prod->slug) }}">
+                                                        <div class="img-box">
+                                                            <img
+                                                                src="{{ asset('storage/archivos/' . $prod->imagen) }}"
+                                                                alt="{{ $prod->titulo }}"
+                                                                onerror="this.src='{{ asset('images/no-image.png') }}'">
+                                                        </div>
+                                                    </a>
 
-                            <div class="woocommerce">
-                                <div class="products products-sc products-sc-default">
-                                    <ul class="cats tabs-cats slider-filter">
-                                        <li><span class="cat cat-active" data-filter="145">Coffee</span></li>
-                                        <li><span class="cat" data-filter="155">Green coffee</span></li>
-                                    </ul>
-                                    <div class="items">
-                                        <div class="row">
-                                            <div
-                                                class="swiper-container slider-filter-container products-slider swiper-container-horizontal"
-                                                data-cols="4" data-autoplay="0">
-                                                <div class="swiper-wrapper">
-                                                    <div
-                                                        class="col-lg-3 col-md-4 col-sm-6 swiper-slide filter-item item filter-type-145 swiper-slide-active"
-                                                        style="width: 323.333px;">
-                                                        <article id="post-2062"
-                                                                 class="matchHeight post-2062 product type-product status-publish has-post-thumbnail product_cat-coffe product_tag-arabica first outofstock sale shipping-taxable purchasable product-type-simple"
-                                                                 style="height: 557.743px;"><span
-                                                                class="onsale">Sale</span>
-                                                            <a href="https://coffeeking.like-themes.com/product/coffee-cup/"
-                                                               class="photo"> <img decoding="async" width="300"
-                                                                                   height="300"
-                                                                                   src="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item1-300x300.jpg"
-                                                                                   class="attachment-shop_catalog size-shop_catalog"
-                                                                                   alt=""
-                                                                                   srcset="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item1-300x300.jpg 300w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item1-150x150.jpg 150w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item1-100x100.jpg 100w"
-                                                                                   sizes="(max-width: 300px) 100vw, 300px">
+                                                    <div class="description">
+                                                        <div class="meta-block">
+                                                            <a class="header"
+                                                               href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), '/producto/' . $prod->slug) }}">
+                                                                <h5>{{ $prod->titulo }}</h5>
                                                             </a>
-                                                            <div class="description"><a
-                                                                    href="https://coffeeking.like-themes.com/product/coffee-cup/"
-                                                                    class="header"><h5>MyCoffeeShop Cup</h5></a>
-                                                                <div class="post_content entry-content">Duis et aliquam
-                                                                    orci. Vivamus augue quam, ...
-                                                                </div>
-                                                                <h4 class="price color-main">
-                                                                    <del aria-hidden="true"><span
-                                                                            class="woocommerce-Price-amount amount"><bdi><span
-                                                                                    class="woocommerce-Price-currencySymbol">$</span>23.00</bdi></span>
-                                                                    </del>
-                                                                    <span class="screen-reader-text">Original price was: $23.00.</span>
-                                                                    <ins aria-hidden="true"><span
-                                                                            class="woocommerce-Price-amount amount"><bdi><span
-                                                                                    class="woocommerce-Price-currencySymbol">$</span>19.00</bdi></span>
-                                                                    </ins>
-                                                                    <span class="screen-reader-text">Current price is: $19.00.</span>
-                                                                </h4>
-                                                                <a rel="nofollow"
-                                                                   href="https://coffeeking.like-themes.com/product/coffee-cup/"
-                                                                   data-quantity="1" data-product_id="2062"
-                                                                   data-product_sku=""
-                                                                   class="ajax_add_to_cart button btn btn-default color-hover-black btn-xs transform-lowercase add_to_cart_button"><i
-                                                                        class="fa fa-shopping-cart"
-                                                                        aria-hidden="true"></i>Read
-                                                                    more</a></div>
-                                                        </article>
-                                                    </div>
 
+                                                            {{-- deja SIEMPRE el div; si no hay texto, quedará vacío pero con altura fija --}}
+                                                            <div class="post_content entry-content">
+                                                                {{ $prod->descripcion ?? '' }}
+                                                            </div>
+                                                        </div>
 
-                                                    <div
-                                                        class="col-lg-3 col-md-4 col-sm-6 swiper-slide filter-item item filter-type-145 filter-type-155"
-                                                        style="width: 323.333px;">
-                                                        <article id="post-2068"
-                                                                 class="matchHeight post-2068 product type-product status-publish has-post-thumbnail product_cat-coffe product_cat-green-coffee product_tag-arabica  instock shipping-taxable purchasable product-type-simple"
-                                                                 style="height: 557.743px;"><a
-                                                                href="https://coffeeking.like-themes.com/product/green-africana/"
-                                                                class="photo"> <img loading="lazy" decoding="async"
-                                                                                    width="300" height="300"
-                                                                                    src="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item2-300x300.jpg"
-                                                                                    class="attachment-shop_catalog size-shop_catalog"
-                                                                                    alt=""
-                                                                                    srcset="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item2-300x300.jpg 300w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item2-150x150.jpg 150w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item2-600x600.jpg 600w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item2-100x100.jpg 100w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item2.jpg 625w"
-                                                                                    sizes="auto, (max-width: 300px) 100vw, 300px">
-                                                            </a>
-                                                            <div class="description"><a
-                                                                    href="https://coffeeking.like-themes.com/product/green-africana/"
-                                                                    class="header"><h5>Green Africana</h5></a>
-                                                                <div class="post_content entry-content">Duis et aliquam
-                                                                    orci. Vivamus augue quam, ...
-                                                                </div>
-                                                                <h4 class="price color-main"><span
-                                                                        class="woocommerce-Price-amount amount"><bdi><span
-                                                                                class="woocommerce-Price-currencySymbol">$</span>9.00</bdi></span>
-                                                                </h4>
-                                                                <a rel="nofollow" href="?add-to-cart=2068"
-                                                                   data-quantity="1"
-                                                                   data-product_id="2068" data-product_sku=""
-                                                                   class="ajax_add_to_cart button btn btn-default color-hover-black btn-xs transform-lowercase add_to_cart_button"><i
-                                                                        class="fa fa-shopping-cart"
-                                                                        aria-hidden="true"></i>Add
-                                                                    to cart</a></div>
-                                                        </article>
-                                                    </div>
-                                                    <div
-                                                        class="col-lg-3 col-md-4 col-sm-6 swiper-slide filter-item item filter-type-145"
-                                                        style="width: 323.333px;">
-                                                        <article id="post-2066"
-                                                                 class="matchHeight post-2066 product type-product status-publish has-post-thumbnail product_cat-coffe product_tag-arabica last instock shipping-taxable purchasable product-type-simple"
-                                                                 style="height: 557.743px;"><a
-                                                                href="https://coffeeking.like-themes.com/product/american-black-coffee/"
-                                                                class="photo"> <img loading="lazy" decoding="async"
-                                                                                    width="300" height="300"
-                                                                                    src="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item4-300x300.jpg"
-                                                                                    class="attachment-shop_catalog size-shop_catalog"
-                                                                                    alt=""
-                                                                                    srcset="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item4-300x300.jpg 300w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item4-150x150.jpg 150w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item4-100x100.jpg 100w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item4.jpg 400w"
-                                                                                    sizes="auto, (max-width: 300px) 100vw, 300px">
-                                                            </a>
-                                                            <div class="description"><a
-                                                                    href="https://coffeeking.like-themes.com/product/american-black-coffee/"
-                                                                    class="header"><h5>American Black Coffee</h5></a>
-                                                                <div class="post_content entry-content">Duis et aliquam
-                                                                    orci. Vivamus augue quam, ...
-                                                                </div>
-                                                                <h4 class="price color-main"><span
-                                                                        class="woocommerce-Price-amount amount"><bdi><span
-                                                                                class="woocommerce-Price-currencySymbol">$</span>14.00</bdi></span>
-                                                                </h4>
-                                                                <a rel="nofollow" href="?add-to-cart=2066"
-                                                                   data-quantity="1"
-                                                                   data-product_id="2066" data-product_sku=""
-                                                                   class="ajax_add_to_cart button btn btn-default color-hover-black btn-xs transform-lowercase add_to_cart_button"><i
-                                                                        class="fa fa-shopping-cart"
-                                                                        aria-hidden="true"></i>Add
-                                                                    to cart</a></div>
-                                                        </article>
-                                                    </div>
-                                                    <div
-                                                        class="col-lg-3 col-md-4 col-sm-6 swiper-slide filter-item item filter-type-145"
-                                                        style="width: 323.333px;">
-                                                        <article id="post-2164"
-                                                                 class="matchHeight post-2164 product type-product status-publish has-post-thumbnail product_cat-coffe product_tag-arabica product_tag-bean first instock shipping-taxable purchasable product-type-simple"
-                                                                 style="height: 557.743px;"><a
-                                                                href="https://coffeeking.like-themes.com/product/ground-coffee/"
-                                                                class="photo"> <img loading="lazy" decoding="async"
-                                                                                    width="300" height="300"
-                                                                                    src="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item9-300x300.jpg"
-                                                                                    class="attachment-shop_catalog size-shop_catalog"
-                                                                                    alt=""
-                                                                                    srcset="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item9-300x300.jpg 300w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item9-150x150.jpg 150w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item9-100x100.jpg 100w"
-                                                                                    sizes="auto, (max-width: 300px) 100vw, 300px">
-                                                            </a>
-                                                            <div class="description"><a
-                                                                    href="https://coffeeking.like-themes.com/product/ground-coffee/"
-                                                                    class="header"><h5>Ground coffee</h5></a>
-                                                                <div class="post_content entry-content">Duis et aliquam
-                                                                    orci. Vivamus augue quam, ...
-                                                                </div>
-                                                                <h4 class="price color-main"><span
-                                                                        class="woocommerce-Price-amount amount"><bdi><span
-                                                                                class="woocommerce-Price-currencySymbol">$</span>13.44</bdi></span>
-                                                                </h4>
-                                                                <a rel="nofollow" href="?add-to-cart=2164"
-                                                                   data-quantity="1"
-                                                                   data-product_id="2164" data-product_sku=""
-                                                                   class="ajax_add_to_cart button btn btn-default color-hover-black btn-xs transform-lowercase add_to_cart_button"><i
-                                                                        class="fa fa-shopping-cart"
-                                                                        aria-hidden="true"></i>Add
-                                                                    to cart</a></div>
-                                                        </article>
-                                                    </div>
+                                                        {{-- Presentaciones --}}
+                                                        <div>
+                                                            <label class="select-label">
+                                                                {{ __('meta.product_v3') }}
+                                                            </label>
+                                                            <select class="form-select"
+                                                                    name="presentacion"
+                                                                    data-product="{{ $prod->id }}">
+                                                                @foreach ($prod->presentaciones as $pres)
+                                                                    <option value="{{ $pres->id }}">
+                                                                        {{ $pres->titulo }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
 
+                                                        {{-- Precio --}}
+                                                        <div class="price">
+                                                            {{ $prod->precioFormat }}
+                                                        </div>
 
-                                                </div>
-                                                <div class="arrows"><a href="#"
-                                                                       class="arrow-left fa fa-chevron-left swiper-button-disabled"></a>
-                                                    <a href="#" class="arrow-right fa fa-chevron-right"></a></div>
-                                            </div>
+                                                        {{-- Botón carrito --}}
+                                                        <button type="button"
+                                                                class="btn-cart"
+                                                                onclick="agregarAlCarrito({{ $prod->id }})">
+                                                            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                                            {{ __('meta.product_v2') }}
+                                                        </button>
+                                                    </div>
+                                                </article>
+                                            @endforeach
                                         </div>
                                     </div>
+                                @endforeach
+                            @else
+                                <div class="category-block">
+                                    <p style="text-align:center; color:#ccc; margin: 24px 0 8px;">
+                                        {{ __('meta.no_products') ?? 'No hay productos disponibles.' }}
+                                    </p>
                                 </div>
-                            </div>
+                            @endif
 
-
-                            <div class="es-resp">
-                                <div class="hidden-sm hidden-ms hidden-xs" style="height: 80px;"></div>
-                                <div class="hidden-xl hidden-lg hidden-md hidden-xs" style="height: 50px;"></div>
-                                <div class="visible-xs" style="height: 50px;"></div>
-                            </div>
                         </div>
+
                     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 </div>
             </div>
         </div>
     </section>
 
-
-
-
     <div class="vc_row-full-width vc_clearfix"></div>
-
-
-
-
-
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')
+
+    {{-- ===== JS: Tabs + Add to cart placeholder ===== --}}
+    <script>
+        // Tabs: mostrar/ocultar bloques por categoría
+        document.querySelectorAll('.tabs-cats .cat').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const id = tab.getAttribute('data-cat');
+
+                // activar pill
+                document.querySelectorAll('.tabs-cats .cat').forEach(c => c.classList.remove('cat-active'));
+                tab.classList.add('cat-active');
+
+                // mostrar solo el bloque correspondiente
+                document.querySelectorAll('.js-cat-block').forEach(b => {
+                    b.style.display = (b.getAttribute('data-cat') === id) ? '' : 'none';
+                });
+
+                // accesibilidad
+                document.querySelectorAll('.tabs-cats .cat').forEach(c => c.setAttribute('aria-selected', 'false'));
+                tab.setAttribute('aria-selected', 'true');
+            });
+        });
+
+        // Agregar al carrito (ejemplo: lee la presentación elegida)
+        function agregarAlCarrito(productId) {
+            const select = document.querySelector(`select.form-select[data-product='${productId}']`);
+            const presentacionId = select ? select.value : null;
+
+
+            console.log('Agregar al carrito:', {productId, presentacionId});
+        }
+    </script>
 @endsection

@@ -24,6 +24,48 @@ if (!function_exists('getRegionContent')) {
             $regionSlug = $regionByLocale[$locale] ?? 'sv';
         }
 
+
+        // 3) Sin caché: consultar directamente
+        $region = Region::where('slug', $regionSlug)->first();
+        if (!$region) return [];
+
+        $content = RegionContent::where('region_id', $region->id)
+            ->where('key', $key)
+            ->first();
+
+        if (!$content) return [];
+
+        // Traducción en idioma actual
+        $tr = RegionContentTranslation::where('content_id', $content->id)
+            ->where('locale', $locale)
+            ->first();
+
+        if ($tr) {
+            return [
+                'title'  => $tr->title ?? '',
+                'body'   => $tr->body ?? '',
+                'slug'   => $tr->slug ?? '',
+                'altseo' => $tr->altseo ?? '',
+            ];
+        }
+
+        // Fallback
+        $fallback = $region->locale ?: config('app.fallback_locale', 'es');
+
+        $trFallback = RegionContentTranslation::where('content_id', $content->id)
+            ->where('locale', $fallback)
+            ->first();
+
+        return [
+            'title'  => $trFallback->title ?? '',
+            'body'   => $trFallback->body ?? '',
+            'slug'   => $trFallback->slug ?? '',
+            'altseo' => $trFallback->altseo ?? '',
+        ];
+
+
+
+
         // 3) Cache por región+key+idioma
         $cacheKey = "rc:$regionSlug:$key:$locale";
 

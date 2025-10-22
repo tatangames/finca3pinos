@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend\Sistema;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ContactMail;
+use App\Models\Categoria;
 use App\Models\Galeria;
 use App\Models\Producto;
 use App\Models\ProductosPresentacion;
@@ -161,39 +162,72 @@ class FrontendController extends Controller
         }
     }
 
+    function limitarTexto($texto, $limite = 80) {
+        return strlen($texto) > $limite ? substr($texto, 0, $limite) . '...' : $texto;
+    }
+
     public function vistaProducts(){
 
-        $arrayProductos = Producto::where('activo', 1)
+        $arrayCategorias = Categoria::where('activo', 1)
             ->orderBy('posicion', 'ASC')
             ->get()
-            ->map(function ($item) {
+            ->map(function ($itemCategoria) {
 
-                $arrayRegion = getRegionContent($item->content_key);
-                $item->titulo = $arrayRegion['title'];
-                $item->descripcion = $arrayRegion['body'];
-                $item->slug = $arrayRegion['slug'];
+                $arrayRegionCategoria = getRegionContent($itemCategoria->content_key);
+                $itemCategoria->titulo = $arrayRegionCategoria['title'];
 
-                $item->precioFormat = '$' . number_format((float)$item->precio, 2, '.', '');
-
-                $arrayPresentaciones = ProductosPresentacion::where('id_productos', $item->id)
-                    ->where('activo', 1)
+                // --- Productos activos dentro de la categoría ---
+                $arrayProductos = Producto::where('activo', 1)
+                    ->where('id_categorias', $itemCategoria->id)
                     ->orderBy('posicion', 'ASC')
-                    ->get();
+                    ->get()
+                    ->map(function ($itemProducto) {
 
-                foreach ($arrayPresentaciones as $presentacion) {
-                    $arrayRegion2 = getRegionContent($presentacion->content_key);
-                    $presentacion->titulo = $arrayRegion2['title'];
+                        $arrayRegionProducto = getRegionContent($itemProducto->content_key);
+                        $itemProducto->titulo = $arrayRegionProducto['title'];
+                        $itemProducto->descripcion = $this->limitarTexto($arrayRegionProducto['body']);
+
+                        $itemProducto->slug = $arrayRegionProducto['slug'];
+                        $itemProducto->precioFormat = '$' . number_format((float)$itemProducto->precio, 2, '.', '');
+
+                        // --- Presentaciones activas ---
+                        $arrayPresentaciones = ProductosPresentacion::where('activo', 1)
+                            ->where('id_productos', $itemProducto->id)
+                            ->orderBy('posicion', 'ASC')
+                            ->get()
+                            ->map(function ($itemPresentacion) {
+
+                                $arrayRegionPresentacion = getRegionContent($itemPresentacion->content_key);
+                                $itemPresentacion->titulo = $arrayRegionPresentacion['title'];
+                                return $itemPresentacion;
+                            });
+
+                        // ✅ Solo incluir productos que tengan presentaciones
+                        if ($arrayPresentaciones->isEmpty()) {
+                            return null; // Se filtra más abajo
+                        }
+
+                        $itemProducto->presentaciones = $arrayPresentaciones;
+                        return $itemProducto;
+                    })
+                    // ✅ Eliminar productos nulos (sin presentaciones)
+                    ->filter();
+
+                // ✅ Solo incluir categorías que tengan productos válidos
+                if ($arrayProductos->isEmpty()) {
+                    return null; // Se filtra más abajo
                 }
 
-                $item->presentaciones = $arrayPresentaciones;
+                $itemCategoria->productos = $arrayProductos;
+                return $itemCategoria;
+            })
+            // ✅ Eliminar categorías nulas (sin productos)
+            ->filter()
+            ->values(); // reindexa el array final (0,1,2,...)
 
-                return $item;
-            });
+        //return $arrayCategorias;
 
-
-        return $arrayProductos;
-
-        return view('frontend.pages.products', compact('arrayProductos'));
+        return view('frontend.pages.products', compact('arrayCategorias'));
     }
 
 }
