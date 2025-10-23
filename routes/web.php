@@ -179,8 +179,16 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
 
 
-        Route::get('/login',  [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');
+
+        Route::get(LaravelLocalization::transRoute('routes.login'), [UsuarioAuthController::class, 'showLoginFormUsuario'])
+            ->name('user.login');
+
+
+        //Route::get('/login',  [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');
         Route::post('/login', [UsuarioAuthController::class, 'loginUsuario'])->name('user.login.process');
+
+
+
 
         Route::get('/dashboard', [DashboardController::class, 'vistaInicio'])->name('user.dashboard');
     });

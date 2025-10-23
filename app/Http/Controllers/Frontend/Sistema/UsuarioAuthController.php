@@ -24,16 +24,35 @@ class UsuarioAuthController extends Controller
     }
 
     public function loginUsuario(Request $request){
+
         $rules = [
-            'email' => 'required|email',
-            'password' => 'required',
+            'email'    => ['required'],
+            'password'   => ['required'],
         ];
 
-        $validator = Validator::make($request->all(), $rules);
+        $attributes = [
+            'email'   => __('meta.contact_v12'), // el correo es requerido
+            'password' => __('meta.contact_v14'), // la contraseña es requerida
+        ];
+
+        $validator = Validator::make($request->all(), $rules, [], $attributes);
 
         if ($validator->fails()) {
-            return response()->json(['success' => 0, 'errors' => $validator->errors()]);
+            return response()->json([
+                'success' => 0,
+                'message' => __('meta.unknown_error'),
+            ]);
         }
+
+        return response()->json([
+            'success' => 0,
+            'message' => __('meta.unknown_error'),
+        ]);
+
+
+
+
+
 
         $credentials = $request->only('email', 'password');
 

@@ -120,7 +120,9 @@ return [
     'contact_v9' => 'Required field',
     'contact_v10' => 'Invalid email',
     'contact_v11' => 'Email sent',
-
+    'contact_v12' => 'Email is required.',
+    'contact_v13' => 'Enter a valid email.',
+    'contact_v14' => 'Password is required.',
 
 
     'contact_ok'    => 'Thanks! We received your message and will get back to you soon.',
@@ -134,7 +136,20 @@ return [
     'product_v1' => 'Select your coffee',
     'product_v2' => 'Add to cart',
     'product_v3' => 'Presentation',
-    'product_v4' => '',
+    'product_v4' => 'Invalid link',
+    'product_v5' => 'The link to reset your password has expired or has already been used.',
+    'product_v6' => 'Request a new link',
+    'product_v7' => 'Finca 3 Pinos — Administration Panel',
+    'product_v8' => 'Reset Password',
+    'product_v9' => 'Request to reset your password on',
+    'product_v10' => 'If it wasn’t you, please ignore this email.',
+    'product_v11' => 'We have received a request to reset your password on',
+    'product_v12' => 'To continue, click the button below:',
+    'product_v13' => 'If the button doesn’t work, copy and paste this link into your browser:',
+    'product_v14' => 'If you didn’t make this request, you can safely ignore this email.',
+
+
+
 
     'create_account' => 'Create an account',
     'email_address' => 'Email address',

@@ -365,6 +365,39 @@
         }
 
 
+
+        .form-row { position: relative; }
+        .field-error {
+            color: #e53935;            /* rojo */
+            font-size: 12px;
+            line-height: 1.2;
+            margin-top: 6px;
+            display: block;
+        }
+        /* opcional: borde rojo cuando hay error */
+        input[aria-invalid="true"] {
+            border-color: #e53935 !important;
+            outline: none;
+        }
+
+
+
+        .btn-primary.loading {
+            position: relative;
+            color: transparent !important;
+        }
+        .btn-primary.loading::after {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 18px; height: 18px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: spin 1s linear infinite;
+        }
+
     </style>
 
     <header class="page-header like-parallax"
@@ -407,34 +440,31 @@
 
                 {{-- PANE: LOGIN --}}
                 <div id="panel-login" class="auth-panel is-active" role="tabpanel" aria-labelledby="tab-login">
-                    <form>
+                    <form id="form-login" method="POST" action="">
                         @csrf
                         <input type="hidden" name="form_type" value="login">
 
                         <div class="form-row">
                             <label for="email">{{ __('meta.email_address') }} <span class="req">*</span></label>
                             <input id="email" type="email" name="email" value="" required autocomplete="email" autofocus>
+                            <!-- los errores se inyectan aquí -->
                         </div>
 
                         <div class="form-row">
                             <label for="password">{{ __('meta.password') }} <span class="req">*</span></label>
                             <div class="password-wrap">
-                                <input id="password" type="password" name="password" required
-                                       autocomplete="current-password">
-                                <button type="button" class="toggle-pass" data-target="password"
-                                        aria-label="">👁️
-                                </button>
+                                <input id="password" type="password" name="password" required autocomplete="current-password">
+                                <button type="button" class="toggle-pass" data-target="password" aria-label="">👁️</button>
                             </div>
+                            <!-- los errores se inyectan aquí -->
                         </div>
 
                         <div class="form-meta">
-                            <a class="link"
-                               href="#">{{ __('meta.forgot_your_password') }}</a>
+                            <a class="link" href="#">{{ __('meta.forgot_your_password') }}</a>
                         </div>
 
-                        <button type="button" class="btn-primary">{{ __('meta.login_v2') }}</button>
+                        <button id="btn-login" type="button" style="color: white !important;" class="btn-primary">{{ __('meta.login_v2') }}</button>
 
-                        {{-- Social (opcional) --}}
                         <div class="divider"><span>{{ __('meta.o') }}</span></div>
                         <div class="social-grid">
                             <a href="" class="btn-social">{{ __('meta.google') }}</a>
@@ -486,61 +516,207 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn-primary">{{ __('meta.create_account') }}</button>
+                        <button type="button" style="color: white !important;" class="btn-primary">{{ __('meta.create_account') }}</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
+
+
+    <script>
+        const loginUrl = "{{ LaravelLocalization::localizeURL('/login') }}";
+    </script>
+
+    <script>
+
+        (function () {
+            const form    = document.getElementById('form-login');
+            const btn     = document.getElementById('btn-login');
+            const emailEl = document.getElementById('email');
+            const passEl  = document.getElementById('password');
+
+            const messages = {
+                emailRequired: "{{ __('meta.contact_v12') }}",
+                emailInvalid : "{{ __('meta.contact_v13') }}",
+                passRequired : "{{ __('meta.contact_v14') }}",
+                generalError : "{{ __('meta.unknown_error') }}",
+            };
+
+            const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            axios.defaults.headers.common['X-CSRF-TOKEN'] = csrf;
+            axios.defaults.headers.common['Accept'] = 'application/json';
+
+            // --- Helpers ---
+            function isEmailValid(value) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+            }
+
+            function getRow(input) {
+                return input.closest('.form-row') || input.parentElement;
+            }
+
+            function showError(input, msg) {
+                const row = getRow(input);
+                let help = row.querySelector('.field-error');
+                if (!help) {
+                    help = document.createElement('small');
+                    help.className = 'field-error';
+                    help.style.color = '#e53935';
+                    help.style.fontSize = '12px';
+                    row.appendChild(help);
+                }
+                help.textContent = msg;
+                input.setAttribute('aria-invalid', 'true');
+            }
+
+            function clearError(input) {
+                const row = getRow(input);
+                const help = row.querySelector('.field-error');
+                if (help) help.remove();
+                input.removeAttribute('aria-invalid');
+            }
+
+
+
+
+            function showLoadingButton() {
+                btn.classList.add('loading');
+                btn.disabled = true;
+            }
+            function closeLoadingButton() {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+
+
+
+
+
+            function validate() {
+                let ok = true;
+                const email = emailEl.value.trim();
+                const pass  = passEl.value.trim();
+
+                if (email === '') {
+                    showError(emailEl, messages.emailRequired);
+                    ok = false;
+                } else if (!isEmailValid(email)) {
+                    showError(emailEl, messages.emailInvalid);
+                    ok = false;
+                } else {
+                    clearError(emailEl);
+                }
+
+                if (pass === '') {
+                    showError(passEl, messages.passRequired);
+                    ok = false;
+                } else {
+                    clearError(passEl);
+                }
+
+                return ok;
+            }
+
+            // --- Limpiar error al tipear ---
+            [emailEl, passEl].forEach(el => {
+                el.addEventListener('input', () => clearError(el));
+            });
+
+            // --- Envío con Axios ---
+            btn.addEventListener('click', () => {
+                if (!validate()) return;
+
+                const formData = new FormData();
+                formData.append('email', emailEl.value.trim());
+                formData.append('password', passEl.value.trim());
+
+                // Mostrar algún loading si quieres
+                showLoadingButton();
+
+                axios.post(loginUrl, formData)
+                    .then(response => {
+                        closeLoadingButton()
+
+                        const data = response.data;
+                        if (data.success === 1) {
+                            // login correcto
+                            window.location.href = "/";
+                        } else {
+                            showError(passEl, data.message)
+                        }
+                    })
+                    .catch(error => {
+                        closeLoadingButton()
+                        showError(passEl, messages.generalError)
+                    });
+            });
+
+            // --- Enter para enviar ---
+            form.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
+
+            // --- Mostrar / ocultar contraseña ---
+            document.querySelectorAll('.toggle-pass').forEach(tg => {
+                tg.addEventListener('click', () => {
+                    const id = tg.getAttribute('data-target');
+                    const input = document.getElementById(id);
+                    if (!input) return;
+                    input.type = (input.type === 'password') ? 'text' : 'password';
+                    input.focus();
+                });
+            });
+        })();
+
+    </script>
+
 
 
 
 
     <script>
-        // Tabs con hash (#login / #register)
-        (function () {
-            const tabs = document.querySelectorAll('.auth-tab');
-            const panels = document.querySelectorAll('.auth-panel');
+        (function(){
+            const tabs  = document.querySelectorAll('.auth-tab');
+            const panes = document.querySelectorAll('.auth-panel');
 
             function activate(tabName) {
+                // Tabs
                 tabs.forEach(t => {
-                    const active = t.dataset.tab === tabName;
-                    t.classList.toggle('is-active', active);
-                    t.setAttribute('aria-selected', active);
+                    const isActive = t.dataset.tab === tabName;
+                    t.classList.toggle('is-active', isActive);
+                    t.setAttribute('aria-selected', String(isActive));
                 });
-                panels.forEach(p => {
-                    const show = p.id === 'panel-' + tabName;
-                    p.classList.toggle('is-active', show);
-                    p.hidden = !show;
+
+                // Panels
+                panes.forEach(p => {
+                    const isActive = p.id === `panel-${tabName}`;
+                    p.classList.toggle('is-active', isActive);
+                    p.toggleAttribute('hidden', !isActive);
                 });
+
+                // Quitar cualquier hash/cambio de URL
+                const url = location.pathname + location.search;
+                history.replaceState(null, '', url);
             }
 
-            tabs.forEach(t => t.addEventListener('click', () => {
-                const name = t.dataset.tab;
-                history.replaceState(null, '', '#' + name);
-                activate(name);
-            }));
-
-            const initial = location.hash.replace('#', '');
-            if (initial && ['login', 'register'].includes(initial)) {
-                activate(initial);
-            } else {
-                activate('{{ $errors->any() && old("form_type")==="register" ? "register" : "login" }}');
-            }
-
-            // Toggle password
-            document.querySelectorAll('.toggle-pass').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = btn.dataset.target;
-                    const input = document.getElementById(id);
-                    if (!input) return;
-                    input.type = input.type === 'password' ? 'text' : 'password';
+            // Click handler
+            tabs.forEach(t => {
+                t.addEventListener('click', (e) => {
+                    e.preventDefault(); // por si acaso
+                    activate(t.dataset.tab);
                 });
             });
+
+            // Por defecto (si quieres abrir login)
+            activate('login');
         })();
     </script>
-
 
 
 

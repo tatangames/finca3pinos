@@ -5,4 +5,5 @@ return [
     'gallery' => 'gallery',
     'contact' => 'contact',
     'products' => 'products',
+    'login' => 'login',
 ];

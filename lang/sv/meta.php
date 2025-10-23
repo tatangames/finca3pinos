@@ -120,6 +120,11 @@ return [
     'contact_v9' => 'Campo requerido',
     'contact_v10' => 'Correo no valido',
     'contact_v11' => 'Correo enviado',
+    'contact_v12' => 'El correo es requerido.',
+    'contact_v13' => 'Ingresa un correo válido.',
+    'contact_v14' => 'La contraseña es requerida.',
+
+
 
 
     'contact_ok'    => '¡Gracias! Hemos recibido tu mensaje y te responderemos pronto.',
@@ -134,7 +139,21 @@ return [
     'product_v1' => 'Selecciona tu café',
     'product_v2' => 'Agregar al carrito',
     'product_v3' => 'Presentación',
-    'product_v4' => '',
+    'product_v4' => 'Enlace no válido',
+    'product_v5' => 'El enlace para restablecer la contraseña ha expirado o ya fue utilizado.',
+    'product_v6' => 'Solicitar nuevo enlace',
+    'product_v7' => 'Finca 3 Pinos — Panel de Administración',
+    'product_v8' => 'Restablecer contraseña',
+    'product_v9' => 'Solicitud para restablecer tu contraseña en',
+    'product_v10' => ' Si no fuiste tú, ignora este correo.',
+    'product_v11' => 'Hemos recibido una solicitud para restablecer tu contraseña en',
+    'product_v12' => 'Para continuar, haz clic en el botón siguiente:',
+    'product_v13' => 'Si el botón no funciona, copia y pega este enlace en tu navegador:',
+    'product_v14' => 'Si tú no realizaste esta solicitud, puedes ignorar este correo.',
+
+
+
+
 
     'create_account' => 'Crear una cuenta',
     'email_address' => 'Correo electrónico',

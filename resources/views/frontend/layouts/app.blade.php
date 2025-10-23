@@ -108,6 +108,7 @@
 <script type="text/javascript" src="{{ asset('frontend/js/vc-waypoints.min.js') }}" id="vc_waypoints-js"></script>
 <script type="text/javascript" src="{{ asset('frontend/js/skrollr.min.js') }}" id="vc_jquery_skrollr_js-js"></script>
 
+
 @stack('scripts')
 </body>
 </html>

@@ -287,169 +287,200 @@
         }
 
 
-
-
-
-
-
-
         /* ===== Sección general ===== */
         /* ===== Sección a ancho completo con líneas doradas ===== */
-        .geisha-product{
-            position:relative;
-            width:100vw;
-            left:50%; right:50%;
-            margin-left:-50vw; margin-right:-50vw;
-            background:#1a1a1a;
-            padding:60px 0 80px;
-            overflow:hidden;
+        .geisha-product {
+            position: relative;
+            width: 100vw;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            background: #1a1a1a;
+            padding: 60px 0 80px;
+            overflow: hidden;
         }
+
         .geisha-product::before,
-        .geisha-product::after{
-            content:"";
-            position:absolute; left:0; width:100%; height:2px;
-            background:#D2AA6DFF;
+        .geisha-product::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #D2AA6DFF;
         }
-        .geisha-product::before{ top:0; }
-        .geisha-product::after{ bottom:0; }
+
+        .geisha-product::before {
+            top: 0;
+        }
+
+        .geisha-product::after {
+            bottom: 0;
+        }
 
         /* ===== Título ===== */
-        .geisha-product .header{
-            font-weight:800;
-            font-size:clamp(26px,4vw,40px);
-            color:#f9f9f9;
-            margin:0 0 36px;
-            text-align:center;
+        .geisha-product .header {
+            font-weight: 800;
+            font-size: clamp(26px, 4vw, 40px);
+            color: #f9f9f9;
+            margin: 0 0 36px;
+            text-align: center;
         }
 
         /* ===== Layout 2 columnas ===== */
-        .geisha-product .product-grid{
-            display:grid;
+        .geisha-product .product-grid {
+            display: grid;
             grid-template-columns:1fr 1fr;
-            gap:36px;
-            align-items:center;
-            justify-content:center;
-            max-width:900px;
-            margin:0 auto;
-            text-align:left;
+            gap: 36px;
+            align-items: center;
+            justify-content: center;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: left;
         }
 
         /* ===== Imagen izquierda (card) ===== */
-        .geisha-product .product-media{
-            background:#ffffff;
-            border-radius:16px;
-            padding:18px;
-            box-shadow:0 10px 30px rgba(0,0,0,.6);
-            display:flex;
-            justify-content:center;
-            align-items:center;
+        .geisha-product .product-media {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
             /* transición y rendimiento */
-            transition:transform .35s ease, box-shadow .35s ease, filter .35s ease;
-            will-change:transform;
-            transform:translateZ(0);
+            transition: transform .35s ease, box-shadow .35s ease, filter .35s ease;
+            will-change: transform;
+            transform: translateZ(0);
         }
-        .geisha-product .product-media img{
-            display:block;
-            max-width:70%;
-            height:auto;
-            object-fit:contain;
-            border-radius:10px;
-            transition:transform .4s ease;
+
+        .geisha-product .product-media img {
+            display: block;
+            max-width: 70%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 10px;
+            transition: transform .4s ease;
         }
 
         /* ===== Card de detalles (derecha) ===== */
-        .geisha-product .product-details.card{
-            background:#fff;
-            border-radius:14px;
-            padding:28px 32px;
-            box-shadow:0 8px 30px rgba(0,0,0,.25);
+        .geisha-product .product-details.card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 28px 32px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
 
             /* transición y rendimiento */
-            transition:transform .35s ease, box-shadow .35s ease, background-color .35s ease;
-            will-change:transform;
-            transform:translateZ(0);
+            transition: transform .35s ease, box-shadow .35s ease, background-color .35s ease;
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         /* ===== Hover / Focus: Zoom suave en cada card ===== */
         .geisha-product .product-media:hover,
-        .geisha-product .product-media:focus-within{
-            transform:scale(1.04);
-            box-shadow:0 18px 40px rgba(0,0,0,.55);
-            filter:brightness(1.02);
+        .geisha-product .product-media:focus-within {
+            transform: scale(1.04);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .55);
+            filter: brightness(1.02);
         }
+
         .geisha-product .product-media:hover img,
-        .geisha-product .product-media:focus-within img{
-            transform:scale(1.08);
+        .geisha-product .product-media:focus-within img {
+            transform: scale(1.08);
         }
 
         .geisha-product .product-details.card:hover,
-        .geisha-product .product-details.card:focus-within{
-            transform:scale(1.04);
-            box-shadow:0 18px 44px rgba(0,0,0,.35);
+        .geisha-product .product-details.card:focus-within {
+            transform: scale(1.04);
+            box-shadow: 0 18px 44px rgba(0, 0, 0, .35);
         }
 
         /* ===== Texto y bloques internos ===== */
-        .geisha-product .excerpt{
-            color:#333; line-height:1.6; margin-bottom:16px;
+        .geisha-product .excerpt {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 16px;
         }
-        .geisha-product .product-info{
-            display:flex; gap:20px; flex-wrap:wrap;
-            color:#222; font-weight:600; margin-bottom:12px;
+
+        .geisha-product .product-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            color: #222;
+            font-weight: 600;
+            margin-bottom: 12px;
         }
-        .geisha-product .product-info .label{
-            color:#777; font-weight:700; margin-right:4px;
+
+        .geisha-product .product-info .label {
+            color: #777;
+            font-weight: 700;
+            margin-right: 4px;
         }
-        .geisha-product .price{
-            font-size:1.4rem; font-weight:800; color:#b8914b; margin:10px 0 16px;
+
+        .geisha-product .price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #b8914b;
+            margin: 10px 0 16px;
         }
 
         /* ===== Botón ===== */
         .geisha-product .btn-cart {
             display: inline-flex;
             align-items: center;
-            gap: 5px;                         /* espacio entre ícono y texto */
+            gap: 5px; /* espacio entre ícono y texto */
             background: #b8914b;
             color: #fff;
-            padding: 6px 12px;                /* 🔹 más compacto */
-            border-radius: 5px;               /* 🔹 esquinas más rectas */
+            padding: 6px 12px; /* 🔹 más compacto */
+            border-radius: 5px; /* 🔹 esquinas más rectas */
             font-weight: 600;
-            font-size: 0.8rem;                /* 🔹 texto más pequeño */
+            font-size: 0.8rem; /* 🔹 texto más pequeño */
             text-decoration: none;
-            box-shadow: 0 2px 8px rgba(184,145,75,.25);
+            box-shadow: 0 2px 8px rgba(184, 145, 75, .25);
             transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease;
         }
 
         .geisha-product .btn-cart:hover {
             background: #a37a30;
             transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(184,145,75,.35);
+            box-shadow: 0 4px 10px rgba(184, 145, 75, .35);
         }
 
         .geisha-product .btn-cart i {
-            font-size: 0.8em;                 /* 🔹 ícono más pequeño */
+            font-size: 0.8em; /* 🔹 ícono más pequeño */
             margin-right: 3px;
         }
 
         /* ===== Responsive ===== */
-        @media (max-width:900px){
-            .geisha-product .product-grid{
+        @media (max-width: 900px) {
+            .geisha-product .product-grid {
                 grid-template-columns:1fr;
-                gap:28px;
-                text-align:center;
+                gap: 28px;
+                text-align: center;
             }
-            .geisha-product .product-media img{ max-width:60%; }
-            .geisha-product .product-details.card{ text-align:center; }
-            .geisha-product .product-info{ justify-content:center; }
+
+            .geisha-product .product-media img {
+                max-width: 60%;
+            }
+
+            .geisha-product .product-details.card {
+                text-align: center;
+            }
+
+            .geisha-product .product-info {
+                justify-content: center;
+            }
         }
 
         /* Respeta usuarios con movimiento reducido */
-        @media (prefers-reduced-motion:reduce){
+        @media (prefers-reduced-motion: reduce) {
             .geisha-product .product-media,
             .geisha-product .product-details.card,
             .geisha-product .product-media img,
-            .geisha-product .btn-cart{
-                transition:none !important;
+            .geisha-product .btn-cart {
+                transition: none !important;
             }
         }
 
@@ -514,7 +545,8 @@
                                                                 <div class="hero-container">
                                                                     <!-- Izquierda: Card de texto -->
                                                                     <div class="hero-card hero-text">
-                                                                        <span class="eyebrow">{{ __('meta.coffee_v0') }}</span>
+                                                                        <span
+                                                                            class="eyebrow">{{ __('meta.coffee_v0') }}</span>
                                                                         <h1>{{ __('meta.finca3pinos') }}</h1>
                                                                         <h2>{{ __('meta.coffee_v14') }}</h2>
                                                                         <p>
@@ -522,15 +554,15 @@
                                                                         </p>
                                                                         <div class="btn-group">
                                                                             <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(),
-                route('user.ourcoffee', [], false)) }}" class="btn btn-primary" style="color: white">{{ __('meta.coffee_v6') }}</a>
+                                                                    route('user.ourcoffee', [], false)) }}" class="btn btn-primary"
+                                                                               style="color: white">{{ __('meta.coffee_v6') }}</a>
 
 
-
-
-
-                                                                            <a href="#productos" class="btn btn-primary js-scroll" style="color:white">
+                                                                            <a href="#productos"
+                                                                               class="btn btn-primary js-scroll"
+                                                                               style="color:white">
                                                                                 {{ __('meta.coffee_v5') }}
-                                                                            </a>                                                                        </div>
+                                                                            </a></div>
                                                                     </div>
 
                                                                     <!-- Derecha: Card con imagen -->
@@ -572,7 +604,8 @@
                                             <div class="wpb_wrapper">
                                                 <div
                                                     class="heading head-subheader align-left color-white subcolor-main transform-default">
-                                                    <h5 class="subheader" style="color: #D2AA6DFF">{{ __('meta.coffee_v7') }}</h5>
+                                                    <h5 class="subheader"
+                                                        style="color: #D2AA6DFF">{{ __('meta.coffee_v7') }}</h5>
                                                     <h2 class="header">{{ __('meta.finca3pinos') }}</h2>
                                                 </div>
 
@@ -685,9 +718,6 @@
                             <div class="vc_row-full-width vc_clearfix"></div>
 
 
-
-
-
                         </div>
                     </article>
                 </div>
@@ -701,9 +731,9 @@
             function getOffset() {
                 let off = 0;
                 const sticky = document.querySelector('.navbar-fixed-top, .site-header.sticky, .header-sticky');
-                const admin  = document.querySelector('#wpadminbar');
+                const admin = document.querySelector('#wpadminbar');
                 if (sticky) off += sticky.offsetHeight || 0;
-                if (admin)  off += admin.offsetHeight  || 0;
+                if (admin) off += admin.offsetHeight || 0;
                 // fallback si no hay sticky
                 if (!off) off = 80; // ajusta a tu diseño
                 return off;
@@ -721,7 +751,7 @@
                     const offset = getOffset();
                     const y = target.getBoundingClientRect().top + window.pageYOffset - offset;
 
-                    window.scrollTo({ top: y, behavior: 'smooth' });
+                    window.scrollTo({top: y, behavior: 'smooth'});
 
                     // Actualiza el hash sin “saltar” (permite re-clics)
                     history.pushState(null, '', id);

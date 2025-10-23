@@ -112,10 +112,10 @@
         <div class="logo-container">
             <img src="{{ asset('images/logoindex.png') }}" alt="Logo">
         </div>
-        <h4>Enlace no válido</h4>
-        <p>El enlace para restablecer la contraseña ha expirado o ya fue utilizado.</p>
-        <a href="{{ route('admin.password.reset') }}" class="btn btn-main w-100">Solicitar nuevo enlace</a>
-        <p class="footer-text">© {{ date('Y') }} Finca 3 Pinos — Panel de Administración</p>
+        <h4>{{ __('meta.product_v4') }}</h4>
+        <p>{{ __('meta.product_v5') }}</p>
+        <a href="{{ route('admin.password.reset') }}" class="btn btn-main w-100">{{ __('meta.product_v6') }}</a>
+        <p class="footer-text">© {{ date('Y') }} {{ __('meta.product_v7') }}</p>
     </div>
 </div>
 
