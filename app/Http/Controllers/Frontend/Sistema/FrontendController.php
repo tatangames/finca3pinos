@@ -36,7 +36,6 @@ class FrontendController extends Controller
 
 
 
-
     public function vistaGallery()
     {
         $limitFirst = 24;
@@ -168,7 +167,7 @@ class FrontendController extends Controller
 
     public function vistaProducts(){
 
-        $arrayCategorias = Categoria::where('activo', 1)
+        /*$arrayCategorias = Categoria::where('activo', 1)
             ->orderBy('posicion', 'ASC')
             ->get()
             ->map(function ($itemCategoria) {
@@ -223,11 +222,44 @@ class FrontendController extends Controller
             })
             // ✅ Eliminar categorías nulas (sin productos)
             ->filter()
-            ->values(); // reindexa el array final (0,1,2,...)
+            ->values(); // reindexa el array final (0,1,2,...)*/
 
-        //return $arrayCategorias;
 
-        return view('frontend.pages.products', compact('arrayCategorias'));
+
+        // Solo producto 1 de esa categoría
+        $arrayProductos = Producto::where('id', 1)
+            ->where('activo', 1)
+            ->get()
+            ->map(function ($itemProducto) {
+                $rcProd = getRegionContent($itemProducto->content_key);
+                $itemProducto->titulo      = $rcProd['title'] ?? '';
+                $itemProducto->descripcion = $rcProd['body']  ?? '';
+                $itemProducto->slug        = $rcProd['slug']  ?? '';
+                $itemProducto->precioFormat = '$' . number_format((float)$itemProducto->precio, 2, '.', '');
+
+                // Presentaciones activas
+                $arrayPresentaciones = \App\Models\ProductosPresentacion::where('activo', 1)
+                    ->where('id_productos', $itemProducto->id)
+                    ->orderBy('posicion', 'ASC')
+                    ->get()
+                    ->map(function ($itemPresentacion) {
+                        $rcPres = getRegionContent($itemPresentacion->content_key);
+                        $itemPresentacion->titulo = $rcPres['title'] ?? '';
+                        return $itemPresentacion;
+                    });
+
+                // Solo incluir si tiene presentaciones
+                if ($arrayPresentaciones->isEmpty()) {
+                    return null;
+                }
+
+                $itemProducto->presentaciones = $arrayPresentaciones;
+                return $itemProducto;
+            })
+            ->filter(); // quita nulls (sin presentaciones)
+
+
+        return view('frontend.pages.products', compact('arrayProductos'));
     }
 
 }

@@ -130,7 +130,7 @@ return [
     'network_error' => '서버에 연결할 수 없습니다. 인터넷 연결을 확인하세요.',
     'derechos' => '핀카 3 피노스 — 모든 권리 보유.',
 
-
+    'out_of_stock' => '품절',
 
     'product_v1' => '커피를 선택하세요',
     'product_v2' => '장바구니에 추가',

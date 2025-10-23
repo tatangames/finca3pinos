@@ -129,12 +129,16 @@ return [
     'network_error' => 'Could not reach the server. Check your connection.',
     'derechos' => 'Finca 3 Pinos — All rights reserved.',
 
-
+    'out_of_stock' => 'Out of stock.',
 
     'product_v1' => 'Select your coffee',
     'product_v2' => 'Add to cart',
     'product_v3' => 'Presentation',
     'product_v4' => '',
+
+
+
+
 
 
 

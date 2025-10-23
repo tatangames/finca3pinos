@@ -22,6 +22,8 @@ return new class extends Migration
 
             $table->decimal('precio', 8, 2)->default(0);
 
+            $table->boolean('disponible')->default(1);
+
             // titulo y Descripcion por Idioma
 
             $table->foreign('id_categorias')->references('id')->on('categorias');

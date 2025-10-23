@@ -128,6 +128,8 @@ return [
     'network_error' => 'No fue posible conectar con el servidor. Verifica tu conexión.',
     'derechos' => 'Finca 3 Pinos — Todos los derechos reservados.',
 
+    'out_of_stock' => 'No disponible',
+
 
     'product_v1' => 'Selecciona tu café',
     'product_v2' => 'Agregar al carrito',
