@@ -171,8 +171,6 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.gallery'), [FrontendController::class, 'vistaGallery'])
             ->name('user.gallery');
 
-
-
         Route::get(LaravelLocalization::transRoute('routes.contact'), [FrontendController::class, 'vistaContact'])
             ->name('user.contact');
 

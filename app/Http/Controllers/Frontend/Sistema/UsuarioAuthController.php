@@ -17,10 +17,10 @@ class UsuarioAuthController extends Controller
     public function showLoginFormUsuario()
     {
         if (Auth::guard('web')->check()) {
-            return redirect()->route('user.dashboard');
+            return redirect()->route('user.index');
         }
 
-        return view('frontend.login.vistaloginusuario');
+        return view('frontend.login.vistalogin');
     }
 
     public function loginUsuario(Request $request){
