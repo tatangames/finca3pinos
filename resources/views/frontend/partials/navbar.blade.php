@@ -38,7 +38,7 @@
 
                     {{-- Usuario --}}
                     <li class="only-desktop nav-user">
-                        @auth
+                        @auth('web')
                             <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}">
                                 <i class="fa fa-user"></i> <span>{{ __('meta.my_account') }}</span>
                             </a>

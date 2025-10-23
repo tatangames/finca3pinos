@@ -166,7 +166,7 @@ return [
     'o' => '또는',
     'show_or_hide_password' => '비밀번호 표시/숨기기',
     'confirm_password' => '비밀번호 확인',
-
+    'incorrect_data' => '로그인 정보가 올바르지 않습니다',
 
 
 

@@ -27,7 +27,6 @@ use Illuminate\Support\Str;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/',        [AdminAuthController::class, 'showLoginFormAdmin'])->name('login');
-    Route::post('/login',  [AdminAuthController::class, 'loginAdmin'])->name('login.process');
     Route::post('/logout', [AdminAuthController::class, 'logoutAdmin'])->name('logout');
 
     // formulario para ingresar el correo

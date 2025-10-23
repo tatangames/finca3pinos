@@ -160,7 +160,7 @@ return [
     'o' => 'or',
     'show_or_hide_password' => 'Show or hide password',
     'confirm_password' => 'Confirm password',
-
+    'incorrect_data' => 'Invalid credentials',
 
 
 

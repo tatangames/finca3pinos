@@ -44,16 +44,6 @@ class UsuarioAuthController extends Controller
             ]);
         }
 
-        return response()->json([
-            'success' => 0,
-            'message' => __('meta.unknown_error'),
-        ]);
-
-
-
-
-
-
         $credentials = $request->only('email', 'password');
 
         // Guard admin (usa el provider 'admin' del auth.php)
@@ -65,12 +55,12 @@ class UsuarioAuthController extends Controller
             // Puedes redirigir o devolver JSON
             return response()->json([
                 'success' => 1,
-                'ruta' => route('user.dashboard'),
+                'ruta' => route('user.index'),
                 'admin' => Auth::guard('web')->user(),
             ]);
         }
 
-        return response()->json(['success' => 2, 'message' => 'Credenciales incorrectas']);
+        return ['success' => 2, 'message' => __('meta.incorrect_data')];
     }
 
     public function logoutUsuario(Request $request){

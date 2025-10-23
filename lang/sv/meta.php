@@ -164,7 +164,7 @@ return [
     'o' => 'o',
     'show_or_hide_password' => 'Mostrar u ocultar contraseña',
     'confirm_password' => 'Confirmar contraseña',
-
+    'incorrect_data' => 'Datos incorrectos',
 
 
 ];

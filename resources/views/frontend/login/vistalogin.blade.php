@@ -327,12 +327,13 @@
         /* Botón principal */
         .btn-primary {
             background: var(--f3p-accent) !important;
-            color: #121212 !important;
+            color: #fff !important; /* ← blanco */
             border-radius: 10px !important;
             border: 1px solid rgba(0, 0, 0, .1) !important;
             font-weight: 700 !important;
             padding: 12px 16px !important;
             box-shadow: 0 2px 0 rgba(0, 0, 0, .06);
+            transition: filter .25s ease, transform .06s ease;
         }
 
         .btn-primary:hover {
@@ -384,7 +385,7 @@
 
         .btn-primary.loading {
             position: relative;
-            color: transparent !important;
+            color: transparent !important; /* ahora sí se oculta el texto */
         }
         .btn-primary.loading::after {
             content: "";
@@ -396,6 +397,11 @@
             border-radius: 50%;
             transform: translate(-50%, -50%);
             animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
     </style>
@@ -463,7 +469,9 @@
                             <a class="link" href="#">{{ __('meta.forgot_your_password') }}</a>
                         </div>
 
-                        <button id="btn-login" type="button" style="color: white !important;" class="btn-primary">{{ __('meta.login_v2') }}</button>
+                        <button id="btn-login" type="button" class="btn-primary">
+                            {{ __('meta.login_v2') }}
+                        </button>
 
                         <div class="divider"><span>{{ __('meta.o') }}</span></div>
                         <div class="social-grid">
@@ -642,9 +650,11 @@
 
                         const data = response.data;
                         if (data.success === 1) {
-                            // login correcto
-                            window.location.href = "/";
+                            const data = response.data;
+
+                            window.location.href = data.ruta;
                         } else {
+                            // error de credenciales incorrectas
                             showError(passEl, data.message)
                         }
                     })
