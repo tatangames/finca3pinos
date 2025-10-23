@@ -137,4 +137,22 @@ return [
     'product_v3' => '프레젠테이션',
     'product_v4' => '',
 
+
+
+
+    'create_account' => '계정 만들기',
+    'email_address' => '이메일 주소',
+    'password' => '비밀번호',
+    'login_v2' => '로그인',
+    'forgot_your_password' => '비밀번호를 잊으셨나요?',
+    'google' => '구글',
+    'o' => '또는',
+    'show_or_hide_password' => '비밀번호 표시/숨기기',
+    'confirm_password' => '비밀번호 확인',
+
+
+
+
+
+
 ];

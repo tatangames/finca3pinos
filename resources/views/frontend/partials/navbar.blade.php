@@ -61,9 +61,9 @@
                             </a>
                         </li>
                         @auth
-                            <li class="only-mobile"><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}"><i class="fa fa-user"></i> Mi cuenta</a></li>
+                            <li class="only-mobile"><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}"><i class="fa fa-user"></i> {{ __('meta.my_account') }}</a></li>
                         @else
-                            <li class="only-mobile"><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}"><i class="fa fa-user"></i> Iniciar sesión</a></li>
+                            <li class="only-mobile"><a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.login', [], false)) }}"><i class="fa fa-user"></i> {{ __('meta.login') }}</a></li>
                         @endauth
                     </ul>
                 </div>

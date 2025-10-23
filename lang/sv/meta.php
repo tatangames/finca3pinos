@@ -136,8 +136,15 @@ return [
     'product_v3' => 'Presentación',
     'product_v4' => '',
 
-
-
+    'create_account' => 'Crear una cuenta',
+    'email_address' => 'Correo electrónico',
+    'password' => 'Contraseña',
+    'login_v2' => 'Ingresar',
+    'forgot_your_password' => '¿Olvidaste tu contraseña?',
+    'google' => 'Google',
+    'o' => 'o',
+    'show_or_hide_password' => 'Mostrar u ocultar contraseña',
+    'confirm_password' => 'Confirmar contraseña',
 
 
 
