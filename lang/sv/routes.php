@@ -6,4 +6,7 @@ return [
     'contact' => 'contacto',
     'products' => 'productos',
     'login' => 'acceder',
+    'passwordrequest' => 'reestablecer-clave',
+    'passwordreset' => 'resetear-clave/{token}',
+
 ];

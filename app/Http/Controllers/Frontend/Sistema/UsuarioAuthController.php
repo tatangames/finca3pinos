@@ -3,15 +3,24 @@
 namespace App\Http\Controllers\Frontend\Sistema;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PasswordResetMail;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
+
 
 class UsuarioAuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:web')->except(['showLoginFormUsuario', 'loginUsuario']);
+        $this->middleware('auth:web')->except(['showLoginFormUsuario', 'loginUsuario', 'showIngresarCorreoForm',
+        'solicitarCodigoCorreo', 'showResetPasswordForm']);
     }
 
     public function showLoginFormUsuario()
@@ -68,6 +77,115 @@ class UsuarioAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('');
+        return redirect()->route('user.index');
     }
+
+
+    public function showIngresarCorreoForm()
+    {
+        return view('frontend.login.vistaingresarcorreo');
+    }
+
+    public function solicitarCodigoCorreo(Request $request)
+    {
+        $rules = [
+            'email' => ['required', 'email:rfc,dns'],
+        ];
+        $attributes = [
+            'email' => __('meta.contact_v12'),
+        ];
+
+        $validator = Validator::make($request->all(), $rules, [], $attributes);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => __('meta.unknown_error'),
+            ]);
+        }
+
+        // 2) (Opcional) Rate limit por IP + email para evitar abuso
+        $key = 'pwd-reset:' . Str::lower($request->input('email')) . '|' . $request->ip();
+        if (RateLimiter::tooManyAttempts($key, 25)) {
+            $seconds = RateLimiter::availableIn($key);
+            return response()->json([
+                'success' => 1, // muchos intentos
+                'message' => __('meta.too_many_attempts', ['seconds' => $seconds]), // crea esta key si quieres
+            ]);
+        }
+
+        // 🔍 Buscar el usuario
+        $user = Usuario::where('email', $request->email)->first();
+
+        if (! $user) {
+            RateLimiter::hit($key, 60);
+            return response()->json([
+                'success' => 2, // correo no encontrado
+                'message' => __('meta.email_not_found'),
+            ]);
+        }
+
+        // 🧩 Crear token de recuperación
+        $token = Password::broker('users')->createToken($user);
+
+        // 🔗 Generar URL personalizada de reseteo
+        $resetUrl = route('user.password.reset.form', ['token' => $token, 'email' => $user->email]);
+
+        // ✉️ Enviar correo personalizado
+        Mail::to($user->email)->send(new PasswordResetMail($user, $resetUrl));
+
+        return response()->json([
+            'success' => 3,
+            'message' => __('meta.reset_link_sent'), // enviado
+        ]);
+    }
+
+
+    public function showResetPasswordForm(Request $request, $token)
+    {
+        $email = $request->query('email');
+
+        return view('frontend.login.vistaresetpassword', [
+            'token' => $token,
+            'email' => $email,
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // @Auth
+    public function vistaDashboard()
+    {
+       return view('frontend.dashboard.vistadashboard');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -404,12 +404,18 @@
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
+
+
+
+        .auth-alert { opacity: 0; transition: opacity .25s ease; }
+        .auth-alert.is-visible { opacity: 1; }
+
     </style>
 
     <header class="page-header like-parallax"
             style="background-image: url('{{ asset('images/inner_parallax.jpg') }}');
                background-size: cover; background-position: center; background-repeat: no-repeat;">
-        <div class="container"><h1>{{ __('meta.my_account') }}</h1>
+        <div class="container"><h1>{{ __('meta.reset_account') }}</h1>
             <ul class="breadcrumbs" typeof="BreadcrumbList" vocab="https://schema.org/">
                 <li class="home"><span property="itemListElement" typeof="ListItem">
                     <a property="item" typeof="WebPage" title="{{ __('meta.go_to_finca3pinos') }}"
@@ -418,7 +424,7 @@
                     <meta property="position" content="1"></span>
                 </li>
                 <li class="post post-page current-item"><span property="itemListElement" typeof="ListItem">
-                    <span property="name">{{ __('meta.my_account') }}</span>
+                    <span property="name">{{ __('meta.reset_account') }}</span>
                     <meta property="position" content="2"></span>
                 </li>
             </ul>
@@ -430,103 +436,32 @@
         <div class="auth-wrapper">
             <div class="auth-card">
                 <div class="auth-tabs" role="tablist" aria-label="Auth Tabs">
-                    <button class="auth-tab is-active" data-tab="login" id="tab-login" role="tab" aria-selected="true"
+                    <button class="auth-tab is-active" style="color: white !important;" disabled data-tab="login" id="tab-login" role="tab" aria-selected="true"
                             aria-controls="panel-login">
-                        {{ __('meta.login') }}
-                    </button>
-                    <button class="auth-tab" data-tab="register" id="tab-register" role="tab" aria-selected="false"
-                            aria-controls="panel-register">
-                        {{ __('meta.create_account') }}
+                        {{ __('meta.forgot_your_password') }}
                     </button>
                 </div>
-
-                {{-- Mensajes flash (opcional) --}}
-
-
 
                 {{-- PANE: LOGIN --}}
                 <div id="panel-login" class="auth-panel is-active" role="tabpanel" aria-labelledby="tab-login">
+                    <!-- Mensajes globales -->
+                    <div id="form-message" class="auth-alert" role="status" aria-live="polite" style="display:none"></div>
+
                     <form id="form-login" method="POST" action="">
                         @csrf
                         <input type="hidden" name="form_type" value="login">
-
                         <div class="form-row">
                             <label for="email">{{ __('meta.email_address') }} <span class="req">*</span></label>
                             <input id="email" type="email" name="email" value="" required autocomplete="email" autofocus>
-                            <!-- los errores se inyectan aquí -->
+                            <!-- errores de campo aquí -->
                         </div>
-
-                        <div class="form-row">
-                            <label for="password">{{ __('meta.password') }} <span class="req">*</span></label>
-                            <div class="password-wrap">
-                                <input id="password" type="password" name="password" required autocomplete="current-password">
-                                <button type="button" class="toggle-pass" data-target="password" aria-label="">👁️</button>
-                            </div>
-                            <!-- los errores se inyectan aquí -->
-                        </div>
-
-                        <div class="form-meta">
-                            <a class="link" href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.password.request', [], false)) }}">{{ __('meta.forgot_your_password') }}</a>
-                        </div>
-
                         <button id="btn-login" type="button" class="btn-primary">
-                            {{ __('meta.login_v2') }}
+                            {{ __('meta.reset_account') }}
                         </button>
-
-                        <div class="divider"><span>{{ __('meta.o') }}</span></div>
-                        <div class="social-grid">
-                            <a href="" class="btn-social">{{ __('meta.google') }}</a>
-                        </div>
                     </form>
                 </div>
 
-                {{-- PANE: REGISTER --}}
-                <div id="panel-register" class="auth-panel" role="tabpanel" aria-labelledby="tab-register" hidden>
-                    <form method="POST" action="" novalidate>
-                        @csrf
-                        <input type="hidden" name="form_type" value="register">
 
-                        <div class="form-row">
-                            <label for="name">{{ __('meta.contact_v5') }} <span class="req">*</span></label>
-                            <input id="name" type="text" name="name" value="{{ old('name') }}" required
-                                   autocomplete="name">
-
-                        </div>
-
-                        <div class="form-row">
-                            <label for="email_reg">{{ __('meta.email_address') }} <span class="req">*</span></label>
-                            <input id="email_reg" type="email" name="email" value="{{ old('email') }}" required
-                                   autocomplete="email">
-
-                        </div>
-
-                        <div class="form-row">
-                            <label for="password_reg">{{ __('meta.password') }} <span class="req">*</span></label>
-                            <div class="password-wrap">
-                                <input id="password_reg" type="password" name="password" required
-                                       autocomplete="new-password" minlength="8">
-                                <button type="button" class="toggle-pass" data-target="password_reg"
-                                        aria-label="{{ __('meta.show_or_hide_password') }}">👁️
-                                </button>
-                            </div>
-                            @error('password') <small class="field-error">{{ $message }}</small> @enderror
-                        </div>
-
-                        <div class="form-row">
-                            <label for="password_confirmation">{{ __('meta.confirm_password') }} <span
-                                    class="req">*</span></label>
-                            <div class="password-wrap">
-                                <input id="password_confirmation" type="password" name="password_confirmation" required
-                                       autocomplete="new-password">
-                                <button type="button" class="toggle-pass" data-target="password_confirmation"
-                                        aria-label="{{ __('meta.show_or_hide_password') }}">👁️
-                                </button>
-                            </div>
-                        </div>
-
-                        <button type="button" style="color: white !important;" class="btn-primary">{{ __('meta.create_account') }}</button>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
@@ -535,38 +470,36 @@
 
 
     <script>
-        const loginUrl = "{{ LaravelLocalization::localizeURL('/login') }}";
+        const requestCodeUrl = "{{ LaravelLocalization::localizeURL('/request-code') }}";
     </script>
 
     <script>
-
         (function () {
             const form    = document.getElementById('form-login');
             const btn     = document.getElementById('btn-login');
             const emailEl = document.getElementById('email');
-            const passEl  = document.getElementById('password');
+            const msgBox  = document.getElementById('form-message');
 
             const messages = {
                 emailRequired: "{{ __('meta.contact_v12') }}",
                 emailInvalid : "{{ __('meta.contact_v13') }}",
-                passRequired : "{{ __('meta.contact_v14') }}",
                 generalError : "{{ __('meta.unknown_error') }}",
+                successSent  : "{{ __('meta.reset_email_sent') ?? 'Te enviamos un código a tu correo. Revisa tu bandeja y spam.' }}"
             };
 
             const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             axios.defaults.headers.common['X-CSRF-TOKEN'] = csrf;
             axios.defaults.headers.common['Accept'] = 'application/json';
 
-            // --- Helpers ---
-            function isEmailValid(value) {
-                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-            }
-
+            // ===================== Helpers de UI =====================
             function getRow(input) {
                 return input.closest('.form-row') || input.parentElement;
             }
 
             function showError(input, msg) {
+                // limpia mensaje global si lo hubiera
+                hideMessage();
+
                 const row = getRow(input);
                 let help = row.querySelector('.field-error');
                 if (!help) {
@@ -578,6 +511,7 @@
                 }
                 help.textContent = msg;
                 input.setAttribute('aria-invalid', 'true');
+                input.focus();
             }
 
             function clearError(input) {
@@ -587,26 +521,39 @@
                 input.removeAttribute('aria-invalid');
             }
 
+            // Mensaje GLOBAL (éxito o error general)
+            function showMessage(type, text, options = {}) {
+                const { autoCloseMs = 0 } = options;
 
+                msgBox.className = 'auth-alert'; // reset
+                msgBox.classList.add(type === 'success' ? 'success' : 'error', 'is-visible');
+                msgBox.textContent = text;
+                msgBox.style.display = 'block';
 
-
-            function showLoadingButton() {
-                btn.classList.add('loading');
-                btn.disabled = true;
+                if (autoCloseMs > 0) {
+                    setTimeout(hideMessage, autoCloseMs);
+                }
             }
-            function closeLoadingButton() {
-                btn.classList.remove('loading');
-                btn.disabled = false;
+            function showSuccess(text, opts)     { showMessage('success', text, opts); }
+            function showErrorGlobal(text, opts) { showMessage('error',   text, opts); }
+
+            function hideMessage() {
+                msgBox.classList.remove('is-visible');
+                msgBox.style.display = 'none';
+                msgBox.textContent = '';
+                msgBox.className = 'auth-alert';
             }
 
+            function showLoadingButton() { btn.classList.add('loading'); btn.disabled = true; }
+            function closeLoadingButton() { btn.classList.remove('loading'); btn.disabled = false; }
 
-
-
+            function isEmailValid(value) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+            }
 
             function validate() {
                 let ok = true;
                 const email = emailEl.value.trim();
-                const pass  = passEl.value.trim();
 
                 if (email === '') {
                     showError(emailEl, messages.emailRequired);
@@ -617,116 +564,73 @@
                 } else {
                     clearError(emailEl);
                 }
-
-                if (pass === '') {
-                    showError(passEl, messages.passRequired);
-                    ok = false;
-                } else {
-                    clearError(passEl);
-                }
-
                 return ok;
             }
 
-            // --- Limpiar error al tipear ---
-            [emailEl, passEl].forEach(el => {
-                el.addEventListener('input', () => clearError(el));
-            });
+            // Limpiar error al tipear
+            [emailEl].forEach(el => el.addEventListener('input', () => {
+                clearError(el);
+                hideMessage();
+            }));
 
-            // --- Envío con Axios ---
+
             btn.addEventListener('click', () => {
                 if (!validate()) return;
 
                 const formData = new FormData();
                 formData.append('email', emailEl.value.trim());
-                formData.append('password', passEl.value.trim());
 
-                // Mostrar algún loading si quieres
+                hideMessage();
                 showLoadingButton();
 
-                axios.post(loginUrl, formData)
-                    .then(response => {
-                        closeLoadingButton()
+                axios.post(requestCodeUrl, formData)
+                    .then(({ data }) => {
+                        closeLoadingButton();
 
-                        const data = response.data;
                         if (data.success === 1) {
-                            const data = response.data;
+                            // rate limit
+                            showError(emailEl, data.message);
+                        } else if (data.success === 2) {
+                            // correo no encontrado
+                            showError(emailEl, data.message);
+                        } else if (data.success === 3) {
+                            // ÉXITO: correo enviado
+                            clearError(emailEl);
+                            showSuccess(data.message, { autoCloseMs: 6000 });
 
-                            window.location.href = data.ruta;
+                            // Opcional: deshabilita el botón unos segundos para evitar spam
+                            btn.disabled = true;
+                            setTimeout(() => { btn.disabled = false; }, 15000);
+
+                            // Opcional: limpia el campo
+                            //form.reset();
                         } else {
-                            // error de credenciales incorrectas
-                            showError(passEl, data.message)
+                            // error genérico
+                            showErrorGlobal(messages.generalError);
                         }
                     })
-                    .catch(error => {
-                        closeLoadingButton()
-                        showError(passEl, messages.generalError)
+                    .catch(() => {
+                        closeLoadingButton();
+                        showErrorGlobal(messages.generalError);
                     });
             });
 
-            // --- Enter para enviar ---
+            // Enter para enviar
             form.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     btn.click();
                 }
             });
-
-            // --- Mostrar / ocultar contraseña ---
-            document.querySelectorAll('.toggle-pass').forEach(tg => {
-                tg.addEventListener('click', () => {
-                    const id = tg.getAttribute('data-target');
-                    const input = document.getElementById(id);
-                    if (!input) return;
-                    input.type = (input.type === 'password') ? 'text' : 'password';
-                    input.focus();
-                });
-            });
-        })();
-
-    </script>
-
-
-
-
-
-    <script>
-        (function(){
-            const tabs  = document.querySelectorAll('.auth-tab');
-            const panes = document.querySelectorAll('.auth-panel');
-
-            function activate(tabName) {
-                // Tabs
-                tabs.forEach(t => {
-                    const isActive = t.dataset.tab === tabName;
-                    t.classList.toggle('is-active', isActive);
-                    t.setAttribute('aria-selected', String(isActive));
-                });
-
-                // Panels
-                panes.forEach(p => {
-                    const isActive = p.id === `panel-${tabName}`;
-                    p.classList.toggle('is-active', isActive);
-                    p.toggleAttribute('hidden', !isActive);
-                });
-
-                // Quitar cualquier hash/cambio de URL
-                const url = location.pathname + location.search;
-                history.replaceState(null, '', url);
-            }
-
-            // Click handler
-            tabs.forEach(t => {
-                t.addEventListener('click', (e) => {
-                    e.preventDefault(); // por si acaso
-                    activate(t.dataset.tab);
-                });
-            });
-
-            // Por defecto (si quieres abrir login)
-            activate('login');
         })();
     </script>
+
+
+
+
+
+
+
 
 
 

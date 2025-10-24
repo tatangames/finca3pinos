@@ -9,11 +9,21 @@ class DashboardController extends Controller
 {
 
     public function __construct(){
-        $this->middleware('auth:web');
+        //$this->middleware('auth:web');
     }
 
     public function vistaInicio()
     {
         return "inicio sesion";
     }
+
+    public function vistaPrueba()
+    {
+        $userName = 'Tatan Games';
+        $resetUrl = 'https://finca3pinos.com/reset-password/ABC123456';
+
+        return view('mail.passwordreset', compact('userName', 'resetUrl'));
+    }
+
+
 }

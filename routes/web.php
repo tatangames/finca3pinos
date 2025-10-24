@@ -176,20 +176,27 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::post(LaravelLocalization::transRoute('routes.contact'), [FrontendController::class, 'send'])
             ->name('contact.send');
 
-
-
-
         Route::get(LaravelLocalization::transRoute('routes.login'), [UsuarioAuthController::class, 'showLoginFormUsuario'])
             ->name('user.login');
 
+        Route::get(LaravelLocalization::transRoute('routes.passwordrequest'), [UsuarioAuthController::class, 'showIngresarCorreoForm'])
+            ->name('user.password.request');
 
-        //Route::get('/login',  [UsuarioAuthController::class, 'showLoginFormUsuario'])->name('user.login');
         Route::post('/login', [UsuarioAuthController::class, 'loginUsuario'])->name('user.login.process');
+        Route::post('/logout', [UsuarioAuthController::class, 'logoutUsuario'])->name('user.logout');
+        Route::post('/request-code', [UsuarioAuthController::class, 'solicitarCodigoCorreo']);
+
+
+        Route::get(LaravelLocalization::transRoute('routes.passwordreset'), [UsuarioAuthController::class, 'showResetPasswordForm'])
+            ->name('user.password.reset.form');
 
 
 
 
-        Route::get('/dashboard', [DashboardController::class, 'vistaInicio'])->name('user.dashboard');
+
+
+
+        Route::get('/dashboard', [UsuarioAuthController::class, 'vistaDashboard'])->name('user.dashboard');
     });
 
 });
@@ -200,6 +207,6 @@ Route::get('/galeria/cargar', [FrontendController::class, 'cargarGaleria'])
 
 
 
-
+Route::get('/prueba', [DashboardController::class, 'vistaPrueba']);
 
 

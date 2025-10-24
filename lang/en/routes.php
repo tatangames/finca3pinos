@@ -6,4 +6,9 @@ return [
     'contact' => 'contact',
     'products' => 'products',
     'login' => 'login',
+    'passwordrequest' => 'forgot-password',
+    'passwordreset' => 'reset-password/{token}',
+
+
+
 ];

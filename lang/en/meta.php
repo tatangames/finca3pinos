@@ -161,6 +161,13 @@ return [
     'show_or_hide_password' => 'Show or hide password',
     'confirm_password' => 'Confirm password',
     'incorrect_data' => 'Invalid credentials',
+    'reset_account' => 'Reset account',
+    'reset_password' => 'Reset password',
+    'too_many_attempts' => 'Too many attempts',
+    'email_not_found' => 'Email not found',
+    'reset_link_sent' => 'Reset link sent'
+
+
 
 
 

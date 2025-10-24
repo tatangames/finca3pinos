@@ -22,8 +22,6 @@ class FrontendController extends Controller
 {
     public function vistaIndex()
     {
-
-
         return view('frontend.index');
     }
 

@@ -165,6 +165,11 @@ return [
     'show_or_hide_password' => 'Mostrar u ocultar contraseña',
     'confirm_password' => 'Confirmar contraseña',
     'incorrect_data' => 'Datos incorrectos',
+    'reset_account' => 'Restablecer cuenta',
+    'reset_password' => 'Restablecer contraseña',
+    'too_many_attempts' => 'Demasiados intentos',
+    'email_not_found' => 'Correo no encontrado',
+    'reset_link_sent' => 'Enlace enviado.'
 
 
 ];

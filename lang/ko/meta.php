@@ -167,7 +167,11 @@ return [
     'show_or_hide_password' => '비밀번호 표시/숨기기',
     'confirm_password' => '비밀번호 확인',
     'incorrect_data' => '로그인 정보가 올바르지 않습니다',
-
+    'reset_account' => '계정 재설정',
+    'reset_password' => '비밀번호 재설정',
+    'too_many_attempts' => '시도 횟수가 너무 많습니다',
+    'email_not_found' => '이메일을 찾을 수 없습니다',
+    'reset_link_sent' => '재설정 링크가 전송되었습니다'
 
 
 
