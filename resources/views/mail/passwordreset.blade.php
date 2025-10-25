@@ -10,7 +10,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restablecer contraseña</title>
+    <title>{{ __('meta.reset_password') }}</title>
     <style>
         body {
             background-color: #f6f6f6;
@@ -95,29 +95,29 @@
 <body>
 <div class="email-container">
     <div class="header">
-        <img src="{{ asset('images/logoindex.png') }}" alt="Finca 3 Pinos" class="logo">
-        <h1>Restablecer contraseña</h1>
+        <img src="{{ secure_asset('images/logoindex.png') }}" alt="{{ __('meta.finca3pinos') }}" class="logo">
+        <h1>{{ __('meta.reset_password') }}</h1>
     </div>
 
     <div class="body">
-        <p>Hola {{ $userName }},</p>
+        <p>{{ __('meta.product_v15') }},</p>
 
-        <p>Hemos recibido una solicitud para restablecer tu contraseña de acceso a <strong>Finca 3 Pinos</strong>.</p>
+        <p>{{ __('meta.product_v16') }} <strong>{{ __('meta.finca3pinos') }}</strong>.</p>
 
-        <p>Si realizaste esta solicitud, haz clic en el siguiente botón para establecer una nueva contraseña:</p>
+        <p>{{ __('meta.product_v17') }}</p>
 
         <p style="text-align:center;">
-            <a href="{{ $resetUrl }}" class="btn">Restablecer mi contraseña</a>
+            <a href="{{ $resetUrl }}" class="btn">{{ __('meta.product_v8') }}</a>
         </p>
 
-        <p>Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta seguirá segura.</p>
+        <p>{{ __('meta.product_v18') }}</p>
 
-        <p style="margin-top: 20px;">Gracias,<br>El equipo de <strong>Finca 3 Pinos</strong></p>
+        <p style="margin-top: 20px;">{{ __('meta.product_v19') }}<br>{{ __('meta.product_v20') }} <strong>{{ __('meta.finca3pinos') }}</strong></p>
     </div>
 
     <div class="footer">
-        &copy; {{ date('Y') }} Finca 3 Pinos. Todos los derechos reservados.<br>
-        Este correo se generó automáticamente, por favor no respondas a este mensaje.
+        &copy; {{ date('Y') }} {{ __('meta.derechos') }}<br>
+        {{ __('meta.product_v21') }}
 
         <div class="social-links">
             <a href="{{ $facebookUrl }}" target="_blank" title="Facebook">

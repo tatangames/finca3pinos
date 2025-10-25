@@ -148,6 +148,15 @@ return [
     'product_v13' => 'If the button doesn’t work, copy and paste this link into your browser:',
     'product_v14' => 'If you didn’t make this request, you can safely ignore this email.',
 
+    'product_v15' => 'Hello,',
+    'product_v16' => 'We have received a request to reset your account password for',
+    'product_v17' => 'If you made this request, click the button below to set a new password:',
+    'product_v18' => 'If you did not request this change, you can safely ignore this message. Your account will remain secure.',
+    'product_v19' => 'Thank you,',
+    'product_v20' => 'The team',
+    'product_v21' => 'This email was generated automatically. Please do not reply to this message.',
+
+
 
 
 
@@ -165,10 +174,16 @@ return [
     'reset_password' => 'Reset password',
     'too_many_attempts' => 'Too many attempts',
     'email_not_found' => 'Email not found',
-    'reset_link_sent' => 'Reset link sent'
-
-
-
+    'reset_link_sent' => 'Reset link sent',
+    'update_password' => 'Update password',
+    'reset_email_sent' => 'We’ve sent a code to your email. Please check your inbox and spam folder.',
+    'new_password' => 'New password',
+    'password_hint_min8' => 'The password must be at least 8 characters long.',
+    'show_hide' => 'Show / Hide',
+    'password_min8' => 'The password must be at least 8 characters.',
+    'passwords_must_match' => 'The passwords must match.',
+    'password_confirmation_required' => 'You must confirm the password.',
+    'password.reset' => 'Your password has been reset.',
 
 
 

@@ -20,7 +20,7 @@ class UsuarioAuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:web')->except(['showLoginFormUsuario', 'loginUsuario', 'showIngresarCorreoForm',
-        'solicitarCodigoCorreo', 'showResetPasswordForm']);
+        'solicitarCodigoCorreo', 'showResetPasswordForm', 'showtokenInvalid']);
     }
 
     public function showLoginFormUsuario()
@@ -143,14 +143,30 @@ class UsuarioAuthController extends Controller
 
     public function showResetPasswordForm(Request $request, $token)
     {
-        $email = $request->query('email');
 
-        return view('frontend.login.vistaresetpassword', [
-            'token' => $token,
-            'email' => $email,
-        ]);
+        $email  = request('email');
+        $broker = Password::broker('users'); // <-- tu broker para admins
+        $user   = $broker->getUser(['email' => $email]);
+
+        $tokenIsValid = $user && (
+            method_exists($broker, 'tokenExists')
+                ? $broker->tokenExists($user, $token)
+                : $broker->getRepository()->exists($user, $token)
+            );
+
+        if (!$tokenIsValid) {
+            return redirect()
+                ->route('user.token.novalid');
+        }
+
+        return view('frontend.login.vistaresetpassword', compact('token', 'email'));
     }
 
+
+    public function showtokenInvalid()
+    {
+        return view('frontend.login.vistatokennovalido');
+    }
 
 
 

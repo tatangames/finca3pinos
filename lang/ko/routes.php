@@ -8,6 +8,7 @@ return [
     'login' => 'login',
     'passwordrequest' => 'forgot-password',
     'passwordreset' => 'reset-password/{token}',
-
+    'tokeninvalid' => 'token-invalid',
+    'updatepassword' => 'update-password',
 
 ];

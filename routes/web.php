@@ -16,6 +16,7 @@ use App\Http\Controllers\Backend\Sistema\CategoriasController;
 use App\Http\Controllers\Frontend\Sistema\UsuarioAuthController;
 use App\Http\Controllers\Frontend\Sistema\FrontendController;
 use App\Http\Controllers\Frontend\Sistema\DashboardController;
+use App\Http\Controllers\Frontend\Sistema\PasswordResetController;
 
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
@@ -179,6 +180,7 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.login'), [UsuarioAuthController::class, 'showLoginFormUsuario'])
             ->name('user.login');
 
+        // vista ingresar correo recuperacion
         Route::get(LaravelLocalization::transRoute('routes.passwordrequest'), [UsuarioAuthController::class, 'showIngresarCorreoForm'])
             ->name('user.password.request');
 
@@ -186,12 +188,18 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::post('/logout', [UsuarioAuthController::class, 'logoutUsuario'])->name('user.logout');
         Route::post('/request-code', [UsuarioAuthController::class, 'solicitarCodigoCorreo']);
 
-
+        // vista cambiar contrasena
         Route::get(LaravelLocalization::transRoute('routes.passwordreset'), [UsuarioAuthController::class, 'showResetPasswordForm'])
             ->name('user.password.reset.form');
 
+        // vista token no valido
+        Route::get(LaravelLocalization::transRoute('routes.tokeninvalid'), [UsuarioAuthController::class, 'showtokenInvalid'])
+            ->name('user.token.novalid');
 
 
+
+        Route::post(LaravelLocalization::transRoute('routes.updatepassword'), [PasswordResetController::class, 'resetPassword'])
+        ->name('user.password.update');
 
 
 

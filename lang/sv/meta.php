@@ -151,7 +151,13 @@ return [
     'product_v13' => 'Si el botón no funciona, copia y pega este enlace en tu navegador:',
     'product_v14' => 'Si tú no realizaste esta solicitud, puedes ignorar este correo.',
 
-
+    'product_v15' => 'Hola',
+    'product_v16' => 'Hemos recibido una solicitud para restablecer tu contraseña de acceso a',
+    'product_v17' => 'Si realizaste esta solicitud, haz clic en el siguiente botón para establecer una nueva contraseña:',
+    'product_v18' => 'Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta seguirá segura.',
+    'product_v19' => 'Gracias,',
+    'product_v20' => 'El equipo de',
+    'product_v21' => 'Este correo se generó automáticamente, por favor no respondas a este mensaje.',
 
 
 
@@ -169,7 +175,20 @@ return [
     'reset_password' => 'Restablecer contraseña',
     'too_many_attempts' => 'Demasiados intentos',
     'email_not_found' => 'Correo no encontrado',
-    'reset_link_sent' => 'Enlace enviado.'
+    'reset_link_sent' => 'Enlace enviado.',
+    'update_password' => 'Actualizar contraseña',
+    'reset_email_sent' => 'Te enviamos un código a tu correo. Revisa tu bandeja y spam.',
+    'new_password' => 'Nueva contraseña',
+    'password_hint_min8' => 'La contraseña debe tener al menos 8 caracteres',
+    'show_hide' => 'Mostrar/Ocultar',
+    'password_min8' => 'La contraseña debe tener al menos 8 caracteres.',
+    'passwords_must_match' => 'Las contraseñas deben coincidir.',
+    'password_confirmation_required' => 'Debes confirmar la contraseña.',
+    'password_reset' => 'Tu contraseña ha sido restablecida.',
+
+
+
+
 
 
 ];

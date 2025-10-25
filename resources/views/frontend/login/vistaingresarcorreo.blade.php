@@ -484,7 +484,7 @@
                 emailRequired: "{{ __('meta.contact_v12') }}",
                 emailInvalid : "{{ __('meta.contact_v13') }}",
                 generalError : "{{ __('meta.unknown_error') }}",
-                successSent  : "{{ __('meta.reset_email_sent') ?? 'Te enviamos un código a tu correo. Revisa tu bandeja y spam.' }}"
+                successSent  : "{{ __('meta.reset_email_sent')}}"
             };
 
             const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -603,7 +603,7 @@
                             setTimeout(() => { btn.disabled = false; }, 15000);
 
                             // Opcional: limpia el campo
-                            //form.reset();
+                            form.reset();
                         } else {
                             // error genérico
                             showErrorGlobal(messages.generalError);

@@ -49,39 +49,43 @@
                     </li>
 
 
-
-
                     {{-- Usuario --}}
                     <li class="only-desktop nav-user dropdown">
                     {{-- ====== USUARIO ====== --}}
-                    <li id="menu-item-user" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children only-desktop">
-                        @auth('web')
+                    @auth('web')
+                        <li id="menu-item-user"
+                            class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children only-desktop">
                             <a><i class="fa fa-user"></i> <span>{{ __('meta.my_account') }}</span></a>
 
                             <ul class="sub-menu">
-                                <li id="menu-item-account" class="menu-item menu-item-type-post_type menu-item-object-page">
+                                <li id="menu-item-account"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page">
                                     <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.index', [], false)) }}">
                                         <i class="fa fa-id-badge"></i> <span>{{ __('meta.my_account') }}</span>
                                     </a>
                                 </li>
-                                <li id="menu-item-logout" class="menu-item menu-item-type-post_type menu-item-object-page">
+                                <li id="menu-item-logout"
+                                    class="menu-item menu-item-type-post_type menu-item-object-page">
                                     <a href="#" id="logoutLink">
                                         <i class="fa fa-sign-out"></i> <span>{{ __('meta.logout') }}</span>
                                     </a>
                                 </li>
                             </ul>
-                        @else
+                        </li>
+                    @else
+                        <li id="menu-item-login" class="menu-item menu-item-type-custom menu-item-object-custom only-desktop">
                             <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.login', [], false)) }}">
                                 <i class="fa fa-user"></i> <span>{{ __('meta.login') }}</span>
                             </a>
-                        @endauth
-                    </li>
+                        </li>
+                    @endauth
 
-                    @auth('web')
+
+                @auth('web')
                         <form id="logout-form" action="{{ route('user.logout') }}" method="POST" style="display:none;">
                             @csrf
                         </form>
-                        @endauth
+                    @endauth
 
                 </ul>
 
@@ -128,6 +132,8 @@
 </div>
 
 <style>
+
+
     /* ===== Enlaces base ===== */
     .f3p-nav .nav-main > li > a {
         font-size: 14px;

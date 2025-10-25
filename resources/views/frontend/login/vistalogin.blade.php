@@ -404,6 +404,26 @@
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
+
+        /* === Tabs activos: texto blanco === */
+        .auth-tab.is-active {
+            background: var(--f3p-accent) !important; /* ya lo tenías */
+            color: #fff !important;                   /* ← blanco */
+        }
+
+        /* Opcional: mejor hover/focus en tabs no activos */
+        .auth-tab:not(.is-active):hover,
+        .auth-tab:not(.is-active):focus-visible {
+            color: #111 !important;
+        }
+
+        /* Accesibilidad: anillo de enfoque visible */
+        .auth-tab:focus-visible {
+            outline: 3px solid rgba(210,170,109,.35);
+            outline-offset: 2px;
+        }
+
+
     </style>
 
     <header class="page-header like-parallax"

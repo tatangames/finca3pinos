@@ -8,5 +8,7 @@ return [
     'login' => 'acceder',
     'passwordrequest' => 'reestablecer-clave',
     'passwordreset' => 'resetear-clave/{token}',
+    'tokeninvalid' => 'token-invalido',
+    'updatepassword' => 'update-password',
 
 ];

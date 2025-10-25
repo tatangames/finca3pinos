@@ -154,6 +154,13 @@ return [
     'product_v13' => '버튼이 작동하지 않는 경우, 이 링크를 복사하여 브라우저에 붙여넣으세요:',
     'product_v14' => '이 요청을 직접 하지 않으셨다면, 이 이메일을 무시하셔도 됩니다.',
 
+    'product_v15' => '안녕하세요,',
+    'product_v16' => '귀하의 계정 비밀번호 재설정을 위한 요청을 확인했습니다.',
+    'product_v17' => '이 요청을 직접 하신 경우, 아래 버튼을 눌러 새로운 비밀번호를 설정해주세요:',
+    'product_v18' => '만약 이 변경을 요청하지 않으셨다면, 이 메시지는 무시하셔도 됩니다. 계정은 계속 안전하게 유지됩니다.',
+    'product_v19' => '감사합니다.',
+    'product_v20' => '팀 드림',
+    'product_v21' => '이 메일은 자동으로 발송되었습니다. 회신하지 말아주세요.',
 
 
 
@@ -171,7 +178,17 @@ return [
     'reset_password' => '비밀번호 재설정',
     'too_many_attempts' => '시도 횟수가 너무 많습니다',
     'email_not_found' => '이메일을 찾을 수 없습니다',
-    'reset_link_sent' => '재설정 링크가 전송되었습니다'
+    'reset_link_sent' => '재설정 링크가 전송되었습니다',
+    'update_password' => '비밀번호 업데이트',
+    'reset_email_sent' => '이메일로 코드를 보냈습니다. 받은편지함과 스팸함을 확인해주세요.',
+    'new_password' => '새 비밀번호',
+    'password_hint_min8' => '비밀번호는 최소 8자 이상이어야 합니다.',
+    'show_hide' => '표시 / 숨기기',
+    'password_min8' => '비밀번호는 최소 8자 이상이어야 합니다.',
+    'passwords_must_match' => '비밀번호가 서로 일치해야 합니다.',
+    'password_confirmation_required' => '비밀번호를 확인해야 합니다.',
+    'password.reset' => '비밀번호가 재설정되었습니다.',
+
 
 
 
