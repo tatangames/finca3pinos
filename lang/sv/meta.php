@@ -185,9 +185,17 @@ return [
     'passwords_must_match' => 'Las contraseñas deben coincidir.',
     'password_confirmation_required' => 'Debes confirmar la contraseña.',
     'password_reset' => 'Tu contraseña ha sido restablecida.',
+    'name_required' => 'El nombre es requerido.',
+    'email_repetido' => 'El correo electrónico ya se encuentra registrado.',
 
-
-
+    'orders' => 'Ordenes',
+    'addresses' => 'Direcciones',
+    'profile' => 'Perfil',
+    'my_orders' => 'Mis Ordenes',
+    'no_orders_yet' => 'No hay ordenes aun',
+    'gotoshop' => 'Ir a comprar',
+    'gottocart' => 'Ir al carrito',
+    'tracking' => 'seguimiento',
 
 
 

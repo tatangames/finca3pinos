@@ -184,6 +184,18 @@ return [
     'passwords_must_match' => 'The passwords must match.',
     'password_confirmation_required' => 'You must confirm the password.',
     'password.reset' => 'Your password has been reset.',
+    'name_required' => 'The name is required.',
+    'email_repetido' => 'The email address is already registered.',
+
+    'orders' => 'Orders',
+    'addresses' => 'Addresses',
+    'profile' => 'Profile',
+    'my_orders' => 'My orders',
+    'no_orders_yet' => 'No orders yet',
+    'gotoshop' => 'Go to shop',
+    'gottocart' => 'Go to cart',
+    'tracking' => 'Tracking',
+
 
 
 

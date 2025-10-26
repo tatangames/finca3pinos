@@ -491,9 +491,6 @@
                                        placeholder="{{ __('meta.new_password') }}">
                                 <button class="toggle-pass" type="button" data-target="password" aria-label="Mostrar/Ocultar">👁️</button>
                             </div>
-                            <small id="pwd-hint" class="field-help" style="color:#6b6b6b;display:block;margin-top:6px">
-                                {{ __('meta.password_hint_min8') }} — máximo 25 caracteres.
-                            </small>
                         </div>
 
                         <div class="form-row">

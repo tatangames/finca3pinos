@@ -188,6 +188,17 @@ return [
     'passwords_must_match' => '비밀번호가 서로 일치해야 합니다.',
     'password_confirmation_required' => '비밀번호를 확인해야 합니다.',
     'password.reset' => '비밀번호가 재설정되었습니다.',
+    'name_required' => '이름은 필수 항목입니다.',
+    'email_repetido' => '해당 이메일 주소는 이미 등록되어 있습니다.',
+
+    'orders' => '주문내역',
+    'addresses' => '배송지 주소',
+    'profile' => '프로필',
+    'my_orders' => '내 주문',
+    'no_orders_yet' => '아직 주문이 없습니다',
+    'gotoshop' => '쇼핑하러 가기',
+    'gottocart' => '장바구니로 이동',
+    'tracking' => '배송추적',
 
 
 

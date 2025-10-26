@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Usuario;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +19,7 @@ class UsuarioSeeder extends Seeder
             'nombre' => 'Jonathan',
             'password' => Hash::make('1234'),
             'email' => 'tatan@gmail.com',
+            'fecha_registro' => Carbon::now('America/El_Salvador')
         ]);
     }
 }

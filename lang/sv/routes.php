@@ -10,5 +10,6 @@ return [
     'passwordreset' => 'resetear-clave/{token}',
     'tokeninvalid' => 'token-invalido',
     'updatepassword' => 'update-password',
+    'user_profile' => 'perfil-usuario',
 
 ];

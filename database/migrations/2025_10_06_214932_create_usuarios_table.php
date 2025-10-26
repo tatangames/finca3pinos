@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nombre', 50);
             $table->string('email', 100)->unique();
             $table->string('password', 255);
+            $table->datetime('fecha_registro');
         });
     }
 

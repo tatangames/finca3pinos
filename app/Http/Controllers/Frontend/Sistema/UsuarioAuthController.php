@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Frontend\Sistema;
 use App\Http\Controllers\Controller;
 use App\Mail\PasswordResetMail;
 use App\Models\Usuario;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 
 class UsuarioAuthController extends Controller
@@ -20,7 +23,7 @@ class UsuarioAuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:web')->except(['showLoginFormUsuario', 'loginUsuario', 'showIngresarCorreoForm',
-        'solicitarCodigoCorreo', 'showResetPasswordForm', 'showtokenInvalid']);
+        'solicitarCodigoCorreo', 'showResetPasswordForm', 'showtokenInvalid', 'registroCliente']);
     }
 
     public function showLoginFormUsuario()
@@ -168,7 +171,60 @@ class UsuarioAuthController extends Controller
         return view('frontend.login.vistatokennovalido');
     }
 
+    public function registroCliente(Request $request)
+    {
+        $regla = array(
+            'name' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+        );
 
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        // 2) Normalizar datos
+        $name  = trim($request->input('name'));
+        $email = trim(mb_strtolower($request->input('email')));
+        $pass  = $request->input('password');
+
+        // 3) Crear usuario + login dentro de transacción
+        try {
+            DB::beginTransaction();
+
+            if(Usuario::where('email', $email)->exists()){
+                return ['success' => 1];
+            }
+
+            $fechaActual = Carbon::now('America/El_Salvador');
+
+            $user = Usuario::create([
+                'nombre'     => $name,
+                'email'    => $email,
+                'password' => Hash::make($pass),
+                'fecha_registro' => $fechaActual
+            ]);
+
+            Auth::guard('web')->login($user);
+            $request->session()->regenerate();
+
+            DB::commit();
+
+            // 4) Redirección (elige tu destino)
+            // Opción dashboard:
+            $ruta = route('user.index');
+
+            return response()->json([
+                'success' => 2,
+                'ruta'    => $ruta,
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::info($e->getMessage());
+            // error generico
+            return ['success' => 99];
+        }
+    }
 
 
 

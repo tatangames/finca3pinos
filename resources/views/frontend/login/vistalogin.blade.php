@@ -3,7 +3,7 @@
 @section('title', __('meta.title'))
 
 @section('content')
-
+    <link rel="stylesheet" href="{{ asset('css/toastr.min.css') }}">
     <style>
 
         .auth-wrapper {
@@ -98,10 +98,8 @@
             box-shadow: 0 0 0 3px rgba(210, 170, 109, .15)
         }
 
-        .password-wrap {
-            position: relative
-        }
-
+        .password-wrap { position: relative; }
+        .password-wrap input { padding-right: 44px; }     /* deja espacio para el botón */
         .toggle-pass {
             position: absolute;
             right: 10px;
@@ -109,10 +107,10 @@
             transform: translateY(-50%);
             background: transparent;
             border: none;
-            font-size: 1rem;
             cursor: pointer;
-            color: #cfcfcf
+            z-index: 2;                                     /* asegura que quede por encima */
         }
+
 
         .field-error {
             display: block;
@@ -472,14 +470,14 @@
 
                         <div class="form-row">
                             <label for="email">{{ __('meta.email_address') }} <span class="req">*</span></label>
-                            <input id="email" type="email" name="email" value="" required autocomplete="email" autofocus>
+                            <input id="email" type="email" maxlength="200" name="email" value="" required autocomplete="email" autofocus>
                             <!-- los errores se inyectan aquí -->
                         </div>
 
                         <div class="form-row">
                             <label for="password">{{ __('meta.password') }} <span class="req">*</span></label>
                             <div class="password-wrap">
-                                <input id="password" type="password" name="password" required autocomplete="current-password">
+                                <input id="password" type="password" maxlength="100" name="password" required autocomplete="current-password">
                                 <button type="button" class="toggle-pass" data-target="password" aria-label="">👁️</button>
                             </div>
                             <!-- los errores se inyectan aquí -->
@@ -502,60 +500,61 @@
 
                 {{-- PANE: REGISTER --}}
                 <div id="panel-register" class="auth-panel" role="tabpanel" aria-labelledby="tab-register" hidden>
-                    <form method="POST" action="" novalidate>
+                    <form id="form-register" method="POST" action="" novalidate>
                         @csrf
                         <input type="hidden" name="form_type" value="register">
 
                         <div class="form-row">
                             <label for="name">{{ __('meta.contact_v5') }} <span class="req">*</span></label>
-                            <input id="name" type="text" name="name" value="{{ old('name') }}" required
-                                   autocomplete="name">
-
+                            <input id="name" type="text" name="name" value="{{ old('name') }}" required autocomplete="name">
+                            <!-- errores aquí -->
                         </div>
 
                         <div class="form-row">
                             <label for="email_reg">{{ __('meta.email_address') }} <span class="req">*</span></label>
-                            <input id="email_reg" type="email" name="email" value="{{ old('email') }}" required
-                                   autocomplete="email">
-
+                            <input id="email_reg" type="email" name="email" value="{{ old('email') }}" required autocomplete="email">
+                            <!-- errores aquí -->
                         </div>
 
                         <div class="form-row">
                             <label for="password_reg">{{ __('meta.password') }} <span class="req">*</span></label>
                             <div class="password-wrap">
-                                <input id="password_reg" type="password" name="password" required
-                                       autocomplete="new-password" minlength="8">
-                                <button type="button" class="toggle-pass" data-target="password_reg"
-                                        aria-label="{{ __('meta.show_or_hide_password') }}">👁️
-                                </button>
+                                <input id="password_reg" type="password" name="password" required autocomplete="new-password" minlength="8">
+                                <button type="button" class="toggle-pass" data-target="password_reg" aria-label="{{ __('meta.show_or_hide_password') }}">👁️</button>
                             </div>
-                            @error('password') <small class="field-error">{{ $message }}</small> @enderror
+                            <!-- errores aquí -->
                         </div>
 
                         <div class="form-row">
-                            <label for="password_confirmation">{{ __('meta.confirm_password') }} <span
-                                    class="req">*</span></label>
+                            <label for="password_confirmation">{{ __('meta.confirm_password') }} <span class="req">*</span></label>
                             <div class="password-wrap">
-                                <input id="password_confirmation" type="password" name="password_confirmation" required
-                                       autocomplete="new-password">
-                                <button type="button" class="toggle-pass" data-target="password_confirmation"
-                                        aria-label="{{ __('meta.show_or_hide_password') }}">👁️
-                                </button>
+                                <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password">
+                                <button type="button" class="toggle-pass" data-target="password_confirmation" aria-label="{{ __('meta.show_or_hide_password') }}">👁️</button>
                             </div>
+                            <!-- errores aquí -->
                         </div>
 
-                        <button type="button" style="color: white !important;" class="btn-primary">{{ __('meta.create_account') }}</button>
+                        <button id="btn-register" type="button" class="btn-primary">
+                            {{ __('meta.create_account') }}
+                        </button>
                     </form>
                 </div>
+
+
+
+
             </div>
         </div>
     </div>
-
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/toastr.min.js') }}"></script>
+    <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
 
 
     <script>
         const loginUrl = "{{ LaravelLocalization::localizeURL('/login') }}";
+        const registerUrl = "{{ LaravelLocalization::localizeURL('/register') }}";
     </script>
 
     <script>
@@ -661,7 +660,6 @@
                 formData.append('email', emailEl.value.trim());
                 formData.append('password', passEl.value.trim());
 
-                // Mostrar algún loading si quieres
                 showLoadingButton();
 
                 axios.post(loginUrl, formData)
@@ -708,6 +706,213 @@
 
 
 
+
+    <script>
+        (function () {
+            // ====== Rutas ======
+            // Si ya tienes una variable global registerUrl, úsala.
+            // Si no, define aquí la ruta a tu endpoint de registro:
+
+
+            // ====== Elementos ======
+            const form   = document.getElementById('form-register');
+            const btn    = document.getElementById('btn-register');
+
+            const nameEl   = document.getElementById('name');
+            const emailEl  = document.getElementById('email_reg');
+            const passEl   = document.getElementById('password_reg');
+            const pass2El  = document.getElementById('password_confirmation');
+
+            // ====== Mensajes (usa tus keys existentes) ======
+            const messages = {
+                nameRequired: "{{ __('meta.name_required') }}", // el nombre es requerido
+                emailRequired: "{{ __('meta.contact_v12') }}", // el correo es requerido
+                emailInvalid : "{{ __('meta.contact_v13') }}", // ingresar un correo valido
+                passRequired : "{{ __('meta.contact_v14') }}", // la contrasena es requerida
+                passMin8     : "{{ __('meta.password_min8') }}", // La contraseña debe tener al menos 8 caracteres.
+                passConfirmRequired: "{{ __('meta.password_confirmation_required') }}", // Debes confirmar la contraseña.
+                passMatch    : "{{ __('meta.passwords_must_match') }}", // Las contraseñas deben coincidir
+                generalError : "{{ __('meta.unknown_error') }}",
+                emailRepetido : "{{ __('meta.email_repetido') }}",
+            };
+
+            // ====== Axios / CSRF ======
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            if (csrfMeta) {
+                axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
+            }
+            axios.defaults.headers.common['Accept'] = 'application/json';
+
+            // ====== Helpers (mismos del login) ======
+            function isEmailValid(value) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+            }
+            function getRow(input) {
+                return input.closest('.form-row') || input.parentElement;
+            }
+            function showError(input, msg) {
+                const row = getRow(input);
+                let help = row.querySelector('.field-error');
+                if (!help) {
+                    help = document.createElement('small');
+                    help.className = 'field-error';
+                    help.style.color = '#e53935';
+                    help.style.fontSize = '12px';
+                    row.appendChild(help);
+                }
+                help.textContent = msg;
+                input.setAttribute('aria-invalid', 'true');
+            }
+            function clearError(input) {
+                const row = getRow(input);
+                const help = row.querySelector('.field-error');
+                if (help) help.remove();
+                input.removeAttribute('aria-invalid');
+            }
+            function showLoadingButton() {
+                btn.classList.add('loading');
+                btn.disabled = true;
+            }
+            function closeLoadingButton() {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+
+            // ====== Validación cliente ======
+            function validate() {
+                let ok = true;
+                const name  = nameEl.value.trim();
+                const email = emailEl.value.trim();
+                const pass  = passEl.value.trim();
+                const pass2 = pass2El.value.trim();
+
+                // Nombre
+                if (name === '') {
+                    showError(nameEl, messages.nameRequired);
+                    ok = false;
+                } else {
+                    clearError(nameEl);
+                }
+
+                // Email
+                if (email === '') {
+                    showError(emailEl, messages.emailRequired);
+                    ok = false;
+                } else if (!isEmailValid(email)) {
+                    showError(emailEl, messages.emailInvalid);
+                    ok = false;
+                } else {
+                    clearError(emailEl);
+                }
+
+                // Password
+                if (pass === '') {
+                    showError(passEl, messages.passRequired);
+                    ok = false;
+                } else if (pass.length < 8) {
+                    showError(passEl, messages.passMin8);
+                    ok = false;
+                } else {
+                    clearError(passEl);
+                }
+
+                // Confirmación
+                if (pass2 === '') {
+                    showError(pass2El, messages.passConfirmRequired);
+                    ok = false;
+                } else if (pass !== pass2) {
+                    showError(pass2El, messages.passMatch);
+                    ok = false;
+                } else {
+                    clearError(pass2El);
+                }
+
+                return ok;
+            }
+
+            // Limpiar errores al tipear
+            [nameEl, emailEl, passEl, pass2El].forEach(el => {
+                el.addEventListener('input', () => clearError(el));
+            });
+
+            // ====== Envío por Axios ======
+            btn.addEventListener('click', () => {
+                if (!validate()) return;
+                const formData = new FormData();
+                formData.append('name', nameEl.value.trim());
+                formData.append('email', emailEl.value.trim());
+                formData.append('password', passEl.value.trim());
+                formData.append('password_confirmation', pass2El.value.trim());
+
+                showLoadingButton();
+
+                axios.post(registerUrl, formData)
+                    .then(response => {
+                        closeLoadingButton();
+
+                        const data = response.data || {};
+
+                        if(data.success === 1){ // correo repetido
+                            showError(emailEl, messages.emailRepetido);
+                        }
+                        else if (data.success === 2) {
+                            // Si tu backend devuelve 'ruta' como en login, reusa esa convención
+                            const next = data.ruta || "{{ url('/') }}";
+                            window.location.href = next;
+                        }
+                        else {
+                            toastr.error(messages.generalError);
+                        }
+                    })
+                    .catch(error => {
+                        closeLoadingButton();
+                        toastr.error(messages.generalError);
+                    });
+            });
+
+            // Enter para enviar
+            form.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
+
+            // Mostrar / ocultar contraseña (reusa la misma lógica del login)
+            document.querySelectorAll('.toggle-pass').forEach(tg => {
+                tg.addEventListener('click', () => {
+                    const id = tg.getAttribute('data-target');
+                    const input = document.getElementById(id);
+                    if (!input) return;
+                    input.type = (input.type === 'password') ? 'text' : 'password';
+                    input.focus();
+                });
+            });
+        })();
+    </script>
+
+
+    <script>
+        /* ============================================================
+           TOGGLE PASSWORDS (funciona en ambos paneles)
+        ============================================================ */
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.toggle-pass');
+            if (!btn) return;
+
+            e.preventDefault();
+
+            const targetId = btn.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            if (!input) return;
+
+            const showing = input.type === 'text';
+            input.type = showing ? 'password' : 'text';
+            btn.setAttribute('aria-pressed', String(!showing));
+            btn.textContent = showing ? '👁️' : '🙈'; // alterna el icono
+            input.focus({ preventScroll: true });
+        });
+    </script>
 
 
     <script>

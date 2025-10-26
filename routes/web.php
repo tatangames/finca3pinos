@@ -187,6 +187,8 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::post('/login', [UsuarioAuthController::class, 'loginUsuario'])->name('user.login.process');
         Route::post('/logout', [UsuarioAuthController::class, 'logoutUsuario'])->name('user.logout');
         Route::post('/request-code', [UsuarioAuthController::class, 'solicitarCodigoCorreo']);
+        Route::post('/register', [UsuarioAuthController::class, 'registroCliente']);
+
 
         // vista cambiar contrasena
         Route::get(LaravelLocalization::transRoute('routes.passwordreset'), [UsuarioAuthController::class, 'showResetPasswordForm'])
@@ -196,15 +198,15 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.tokeninvalid'), [UsuarioAuthController::class, 'showtokenInvalid'])
             ->name('user.token.novalid');
 
-
-
+        // actualiza la contrasena del usuario
         Route::post(LaravelLocalization::transRoute('routes.updatepassword'), [PasswordResetController::class, 'resetPassword'])
         ->name('user.password.update');
 
+        // vista dashboard
+        Route::get(LaravelLocalization::transRoute('routes.user_profile'), [UsuarioAuthController::class, 'vistaDashboard'])
+            ->name('user.profile');
 
 
-
-        Route::get('/dashboard', [UsuarioAuthController::class, 'vistaDashboard'])->name('user.dashboard');
     });
 
 });

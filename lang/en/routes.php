@@ -10,6 +10,6 @@ return [
     'passwordreset' => 'reset-password/{token}',
     'tokeninvalid' => 'token-invalid',
     'updatepassword' => 'update-password',
-
+    'user_profile' => 'user-profile',
 
 ];
