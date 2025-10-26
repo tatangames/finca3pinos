@@ -199,7 +199,8 @@ return [
     'gotoshop' => '쇼핑하러 가기',
     'gottocart' => '장바구니로 이동',
     'tracking' => '배송추적',
-
+    'no_addresses' => '등록된 주소가 없습니다',
+    'add_new_address' => '새 배송지 추가',
 
 
 

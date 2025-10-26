@@ -61,6 +61,30 @@
                     </li>
 
 
+
+
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Configuración
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.paises') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Países</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
+
             </ul>
         </nav>
     </div>

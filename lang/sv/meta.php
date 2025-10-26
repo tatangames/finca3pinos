@@ -196,6 +196,8 @@ return [
     'gotoshop' => 'Ir a comprar',
     'gottocart' => 'Ir al carrito',
     'tracking' => 'seguimiento',
+    'no_addresses' => 'No hay direcciones',
+    'add_new_address' => 'Agregar dirección',
 
 
 

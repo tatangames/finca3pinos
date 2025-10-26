@@ -17,13 +17,6 @@ class DashboardController extends Controller
         return "inicio sesion";
     }
 
-    public function vistaPrueba()
-    {
-        $userName = 'Tatan Games';
-        $resetUrl = 'https://finca3pinos.com/reset-password/ABC123456';
-
-        return view('mail.passwordreset', compact('userName', 'resetUrl'));
-    }
 
 
 }

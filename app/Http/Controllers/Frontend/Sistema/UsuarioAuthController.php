@@ -244,9 +244,14 @@ class UsuarioAuthController extends Controller
 
 
     // @Auth
-    public function vistaDashboard()
+    public function vistaMisOrdenes()
     {
-       return view('frontend.dashboard.vistadashboard');
+       return view('frontend.dashboard.vistaordenes');
+    }
+
+    public function vistaMisDirecciones()
+    {
+        return view('frontend.dashboard.vistamisdirecciones');
     }
 
 

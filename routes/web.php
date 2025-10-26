@@ -10,6 +10,7 @@ use App\Http\Controllers\Backend\Roles\PermisoController;
 use App\Http\Controllers\Backend\Sistema\PerfilController;
 use App\Http\Controllers\Controles\ControlRolController;
 use App\Http\Controllers\Backend\Sistema\CategoriasController;
+use App\Http\Controllers\Backend\Sistema\PaisesController;
 
 
 // ======================== FRONTEND =============================
@@ -144,6 +145,32 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/producto/presentacion/informacion', [CategoriasController::class,'informacionProductoPresentacion']);
     Route::post('/producto/presentacion/editar', [CategoriasController::class,'editarProductoPresentacion']);
 
+    // PAIS
+
+    Route::get('/paises', [PaisesController::class, 'vistaPaises'])->name('paises');
+    Route::get('/paises/index/tabla', [PaisesController::class, 'tablaPaises']);
+    Route::post('/paises/informacion', [PaisesController::class,'informacionPais']);
+    Route::post('/paises/nuevo', [PaisesController::class,'registrarNuevoPais']);
+    Route::post('/paises/editar', [PaisesController::class,'editarPais']);
+
+    Route::get('/departamentos/index/{idpais}', [PaisesController::class, 'vistaDepartamentos']);
+    Route::get('/departamentos/tabla/{idpais}', [PaisesController::class, 'tablaDepartamentos']);
+    Route::post('/departamentos/informacion', [PaisesController::class,'informacionDepartamento']);
+    Route::post('/departamentos/nuevo', [PaisesController::class,'registrarNuevoDepartamento']);
+    Route::post('/departamentos/editar', [PaisesController::class,'editarDepartamento']);
+
+    Route::get('/departamentos/index/{idpais}', [PaisesController::class, 'vistaDepartamentos']);
+    Route::get('/departamentos/tabla/{idpais}', [PaisesController::class, 'tablaDepartamentos']);
+    Route::post('/departamentos/informacion', [PaisesController::class,'informacionDepartamento']);
+    Route::post('/departamentos/nuevo', [PaisesController::class,'registrarNuevoDepartamento']);
+    Route::post('/departamentos/editar', [PaisesController::class,'editarDepartamento']);
+
+    Route::get('/municipios/index/{idpais}', [PaisesController::class, 'vistaMunicipios']);
+    Route::get('/municipios/tabla/{idpais}', [PaisesController::class, 'tablaMunicipios']);
+    Route::post('/municipios/informacion', [PaisesController::class,'informacionMunicipio']);
+    Route::post('/municipios/nuevo', [PaisesController::class,'registrarNuevoMunicipio']);
+    Route::post('/municipios/editar', [PaisesController::class,'editarMunicipio']);
+
 
 
 });
@@ -202,9 +229,14 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::post(LaravelLocalization::transRoute('routes.updatepassword'), [PasswordResetController::class, 'resetPassword'])
         ->name('user.password.update');
 
-        // vista dashboard
-        Route::get(LaravelLocalization::transRoute('routes.user_profile'), [UsuarioAuthController::class, 'vistaDashboard'])
-            ->name('user.profile');
+        // vista ordenes
+        Route::get(LaravelLocalization::transRoute('routes.orders'), [UsuarioAuthController::class, 'vistaMisOrdenes'])
+            ->name('user.orders');
+
+        // vista ordenes
+        Route::get(LaravelLocalization::transRoute('routes.address'), [UsuarioAuthController::class, 'vistaMisDirecciones'])
+            ->name('user.address');
+
 
 
     });
@@ -216,7 +248,5 @@ Route::get('/galeria/cargar', [FrontendController::class, 'cargarGaleria'])
     ->name('galeria.cargar');
 
 
-
-Route::get('/prueba', [DashboardController::class, 'vistaPrueba']);
 
 

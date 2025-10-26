@@ -195,7 +195,8 @@ return [
     'gotoshop' => 'Go to shop',
     'gottocart' => 'Go to cart',
     'tracking' => 'Tracking',
-
+    'no_addresses' => 'No addresses',
+    'add_new_address' => 'Add new address',
 
 
 

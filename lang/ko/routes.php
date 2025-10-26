@@ -11,7 +11,8 @@ return [
     'tokeninvalid' => 'token-invalid',
     'updatepassword' => 'update-password',
     'user_profile' => 'user-profile',
-
+    'orders' => 'user-orders',
+    'address' => 'user-address',
 
 
 ];

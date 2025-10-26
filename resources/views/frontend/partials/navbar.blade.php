@@ -60,7 +60,7 @@
                             <ul class="sub-menu">
                                 <li id="menu-item-account"
                                     class="menu-item menu-item-type-post_type menu-item-object-page">
-                                    <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.profile', [], false)) }}">
+                                    <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.orders', [], false)) }}">
                                         <i class="fa fa-id-badge"></i> <span>{{ __('meta.my_account') }}</span>
                                     </a>
                                 </li>
@@ -103,7 +103,7 @@
 
                         @auth('web')
                             <li class="only-mobile">
-                                <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.profile', [], false)) }}">
+                                <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.orders', [], false)) }}">
                                     <i class="fa fa-user"></i> {{ __('meta.my_account') }}
                                 </a>
                             </li>

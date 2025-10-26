@@ -11,5 +11,7 @@ return [
     'tokeninvalid' => 'token-invalido',
     'updatepassword' => 'update-password',
     'user_profile' => 'perfil-usuario',
+    'orders' => 'perfil-ordenes',
+    'address' => 'perfil-direcciones',
 
 ];
