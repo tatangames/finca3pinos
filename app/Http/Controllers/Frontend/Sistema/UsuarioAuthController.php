@@ -280,6 +280,54 @@ class UsuarioAuthController extends Controller
         ]);
     }
 
+    // guardar nueva direccion
+    public function guardarNuevaDireccion(Request $request)
+    {
+        $ruta = route('user.address');
+
+        return response()->json([
+            'success' => 1,
+            'ruta'    => $ruta,
+        ]);
+
+        $regla = array(
+            'pais' => 'required',
+            'nombre' => 'required',
+            'telefono' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+
+      /*  [2025-10-27 14:56:55] local.INFO: array (
+        '_token' => '4wnnvBhQZ1fVMxBnr0CL70DMts8zsKXLKxJzjvzk',
+        'pais' => '2',
+        'departamento' => '21',
+        'municipio' => NULL,
+        'nombre' => 'aaa',
+        'direccion' => 'bbb',
+        'direccion_opcional' => 'ccc',
+        'telefono' => '2333',
+        'ciudad' => 'miciudad',
+        'provincia' => 'mi estado',
+        'postal' => '503 postal',
+    )*/
+
+
+
+
+
+        return response()->json([
+            'success' => 1,
+            'ruta' => route('user.index'),
+            'admin' => Auth::guard('web')->user(),
+        ]);
+
+        return ['success' => 1];
+
+    }
 
 
 

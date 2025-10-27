@@ -213,5 +213,20 @@ return [
     'state_province' => '주 / 도 / 지역',
     'input_direction' => '도로명 주소',
     'input_directionv2' => '상세 주소',
+    'country_required' => '국가는 필수 항목입니다.',
+    'address_required' => '주소는 필수 항목입니다.',
+    'phone_required' => '전화번호는 필수 항목입니다.',
+    'department_required' => '지역',
+    'municipality_required' => '시 / 군 / 구',
+    'city_required' => '도시는 필수 항목입니다.',
+    'error_v1' => '저장 중 오류가 발생했습니다. 다시 시도해주세요.',
+    'saved_successfully' => '성공적으로 저장되었습니다',
+    'saving' => '저장 중...',
+
+
+
+
+
+
 
 ];

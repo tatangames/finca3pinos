@@ -692,9 +692,6 @@
                         if (errores.email)   showError(errorEmail, errores.email[0]);
                         if (errores.message) showError(errorMsg, errores.message[0]);
 
-                    } else {
-                        console.error(error);
-                        alert('Error');
                     }
                 })
                 .finally(() => {

@@ -237,6 +237,10 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.address'), [UsuarioAuthController::class, 'vistaMisDirecciones'])
             ->name('user.address');
 
+        // guardar nueva direccion
+        Route::post(LaravelLocalization::transRoute('routes.save_direction'), [UsuarioAuthController::class, 'guardarNuevaDireccion'])
+            ->name('user.savenew.direction');
+
 
 
     });

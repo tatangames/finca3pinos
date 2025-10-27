@@ -13,5 +13,6 @@ return [
     'user_profile' => 'user-profile',
     'orders' => 'user-orders',
     'address' => 'user-address',
+    'save_direction' => 'save-direction',
 
 ];

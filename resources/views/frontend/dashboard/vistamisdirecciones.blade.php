@@ -3,6 +3,8 @@
 @section('title', __('meta.title'))
 
 @section('content')
+    <link rel="stylesheet" href="{{ asset('css/toastr.min.css') }}">
+
     <style>
         /* ===== THEME (claro tipo maqueta 2) ===== */
         .theme-light {
@@ -886,6 +888,13 @@
         </div>
     </section>
 
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/toastr.min.js') }}"></script>
+    <script src="{{ asset('js/axios.min.js') }}"></script>
+    <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
+
+
     <script>
         document.getElementById('btn-back')?.addEventListener('click', e => {
             e.preventDefault();
@@ -1045,7 +1054,7 @@
 
 
     <script>
-        (function(){
+        (function () {
             const form   = document.getElementById('address-form');
 
             // Controles
@@ -1055,7 +1064,11 @@
 
             const inpNombre    = document.getElementById('nombre-usuario');
             const inpDireccion = document.getElementById('direccion-usuario');
+            const inpDirOpt    = document.getElementById('direccionopcional-usuario');
             const inpTelefono  = document.getElementById('telefono-usuario');
+            const inpCiudad    = document.getElementById('ciudad-usuario');
+            const inpProvincia = document.getElementById('provincia-usuario');
+            const inpPostal    = document.getElementById('postal-usuario');
 
             // Form-groups
             const fgPais   = selPais?.closest('.form-group');
@@ -1065,16 +1078,20 @@
             const fgDir    = inpDireccion?.closest('.form-group');
             const fgTel    = inpTelefono?.closest('.form-group');
 
-            // i18n (cámbialo a tus __() si deseas)
+            // i18n
             const i18n = {
-                countryRequired:     "El país es requerido",
-                nameRequired:        "El nombre es requerido",
-                addressRequired:     "La dirección es requerida",
-                phoneRequired:       "El teléfono es requerido",
-                departmentRequired:  "El departamento es requerido",
-                municipalityRequired:"El municipio es requerido"
+                countryRequired:      "{{ __('meta.country_required') }}",
+                nameRequired:         "{{ __('meta.name_required') }}",
+                addressRequired:      "{{ __('meta.address_required') }}",
+                phoneRequired:        "{{ __('meta.phone_required') }}",
+                departmentRequired:   "{{ __('meta.department_required') }}",
+                municipalityRequired: "{{ __('meta.municipality_required') }}",
+                genericError:         "{{ __('meta.error_v1') }}",
+                savedOk:              "{{ __('meta.saved_successfully') ?? 'Guardado correctamente' }}",
+                saving:               "{{ __('meta.saving') ?? 'Guardando...' }}"
             };
 
+            // ==== Utilidades de UI (errores/visibilidad) ====
             function isVisibleControl(ctrl){
                 if(!ctrl) return false;
                 const group = ctrl.closest('.form-group') || ctrl;
@@ -1099,7 +1116,6 @@
                 fg.appendChild(span);
             }
 
-            // Limpia error al corregir
             function attachAutoClear(control, fg, isValidFn){
                 if(!control || !fg) return;
                 const handler = () => { if(isValidFn()) clearError(fg); };
@@ -1108,75 +1124,151 @@
                 control.addEventListener('blur', handler);
             }
 
+            // ==== Validación front ====
             function validate(){
                 let ok = true;
 
-                // Limpia previos
                 [fgPais, fgDep, fgMun, fgNombre, fgDir, fgTel].forEach(clearError);
 
                 const paisId = parseInt(selPais?.value || 0, 10);
 
-                // País
                 if(!selPais || selPais.value === ''){
-                    setError(fgPais, i18n.countryRequired);
-                    ok = false;
+                    setError(fgPais, i18n.countryRequired); ok = false;
                 }
-
-                // Nombre
                 if(!inpNombre || !inpNombre.value.trim()){
-                    setError(fgNombre, i18n.nameRequired);
-                    ok = false;
+                    setError(fgNombre, i18n.nameRequired); ok = false;
                 }
-
-                // Dirección
                 if(!inpDireccion || !inpDireccion.value.trim()){
-                    setError(fgDir, i18n.addressRequired);
-                    ok = false;
+                    setError(fgDir, i18n.addressRequired); ok = false;
                 }
-
-                // Teléfono
                 if(!inpTelefono || !inpTelefono.value.trim()){
-                    setError(fgTel, i18n.phoneRequired);
-                    ok = false;
+                    setError(fgTel, i18n.phoneRequired); ok = false;
                 }
-
                 // ES (1): municipio requerido
                 if(paisId === 1 && selMun && isVisibleControl(selMun)){
                     if(selMun.value === '' || selMun.selectedIndex === 0){
-                        setError(fgMun, i18n.municipalityRequired);
-                        ok = false;
+                        setError(fgMun, i18n.municipalityRequired); ok = false;
                     }
                 }
-
                 // US (2): departamento requerido
                 if(paisId === 2 && selDep && isVisibleControl(selDep)){
                     if(selDep.value === '' || selDep.selectedIndex === 0){
-                        setError(fgDep, i18n.departmentRequired);
-                        ok = false;
+                        setError(fgDep, i18n.departmentRequired); ok = false;
                     }
                 }
-
                 return ok;
             }
 
-            // Auto-clear para quitar el label al corregir
-            attachAutoClear(selPais,   fgPais,   () => selPais.value !== '');
-            attachAutoClear(inpNombre, fgNombre, () => !!inpNombre.value.trim());
-            attachAutoClear(inpDireccion, fgDir, () => !!inpDireccion.value.trim());
-            attachAutoClear(inpTelefono,  fgTel, () => !!inpTelefono.value.trim());
-            attachAutoClear(selDep,    fgDep,    () => selDep.value !== '' && selDep.selectedIndex > 0);
-            attachAutoClear(selMun,    fgMun,    () => selMun.value !== '' && selMun.selectedIndex > 0);
+            // Auto-clear
+            attachAutoClear(selPais,      fgPais,   () => selPais.value !== '');
+            attachAutoClear(inpNombre,    fgNombre, () => !!inpNombre.value.trim());
+            attachAutoClear(inpDireccion, fgDir,    () => !!inpDireccion.value.trim());
+            attachAutoClear(inpTelefono,  fgTel,    () => !!inpTelefono.value.trim());
+            attachAutoClear(selDep,       fgDep,    () => selDep.value !== '' && selDep.selectedIndex > 0);
+            attachAutoClear(selMun,       fgMun,    () => selMun.value !== '' && selMun.selectedIndex > 0);
 
-            // Submit
-            form?.addEventListener('submit', function(e){
+            // ==== Axios submit ====
+            // URL localizada (Blade):
+            const SAVE_URL = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.savenew.direction', [], false)) }}";
+            // Redirección por defecto si el backend no envía 'redirect'
+            const REDIRECT_FALLBACK = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.index', [], false)) }}";
+            // Token CSRF
+            const CSRF = (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'))
+                || (form?.querySelector('input[name=_token]')?.value) || '';
+
+            function setSubmitting(state){
+                if(!form) return;
+                const btn = form.querySelector('[type="submit"], button.submit');
+                if(btn){
+                    if(state){
+                        btn.dataset.prevText = btn.innerHTML;
+                        btn.setAttribute('disabled', 'disabled');
+                        btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> ' + i18n.saving;
+                    } else {
+                        btn.removeAttribute('disabled');
+                        if(btn.dataset.prevText) btn.innerHTML = btn.dataset.prevText;
+                    }
+                }
+            }
+
+            function getVal(el){
+                return (el?.value ?? '').trim();
+            }
+
+            async function sendWithAxios(){
+                if(typeof window.axios === 'undefined'){
+                    alert(i18n.genericError);
+                    return;
+                }
+
+                // Construye FormData desde el form…
+                const fd = new FormData(form);
+
+                // …y asegura/normaliza claves críticas (usa set para evitar duplicados)
+                fd.set('pais',               selPais?.value || '');
+                fd.set('departamento',       selDep?.value || '');
+                fd.set('municipio',          selMun?.value || '');
+                fd.set('nombre',             getVal(inpNombre));
+                fd.set('direccion',          getVal(inpDireccion));
+                fd.set('direccion_opcional', getVal(inpDirOpt));
+                fd.set('telefono',           getVal(inpTelefono));
+                fd.set('ciudad',             getVal(inpCiudad));    // podrían estar disabled
+                fd.set('provincia',          getVal(inpProvincia)); // idem
+                fd.set('postal',             getVal(inpPostal));    // idem
+
+                try {
+                    setSubmitting(true);
+
+                    const res = await axios.post(
+                        SAVE_URL,
+                        fd,
+                        {
+                            headers: {
+                                'X-CSRF-TOKEN': CSRF,
+                                'Accept': 'application/json'
+                                // Nota: NO fijes Content-Type; el navegador agrega boundary de FormData
+                            }
+                        }
+                    );
+
+                    const data = res?.data || {};
+
+                    if (data.success === 1) {
+                        // Limpia errores visuales
+                        [fgPais, fgDep, fgMun, fgNombre, fgDir, fgTel].forEach(clearError);
+
+                        // Feedback opcional
+                        toastr.success(i18n.savedOk);
+
+                        // Redirige (usa data.redirect si viene, si no fallback)
+                        const url = data.redirect;
+                        window.location.assign(url);
+                        toastr.success("pruebaaa");
+                    }else{
+                        // Fallo general
+                        toastr.error(i18n.genericError);
+                    }
+                } catch (err) {
+                    toastr.error(i18n.genericError);
+                } finally {
+                    setSubmitting(false);
+                }
+            }
+
+            // Intercepta el submit y envía con Axios
+            form?.addEventListener('submit', function (e) {
+                e.preventDefault();
                 if(!validate()){
-                    e.preventDefault();
                     const firstErr = form.querySelector('.has-error select, .has-error input, .has-error textarea');
                     firstErr?.focus();
+                    return;
                 }
+                sendWithAxios();
             });
         })();
     </script>
+
+
 
 
 

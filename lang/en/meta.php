@@ -209,5 +209,20 @@ return [
     'state_province' => 'State / Province / Region',
     'input_direction' => 'Street address, P.O. Box, company name',
     'input_directionv2' => 'Apartment, suite, building, floor, etc',
+    'country_required' => 'Country is required.',
+    'address_required' => 'The address is required.',
+    'phone_required' => 'The phone number is required.',
+    'department_required' => 'The department is required.',
+    'municipality_required' => 'The municipality is required.',
+    'city_required' => 'City is required.',
+    'error_v1' => 'An error occurred while saving. Please try again.',
+    'saved_successfully' => 'Saved successfully',
+    'saving' => 'Saving...',
+
+
+
+
+
+
 
 ];
