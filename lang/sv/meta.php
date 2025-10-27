@@ -198,7 +198,18 @@ return [
     'tracking' => 'seguimiento',
     'no_addresses' => 'No hay direcciones',
     'add_new_address' => 'Agregar dirección',
-
+    'select' => 'Seleccionar',
+    'country' => 'País',
+    'department' => 'Departamento',
+    'municipality' => 'Municipio',
+    'city' => 'Ciudad',
+    'name_and_lastname' => 'Nombre y Apellido',
+    'postal_code' => 'Código Postal',
+    'phone_number' => 'Número de Teléfono',
+    'direction' => 'Dirección',
+    'state_province' => 'Estado / Provincia / Región',
+    'input_direction' => 'Dirección',
+    'input_directionv2' => 'Referencia',
 
 
 ];

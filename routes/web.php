@@ -233,7 +233,7 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.orders'), [UsuarioAuthController::class, 'vistaMisOrdenes'])
             ->name('user.orders');
 
-        // vista ordenes
+        // vista direcciones
         Route::get(LaravelLocalization::transRoute('routes.address'), [UsuarioAuthController::class, 'vistaMisDirecciones'])
             ->name('user.address');
 

@@ -14,18 +14,20 @@ return new class extends Migration
         Schema::create('direcciones', function (Blueprint $table) {
             $table->id();
 
+            $table->bigInteger('id_usuario')->unsigned();
             $table->bigInteger('id_paises')->unsigned();
 
-            //
             $table->bigInteger('id_departamento')->unsigned()->nullable();
             $table->bigInteger('id_municipio')->unsigned()->nullable();
 
             $table->string('nombre', 50);
 
-            $table->string('direccion', 60);
-            $table->string('direccion_opcional', 60)->nullable();
+            $table->string('direccion', 100);
+            $table->string('direccion_opcional', 100)->nullable();
 
             $table->string('ciudad', 50)->nullable();
+
+
             // estado / provincia / region
             $table->string('estado', 50)->nullable();
 
@@ -38,6 +40,7 @@ return new class extends Migration
             $table->foreign('id_paises')->references('id')->on('paises');
             $table->foreign('id_departamento')->references('id')->on('departamentos');
             $table->foreign('id_municipio')->references('id')->on('municipios');
+            $table->foreign('id_usuario')->references('id')->on('usuarios');
         });
     }
 

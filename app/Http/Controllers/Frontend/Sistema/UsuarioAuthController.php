@@ -251,7 +251,33 @@ class UsuarioAuthController extends Controller
 
     public function vistaMisDirecciones()
     {
-        return view('frontend.dashboard.vistamisdirecciones');
+        // Países activos y disponibles
+        $paises = DB::table('paises')
+            ->where('activo', 1)
+            ->where('disponible', 1)
+            ->select('id', 'nombre')
+            ->get();
+
+        // Departamentos solo de El Salvador y USA
+        $departamentos = DB::table('departamentos')
+            ->whereIn('id_paises', [1, 2])
+            ->where('activo', 1)
+            ->where('disponible', 1)
+            ->select('id', 'id_paises', 'nombre')
+            ->get();
+
+        // Municipios solo de El Salvador
+        $municipios = DB::table('municipios')
+            ->where('activo', 1)
+            ->where('disponible', 1)
+            ->select('id', 'id_departamentos', 'nombre')
+            ->get();
+
+        return view('frontend.dashboard.vistamisdirecciones', [
+            'paises' => $paises,
+            'departamentos' => $departamentos,
+            'municipios' => $municipios,
+        ]);
     }
 
 

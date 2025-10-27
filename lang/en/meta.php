@@ -197,8 +197,17 @@ return [
     'tracking' => 'Tracking',
     'no_addresses' => 'No addresses',
     'add_new_address' => 'Add new address',
-
-
-
+    'select' => 'Select',
+    'country' => 'Country',
+    'department' => 'Department',
+    'municipality' => 'Municipality',
+    'city' => 'City',
+    'name_and_lastname' => 'First and Last Name',
+    'postal_code' => 'Zip Code',
+    'phone_number' => 'Phone number',
+    'direction' => 'Direction',
+    'state_province' => 'State / Province / Region',
+    'input_direction' => 'Street address, P.O. Box, company name',
+    'input_directionv2' => 'Apartment, suite, building, floor, etc',
 
 ];

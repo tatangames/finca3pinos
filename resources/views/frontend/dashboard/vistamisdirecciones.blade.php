@@ -137,7 +137,7 @@
             letter-spacing: .02em
         }
 
-        /* ===== Address cards ===== */
+        /* ===== Address ===== */
         .address-wrap {
             padding: 18px 18px 22px
         }
@@ -252,54 +252,47 @@
             height: 18px
         }
 
-        /* Add new card */
-        .add-card {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px dashed var(--border);
+        /* ===== Form ===== */
+        .address-form {
+            margin-top: 22px;
             background: #fff;
+            border: 1px solid var(--border);
             border-radius: 16px;
-            min-height: 120px
+            padding: 18px
         }
 
-        .add-btn {
+        .form-row {
+            display: grid;
+            grid-template-columns:repeat(2, minmax(0, 1fr));
+            gap: 14px
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns:1fr
+            }
+        }
+
+        .form-group {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            padding: 20px 10px;
-            border: 0;
-            background: transparent;
-            cursor: pointer
+            gap: 6px
         }
 
-        .add-btn .plus {
-            width: 48px;
-            height: 48px;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px
-        }
-
-        .add-btn span {
+        .form-group label {
+            font-size: 13px;
             font-weight: 700
         }
 
-        /* Empty */
-        .empty {
-            padding: 56px 18px 64px;
-            text-align: center;
-            color: var(--muted)
+        .form-group select {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            background: #fff
         }
 
-        .empty h4 {
-            margin: 0 0 10px;
-            color: var(--text);
-            font-size: 22px
+        .row-span-2 {
+            grid-column: span 2
         }
 
         .btn {
@@ -318,14 +311,427 @@
             background: var(--primary);
             color: #fff
         }
+
+        /* ======== MODO COMPACTO + SIN FLECHA ======== */
+        .address-form.address-form--compact {
+            padding: 12px !important;
+            border-radius: 12px !important;
+        }
+
+        .address-form.address-form--compact h4 {
+            margin: 0 0 8px !important;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        /* Menos separación vertical real */
+        .address-form.address-form--compact .form-row {
+            grid-template-columns:1fr !important;
+            row-gap: 6px !important; /* ↓↓↓ aquí se acorta la distancia */
+            column-gap: 6px !important;
+        }
+
+        .address-form.address-form--compact .form-group {
+
+
+        }
+
+        .address-form.address-form--compact .form-group + .form-group {
+            margin-top: 2px !important;
+        }
+
+        /* Labels e inputs compactos */
+        .address-form.address-form--compact .form-group label {
+            font-size: 12px !important;
+            line-height: 1.1 !important;
+            margin: 0 !important;
+        }
+
+        .address-form.address-form--compact select,
+        .address-form.address-form--compact input,
+        .address-form.address-form--compact textarea {
+            height: 32px !important;
+            padding: 6px 10px !important;
+            font-size: 13px !important;
+            border: 1px solid #d5d9d9 !important;
+            border-radius: 8px !important;
+            background: #fff !important;
+            outline: none !important;
+        }
+
+        .address-form.address-form--compact textarea {
+            height: auto !important;
+            min-height: 80px !important;
+            resize: vertical !important;
+        }
+
+        /* Quitar flecha nativa y posibles iconos de tema */
+        .address-form.address-form--compact select {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            background-image: none !important;
+            background-position: right 10px center !important;
+            background-repeat: no-repeat !important;
+            padding-right: 10px !important; /* sin chevron */
+        }
+
+        .address-form.address-form--compact select::-ms-expand {
+            display: none !important;
+        }
+
+        /* Si el tema dibuja una flecha con ::after en el contenedor, la apagamos */
+        .address-form.address-form--compact .form-group::after {
+            content: none !important;
+            display: none !important;
+        }
+
+        /* Anchura de los controles (tipo Amazon) */
+        .address-form.address-form--compact .form-group select,
+        .address-form.address-form--compact .form-group input {
+            width: 70% !important;
+            max-width: 380px !important;
+            min-width: 260px !important;
+            margin-left: 4px !important;
+        }
+
+        @media (max-width: 600px) {
+            .address-form.address-form--compact .form-group select,
+            .address-form.address-form--compact .form-group input {
+                width: 100% !important;
+                max-width: none !important;
+                margin-left: 0 !important;
+            }
+        }
+
+        /* Botón compacto */
+        .address-form.address-form--compact .btn {
+            height: 36px !important;
+            padding: 0 12px !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+        }
+
+        .address-form.address-form--compact .btn-primary {
+            width: 100% !important;
+        }
+
+        /* Quitar márgenes propios que puedan crear “huecos” */
+        #bloque-departamento, #bloque-municipio {
+            margin: 0 !important;
+        }
+
+
+        .btn-back, .btn-save {
+            font-weight: 600;
+            border-radius: 5px;
+            padding: 5px 16px;
+            font-size: 14px;
+            transition: all .25s ease;
+            display: inline-block;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #4d6fff;
+        }
+
+        .btn-back:hover {
+            background: #4d6fff;
+            color: #fff;
+        }
+
+        .btn-save {
+            background: #4d6fff;
+            border: 1px solid #4d6fff;
+            color: #fff;
+        }
+
+        .btn-save:hover {
+            background: #3a56d9;
+            border-color: #3a56d9;
+        }
+
+        /* Contenedor de acciones (no usar .form-group aquí) */
+        .form-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        /* Botones pequeños */
+        .btn-back, .btn-save {
+            font-weight: 600;
+            border-radius: 6px;
+            padding: 5px 16px;
+            font-size: 14px;
+            transition: all .25s ease;
+            display: inline-flex; /* evita 100% */
+            width: auto !important; /* fuerza tamaño contenido */
+        }
+
+        .btn-back {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #4d6fff;
+        }
+
+        .btn-back:hover {
+            background: #4d6fff;
+            color: #fff;
+        }
+
+        .btn-save {
+            background: #4d6fff;
+            border: 1px solid #4d6fff;
+            color: #fff;
+        }
+
+        /* Anula cualquier width:100% heredado (ej. .btn-primary) */
+        .address-form.address-form--compact .btn-save {
+            width: auto !important;
+        }
+
+        .btn-save:hover {
+            background: #3a56d9;
+            border-color: #3a56d9;
+        }
+
+        /* Botón Regresar en fondo claro */
+        .btn-back {
+            background: #fff; /* o transparent */
+            color: #4d6fff !important; /* azul visible */
+            border: 1px solid #4d6fff;
+            text-decoration: none !important; /* sin subrayado */
+            box-shadow: none !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* estados */
+        .btn-back:hover,
+        .btn-back:focus {
+            background: #4d6fff;
+            color: #fff !important;
+            outline: 0;
+        }
+
+        .btn-back:visited {
+            color: #4d6fff !important;
+        }
+
+        /* === Alinear selects e inputs a la izquierda === */
+        .address-form.address-form--compact .form-group select,
+        .address-form.address-form--compact .form-group input,
+        .address-form.address-form--compact .form-group textarea {
+            width: auto !important;             /* tamaño según contenido */
+            max-width: 380px !important;        /* límite razonable */
+            min-width: 200px !important;
+            margin-left: 0 !important;          /* sin margen izquierdo */
+            text-align: left !important;        /* texto alineado */
+            display: inline-block !important;   /* evita ocupar todo el ancho */
+        }
+
+        /* === Eliminar grid/flex wrap y alinear a la izquierda === */
+        .address-form.address-form--compact .form-row {
+            display: block !important; /* elimina grid */
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .address-form.address-form--compact .form-group {
+            display: block !important;
+            margin: 0 0 8px 0 !important; /* reducir separación vertical */
+            padding: 0 !important;
+        }
+
+        /* === Selects alineados a la izquierda, sin wrap === */
+        .address-form.address-form--compact .form-group select,
+        .address-form.address-form--compact .form-group input,
+        .address-form.address-form--compact .form-group textarea {
+            width: 100% !important;
+            max-width: 600px !important; /* ancho máximo razonable */
+            min-width: 0 !important;
+            margin: 0 !important;
+            display: block !important;
+            text-align: left !important;
+        }
+
+        .address-form.address-form--compact .form-group label {
+            display: block !important;
+            text-align: left !important;
+            margin: 0 0 4px 0 !important; /* pequeño espacio entre label y select */
+        }
+
+        /* === Reducir altura entre form-groups === */
+        .address-form.address-form--compact .form-group + .form-group {
+            margin-top: 0 !important;
+        }
+
+        /* === Ajustar contenedor de acciones === */
+        .form-actions {
+            margin-top: 12px !important;
+            padding-top: 8px !important;
+        }
+
+        /* === Select sin flecha / sin espacio a la derecha === */
+
+        /* 1) Quitar la flecha nativa (Chrome, Safari, Firefox, Edge) */
+        .address-form select{
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            background-image: none !important;  /* por si el tema pone un ícono con background */
+        }
+        .address-form select::-ms-expand{      /* IE/Edge heredado */
+            display: none !important;
+        }
+
+        /* 2) Hacer que el select ocupe solo lo necesario (sin hueco a la derecha) */
+        .address-form .form-group{ position: relative; }
+        .address-form .form-group select{
+            display: inline-block !important;
+            width: auto !important;         /* evita llenar todo el contenedor */
+            max-width: 100% !important;
+            min-width: 220px;               /* ajusta a gusto */
+            padding-right: 10px !important; /* ya sin espacio para chevron */
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        /* 3) Si el tema dibuja una flecha/línea con pseudo-elementos, apágala */
+        .address-form .form-group::after,
+        .address-form .form-group::before{
+            content: none !important;
+            display: none !important;
+        }
+
+        /* 4) En móviles, que el select sí use todo el ancho */
+        @media (max-width: 600px){
+            .address-form .form-group select{
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+        }
+
+        /* === Neutralizar .select-wrap que rompe el layout === */
+        .select-wrap {
+            position: static !important;
+            display: block !important;
+            width: auto !important;
+            max-width: 100% !important;
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* Si agrega una pseudo-flecha con ::after o ::before, se elimina */
+        .select-wrap::after,
+        .select-wrap::before {
+            content: none !important;
+            display: none !important;
+        }
+
+        /* Asegura que el select dentro del wrap quede limpio y sin flecha extra */
+        .select-wrap select {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            background-image: none !important;
+            background: #fff !important;
+            border: 1px solid #d5d9d9 !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            width: 100% !important;
+            height: 32px !important;
+            font-size: 13px !important;
+            color: #111 !important;
+        }
+
+        /* En caso que haya un ícono dentro del wrap (SVG o span) lo ocultamos */
+        .select-wrap svg,
+        .select-wrap i,
+        .select-wrap span[class*="icon"] {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        /* Margen arriba para Departamento y Municipio */
+        #bloque-departamento,
+        #bloque-municipio{
+            margin-top:12px !important;     /* ajusta 8–16px a gusto */
+        }
+
+        /* Select más pequeño y compacto */
+        .address-form .form-group select{
+            height: 28px !important;         /* antes 32px */
+            padding: 4px 8px !important;     /* menos padding */
+            font-size: 12.5px !important;    /* un poco más pequeño */
+            max-width: 340px !important;     /* más angosto en desktop */
+            width: 70% !important;
+        }
+
+        @media (max-width: 600px){
+            .address-form .form-group select{
+                width: 100% !important;
+                max-width: none !important;
+            }
+        }
+
+        /* Apariencia de select deshabilitado */
+        .address-form select:disabled{
+            background: #f2f2f2 !important;
+            color: #9a9a9a !important;
+            cursor: not-allowed !important;
+        }
+
+
+        /* Select/input deshabilitado */
+        .address-form select:disabled{
+            background:#f2f2f2 !important; color:#9a9a9a !important; cursor:not-allowed !important;
+        }
+        /* Input ciudad compacto como los select */
+        #bloque-ciudad input{
+            height:28px !important; padding:4px 8px !important; font-size:12.5px !important;
+            border:1px solid #d5d9d9 !important; border-radius:8px !important; width:100%;
+            max-width:600px;
+        }
+
+
+        /* Apariencia deshabilitado */
+        .address-form select:disabled,
+        #bloque-ciudad input:disabled{
+            background:#f2f2f2 !important; color:#9a9a9a !important; cursor:not-allowed !important;
+        }
+
+
+        /* Utilidad para ocultar SIEMPRE (más fuerte que tu display:block !important) */
+        .hidden{ display:none !important; }
+
+        /* por si quieres ser explícito */
+        #bloque-departamento.hidden,
+        #bloque-municipio.hidden,
+        #bloque-ciudad.hidden{ display:none !important; }
+
+        /* Fuerza el ocultamiento cuando el form-group tenga .hidden */
+        .address-form.address-form--compact .form-group.hidden,
+        #bloque-provincia.hidden,
+        #bloque-postal.hidden {
+            display: none !important;
+        }
+
     </style>
 
     @php
         $active = 'addresses';
         $is = fn ($key) => $active === $key ? 'is-active' : '';
-        /** @var \Illuminate\Support\Collection|\Illuminate\Pagination\AbstractPaginator $addresses */
-        // Estructura esperada de cada $address:
-        // id, title/name, address, reference, department, municipality, is_default (bool), count (int opcional)
     @endphp
 
     <section class="account-wrap theme-light">
@@ -352,103 +758,255 @@
 
             {{-- ===== Content (Addresses) ===== --}}
             <div class="account-content" role="region" aria-label="{{ __('meta.addresses') }}">
-                <div class="head">
-                    <h3>{{ __('meta.addresses') }}</h3>
-                </div>
-
                 <div class="address-wrap">
-                    @if(isset($addresses) && $addresses->count())
-                        <div class="address-grid">
 
-                            @foreach($addresses as $address)
-                                @php
-                                    $isDefault = (bool)($address->is_default ?? false);
-                                    $cardClass = $isDefault ? 'is-default' : '';
-                                    $count = $address->count ?? null; // por ejemplo, número de entregas a esa dirección
-                                @endphp
+                    {{-- Tu grid de direcciones (si aplica) --}}
 
-                                <div class="address-card {{ $cardClass }}">
-                                    <div class="radio">
-                                        <form method="POST" action="#" class="form-default">
-                                            @csrf
-                                            <input type="hidden" name="address_id" value="{{ $address->id }}">
-                                            <input class="address-radio" type="radio" name="default_address"
-                                                   {{ $isDefault ? 'checked' : '' }} aria-label="Set default">
-                                        </form>
-                                    </div>
+                    {{-- ===== Formulario ===== --}}
+                    <form id="address-form" class="address-form address-form--compact" method="POST" action="#">
+                        @csrf
+                        <h4>{{ __('meta.add_new_address') }}</h4>
 
-                                    <div class="address-tools" aria-label="Actions">
-                                        <a href="#" title="{{ __('meta.edit') }}">✏️</a>
-                                        <form method="POST" action="#"
-                                              onsubmit="return confirm('{{ __('meta.areyousure') }}')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" title="{{ __('meta.delete') }}">🗑️</button>
-                                        </form>
-                                    </div>
-
-                                    <h4 class="address-title">
-                                        {{ $address->title ?? __('meta.default') }}
-                                        @if($count !== null)
-                                            <span class="chip">{{ $count }}</span>
-                                        @endif
-                                    </h4>
-
-                                    <div class="address-body">
-                                        @if(!empty($address->address))
-                                            <div>{{ $address->address }}</div>
-                                        @endif
-                                        @if(!empty($address->reference))
-                                            <div class="muted">{{ __('meta.reference_point') }}
-                                                : {{ $address->reference }}</div>
-                                        @endif
-                                        <div class="kv"><b>{{ __('meta.department') }}
-                                                :</b> {{ $address->department ?? '—' }}</div>
-                                        <div class="kv"><b>{{ __('meta.municipality') }}
-                                                :</b> {{ $address->municipality ?? '—' }}</div>
-                                    </div>
-                                </div>
-                            @endforeach
-
-                            {{-- Add new --}}
-                            <div class="add-card">
-                                <a class="add-btn" href="#" aria-label="{{ __('meta.add_new_address') }}">
-                                    <div class="plus">＋</div>
-                                    <span>{{ __('meta.add_new_address') }}</span>
-                                </a>
+                        <div class="form-row">
+                            {{-- País --}}
+                            <div class="form-group">
+                                <label for="pais">{{ __('meta.country') }}</label>
+                                <select id="pais" name="pais" required>
+                                    <option value="">{{ __('meta.select') }}</option>
+                                    @foreach(($paises ?? []) as $p)
+                                        <option value="{{ $p->id }}">{{ $p->nombre }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                        </div>
 
-                        @if(method_exists($addresses, 'links'))
-                            <div style="margin-top:16px">
-                                {{ $addresses->links() }}
+                            <!-- Departamento -->
+                            <div class="form-group" id="bloque-departamento" style="display:none; margin-top: 15px">
+                                <label for="departamento">{{ __('meta.department') }}</label>
+                                <select id="departamento" name="departamento" disabled>
+                                    <option value="" disabled selected>{{ __('meta.select') }}</option>
+                                    @foreach(($departamentos ?? []) as $d)
+                                        <option value="{{ $d->id }}" data-pais="{{ $d->id_paises }}">{{ $d->nombre }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                        @endif
-                    @else
-                        <div class="empty">
-                            <h4>{{ __('meta.no_addresses') }}</h4>
-                            <a class="btn btn-primary" href="#">{{ __('meta.add_new_address') }}</a>
+
+                            <!-- Municipio -->
+                            <div class="form-group" id="bloque-municipio" style="display:none; margin-top: 15px">
+                                <label for="municipio">{{ __('meta.municipality') }}</label>
+                                <select id="municipio" name="municipio" disabled>
+                                    <option value="" disabled selected>{{ __('meta.select') }}</option>
+                                    @foreach(($municipios ?? []) as $m)
+                                        <option value="{{ $m->id }}" data-departamento="{{ $m->id_departamentos }}">{{ $m->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+
+
+                            <!-- Nombre -->
+                            <div class="form-group" style="margin-top: 30px">
+                                <label>{{ __('meta.name_and_lastname') }}</label>
+                                <input id="nombre-usuario" type="text" maxlength="50" placeholder="{{ __('meta.name_and_lastname') }}">
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="form-group" style="margin-top: 15px">
+                                <label>{{ __('meta.direction') }}</label>
+                                <input id="direccion-usuario" type="text" maxlength="100" placeholder="{{ __('meta.input_direction') }}">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px">
+                                <input id="direccionopcional-usuario" style="margin-top: 10px" type="text" maxlength="100" placeholder="{{ __('meta.input_directionv2') }}">
+                            </div>
+
+                            <!-- Ciudad -->
+                            <div class="form-group" id="bloque-ciudad" style="display:none;">
+                                <label>{{ __('meta.city')}}</label>
+                                <input id="ciudad-usuario" type="text" maxlength="50" placeholder="{{ __('meta.city') }}" disabled>
+                            </div>
+
+                            <!-- Provincia -->
+                            <div class="form-group hidden" id="bloque-provincia" style="margin-top:15px">
+                                <label>{{ __('meta.state_province') }}</label>
+                                <input id="provincia-usuario" type="text" maxlength="50"
+                                       placeholder="{{ __('meta.state_province') }}" disabled>
+                            </div>
+
+                            <!-- Código postal -->
+                            <div class="form-group hidden" id="bloque-postal" style="margin-top:15px">
+                                <label>{{ __('meta.postal_code') }}</label>
+                                <input id="postal-usuario" type="text" maxlength="20"
+                                       placeholder="{{ __('meta.postal_code') }}" disabled>
+                            </div>
+
+
+                            <!-- numero de telefono -->
+                            <div class="form-group" id="bloque-telefono" style="display:none; margin-top: 15px">
+                                <label>{{ __('meta.phone_number')}}</label>
+                                <input id="telefono-usuario" type="text" maxlength="20" placeholder="{{ __('meta.phone_number') }}">
+                            </div>
+
+
+
+
+                            <!-- Acciones -->
+                            <div class="form-actions">
+                                <a href="#" class="btn-back" id="btn-back">Regresar</a>
+                                <button type="submit" class="btn-save">Guardar</button>
+                            </div>
+
+
                         </div>
-                    @endif
+                    </form>
+
                 </div>
             </div>
         </div>
     </section>
 
     <script>
-        // Logout por POST (placeholder)
-        document.getElementById('logoutLink')?.addEventListener('click', function (e) {
+        document.getElementById('btn-back')?.addEventListener('click', e => {
             e.preventDefault();
-            document.getElementById('logoutForm')?.submit();
-        });
-
-        // Enviar el formulario al seleccionar una dirección predeterminada
-        document.querySelectorAll('.form-default .address-radio').forEach(function (el) {
-            el.addEventListener('change', function () {
-                this.closest('form').submit();
-            });
+            history.back();
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Oculta por si el HTML no trae la clase (seguro extra)
+            document.getElementById('bloque-provincia')?.classList.add('hidden');
+            document.getElementById('bloque-postal')?.classList.add('hidden');
+
+            // Aplica lógica según país seleccionado
+            const selPais = document.getElementById('pais');
+            if (selPais) aplicarEstadoPorPais(parseInt(selPais.value || 0, 10));
+        });
+    </script>
+
+    <script>
+        const selPais = document.getElementById('pais');
+        const selDep  = document.getElementById('departamento');
+        const selMun  = document.getElementById('municipio');
+
+        const boxDep  = document.getElementById('bloque-departamento');
+        const boxMun  = document.getElementById('bloque-municipio');
+        const boxCity = document.getElementById('bloque-ciudad');
+        const boxPostal = document.getElementById('bloque-postal');
+        const boxProvincia = document.getElementById('bloque-provincia');
+
+        const inpCity = document.getElementById('ciudad-usuario');
+        const inpPostal = document.getElementById('postal-usuario');
+        const inpProvincia = document.getElementById('provincia-usuario');
+
+        // ---- Funciones base ----
+        const resetSelect = (el) => {
+            if (!el) return;
+            el.selectedIndex = 0; // deja “Seleccionar”
+        };
+
+        const toggleBlock = (wrap, control, visible, required = false) => {
+            if (!wrap || !control) return;
+            wrap.classList.toggle('hidden', !visible);
+            control.disabled = !visible;
+            control.required = visible && required;
+            if (!visible) {
+                if (control.tagName === 'SELECT') resetSelect(control);
+                else control.value = '';
+            }
+        };
+
+        const filtrarDepartamentos = (idPais) => {
+            [...selDep.options].forEach(opt => {
+                if (opt.value === '') return opt.hidden = false;
+                opt.hidden = parseInt(opt.dataset.pais) !== idPais;
+            });
+            resetSelect(selDep);
+        };
+
+        const filtrarMunicipios = (idDep) => {
+            [...selMun.options].forEach(opt => {
+                if (opt.value === '') return opt.hidden = false;
+                opt.hidden = parseInt(opt.dataset.departamento) !== idDep;
+            });
+            resetSelect(selMun);
+        };
+
+        // ---- Lógica principal ----
+        function aplicarEstadoPorPais(id) {
+            const isES = id === 1;  // El Salvador
+            const isUS = id === 2;  // Estados Unidos
+            const hasPais = !!id && id !== 0;
+
+            // Limpiar selects e inputs
+            resetSelect(selDep);
+            resetSelect(selMun);
+            inpCity.value = '';
+            inpPostal.value = '';
+            inpProvincia.value = '';
+
+            // === El Salvador ===
+            if (isES) {
+                toggleBlock(boxDep, selDep, true, true);
+                toggleBlock(boxMun, selMun, true, true);
+                toggleBlock(boxCity, inpCity, false);
+                toggleBlock(boxPostal, inpPostal, false);
+                toggleBlock(boxProvincia, inpProvincia, false);
+
+                filtrarDepartamentos(1);
+                [...selMun.options].forEach((opt, i) => opt.hidden = i !== 0);
+            }
+
+            // === Estados Unidos ===
+            else if (isUS) {
+                toggleBlock(boxDep, selDep, true, true);
+                toggleBlock(boxMun, selMun, false);
+                toggleBlock(boxCity, inpCity, true, true);
+                toggleBlock(boxPostal, inpPostal, true, true);
+                toggleBlock(boxProvincia, inpProvincia, true, true);
+
+                filtrarDepartamentos(2);
+            }
+
+            // === Otros países ===
+            else {
+                toggleBlock(boxDep, selDep, false);
+                toggleBlock(boxMun, selMun, false);
+                toggleBlock(boxCity, inpCity, false);
+                toggleBlock(boxPostal, inpPostal, false);
+                toggleBlock(boxProvincia, inpProvincia, false);
+            }
+        }
+
+        // ---- Eventos ----
+        selPais?.addEventListener('change', function () {
+            aplicarEstadoPorPais(parseInt(this.value || 0, 10));
+        });
+
+        selDep?.addEventListener('change', function () {
+            resetSelect(selMun);
+            if (parseInt(selPais.value || 0, 10) === 1) {
+                const depId = parseInt(this.value || 0, 10);
+                filtrarMunicipios(depId);
+            } else {
+                // Municipio solo “Seleccionar”
+                [...selMun.options].forEach((opt, i) => opt.hidden = i !== 0);
+            }
+        });
+
+        // Estado inicial
+        document.addEventListener('DOMContentLoaded', () => {
+            aplicarEstadoPorPais(parseInt(selPais?.value || 0, 10));
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')

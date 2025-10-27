@@ -201,8 +201,17 @@ return [
     'tracking' => '배송추적',
     'no_addresses' => '등록된 주소가 없습니다',
     'add_new_address' => '새 배송지 추가',
-
-
-
+    'select' => '선택하기',
+    'country' => '국가',
+    'department' => '데파르타멘토',
+    'municipality' => '지역',
+    'city' => '도시',
+    'name_and_lastname' => '이름',
+    'postal_code' => '우편번호',
+    'phone_number' => '전화번호',
+    'direction' => '주소',
+    'state_province' => '주 / 도 / 지역',
+    'input_direction' => '도로명 주소',
+    'input_directionv2' => '상세 주소',
 
 ];
