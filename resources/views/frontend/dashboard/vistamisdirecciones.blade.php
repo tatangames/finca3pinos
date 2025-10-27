@@ -985,70 +985,113 @@
 
         // ---- Lógica principal ----
         function aplicarEstadoPorPais(id) {
-            const isES = id === 1;  // El Salvador
-            const isUS = id === 2;  // Estados Unidos
-            const hasPais = !!id && id !== 0;
+            const isES   = id === 1;   // El Salvador
+            const isUS   = id === 2;   // Estados Unidos
+            const hasAny = !!id && id !== 0;
 
-            // Limpiar selects e inputs
+            // --- limpiar campos de ubicación cada vez que cambia el país ---
             resetSelect(selDep);
             resetSelect(selMun);
             inpCity.value = '';
-            inpPostal.value = '';
             inpProvincia.value = '';
+            inpPostal.value = '';
 
-            // === El Salvador ===
-            if (isES) {
-                toggleBlock(boxDep, selDep, true, true);
-                toggleBlock(boxMun, selMun, true, true);
-                toggleBlock(boxCity, inpCity, false);
-                toggleBlock(boxPostal, inpPostal, false);
-                toggleBlock(boxProvincia, inpProvincia, false);
-
-                filtrarDepartamentos(1);
-                [...selMun.options].forEach((opt, i) => opt.hidden = i !== 0);
-            }
-
-            // === Estados Unidos ===
-            else if (isUS) {
-                toggleBlock(boxDep, selDep, true, true);
-                toggleBlock(boxMun, selMun, false);
-                toggleBlock(boxCity, inpCity, true, true);
-                toggleBlock(boxPostal, inpPostal, true, true);
-                toggleBlock(boxProvincia, inpProvincia, true, true);
-
-                filtrarDepartamentos(2);
-            }
-
-            // === Otros países ===
-            else {
+            if (!hasAny) {
+                // sin país -> oculta todo
                 toggleBlock(boxDep, selDep, false);
                 toggleBlock(boxMun, selMun, false);
                 toggleBlock(boxCity, inpCity, false);
-                toggleBlock(boxPostal, inpPostal, false);
                 toggleBlock(boxProvincia, inpProvincia, false);
+                toggleBlock(boxPostal, inpPostal, false);
+                return;
             }
+
+            if (isES) {
+                // ES: Departamento + Municipio requeridos. Sin ciudad/provincia/postal
+                toggleBlock(boxDep, selDep, true,  true);
+                toggleBlock(boxMun, selMun, true,  true);
+                toggleBlock(boxCity, inpCity, false);
+                toggleBlock(boxProvincia, inpProvincia, false);
+                toggleBlock(boxPostal, inpPostal, false);
+
+                filtrarDepartamentos(1);
+                // Oculta municipios hasta seleccionar departamento
+                [...selMun.options].forEach((opt, i) => opt.hidden = i !== 0);
+                return;
+            }
+
+            if (isUS) {
+                // US: Departamento (para estados) requerido, Ciudad y Postal requeridos.
+                //     NO mostrar "Estado / Provincia / Región"
+                toggleBlock(boxDep, selDep, true,  true);
+                toggleBlock(boxMun, selMun, false);
+                toggleBlock(boxCity, inpCity, true,  true);
+                toggleBlock(boxPostal, inpPostal, true,  true);
+                toggleBlock(boxProvincia, inpProvincia, false); // <-- oculto para US
+
+                filtrarDepartamentos(2);
+                return;
+            }
+
+            // Otros países: Ciudad + Provincia/Estado requeridos. Sin Dep/Mun ni Postal
+            toggleBlock(boxDep, selDep, false);
+            toggleBlock(boxMun, selMun, false);
+            toggleBlock(boxCity, inpCity, true,  true);
+            toggleBlock(boxProvincia, inpProvincia, true,  true);
+            toggleBlock(boxPostal, inpPostal, false);
         }
 
-        // ---- Eventos ----
+
+
+
+        // Mantén tus listeners tal cual
         selPais?.addEventListener('change', function () {
+            clearFormForCountryChange();
             aplicarEstadoPorPais(parseInt(this.value || 0, 10));
         });
-
         selDep?.addEventListener('change', function () {
             resetSelect(selMun);
             if (parseInt(selPais.value || 0, 10) === 1) {
-                const depId = parseInt(this.value || 0, 10);
-                filtrarMunicipios(depId);
+                filtrarMunicipios(parseInt(this.value || 0, 10));
             } else {
-                // Municipio solo “Seleccionar”
                 [...selMun.options].forEach((opt, i) => opt.hidden = i !== 0);
             }
         });
 
-        // Estado inicial
         document.addEventListener('DOMContentLoaded', () => {
+            if (!selPais?.value) clearFormForCountryChange();
             aplicarEstadoPorPais(parseInt(selPais?.value || 0, 10));
         });
+
+
+
+
+
+        function clearFormForCountryChange() {
+            const form = document.getElementById('address-form');
+            if (!form) return;
+
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.id === 'pais' || el.name === '_token') return;
+
+                if (el.tagName === 'SELECT') {
+                    el.selectedIndex = 0;       // vuelve a "Seleccionar"
+                } else if (el.type === 'checkbox' || el.type === 'radio') {
+                    el.checked = false;
+                } else {
+                    el.value = '';
+                }
+            });
+
+            // Quitar estados de error y mensajes
+            form.querySelectorAll('.form-group').forEach(fg => {
+                fg.classList.remove('has-error');
+                fg.querySelector('.error-text')?.remove();
+            });
+        }
+
+
+
     </script>
 
 
@@ -1243,7 +1286,7 @@
                         // Redirige (usa data.redirect si viene, si no fallback)
                         const url = data.redirect;
                         window.location.assign(url);
-                        toastr.success("pruebaaa");
+
                     }else{
                         // Fallo general
                         toastr.error(i18n.genericError);
