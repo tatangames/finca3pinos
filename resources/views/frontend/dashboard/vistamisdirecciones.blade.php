@@ -727,6 +727,25 @@
             display: none !important;
         }
 
+
+        .error-text{
+            display:block;
+            margin:4px 0 0 2px;
+            font-size:11.5px;   /* más pequeño */
+            line-height:1.2;
+            text-align:left;    /* alineado a la izquierda */
+            color:#d93025;      /* rojo */
+            font-weight:600;
+        }
+        .has-error select,
+        .has-error input,
+        .has-error textarea{
+            border-color:#d93025 !important;
+            outline:0 !important;
+        }
+
+
+
     </style>
 
     @php
@@ -763,7 +782,11 @@
                     {{-- Tu grid de direcciones (si aplica) --}}
 
                     {{-- ===== Formulario ===== --}}
-                    <form id="address-form" class="address-form address-form--compact" method="POST" action="#">
+                    <form id="address-form"
+                          class="address-form address-form--compact"
+                          method="POST"
+                          action="#"
+                          novalidate>
                         @csrf
                         <h4>{{ __('meta.add_new_address') }}</h4>
 
@@ -771,7 +794,7 @@
                             {{-- País --}}
                             <div class="form-group">
                                 <label for="pais">{{ __('meta.country') }}</label>
-                                <select id="pais" name="pais" required>
+                                <select id="pais" name="pais">
                                     <option value="">{{ __('meta.select') }}</option>
                                     @foreach(($paises ?? []) as $p)
                                         <option value="{{ $p->id }}">{{ $p->nombre }}</option>
@@ -881,6 +904,27 @@
             if (selPais) aplicarEstadoPorPais(parseInt(selPais.value || 0, 10));
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('address-form');
+            if (!form) return;
+
+            // ya agregado en el HTML, pero aseguramos:
+            form.setAttribute('novalidate', '');
+
+            // evita tooltips nativos para cualquier campo inválido
+            form.addEventListener('invalid', (e) => {
+                e.preventDefault();
+            }, true);
+
+            // limpia cualquier "customValidity" por si algún tema lo usa
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                el.setCustomValidity && el.setCustomValidity('');
+            });
+        });
+    </script>
+
 
     <script>
         const selPais = document.getElementById('pais');
@@ -1000,9 +1044,139 @@
 
 
 
+    <script>
+        (function(){
+            const form   = document.getElementById('address-form');
 
+            // Controles
+            const selPais = document.getElementById('pais');
+            const selDep  = document.getElementById('departamento');
+            const selMun  = document.getElementById('municipio');
 
+            const inpNombre    = document.getElementById('nombre-usuario');
+            const inpDireccion = document.getElementById('direccion-usuario');
+            const inpTelefono  = document.getElementById('telefono-usuario');
 
+            // Form-groups
+            const fgPais   = selPais?.closest('.form-group');
+            const fgDep    = selDep?.closest('.form-group');
+            const fgMun    = selMun?.closest('.form-group');
+            const fgNombre = inpNombre?.closest('.form-group');
+            const fgDir    = inpDireccion?.closest('.form-group');
+            const fgTel    = inpTelefono?.closest('.form-group');
+
+            // i18n (cámbialo a tus __() si deseas)
+            const i18n = {
+                countryRequired:     "El país es requerido",
+                nameRequired:        "El nombre es requerido",
+                addressRequired:     "La dirección es requerida",
+                phoneRequired:       "El teléfono es requerido",
+                departmentRequired:  "El departamento es requerido",
+                municipalityRequired:"El municipio es requerido"
+            };
+
+            function isVisibleControl(ctrl){
+                if(!ctrl) return false;
+                const group = ctrl.closest('.form-group') || ctrl;
+                const style = window.getComputedStyle(group);
+                return !group.classList.contains('hidden') && style.display !== 'none' && !ctrl.disabled;
+            }
+
+            function clearError(fg){
+                if(!fg) return;
+                fg.classList.remove('has-error');
+                const old = fg.querySelector('.error-text');
+                if(old) old.remove();
+            }
+
+            function setError(fg, msg){
+                if(!fg) return;
+                clearError(fg);
+                fg.classList.add('has-error');
+                const span = document.createElement('span');
+                span.className = 'error-text';
+                span.textContent = msg;
+                fg.appendChild(span);
+            }
+
+            // Limpia error al corregir
+            function attachAutoClear(control, fg, isValidFn){
+                if(!control || !fg) return;
+                const handler = () => { if(isValidFn()) clearError(fg); };
+                control.addEventListener('input', handler);
+                control.addEventListener('change', handler);
+                control.addEventListener('blur', handler);
+            }
+
+            function validate(){
+                let ok = true;
+
+                // Limpia previos
+                [fgPais, fgDep, fgMun, fgNombre, fgDir, fgTel].forEach(clearError);
+
+                const paisId = parseInt(selPais?.value || 0, 10);
+
+                // País
+                if(!selPais || selPais.value === ''){
+                    setError(fgPais, i18n.countryRequired);
+                    ok = false;
+                }
+
+                // Nombre
+                if(!inpNombre || !inpNombre.value.trim()){
+                    setError(fgNombre, i18n.nameRequired);
+                    ok = false;
+                }
+
+                // Dirección
+                if(!inpDireccion || !inpDireccion.value.trim()){
+                    setError(fgDir, i18n.addressRequired);
+                    ok = false;
+                }
+
+                // Teléfono
+                if(!inpTelefono || !inpTelefono.value.trim()){
+                    setError(fgTel, i18n.phoneRequired);
+                    ok = false;
+                }
+
+                // ES (1): municipio requerido
+                if(paisId === 1 && selMun && isVisibleControl(selMun)){
+                    if(selMun.value === '' || selMun.selectedIndex === 0){
+                        setError(fgMun, i18n.municipalityRequired);
+                        ok = false;
+                    }
+                }
+
+                // US (2): departamento requerido
+                if(paisId === 2 && selDep && isVisibleControl(selDep)){
+                    if(selDep.value === '' || selDep.selectedIndex === 0){
+                        setError(fgDep, i18n.departmentRequired);
+                        ok = false;
+                    }
+                }
+
+                return ok;
+            }
+
+            // Auto-clear para quitar el label al corregir
+            attachAutoClear(selPais,   fgPais,   () => selPais.value !== '');
+            attachAutoClear(inpNombre, fgNombre, () => !!inpNombre.value.trim());
+            attachAutoClear(inpDireccion, fgDir, () => !!inpDireccion.value.trim());
+            attachAutoClear(inpTelefono,  fgTel, () => !!inpTelefono.value.trim());
+            attachAutoClear(selDep,    fgDep,    () => selDep.value !== '' && selDep.selectedIndex > 0);
+            attachAutoClear(selMun,    fgMun,    () => selMun.value !== '' && selMun.selectedIndex > 0);
+
+            // Submit
+            form?.addEventListener('submit', function(e){
+                if(!validate()){
+                    e.preventDefault();
+                    const firstErr = form.querySelector('.has-error select, .has-error input, .has-error textarea');
+                    firstErr?.focus();
+                }
+            });
+        })();
+    </script>
 
 
 
