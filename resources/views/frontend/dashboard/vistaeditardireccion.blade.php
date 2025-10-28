@@ -564,18 +564,14 @@
 
         /* ==========================
            HARD HIDE/SHOW (genérico)
-           - Quita name para que NO se envíe
-           - Deshabilita y oculta controles y WRAPPERS (form-group, row, etc.)
         ========================== */
         function forceHideBlockHard(wrapEl, controlEl) {
             if (!wrapEl || !controlEl) return;
 
-            // Guardar name actual para restauración posterior
             const prevName = controlEl.getAttribute('name');
             if (prevName && !controlEl.dataset.prevName) controlEl.dataset.prevName = prevName;
             controlEl.removeAttribute('name');
 
-            // Apagar totalmente el control
             controlEl.disabled = true;
             controlEl.required = false;
             controlEl.hidden = true;
@@ -583,7 +579,6 @@
             controlEl.classList.add('hidden-hard');
             controlEl.style.display = 'none';
 
-            // Ocultar wrappers comunes
             const wrappers = ['select-wrap','field','row','col','form-row','form-item','grid','form-group'];
             let p = controlEl.parentElement;
             while (p && p !== document) {
@@ -600,7 +595,6 @@
         function forceShowBlockHard(wrapEl, controlEl) {
             if (!wrapEl || !controlEl) return;
 
-            // Restaurar name si estaba guardado
             if (controlEl.dataset.prevName) controlEl.setAttribute('name', controlEl.dataset.prevName);
 
             controlEl.disabled = false;
@@ -609,7 +603,6 @@
             controlEl.classList.remove('hidden-hard');
             controlEl.style.display = '';
 
-            // Mostrar wrappers
             let p = controlEl.parentElement;
             while (p && p !== document) {
                 p.classList?.remove('hidden-hard');
@@ -622,7 +615,6 @@
 
         /* ==========================
            HARD HIDE/SHOW específicos
-           para SELECT Departamento/Municipio
         ========================== */
         let municipioPrevName = null;
         function forceHideMunicipioHard() {
@@ -713,22 +705,22 @@
         };
 
         /* ==========================
-           LÓGICA POR PAÍS
+           LÓGICA POR PAÍS (con preservación)
         ========================== */
-        function aplicarEstadoPorPais(rawId) {
+        function aplicarEstadoPorPais(rawId, { preserve = true } = {}) {
             const id = parseInt(rawId, 10) || 0;
             const isES = id === 1; // El Salvador
             const isUS = id === 2; // Estados Unidos
 
-            // Limpieza base
-            resetSelect(selDep);
-            resetSelect(selMun);
+            const prevDep = preserve && selDep ? selDep.value : '';
+            const prevMun = preserve && selMun ? selMun.value : '';
+
+            // limpiar solo inputs de texto
             if (inpCity)      inpCity.value = '';
             if (inpProvincia) inpProvincia.value = '';
             if (inpPostal)    inpPostal.value = '';
 
             if (!id) {
-                // Sin país => esconder todos los dependientes
                 toggleBlock(boxCity,      inpCity,      false);
                 toggleBlock(boxProvincia, inpProvincia, false);
                 toggleBlock(boxPostal,    inpPostal,    false);
@@ -738,49 +730,59 @@
             }
 
             if (isES) {
-                // ES: Departamento + Municipio visibles y requeridos; Ciudad oculta "hard".
+                // Mostrar Dep/Mun
                 forceShowDepartamentoHard();
                 filtrarDepartamentos(1);
-                toggleBlock(boxDep, selDep, true, true);
+
+                if (selDep) {
+                    const canKeepDep = preserve && [...selDep.options].some(o => !o.hidden && o.value === prevDep);
+                    if (canKeepDep) selDep.value = prevDep;
+                    toggleBlock(boxDep, selDep, true, true);
+                }
 
                 forceShowMunicipioHard();
-                toggleBlock(boxMun, selMun, true, true);
-                if (selMun) [...selMun.options].forEach((opt, i) => opt.hidden = i !== 0);
 
-                // Ocultar DURO: Ciudad, Estado/Provincia y Código Postal
+                if (selDep && selDep.value) filtrarMunicipios(parseInt(selDep.value, 10));
+                if (selMun) {
+                    const canKeepMun = preserve && [...selMun.options].some(o => !o.hidden && o.value === prevMun);
+                    if (canKeepMun) selMun.value = prevMun;
+                }
+                toggleBlock(boxMun, selMun, true, true);
+
+                // Hard-hide Ciudad, Provincia/Estado y Postal
                 forceHideBlockHard(boxCity,      inpCity);
                 forceHideBlockHard(boxProvincia, inpProvincia);
                 forceHideBlockHard(boxPostal,    inpPostal);
-
-                // Provincia/Postal ocultos "normal" (como tenías).
-                toggleBlock(boxProvincia, inpProvincia, false);
-                toggleBlock(boxPostal,    inpPostal,    false);
                 return;
             }
 
             if (isUS) {
-                // US: Departamento visible req; Municipio oculto; Ciudad/Provincia/Postal visibles req
                 forceShowDepartamentoHard();
                 filtrarDepartamentos(2);
-                toggleBlock(boxDep, selDep, true, true);
+
+                if (selDep) {
+                    const canKeepDep = preserve && [...selDep.options].some(o => !o.hidden && o.value === prevDep);
+                    if (canKeepDep) selDep.value = prevDep;
+                    toggleBlock(boxDep, selDep, true, true);
+                }
 
                 resetSelect(selMun);
                 toggleBlock(boxMun, selMun, false);
                 forceHideMunicipioHard();
 
-                forceShowBlockHard(boxCity, inpCity);
+                forceShowBlockHard(boxCity,      inpCity);
                 forceShowBlockHard(boxProvincia, inpProvincia);
-                forceShowBlockHard(boxPostal, inpPostal);
+                forceShowBlockHard(boxPostal,    inpPostal);
                 inpCity.required = true; inpProvincia.required = true; inpPostal.required = true;
                 return;
             }
 
-            // OTROS PAÍSES: sin Dep/Mun; Ciudad/Provincia/Postal requeridos.
+            // Otros países
             forceHideDepartamentoHard();
             forceHideMunicipioHard();
-            forceShowBlockHard(boxCity, inpCity);
+            forceShowBlockHard(boxCity,      inpCity);
             forceShowBlockHard(boxProvincia, inpProvincia);
-            forceShowBlockHard(boxPostal, inpPostal);
+            forceShowBlockHard(boxPostal,    inpPostal);
             inpCity.required = true; inpProvincia.required = true; inpPostal.required = true;
         }
 
@@ -789,20 +791,20 @@
         ========================== */
         selPais?.addEventListener('change', function () {
             clearFormForCountryChange();
-            aplicarEstadoPorPais(this.value);
+            aplicarEstadoPorPais(this.value, { preserve: false }); // usuario cambió país → no preservar
         });
 
         selDep?.addEventListener('change', function () {
-            resetSelect(selMun);
             const idPais = parseInt(selPais?.value || '0', 10);
             if (idPais === 1) {
-                // ES: filtra y muestra municipios
                 const depId = parseInt(this.value || '0', 10);
                 filtrarMunicipios(depId);
                 forceShowMunicipioHard();
+                // si municipio actual no pertenece, reset
+                const ok = [...selMun.options].some(o => !o.hidden && o.value === selMun.value);
+                if (!ok) resetSelect(selMun);
                 toggleBlock(boxMun, selMun, true, true);
             } else {
-                // US u otros: municipio oculto duro
                 toggleBlock(boxMun, selMun, false);
                 forceHideMunicipioHard();
             }
@@ -812,7 +814,7 @@
            INIT
         ========================== */
         document.addEventListener('DOMContentLoaded', () => {
-            aplicarEstadoPorPais(selPais?.value || '0');
+            aplicarEstadoPorPais(selPais?.value || '0', { preserve: true });
             const idPais = parseInt(selPais?.value || '0', 10);
             if (idPais === 1 && selDep?.value) {
                 filtrarMunicipios(parseInt(selDep.value || '0', 10));
