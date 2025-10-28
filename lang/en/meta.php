@@ -218,7 +218,13 @@ return [
     'error_v1' => 'An error occurred while saving. Please try again.',
     'saved_successfully' => 'Saved successfully',
     'saving' => 'Saving...',
-
+    'phone' => 'Phone',
+    'delete' => 'Delete?',
+    'action_will_delete' => 'This action will delete the selected address.',
+    'cancel' => 'Cancel',
+    'yes_delete' => 'Yes, delete',
+    'delete_v2' => 'Deleted',
+    'address_was_detele' => 'The address was deleted successfully.',
 
 
 

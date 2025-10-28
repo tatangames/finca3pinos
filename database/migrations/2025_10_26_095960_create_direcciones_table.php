@@ -37,6 +37,9 @@ return new class extends Migration
             // telefono
             $table->string('telefono', 20)->nullable();
 
+            // direccion predetermianda
+            $table->boolean('predeterminado')->default(false);
+
             $table->foreign('id_paises')->references('id')->on('paises');
             $table->foreign('id_departamento')->references('id')->on('departamentos');
             $table->foreign('id_municipio')->references('id')->on('municipios');

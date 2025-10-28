@@ -14,5 +14,10 @@ return [
     'orders' => 'user-orders',
     'address' => 'user-address',
     'save_direction' => 'save-direction',
+    'deletedirection' => 'delete-direction',
+    'directiondefault' => 'direction-default',
+    'newdirection' => 'new-direction',
+
+
 
 ];

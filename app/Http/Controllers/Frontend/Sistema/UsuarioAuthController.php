@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Frontend\Sistema;
 
 use App\Http\Controllers\Controller;
 use App\Mail\PasswordResetMail;
+use App\Models\Departamento;
+use App\Models\Direcciones;
+use App\Models\Municipio;
+use App\Models\Pais;
 use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -251,6 +255,62 @@ class UsuarioAuthController extends Controller
 
     public function vistaMisDirecciones()
     {
+        $userId = Auth::guard('web')->id();
+
+        $arrayDirecciones = Direcciones::where('id_usuario', $userId)
+            ->get()
+            ->map(function ($item) {
+
+                $infoPais = Pais::find($item->id_paises);
+                $infoDep  = Departamento::find($item->id_departamento);
+                $infoMun  = Municipio::find($item->id_municipio);
+
+                $item->nombrePais = $infoPais->nombre ?? '';
+                $item->nombreDep  = $infoDep->nombre ?? '';
+                $item->nombreMun  = $infoMun->nombre ?? '';
+
+                // --- Construir texto según el país ---
+                switch ($item->id_paises) {
+                    case 1:
+                        // El Salvador → país 1
+                        $item->textoDireccion = "
+                        <b>País:</b> {$item->nombrePais}<br>
+                        <b>Departamento:</b> {$item->nombreDep}<br>
+                        <b>Municipio:</b> {$item->nombreMun}<br>
+                        <b>Dirección:</b> {$item->direccion}
+                    ";
+                        break;
+
+                    case 2:
+                        // Ej. Estados Unidos
+                        $item->textoDireccion = "
+                        <b>País:</b> {$item->nombrePais}<br>
+                        <b>Departamento / Estado:</b> {$item->nombreDep}<br>
+                        <b>Dirección:</b> {$item->direccion}
+                    ";
+                        break;
+
+                    default:
+                        // Otros países
+                        $item->textoDireccion = "
+                        <b>País:</b> {$item->nombrePais}<br>
+                        <b>Dirección:</b> {$item->direccion}
+                    ";
+                        break;
+                }
+
+                return $item;
+            });
+
+        return view('frontend.dashboard.vistamisdirecciones', [
+            'arrayDirecciones' => $arrayDirecciones,
+        ]);
+    }
+
+
+
+    public function vistaNuevaDireccion()
+    {
         // Países activos y disponibles
         $paises = DB::table('paises')
             ->where('activo', 1)
@@ -273,23 +333,17 @@ class UsuarioAuthController extends Controller
             ->select('id', 'id_departamentos', 'nombre')
             ->get();
 
-        return view('frontend.dashboard.vistamisdirecciones', [
+        return view('frontend.dashboard.vistanuevadireccion', [
             'paises' => $paises,
             'departamentos' => $departamentos,
             'municipios' => $municipios,
         ]);
     }
 
+
     // guardar nueva direccion
     public function guardarNuevaDireccion(Request $request)
     {
-        $ruta = route('user.address');
-
-        return response()->json([
-            'success' => 1,
-            'ruta'    => $ruta,
-        ]);
-
         $regla = array(
             'pais' => 'required',
             'nombre' => 'required',
@@ -300,35 +354,138 @@ class UsuarioAuthController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
+        DB::beginTransaction();
+        try {
 
-      /*  [2025-10-27 14:56:55] local.INFO: array (
-        '_token' => '4wnnvBhQZ1fVMxBnr0CL70DMts8zsKXLKxJzjvzk',
-        'pais' => '2',
-        'departamento' => '21',
-        'municipio' => NULL,
-        'nombre' => 'aaa',
-        'direccion' => 'bbb',
-        'direccion_opcional' => 'ccc',
-        'telefono' => '2333',
-        'ciudad' => 'miciudad',
-        'provincia' => 'mi estado',
-        'postal' => '503 postal',
-    )*/
+            // guardar Direccion
+            $userId = Auth::guard('web')->id();
 
+            // Verificar si el usuario ya tiene direcciones
+            $tieneDireccion = Direcciones::where('id_usuario', $userId)->exists();
 
+            // Si no tiene, esta será la predeterminada
+            $esPredeterminada = $tieneDireccion ? 0 : 1;
 
+            Direcciones::create([
+                'id_usuario'         => $userId,            // <- sin espacio
+                'id_paises'          => $request->pais,
+                'id_departamento'    => $request->departamento,
+                'id_municipio'       => $request->municipio,
+                'nombre'             => $request->nombre,
+                'direccion'          => $request->direccion,
+                'direccion_opcional' => $request->direccion_opcional,
+                'ciudad'             => $request->ciudad,
+                'estado'             => $request->provincia,
+                'zipcode'            => $request->postal,
+                'telefono'           => $request->telefono,
+                'predeterminado'     => $esPredeterminada,
+            ]);
 
+            DB::commit();
+            $ruta = route('user.address');
 
-        return response()->json([
-            'success' => 1,
-            'ruta' => route('user.index'),
-            'admin' => Auth::guard('web')->user(),
-        ]);
-
-        return ['success' => 1];
-
+            return response()->json([
+                'success' => 1,
+                'ruta'    => $ruta,
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return ['success' => 0, 'message' => 'Error al actualizar'];
+        }
     }
 
+    public function borrarDireccionCliente(Request $request)
+    {
+        $request->validate([
+            'id' => ['required', 'integer']
+        ]);
+
+        $userId = Auth::guard('web')->id();
+
+        // Buscar la dirección y asegurar que sea del usuario
+        $dir = Direcciones::where('id', $request->id)
+            ->where('id_usuario', $userId)
+            ->first();
+
+        if (!$dir) {
+            return response()->json(['success' => 0,
+                'msg' => 'No encontrada o no pertenece al usuario']);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $eraPredeterminada = (int)($dir->predeterminado ?? 0) === 1;
+
+            // Borrar la dirección
+            $dir->delete();
+
+            // Si la borrada era predeterminada, marcar otra como predeterminada (si existe)
+            if ($eraPredeterminada) {
+                $otra = Direcciones::where('id_usuario', $userId)
+                    ->orderBy('id', 'asc') // o created_at, según tu modelo
+                    ->first();
+
+                if ($otra) {
+                    $otra->predeterminado = 1;
+                    $otra->save();
+                }
+            }
+
+            DB::commit();
+
+            return ['success' => 1];
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            // Log::error($e->getMessage());
+            return response()->json(['success' => 0]);
+        }
+    }
+
+
+    public function direccionPorDefault(Request $request)
+    {
+        try {
+            // Validar datos recibidos
+            $request->validate([
+                'id' => 'required|integer|exists:direcciones,id',
+            ]);
+
+            // Obtener usuario actual
+            $userId = auth()->id();
+
+            // Buscar dirección seleccionada
+            $direccion = Direcciones::where('id', $request->id)
+                ->where('id_usuario', $userId)
+                ->first();
+
+            if (!$direccion) {
+                return response()->json(['success' => 0,
+                    'message' => 'Dirección no encontrada.']);
+            }
+
+            // Quitar el default anterior del mismo usuario
+            Direcciones::where('id_usuario', $userId)
+                ->update(['predeterminado' => 0]);
+
+            // Marcar la nueva como default
+            $direccion->predeterminado = 1;
+            $direccion->save();
+
+            return response()->json([
+                'success' => 1,
+                'message' => 'Dirección establecida como predeterminada.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error al establecer dirección predeterminada: ' . $e->getMessage());
+            return response()->json([
+                'success' => 0,
+                'message' => 'Ocurrió un error al guardar.'
+            ]);
+        }
+    }
 
 
 

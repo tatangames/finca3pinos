@@ -222,7 +222,13 @@ return [
     'error_v1' => '저장 중 오류가 발생했습니다. 다시 시도해주세요.',
     'saved_successfully' => '성공적으로 저장되었습니다',
     'saving' => '저장 중...',
-
+    'phone' => '전화번호',
+    'delete' => '삭제',
+    'action_will_delete' => '이 작업은 선택한 주소를 삭제합니다.',
+    'cancel' => '취소',
+    'yes_delete' => '예, 삭제하기',
+    'delete_v2' => '삭제 완료',
+    'address_was_detele' => '주소가 성공적으로 삭제되었습니다.',
 
 
 

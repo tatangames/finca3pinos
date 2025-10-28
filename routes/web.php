@@ -241,6 +241,22 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::post(LaravelLocalization::transRoute('routes.save_direction'), [UsuarioAuthController::class, 'guardarNuevaDireccion'])
             ->name('user.savenew.direction');
 
+        // borrar direccion
+        Route::post(LaravelLocalization::transRoute('routes.deletedirection'), [UsuarioAuthController::class, 'borrarDireccionCliente'])
+        ->name('user.delete.direction');
+
+        // hacer predeterminada una direccion
+        Route::post(LaravelLocalization::transRoute('routes.directiondefault'), [UsuarioAuthController::class, 'direccionPorDefault'])
+            ->name('user.direction.default');
+
+
+        // vista nueva direccion
+        Route::get(LaravelLocalization::transRoute('routes.newdirection'), [UsuarioAuthController::class, 'vistaNuevaDireccion'])
+            ->name('user.new.direction');
+
+
+
+
 
 
     });

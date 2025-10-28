@@ -11,5 +11,17 @@ class Direcciones extends Model
     protected $table = 'direcciones';
     public $timestamps = false;
 
-    protected $fillable = [''];
+    protected $fillable = [
+        'id_usuario',
+        'id_paises',
+        'id_departamento',
+        'id_municipio',
+        'nombre',
+        'direccion',
+        'direccion_opcional',
+        'ciudad',
+        'estado',
+        'zipcode',
+        'telefono',
+    ];
 }

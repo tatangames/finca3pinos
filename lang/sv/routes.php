@@ -12,7 +12,12 @@ return [
     'updatepassword' => 'update-password',
     'user_profile' => 'perfil-usuario',
     'orders' => 'perfil-ordenes',
-    'address' => 'perfil-direcciones',
-    'save_direction' => 'guardar-direccion',
+    'address' => 'perfil-direcciones', // listado direcciones
+    'save_direction' => 'guardar-direccion', // formulario nueva direccion
+    'deletedirection' => 'borrar-direccion',
+    'directiondefault' => 'direccion-default',
+    'newdirection' => 'nueva-direccion',
+
+
 
 ];

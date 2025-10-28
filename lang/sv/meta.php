@@ -209,7 +209,7 @@ return [
     'direction' => 'Dirección',
     'state_province' => 'Estado / Provincia / Región',
     'input_direction' => 'Dirección',
-    'input_directionv2' => 'Referencia',
+    'input_directionv2' => 'Referencia (Opcional)',
     'country_required' => 'País es requerido.',
     'address_required' => 'La dirección es requerida.',
     'phone_required' => 'El Teléfono es requerido.',
@@ -219,8 +219,14 @@ return [
     'error_v1' => 'Ocurrió un error al guardar. Intentar nuevamente.',
     'saved_successfully' => 'Guardado correctamente.',
     'saving' => 'Guardando...',
+    'phone' => 'Teléfono',
+    'delete_question' => '¿Borrar?',
 
-
+    'action_will_delete' => 'Esta acción eliminará la dirección seleccionada.',
+    'cancel' => 'Cancelar',
+    'yes_delete' => 'Sí, borrar',
+    'delete_v2' => 'Eliminado',
+    'address_was_detele' => 'La dirección fue borrada correctamente.',
 
 
 
