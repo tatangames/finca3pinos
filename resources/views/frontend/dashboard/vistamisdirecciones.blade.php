@@ -510,9 +510,9 @@
                                     </div>
 
                                     <div class="address-tools" aria-label="Actions">
-                                        <a href="javascript:void(0)"
+                                        <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.edit.direction', ['iddirection' => $address->id], false)) }}"
                                            title="{{ __('meta.edit') }}"
-                                           onclick="editarDireccion({{ $address->id }})">✏️</a>
+                                          >✏️</a>
 
                                         <a href="javascript:void(0)"
                                            title="{{ __('meta.delete') }}"
@@ -565,8 +565,6 @@
             document.getElementById('logoutForm')?.submit();
         });
 
-
-
         const i18n = {
             deleteQuestionMessage: "{{ __('meta.delete_question') }}",
             willDeleteMessage: "{{ __('meta.action_will_delete') }}",
@@ -600,7 +598,7 @@
                     confirmButtonText: i18n.yesDeleteMessage,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        axios.post('/borrar/direccion', {
+                        axios.post(DELETE_URL, {
                             id: addressId
                         })
                             .then(res => {

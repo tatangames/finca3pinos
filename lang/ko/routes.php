@@ -17,7 +17,7 @@ return [
     'deletedirection' => 'delete-direction',
     'directiondefault' => 'direction-default',
     'newdirection' => 'new-direction',
-
-
+    'editdirection' => 'edit-direction/{iddirection}',
+    'updatedirection' => 'update-direction',
 
 ];

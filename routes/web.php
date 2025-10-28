@@ -249,12 +249,16 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::post(LaravelLocalization::transRoute('routes.directiondefault'), [UsuarioAuthController::class, 'direccionPorDefault'])
             ->name('user.direction.default');
 
-
         // vista nueva direccion
         Route::get(LaravelLocalization::transRoute('routes.newdirection'), [UsuarioAuthController::class, 'vistaNuevaDireccion'])
             ->name('user.new.direction');
 
+        // vista editare direccion
+        Route::get(LaravelLocalization::transRoute('routes.editdirection'), [UsuarioAuthController::class, 'vistaEditarDireccion'])
+            ->name('user.edit.direction');
 
+        Route::post(LaravelLocalization::transRoute('routes.updatedirection'), [UsuarioAuthController::class, 'actualizarDireccion'])
+            ->name('user.update.direction');
 
 
 

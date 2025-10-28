@@ -10,6 +10,7 @@ use App\Models\Municipio;
 use App\Models\Pais;
 use App\Models\Usuario;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -339,6 +340,48 @@ class UsuarioAuthController extends Controller
             'municipios' => $municipios,
         ]);
     }
+
+
+    public function vistaEditarDireccion($iddireccion)
+    {
+        try {
+            $userId  = auth()->id();
+
+            $address = Direcciones::where('id', $iddireccion)
+                ->where('id_usuario', $userId)
+                ->firstOrFail();
+
+            // === mismos catálogos que en "nuevo" ===
+            $paises = DB::table('paises')
+                ->where('activo', 1)->where('disponible', 1)
+                ->select('id','nombre')->get();
+
+            $departamentos = DB::table('departamentos')
+                ->whereIn('id_paises', [1,2])
+                ->where('activo', 1)->where('disponible', 1)
+                ->select('id','id_paises','nombre')->get();
+
+            $municipios = DB::table('municipios')
+                ->where('activo', 1)->where('disponible', 1)
+                ->select('id','id_departamentos','nombre')->get();
+
+            return view('frontend.dashboard.vistaeditardireccion', [
+                'mode'          => 'edit',
+                'address'       => $address,
+                'paises'        => $paises,
+                'departamentos' => $departamentos,
+                'municipios'    => $municipios,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->view('errors.404', [], 404);
+        }
+    }
+
+
+
+
+
+
 
 
     // guardar nueva direccion
