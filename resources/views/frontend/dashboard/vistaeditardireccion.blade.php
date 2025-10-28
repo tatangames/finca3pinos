@@ -497,11 +497,6 @@
                                    placeholder="{{ __('meta.postal_code') }}" disabled>
                         </div>
 
-
-
-
-
-
                         {{-- Teléfono --}}
                         <div class="form-group">
                             <label for="telefono-usuario">{{ __('meta.phone_number') }}</label>
@@ -715,10 +710,12 @@
             const prevDep = preserve && selDep ? selDep.value : '';
             const prevMun = preserve && selMun ? selMun.value : '';
 
-            // limpiar solo inputs de texto
-            if (inpCity)      inpCity.value = '';
-            if (inpProvincia) inpProvincia.value = '';
-            if (inpPostal)    inpPostal.value = '';
+            // 🔧 SOLO limpiar cuando NO preservamos (cambio manual de país)
+            if (!preserve) {
+                if (inpCity)      inpCity.value = '';
+                if (inpProvincia) inpProvincia.value = '';
+                if (inpPostal)    inpPostal.value = '';
+            }
 
             if (!id) {
                 toggleBlock(boxCity,      inpCity,      false);
@@ -730,7 +727,6 @@
             }
 
             if (isES) {
-                // Mostrar Dep/Mun
                 forceShowDepartamentoHard();
                 filtrarDepartamentos(1);
 
@@ -749,7 +745,7 @@
                 }
                 toggleBlock(boxMun, selMun, true, true);
 
-                // Hard-hide Ciudad, Provincia/Estado y Postal
+                // HARD HIDE para campos que no aplican en ES (NO borra valor cuando preserve = true)
                 forceHideBlockHard(boxCity,      inpCity);
                 forceHideBlockHard(boxProvincia, inpProvincia);
                 forceHideBlockHard(boxPostal,    inpPostal);
@@ -770,6 +766,7 @@
                 toggleBlock(boxMun, selMun, false);
                 forceHideMunicipioHard();
 
+                // Mostrar y habilitar ciudad/estado/postal sin borrar su value
                 forceShowBlockHard(boxCity,      inpCity);
                 forceShowBlockHard(boxProvincia, inpProvincia);
                 forceShowBlockHard(boxPostal,    inpPostal);
@@ -860,6 +857,352 @@
             });
         })();
     </script>
+
+
+
+
+
+
+
+    <script>
+        (function () {
+            const form   = document.getElementById('address-form');
+
+            // Controles
+            const selPais = document.getElementById('pais');
+            const selDep  = document.getElementById('departamento');
+            const selMun  = document.getElementById('municipio');
+
+            const inpNombre    = document.getElementById('nombre-usuario');
+            const inpDireccion = document.getElementById('direccion-usuario');
+            const inpDirOpt    = document.getElementById('direccionopcional-usuario');
+            const inpTelefono  = document.getElementById('telefono-usuario');
+            const inpCiudad    = document.getElementById('ciudad-usuario');
+            const inpProvincia = document.getElementById('provincia-usuario'); // name="estado" en el form
+            const inpPostal    = document.getElementById('postal-usuario');    // name="zipcode" en el form
+            const inpAddressId = form?.querySelector('input[name="address_id"]');
+
+            // Wrappers (bloques)
+            const boxDep       = document.getElementById('bloque-departamento');
+            const boxMun       = document.getElementById('bloque-municipio');
+            const boxCity      = document.getElementById('bloque-ciudad');
+            const boxProvincia = document.getElementById('bloque-provincia');
+            const boxPostal    = document.getElementById('bloque-postal');
+
+            // Form-groups para errores
+            const fgPais   = selPais?.closest('.form-group');
+            const fgDep    = selDep?.closest('.form-group');
+            const fgMun    = selMun?.closest('.form-group');
+            const fgNombre = inpNombre?.closest('.form-group');
+            const fgDir    = inpDireccion?.closest('.form-group');
+            const fgTel    = inpTelefono?.closest('.form-group');
+
+            // i18n
+            const i18n = {
+                countryRequired:      "{{ __('meta.country_required') }}",
+                nameRequired:         "{{ __('meta.name_required') }}",
+                addressRequired:      "{{ __('meta.address_required') }}",
+                phoneRequired:        "{{ __('meta.phone_required') }}",
+                departmentRequired:   "{{ __('meta.department_required') }}",
+                municipalityRequired: "{{ __('meta.municipality_required') }}",
+                genericError:         "{{ __('meta.error_v1') }}",
+                savedOk:              "{{ __('meta.saved_successfully') }}",
+                saving:               "{{ __('meta.saving') }}"
+            };
+
+            // ===== Utilidades UI =====
+            function isVisibleControl(ctrl){
+                if(!ctrl) return false;
+                const group = ctrl.closest('.form-group') || ctrl;
+                const style = window.getComputedStyle(group);
+                return !group.classList.contains('hidden') && style.display !== 'none' && !ctrl.disabled;
+            }
+
+            function clearError(fg){
+                if(!fg) return;
+                fg.classList.remove('has-error');
+                fg.querySelector('.error-text')?.remove();
+            }
+            function setError(fg, msg){
+                if(!fg) return;
+                clearError(fg);
+                const span = document.createElement('span');
+                span.className = 'error-text';
+                span.textContent = msg;
+                fg.appendChild(span);
+            }
+            function attachAutoClear(control, fg, isValidFn){
+                if(!control || !fg) return;
+                const handler = () => { if(isValidFn()) clearError(fg); };
+                control.addEventListener('input', handler);
+                control.addEventListener('change', handler);
+                control.addEventListener('blur', handler);
+            }
+
+            // ===== Toggle sin borrar valor (clave para edición) =====
+            function toggleBlockNoClear(wrap, control, visible, required = false){
+                if(!wrap || !control) return;
+                wrap.classList.toggle('hidden', !visible);
+                wrap.style.display = visible ? '' : 'none';
+                control.disabled   = !visible;
+                control.required   = !!(visible && required);
+                // Importante: NO se limpia el valor al ocultar
+            }
+
+            // ===== Validación =====
+            function validate(){
+                let ok = true;
+
+                [fgPais, fgDep, fgMun, fgNombre, fgDir, fgTel].forEach(clearError);
+
+                const paisId = parseInt(selPais?.value || 0, 10);
+
+                if(!selPais || selPais.value === ''){
+                    setError(fgPais, i18n.countryRequired); ok = false;
+                }
+                if(!inpNombre || !inpNombre.value.trim()){
+                    setError(fgNombre, i18n.nameRequired); ok = false;
+                }
+                if(!inpDireccion || !inpDireccion.value.trim()){
+                    setError(fgDir, i18n.addressRequired); ok = false;
+                }
+                if(!inpTelefono || !inpTelefono.value.trim()){
+                    setError(fgTel, i18n.phoneRequired); ok = false;
+                }
+                // ES: municipio requerido
+                if(paisId === 1 && selMun && isVisibleControl(selMun)){
+                    if(selMun.value === '' || selMun.selectedIndex === 0){
+                        setError(fgMun, i18n.municipalityRequired); ok = false;
+                    }
+                }
+                // US: departamento requerido
+                if(paisId === 2 && selDep && isVisibleControl(selDep)){
+                    if(selDep.value === '' || selDep.selectedIndex === 0){
+                        setError(fgDep, i18n.departmentRequired); ok = false;
+                    }
+                }
+                return ok;
+            }
+
+            // Auto-clear
+            attachAutoClear(selPais,      fgPais,   () => selPais.value !== '');
+            attachAutoClear(inpNombre,    fgNombre, () => !!inpNombre.value.trim());
+            attachAutoClear(inpDireccion, fgDir,    () => !!inpDireccion.value.trim());
+            attachAutoClear(inpTelefono,  fgTel,    () => !!inpTelefono.value.trim());
+            attachAutoClear(selDep,       fgDep,    () => selDep.value !== '' && selDep.selectedIndex > 0);
+            attachAutoClear(selMun,       fgMun,    () => selMun.value !== '' && selMun.selectedIndex > 0);
+
+            // ===== URLS / CSRF =====
+            const UPDATE_URL = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.update.direction', ['id' => $address->id], false)) }}";
+            const CSRF = (document.querySelector('meta[name=\"csrf-token\"]')?.getAttribute('content'))
+                || (form?.querySelector('input[name=_token]')?.value) || '';
+
+            function setSubmitting(state){
+                if(!form) return;
+                const btn = form.querySelector('[type=\"submit\"], button.submit');
+                if(btn){
+                    if(state){
+                        btn.dataset.prevText = btn.innerHTML;
+                        btn.setAttribute('disabled', 'disabled');
+                        btn.innerHTML = '<span class=\"spinner\" aria-hidden=\"true\"></span> ' + i18n.saving;
+                    } else {
+                        btn.removeAttribute('disabled');
+                        if(btn.dataset.prevText) btn.innerHTML = btn.dataset.prevText;
+                    }
+                }
+            }
+
+            function getVal(el){ return (el?.value ?? '').trim(); }
+
+            // ===== Filtros dependientes =====
+            const resetSelect = (el) => { if (el) el.selectedIndex = 0; };
+
+            const filtrarDepartamentos = (idPais) => {
+                if (!selDep) return;
+                [...selDep.options].forEach(opt => {
+                    if (opt.value === '') return (opt.hidden = false);
+                    opt.hidden = parseInt(opt.dataset.pais || '0', 10) !== idPais;
+                });
+                const ok = [...selDep.options].some(o => !o.hidden && o.value === selDep.value);
+                if (!ok) resetSelect(selDep);
+            };
+
+            const filtrarMunicipios = (idDep) => {
+                if (!selMun) return;
+                [...selMun.options].forEach(opt => {
+                    if (opt.value === '') return (opt.hidden = false);
+                    opt.hidden = parseInt(opt.dataset.departamento || '0', 10) !== idDep;
+                });
+                const ok = [...selMun.options].some(o => !o.hidden && o.value === selMun.value);
+                if (!ok) resetSelect(selMun);
+            };
+
+            // ===== Lógica por país (sin borrar valores al ocultar) =====
+            function aplicarEstadoPorPais(rawId){
+                const id = parseInt(rawId, 10) || 0;
+                const isES = id === 1; // El Salvador
+                const isUS = id === 2; // Estados Unidos
+
+                if (!id){
+                    toggleBlockNoClear(boxCity,      inpCiudad,   false);
+                    toggleBlockNoClear(boxProvincia, inpProvincia,false);
+                    toggleBlockNoClear(boxPostal,    inpPostal,   false);
+                    toggleBlockNoClear(boxDep,       selDep,      false);
+                    toggleBlockNoClear(boxMun,       selMun,      false);
+                    return;
+                }
+
+                if (isES){
+                    // Dep/Mun visibles y requeridos
+                    toggleBlockNoClear(boxDep, selDep, true, true);
+                    filtrarDepartamentos(1);
+
+                    const depId = parseInt(selDep?.value || '0', 10);
+                    if (depId) filtrarMunicipios(depId);
+                    toggleBlockNoClear(boxMun, selMun, true, true);
+
+                    // Ocultar ciudad/estado/postal (sin limpiar valores)
+                    toggleBlockNoClear(boxCity,      inpCiudad,    false);
+                    toggleBlockNoClear(boxProvincia, inpProvincia, false);
+                    toggleBlockNoClear(boxPostal,    inpPostal,    false);
+                    return;
+                }
+
+                if (isUS){
+                    // Solo departamento (requerido)
+                    toggleBlockNoClear(boxDep, selDep, true, true);
+                    filtrarDepartamentos(2);
+                    // Municipio off
+                    toggleBlockNoClear(boxMun, selMun, false);
+
+                    // Ciudad/Estado/Postal ON (requeridos)
+                    toggleBlockNoClear(boxCity,      inpCiudad,    true, true);
+                    toggleBlockNoClear(boxProvincia, inpProvincia, true, true);
+                    toggleBlockNoClear(boxPostal,    inpPostal,    true, true);
+                    return;
+                }
+
+                // Otros países: no dep/mun — sí ciudad/estado/postal
+                toggleBlockNoClear(boxDep, selDep, false);
+                toggleBlockNoClear(boxMun, selMun, false);
+                toggleBlockNoClear(boxCity,      inpCiudad,    true, true);
+                toggleBlockNoClear(boxProvincia, inpProvincia, true, true);
+                toggleBlockNoClear(boxPostal,    inpPostal,    true, true);
+            }
+
+            // ===== Country / Dep listeners =====
+            selPais?.addEventListener('change', function(){
+                aplicarEstadoPorPais(this.value);
+                // NO limpiamos valores de inputs ocultos
+                if (parseInt(this.value || '0',10) !== 1){
+                    // si no es ES, el municipio se deshabilita/oculta
+                    resetSelect(selMun);
+                }
+                if (parseInt(this.value || '0',10) === 1){
+                    // Si es ES y ya hay dep, filtra municipios
+                    const depId = parseInt(selDep?.value || '0', 10);
+                    if (depId) filtrarMunicipios(depId);
+                }
+            });
+
+            selDep?.addEventListener('change', function(){
+                const idPais = parseInt(selPais?.value || '0', 10);
+                if (idPais === 1){
+                    const depId = parseInt(this.value || '0', 10);
+                    filtrarMunicipios(depId);
+                    toggleBlockNoClear(boxMun, selMun, true, true);
+                } else {
+                    toggleBlockNoClear(boxMun, selMun, false);
+                }
+            });
+
+            // ===== Placeholder visual en selects =====
+            (function(){
+                function paintPlaceholder(sel){
+                    if(!sel) return;
+                    const empty = !sel.value || sel.value === '';
+                    sel.classList.toggle('is-placeholder', empty);
+                }
+                ['pais','departamento','municipio'].forEach(id=>{
+                    const el = document.getElementById(id);
+                    if(!el) return;
+                    paintPlaceholder(el);
+                    el.addEventListener('change', ()=>paintPlaceholder(el));
+                });
+            })();
+
+            // ===== INIT =====
+            document.addEventListener('DOMContentLoaded', () => {
+                aplicarEstadoPorPais(selPais?.value || '0');
+                const idPais = parseInt(selPais?.value || '0', 10);
+                if (idPais === 1 && selDep?.value){
+                    filtrarMunicipios(parseInt(selDep.value || '0', 10));
+                    toggleBlockNoClear(boxMun, selMun, true, true);
+                }
+            });
+
+            // ===== Submit por Axios (EDITAR) =====
+            async function sendUpdate(){
+                if(typeof window.axios === 'undefined'){
+                    alert(i18n.genericError);
+                    return;
+                }
+
+                const fd = new FormData(form);
+
+                // Normalizar claves críticas (aunque inputs estén disabled)
+                fd.set('address_id',        inpAddressId?.value || '{{ $address->id }}');
+                fd.set('pais',              selPais?.value || '');
+                fd.set('departamento',      selDep?.value || '');
+                fd.set('municipio',         selMun?.value || '');
+                fd.set('nombre',            getVal(inpNombre));
+                fd.set('direccion',         getVal(inpDireccion));
+                fd.set('direccion_opcional',getVal(inpDirOpt));
+                fd.set('telefono',          getVal(inpTelefono));
+                fd.set('ciudad',            getVal(inpCiudad));
+
+                // IMPORTANTE: backend espera 'provincia' y 'postal'
+                fd.set('provincia',         getVal(inpProvincia)); // aunque el input se llame "estado"
+                fd.set('postal',            getVal(inpPostal));    // aunque el input se llame "zipcode"
+
+                try{
+                    setSubmitting(true);
+
+                    const res = await axios.post(
+                        UPDATE_URL,
+                        fd,
+                        { headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' } }
+                    );
+
+                    const data = res?.data || {};
+                    if (data.success === 1){
+                        // Limpia errores y redirige
+                        [fgPais, fgDep, fgMun, fgNombre, fgDir, fgTel].forEach(clearError);
+                        const url = data.ruta || "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.address', [], false)) }}";
+                        window.location.assign(url);
+                    } else {
+                        toastr.error(i18n.genericError);
+                    }
+                } catch(e){
+                    toastr.error(i18n.genericError);
+                } finally {
+                    setSubmitting(false);
+                }
+            }
+
+            form?.addEventListener('submit', function(e){
+                e.preventDefault();
+                if(!validate()){
+                    const firstErr = form.querySelector('.has-error select, .has-error input, .has-error textarea');
+                    firstErr?.focus();
+                    return;
+                }
+                sendUpdate();
+            });
+        })();
+    </script>
+
+
 
 
 

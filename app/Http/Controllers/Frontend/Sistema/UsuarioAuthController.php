@@ -532,6 +532,51 @@ class UsuarioAuthController extends Controller
 
 
 
+    public function actualizarDireccion(Request $request)
+    {
+
+        try {
+            DB::beginTransaction();
+
+            $userId    = Auth::id();
+            $addressId = $request->input('address_id');
+
+            // Buscar dirección del usuario
+            $address = Direcciones::where('id', $addressId)
+                ->where('id_usuario', $userId)
+                ->firstOrFail();
+
+            // Actualizar campos básicos
+            $address->id_paises       = $request->pais;
+            $address->id_departamento = $request->departamento ?: null;
+            $address->id_municipio    = $request->municipio ?: null;
+            $address->nombre          = $request->nombre;
+            $address->direccion       = $request->direccion;
+            $address->direccion_opcional = $request->direccion_opcional;
+            $address->ciudad          = $request->ciudad;
+            $address->estado          = $request->provincia; // viene del input "provincia"
+            $address->zipcode         = $request->postal;    // viene del input "postal"
+            $address->telefono        = $request->telefono;
+
+            $address->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => 1,
+                'ruta'    => route('user.address'),
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => 0,
+                'message' => 'Ocurrió un error al actualizar la dirección.',
+            ]);
+        }
+    }
+
+
+
 
 
 
