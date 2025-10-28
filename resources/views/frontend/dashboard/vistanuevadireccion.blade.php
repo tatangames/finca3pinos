@@ -1302,9 +1302,8 @@
 
 
                         // Redirige (usa data.redirect si viene, si no fallback)
-                        const url = data.redirect;
+                        const url = data.ruta;
                         window.location.assign(url);
-
                     }else{
                         // Fallo general
                         toastr.error(i18n.genericError);

@@ -225,7 +225,8 @@ return [
     'yes_delete' => 'Yes, delete',
     'delete_v2' => 'Deleted',
     'address_was_detele' => 'The address was deleted successfully.',
-
+    'edit_address' => 'Edit address',
+    'save_changes' => 'Save changes',
 
 
 

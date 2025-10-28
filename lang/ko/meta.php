@@ -229,7 +229,8 @@ return [
     'yes_delete' => '예, 삭제하기',
     'delete_v2' => '삭제 완료',
     'address_was_detele' => '주소가 성공적으로 삭제되었습니다.',
-
+    'edit_address' => '주소 수정',
+    'save_changes' => '변경 사항 저장',
 
 
 
