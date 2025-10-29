@@ -371,7 +371,7 @@
                         <span class="label"><span>📍</span><span>{{ __('meta.addresses') }}</span></span>
                         <span class="hint">→</span>
                     </a>
-                    <a class="{{ $is('profile') }}" href="#">
+                    <a class="{{ $is('profile') }}" href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.view.perfil', [], false)) }}">
                         <span class="label"><span>⚙️</span><span>{{ __('meta.profile') }}</span></span>
                         <span class="hint">→</span>
                     </a>

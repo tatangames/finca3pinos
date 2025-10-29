@@ -19,5 +19,10 @@ return [
     'newdirection' => 'new-direction',
     'editdirection' => 'edit-direction/{iddirection}',
     'updatedirection' => 'update-direction',
+    'updatebilling' => 'update-billing',
+
+
+
+
 
 ];

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\PasswordResetMail;
 use App\Models\Departamento;
 use App\Models\Direcciones;
+use App\Models\DireccionFacturacion;
 use App\Models\Municipio;
 use App\Models\Pais;
 use App\Models\Usuario;
@@ -315,7 +316,6 @@ class UsuarioAuthController extends Controller
         // Países activos y disponibles
         $paises = DB::table('paises')
             ->where('activo', 1)
-            ->where('disponible', 1)
             ->select('id', 'nombre')
             ->get();
 
@@ -323,14 +323,12 @@ class UsuarioAuthController extends Controller
         $departamentos = DB::table('departamentos')
             ->whereIn('id_paises', [1, 2])
             ->where('activo', 1)
-            ->where('disponible', 1)
             ->select('id', 'id_paises', 'nombre')
             ->get();
 
         // Municipios solo de El Salvador
         $municipios = DB::table('municipios')
             ->where('activo', 1)
-            ->where('disponible', 1)
             ->select('id', 'id_departamentos', 'nombre')
             ->get();
 
@@ -423,6 +421,23 @@ class UsuarioAuthController extends Controller
                 'telefono'           => $request->telefono,
                 'predeterminado'     => $esPredeterminada,
             ]);
+
+
+            // Guardar una direccion de facturacion del cliente, 1 sola vez
+            $existe = DireccionFacturacion::where('id_usuario', $userId)->exists();
+
+            if (!$existe) {
+                DireccionFacturacion::create([
+                    'id_usuario'   => $userId,
+                    'id_paises'    => $request->pais,
+                    'nombre'       => $request->nombre,
+                    'direccion'    => $request->direccion,
+                    'ciudad'       => $request->ciudad,
+                    'estado'       => $request->provincia,
+                    'zipcode'      => $request->postal,
+                    'telefono'     => $request->telefono,
+                ]);
+            }
 
             DB::commit();
             $ruta = route('user.address');
@@ -575,6 +590,86 @@ class UsuarioAuthController extends Controller
         }
     }
 
+
+    public function vistaPerfil()
+    {
+        try {
+            $userId  = auth()->id();
+
+            $infoUsuario = Usuario::where('id', $userId)
+                ->firstOrFail();
+
+            $direccionFactura = DireccionFacturacion::where('id_usuario', $userId)->first();
+
+            $paises = DB::table('paises')
+                ->where('activo', 1)
+                ->select('id', 'nombre')
+                ->get();
+
+            return view('frontend.dashboard.vistaperfil', [
+                'paises' => $paises,
+                'infouser'       => $infoUsuario,
+                'arrayDireccionFactura' => $direccionFactura,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->view('errors.404', [], 404);
+        }
+    }
+
+
+
+    public function actualizarPerfil(Request $request)
+    {
+        $userId = Auth::id();
+
+        // 1) Validación: todos los campos opcionales
+        $data = $request->validate([
+            'pais'          => ['nullable','integer','exists:paises,id'],
+            'nombre'        => ['nullable','string','max:50'],
+            'direccion'     => ['nullable','string','max:100'],
+            'ciudad'        => ['nullable','string','max:50'],
+            'estado'        => ['nullable','string','max:50'],
+            'codigo_postal' => ['nullable','string','max:20'],
+            'telefono'      => ['nullable','string','max:20'],
+        ]);
+
+
+
+        try {
+            return DB::transaction(function () use ($userId, $data) {
+
+                // 2) Crea o actualiza el único registro por usuario
+                DireccionFacturacion::updateOrCreate(
+                    ['id_usuario' => $userId],
+                    [
+                        'id_usuario'    => $userId,
+                        'id_paises'     => $data['pais'] ?? null,
+                        'nombre'        => $data['nombre'] ?? null,
+                        'direccion'     => $data['direccion'] ?? null,
+                        'ciudad'        => $data['ciudad'] ?? null,
+                        'estado'        => $data['estado'] ?? null,
+                        'codigo_postal' => $data['codigo_postal'] ?? null,
+                        'telefono'      => $data['telefono'] ?? null,
+                    ]
+                );
+
+                return response()->json([
+                    'success' => 1,
+                    'message' => 'Datos guardados correctamente.',
+                ]);
+            });
+        } catch (\Throwable $e) {
+            Log::error('Actualizar perfil (facturación) falló', [
+                'user_id' => $userId,
+                'msg'     => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => 0,
+                'message' => 'Ocurrió un error al guardar.',
+            ], 500);
+        }
+    }
 
 
 

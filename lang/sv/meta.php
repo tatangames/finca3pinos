@@ -229,8 +229,8 @@ return [
     'address_was_detele' => 'La dirección fue borrada correctamente.',
     'edit_address' => 'Editar dirección',
     'save_changes' => 'Guardar cambios',
-
-
+    'billing_information' => 'información de facturación',
+    'back' => 'volver',
 
 
 

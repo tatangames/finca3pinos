@@ -747,38 +747,37 @@
         }
 
 
-        .address-form.address-form--compact .form-group:has(#nombre-usuario){
+        .address-form.address-form--compact .form-group:has(#nombre){
             margin-top: 20px !important;
         }
 
-        .address-form.address-form--compact .form-group:has(#direccion-usuario){
+        .address-form.address-form--compact .form-group:has(#direccion){
             margin-top: 20px !important;
         }
 
-        .address-form.address-form--compact .form-group:has(#ciudad-usuario){
+        .address-form.address-form--compact .form-group:has(#ciudad){
             margin-top: 20px !important;
         }
 
-        .address-form.address-form--compact .form-group:has(#telefono-usuario){
+        .address-form.address-form--compact .form-group:has(#telefono){
             margin-top: 20px !important;
         }
 
-        .address-form.address-form--compact .form-group:has(#postal-usuario){
+        .address-form.address-form--compact .form-group:has(#codigo_postal){
             margin-top: 20px !important;
         }
 
-        .address-form.address-form--compact .form-group:has(#provincia-usuario){
+        .address-form.address-form--compact .form-group:has(#estado){
             margin-top: 20px !important;
         }
-
-        .address-form.address-form--compact .form-group:has(#munici){
-            margin-top: 20px !important;
+        .address-form.address-form--compact .form-group:has(#textoBilling){
+            margin-top: 25px !important;
         }
 
     </style>
 
     @php
-        $active = 'addresses';
+        $active = 'profile';
         $is = fn ($key) => $active === $key ? 'is-active' : '';
     @endphp
 
@@ -804,118 +803,87 @@
                     <form id="logoutForm" method="POST" action="{{ route('user.logout') }}" style="display:none;">
                         @csrf
                     </form>
-
                 </nav>
             </aside>
 
-            {{-- ===== Content (Addresses) ===== --}}
-            <div class="account-content" role="region" aria-label="{{ __('meta.addresses') }}">
+            {{-- ===== Content ===== --}}
+            <div class="account-content" role="region">
                 <div class="address-wrap">
-
-                    {{-- Tu grid de direcciones (si aplica) --}}
-
-                    {{-- ===== Formulario ===== --}}
-                    <form id="address-form"
-                          class="address-form address-form--compact"
-                          method="POST"
-                          action="#"
-                          novalidate>
+                    <form id="facturacion-form" class="address-form address-form--compact">
                         @csrf
-                        <h4>{{ __('meta.add_new_address') }}</h4>
+                        <h4 style="text-align: left!important; font-weight: 600">{{ __('meta.profile') }}</h4>
 
-                        <div class="form-row">
-                            {{-- País --}}
-                            <div class="form-group">
-                                <label for="pais">{{ __('meta.country') }}</label>
+                        {{-- ===== DATOS DEL USUARIO ===== --}}
+                        <div class="form-group">
+                            <label>{{ __('meta.email_address') }}</label>
+                            <input type="email" value="{{ $infouser->email ?? '' }}" disabled
+                                   style="background-color:#f0f0f0; color:#6c757d; cursor:not-allowed;">
+                        </div>
+
+                        <h4 style="text-align: left!important; font-weight: 600" id="textoBilling">{{ __('meta.billing_information') }}</h4>
+
+                        {{-- ===== DATOS DE FACTURACIÓN ===== --}}
+                        <div class="form-group">
+                            <label>{{ __('meta.country') }}</label>
+                            <div class="select-wrap">
                                 <select id="pais" name="pais">
                                     <option value="">{{ __('meta.select') }}</option>
-                                    @foreach(($paises ?? []) as $p)
-                                        <option value="{{ $p->id }}">{{ $p->nombre }}</option>
+                                    @foreach($paises as $p)
+                                        <option value="{{ $p->id }}" {{ (int)($arrayDireccionFactura->id_paises ?? 0) === (int)$p->id ? 'selected' : '' }}>
+                                            {{ $p->nombre }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
+                        </div>
 
-                            <!-- Departamento -->
-                            <div class="form-group" id="bloque-departamento" style="display:none; margin-top: 15px">
-                                <label for="departamento">{{ __('meta.department') }}</label>
-                                <select id="departamento" name="departamento" disabled>
-                                    <option value="" disabled selected>{{ __('meta.select') }}</option>
-                                    @foreach(($departamentos ?? []) as $d)
-                                        <option value="{{ $d->id }}" data-pais="{{ $d->id_paises }}">{{ $d->nombre }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <label>{{ __('meta.name_and_lastname') }}</label>
+                            <input id="nombre" name="nombre" type="text" maxlength="50"
+                                   value="{{ $arrayDireccionFactura->nombre ?? '' }}"
+                                   placeholder="{{ __('meta.name_and_lastname') }}">
+                        </div>
 
-                            <!-- Municipio -->
-                            <div class="form-group" id="bloque-municipio" style="display:none; margin-top: 15px">
-                                <label for="municipio">{{ __('meta.municipality') }}</label>
-                                <select id="municipio" name="municipio" disabled>
-                                    <option value="" disabled selected>{{ __('meta.select') }}</option>
-                                    @foreach(($municipios ?? []) as $m)
-                                        <option value="{{ $m->id }}" data-departamento="{{ $m->id_departamentos }}">{{ $m->nombre }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <label>{{ __('meta.direction') }}</label>
+                            <input id="direccion" name="direccion" type="text" maxlength="100"
+                                   value="{{ $arrayDireccionFactura->direccion ?? '' }}"
+                                   placeholder="{{ __('meta.input_direction') }}">
+                        </div>
 
+                        <div class="form-group" id="bloque-ciudad">
+                            <label>{{ __('meta.city') }}</label>
+                            <input id="ciudad" name="ciudad" type="text" maxlength="50"
+                                   value="{{ $arrayDireccionFactura->ciudad ?? '' }}"
+                                   placeholder="{{ __('meta.city') }}">
+                        </div>
 
+                        <div class="form-group" id="bloque-estado">
+                            <label>{{ __('meta.state_province') }}</label>
+                            <input id="estado" name="estado" type="text" maxlength="50"
+                                   value="{{ $arrayDireccionFactura->estado ?? '' }}"
+                                   placeholder="{{ __('meta.state_province') }}">
+                        </div>
 
-                            <!-- Nombre -->
-                            <div class="form-group">
-                                <label>{{ __('meta.name_and_lastname') }}</label>
-                                <input id="nombre-usuario" type="text" maxlength="50" placeholder="{{ __('meta.name_and_lastname') }}">
-                            </div>
+                        <div class="form-group">
+                            <label>{{ __('meta.postal_code') }}</label>
+                            <input id="codigo_postal" name="codigo_postal" type="text" maxlength="20"
+                                   value="{{ $arrayDireccionFactura->codigo_postal ?? '' }}"
+                                   placeholder="{{ __('meta.postal_code') }}">
+                        </div>
 
-                            <!-- Dirección -->
-                            <div class="form-group">
-                                <label>{{ __('meta.direction') }}</label>
-                                <input id="direccion-usuario" type="text" maxlength="100" placeholder="{{ __('meta.input_direction') }}">
-                            </div>
+                        <div class="form-group">
+                            <label>{{ __('meta.phone_number') }}</label>
+                            <input id="telefono" name="telefono" type="text" maxlength="20"
+                                   value="{{ $arrayDireccionFactura->telefono ?? '' }}"
+                                   placeholder="{{ __('meta.phone_number') }}">
+                        </div>
 
-
-                            <div class="form-group">
-                                <input id="direccionopcional-usuario" style="margin-top: 10px" type="text" maxlength="100" placeholder="{{ __('meta.input_directionv2') }}">
-                            </div>
-
-                            <!-- Ciudad -->
-                            <div class="form-group" id="bloque-ciudad" style="display:none;">
-                                <label>{{ __('meta.city')}}</label>
-                                <input id="ciudad-usuario" type="text" maxlength="50" placeholder="{{ __('meta.city') }}" disabled>
-                            </div>
-
-                            <!-- Provincia -->
-                            <div class="form-group hidden" id="bloque-provincia" style="margin-top:15px">
-                                <label>{{ __('meta.state_province') }}</label>
-                                <input id="provincia-usuario" type="text" maxlength="50"
-                                       placeholder="{{ __('meta.state_province') }}" disabled>
-                            </div>
-
-                            <!-- Código postal -->
-                            <div class="form-group hidden" id="bloque-postal" style="margin-top:15px">
-                                <label>{{ __('meta.postal_code') }}</label>
-                                <input id="postal-usuario" type="text" maxlength="20"
-                                       placeholder="{{ __('meta.postal_code') }}" disabled>
-                            </div>
-
-
-                            <!-- numero de telefono -->
-                            <div class="form-group" id="bloque-telefono" style="display:none; margin-top: 15px">
-                                <label>{{ __('meta.phone_number')}}</label>
-                                <input id="telefono-usuario" type="text" maxlength="20" placeholder="{{ __('meta.phone_number') }}">
-                            </div>
-
-
-
-
-                            <!-- Acciones -->
-                            <div class="form-actions">
-                                <a href="#" class="btn-back" id="btn-back">Regresar</a>
-                                <button type="submit" class="btn-save">Guardar</button>
-                            </div>
-
-
+                        {{-- Botones --}}
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save">{{ __('meta.save_changes') }}</button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
@@ -926,14 +894,6 @@
     <script src="{{ asset('js/axios.min.js') }}"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
-
-
-    <script>
-        document.getElementById('btn-back')?.addEventListener('click', e => {
-            e.preventDefault();
-            history.back();
-        });
-    </script>
 
 
     <script>
@@ -949,16 +909,15 @@
         });
     </script>
 
+    <script>
+        const SAVE_URL = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.update.perfil', [], false)) }}";
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Oculta por si el HTML no trae la clase (seguro extra)
             document.getElementById('bloque-provincia')?.classList.add('hidden');
             document.getElementById('bloque-postal')?.classList.add('hidden');
-
-            // Aplica lógica según país seleccionado
-            const selPais = document.getElementById('pais');
-            if (selPais) aplicarEstadoPorPais(parseInt(selPais.value || 0, 10));
         });
     </script>
 
@@ -984,373 +943,138 @@
 
 
     <script>
-        const selPais = document.getElementById('pais');
-        const selDep  = document.getElementById('departamento');
-        const selMun  = document.getElementById('municipio');
+        // ====== Selectores ======
+        const selPais   = document.getElementById('pais');
+        const inpCity   = document.getElementById('ciudad');
+        const inpEstado = document.getElementById('estado');
+        const inpPostal = document.getElementById('codigo_postal');
 
-        const boxDep  = document.getElementById('bloque-departamento');
-        const boxMun  = document.getElementById('bloque-municipio');
-        const boxCity = document.getElementById('bloque-ciudad');
-        const boxPostal = document.getElementById('bloque-postal');
-        const boxProvincia = document.getElementById('bloque-provincia');
-
-        const inpCity = document.getElementById('ciudad-usuario');
-        const inpPostal = document.getElementById('postal-usuario');
-        const inpProvincia = document.getElementById('provincia-usuario');
-
-        // ---- Funciones base ----
-        const resetSelect = (el) => {
-            if (!el) return;
-            el.selectedIndex = 0; // deja “Seleccionar”
-        };
-
-        const toggleBlock = (wrap, control, visible, required = false) => {
-            if (!wrap || !control) return;
-            wrap.classList.toggle('hidden', !visible);
-            control.disabled = !visible;
-            control.required = visible && required;
-            if (!visible) {
-                if (control.tagName === 'SELECT') resetSelect(control);
-                else control.value = '';
-            }
-        };
-
-        const filtrarDepartamentos = (idPais) => {
-            [...selDep.options].forEach(opt => {
-                if (opt.value === '') return opt.hidden = false;
-                opt.hidden = parseInt(opt.dataset.pais) !== idPais;
-            });
-            resetSelect(selDep);
-        };
-
-        const filtrarMunicipios = (idDep) => {
-            [...selMun.options].forEach(opt => {
-                if (opt.value === '') return opt.hidden = false;
-                opt.hidden = parseInt(opt.dataset.departamento) !== idDep;
-            });
-            resetSelect(selMun);
-        };
-
-        // ---- Lógica principal ----
-        function aplicarEstadoPorPais(id) {
-            const isES   = id === 1;   // El Salvador
-            const isUS   = id === 2;   // Estados Unidos
-            const hasAny = !!id && id !== 0;
-
-            // --- limpiar campos de ubicación cada vez que cambia el país ---
-            resetSelect(selDep);
-            resetSelect(selMun);
-            inpCity.value = '';
-            inpProvincia.value = '';
-            inpPostal.value = '';
-
-            if (!hasAny) {
-                // sin país -> oculta todo
-                toggleBlock(boxDep, selDep, false);
-                toggleBlock(boxMun, selMun, false);
-                toggleBlock(boxCity, inpCity, false);
-                toggleBlock(boxProvincia, inpProvincia, false);
-                toggleBlock(boxPostal, inpPostal, false);
-                return;
-            }
-
-            if (isES) {
-                // ES: Departamento + Municipio requeridos. Sin ciudad/provincia/postal
-                toggleBlock(boxDep, selDep, true,  true);
-                toggleBlock(boxMun, selMun, true,  true);
-                toggleBlock(boxCity, inpCity, false);
-                toggleBlock(boxProvincia, inpProvincia, false);
-                toggleBlock(boxPostal, inpPostal, false);
-
-                filtrarDepartamentos(1);
-                // Oculta municipios hasta seleccionar departamento
-                [...selMun.options].forEach((opt, i) => opt.hidden = i !== 0);
-                return;
-            }
-
-            if (isUS) {
-                // US: Departamento (para estados) requerido, Ciudad y Postal requeridos.
-                //     NO mostrar "Estado / Provincia / Región"
-                toggleBlock(boxDep, selDep, true,  true);
-                toggleBlock(boxMun, selMun, false);
-                toggleBlock(boxCity, inpCity, true,  true);
-                toggleBlock(boxPostal, inpPostal, true,  true);
-                toggleBlock(boxProvincia, inpProvincia, false); // <-- oculto para US
-
-                filtrarDepartamentos(2);
-                return;
-            }
-
-            // Otros países: Ciudad + Provincia/Estado requeridos. Sin Dep/Mun ni Postal
-            toggleBlock(boxDep, selDep, false);
-            toggleBlock(boxMun, selMun, false);
-            toggleBlock(boxCity, inpCity, true,  true);
-            toggleBlock(boxProvincia, inpProvincia, true,  true);
-            toggleBlock(boxPostal, inpPostal, false);
-        }
-
-        // Mantén tus listeners tal cual
-        selPais?.addEventListener('change', function () {
-            clearFormForCountryChange();
-            aplicarEstadoPorPais(parseInt(this.value || 0, 10));
-        });
-        selDep?.addEventListener('change', function () {
-            resetSelect(selMun);
-            if (parseInt(selPais.value || 0, 10) === 1) {
-                filtrarMunicipios(parseInt(this.value || 0, 10));
-            } else {
-                [...selMun.options].forEach((opt, i) => opt.hidden = i !== 0);
-            }
-        });
-
+        // ====== Inicialización ======
         document.addEventListener('DOMContentLoaded', () => {
-            if (!selPais?.value) clearFormForCountryChange();
-            aplicarEstadoPorPais(parseInt(selPais?.value || 0, 10));
+            // No ocultamos nada ni aplicamos lógica por país
+            // Solo aseguramos que los inputs estén activos
+            [inpCity, inpEstado, inpPostal].forEach(inp => {
+                if (!inp) return;
+                inp.disabled = false;
+                inp.required = false;
+            });
         });
-
-        function clearFormForCountryChange() {
-            const form = document.getElementById('address-form');
-            if (!form) return;
-
-            form.querySelectorAll('input, select, textarea').forEach(el => {
-                if (el.id === 'pais' || el.name === '_token') return;
-
-                if (el.tagName === 'SELECT') {
-                    el.selectedIndex = 0;       // vuelve a "Seleccionar"
-                } else if (el.type === 'checkbox' || el.type === 'radio') {
-                    el.checked = false;
-                } else {
-                    el.value = '';
-                }
-            });
-
-            // Quitar estados de error y mensajes
-            form.querySelectorAll('.form-group').forEach(fg => {
-                fg.classList.remove('has-error');
-                fg.querySelector('.error-text')?.remove();
-            });
-        }
-
     </script>
 
-
-
     <script>
-        (function () {
-            const form   = document.getElementById('address-form');
+        (() => {
+            const form = document.getElementById('facturacion-form');
+            if (!form) return;
 
-            // Controles
-            const selPais = document.getElementById('pais');
-            const selDep  = document.getElementById('departamento');
-            const selMun  = document.getElementById('municipio');
 
-            const inpNombre    = document.getElementById('nombre-usuario');
-            const inpDireccion = document.getElementById('direccion-usuario');
-            const inpDirOpt    = document.getElementById('direccionopcional-usuario');
-            const inpTelefono  = document.getElementById('telefono-usuario');
-            const inpCiudad    = document.getElementById('ciudad-usuario');
-            const inpProvincia = document.getElementById('provincia-usuario');
-            const inpPostal    = document.getElementById('postal-usuario');
+            // CSRF desde meta o input hidden
+            const CSRF = (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'))
+                || (form.querySelector('input[name="_token"]')?.value) || '';
 
-            // Form-groups
-            const fgPais   = selPais?.closest('.form-group');
-            const fgDep    = selDep?.closest('.form-group');
-            const fgMun    = selMun?.closest('.form-group');
-            const fgNombre = inpNombre?.closest('.form-group');
-            const fgDir    = inpDireccion?.closest('.form-group');
-            const fgTel    = inpTelefono?.closest('.form-group');
-
-            // i18n
-            const i18n = {
-                countryRequired:      "{{ __('meta.country_required') }}",
-                nameRequired:         "{{ __('meta.name_required') }}",
-                addressRequired:      "{{ __('meta.address_required') }}",
-                phoneRequired:        "{{ __('meta.phone_required') }}",
-                departmentRequired:   "{{ __('meta.department_required') }}",
-                municipalityRequired: "{{ __('meta.municipality_required') }}",
-                genericError:         "{{ __('meta.error_v1') }}",
-                savedOk:              "{{ __('meta.saved_successfully') }}",
-                saving:               "{{ __('meta.saving') }}"
-            };
-
-            // ==== Utilidades de UI (errores/visibilidad) ====
-            function isVisibleControl(ctrl){
-                if(!ctrl) return false;
-                const group = ctrl.closest('.form-group') || ctrl;
-                const style = window.getComputedStyle(group);
-                return !group.classList.contains('hidden') && style.display !== 'none' && !ctrl.disabled;
+            // Helpers UI
+            function setSubmitting(state){
+                const btn = form.querySelector('.btn-save');
+                if (!btn) return;
+                if (state) {
+                    btn.dataset.prevText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '{{ __("meta.saving") ?? "Guardando..." }}';
+                } else {
+                    btn.disabled = false;
+                    if (btn.dataset.prevText) btn.innerHTML = btn.dataset.prevText;
+                }
             }
 
-            function clearError(fg){
-                if(!fg) return;
-                fg.classList.remove('has-error');
-                const old = fg.querySelector('.error-text');
-                if(old) old.remove();
+            function clearErrors(){
+                form.querySelectorAll('.error-text').forEach(n => n.remove());
+                form.querySelectorAll('.has-error').forEach(n => n.classList.remove('has-error'));
             }
 
-            function setError(fg, msg){
-                if(!fg) return;
-                clearError(fg);
-                fg.classList.add('has-error');
+            function setFieldError(fieldName, msg){
+                const el = form.querySelector(`[name="${fieldName}"]`) || document.getElementById(fieldName);
+                const group = el?.closest('.form-group');
+                if (!group) return;
+                group.classList.add('has-error');
                 const span = document.createElement('span');
                 span.className = 'error-text';
                 span.textContent = msg;
-                fg.appendChild(span);
+                group.appendChild(span);
             }
 
-            function attachAutoClear(control, fg, isValidFn){
-                if(!control || !fg) return;
-                const handler = () => { if(isValidFn()) clearError(fg); };
-                control.addEventListener('input', handler);
-                control.addEventListener('change', handler);
-                control.addEventListener('blur', handler);
-            }
-
-            // ==== Validación front ====
+            // Validación mínima (solo que no vayan vacíos)
             function validate(){
+                clearErrors();
                 let ok = true;
+               /* const requiredIds = ['pais','nombre','direccion','telefono']; // agrega/quita si quieres obligatorios
 
-                [fgPais, fgDep, fgMun, fgNombre, fgDir, fgTel].forEach(clearError);
-
-                const paisId = parseInt(selPais?.value || 0, 10);
-
-                if(!selPais || selPais.value === ''){
-                    setError(fgPais, i18n.countryRequired); ok = false;
-                }
-                if(!inpNombre || !inpNombre.value.trim()){
-                    setError(fgNombre, i18n.nameRequired); ok = false;
-                }
-                if(!inpDireccion || !inpDireccion.value.trim()){
-                    setError(fgDir, i18n.addressRequired); ok = false;
-                }
-                if(!inpTelefono || !inpTelefono.value.trim()){
-                    setError(fgTel, i18n.phoneRequired); ok = false;
-                }
-                // ES (1): municipio requerido
-                if(paisId === 1 && selMun && isVisibleControl(selMun)){
-                    if(selMun.value === '' || selMun.selectedIndex === 0){
-                        setError(fgMun, i18n.municipalityRequired); ok = false;
+                requiredIds.forEach(id => {
+                    const el = form.querySelector(`#${id}[name="${id}"]`) || form.querySelector(`[name="${id}"]`);
+                    if (!el) return;
+                    if (!String(el.value || '').trim()){
+                        ok = false;
+                        setFieldError(id, '{{ __("validation.required") ?? "Campo requerido" }}');
                     }
-                }
-                // US (2): departamento requerido
-                if(paisId === 2 && selDep && isVisibleControl(selDep)){
-                    if(selDep.value === '' || selDep.selectedIndex === 0){
-                        setError(fgDep, i18n.departmentRequired); ok = false;
-                    }
-                }
+                });*/
+
                 return ok;
             }
 
-            // Auto-clear
-            attachAutoClear(selPais,      fgPais,   () => selPais.value !== '');
-            attachAutoClear(inpNombre,    fgNombre, () => !!inpNombre.value.trim());
-            attachAutoClear(inpDireccion, fgDir,    () => !!inpDireccion.value.trim());
-            attachAutoClear(inpTelefono,  fgTel,    () => !!inpTelefono.value.trim());
-            attachAutoClear(selDep,       fgDep,    () => selDep.value !== '' && selDep.selectedIndex > 0);
-            attachAutoClear(selMun,       fgMun,    () => selMun.value !== '' && selMun.selectedIndex > 0);
-
-            // ==== Axios submit ====
-            // URL localizada (Blade):
-            const SAVE_URL = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.savenew.direction', [], false)) }}";
-            // Redirección por defecto si el backend no envía 'redirect'
-            const REDIRECT_FALLBACK = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.index', [], false)) }}";
-            // Token CSRF
-            const CSRF = (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'))
-                || (form?.querySelector('input[name=_token]')?.value) || '';
-
-            function setSubmitting(state){
-                if(!form) return;
-                const btn = form.querySelector('[type="submit"], button.submit');
-                if(btn){
-                    if(state){
-                        btn.dataset.prevText = btn.innerHTML;
-                        btn.setAttribute('disabled', 'disabled');
-                        btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> ' + i18n.saving;
-                    } else {
-                        btn.removeAttribute('disabled');
-                        if(btn.dataset.prevText) btn.innerHTML = btn.dataset.prevText;
-                    }
-                }
-            }
-
-            function getVal(el){
-                return (el?.value ?? '').trim();
-            }
-
-            async function sendWithAxios(){
-                if(typeof window.axios === 'undefined'){
-                    alert(i18n.genericError);
+            async function submitForm(){
+                if (typeof window.axios === 'undefined'){
                     return;
                 }
 
-                // Construye FormData desde el form…
-                const fd = new FormData(form);
+                // Construir payload
+                const fd = new FormData();
+                fd.set('pais',          form.pais?.value || '');
+                fd.set('nombre',        form.nombre?.value?.trim() || '');
+                fd.set('direccion',     form.direccion?.value?.trim() || '');
+                fd.set('ciudad',        form.ciudad?.value?.trim() || '');
+                fd.set('estado',        form.estado?.value?.trim() || '');
+                fd.set('codigo_postal', form.codigo_postal?.value?.trim() || '');
+                fd.set('telefono',      form.telefono?.value?.trim() || '');
 
-                // …y asegura/normaliza claves críticas (usa set para evitar duplicados)
-                fd.set('pais',               selPais?.value || '');
-                fd.set('departamento',       selDep?.value || '');
-                fd.set('municipio',          selMun?.value || '');
-                fd.set('nombre',             getVal(inpNombre));
-                fd.set('direccion',          getVal(inpDireccion));
-                fd.set('direccion_opcional', getVal(inpDirOpt));
-                fd.set('telefono',           getVal(inpTelefono));
-                fd.set('ciudad',             getVal(inpCiudad));    // podrían estar disabled
-                fd.set('provincia',          getVal(inpProvincia)); // idem
-                fd.set('postal',             getVal(inpPostal));    // idem
-
-                try {
+                try{
                     setSubmitting(true);
 
-                    const res = await axios.post(
-                        SAVE_URL,
-                        fd,
-                        {
-                            headers: {
-                                'X-CSRF-TOKEN': CSRF,
-                                'Accept': 'application/json'
-                                // Nota: NO fijes Content-Type; el navegador agrega boundary de FormData
-                            }
+                    const res = await axios.post(SAVE_URL, fd, {
+                        headers: {
+                            'X-CSRF-TOKEN': CSRF,
+                            'Accept': 'application/json'
+                            // No pongas Content-Type manual: el navegador agrega boundary de FormData
                         }
-                    );
+                    });
 
                     const data = res?.data || {};
-
                     if (data.success === 1) {
-                        // Limpia errores visuales
-                        [fgPais, fgDep, fgMun, fgNombre, fgDir, fgTel].forEach(clearError);
-
-
-                        // Redirige (usa data.redirect si viene, si no fallback)
-                        const url = data.ruta;
-                        window.location.assign(url);
-                    }else{
-                        // Fallo general
-                        toastr.error(i18n.genericError);
+                        if (window.toastr) toastr.success('{{ __("meta.saved_successfully") }}');
+                    } else {
+                        // Mensaje genérico o específico
+                        const msg = '{{ __("meta.error_v1") }}';
+                        if (window.toastr) toastr.error(msg);
                     }
-                } catch (err) {
-                    toastr.error(i18n.genericError);
+
+                } catch (err){
+                    // Errores de validación Laravel (422)
+                    const msg = '{{ __("meta.error_v1") }}';
+                    if (window.toastr) toastr.error(msg);
+
                 } finally {
                     setSubmitting(false);
                 }
             }
 
-            // Intercepta el submit y envía con Axios
-            form?.addEventListener('submit', function (e) {
+            form.addEventListener('submit', (e) => {
                 e.preventDefault();
-                if(!validate()){
-                    const firstErr = form.querySelector('.has-error select, .has-error input, .has-error textarea');
-                    firstErr?.focus();
+                if (!validate()){
+                    const first = form.querySelector('.has-error input, .has-error select, .has-error textarea');
+                    first?.focus();
                     return;
                 }
-                sendWithAxios();
+                submitForm();
             });
         })();
     </script>
-
-
-
-
-
 
 
     {{-- Superior (Newsletter) block --}}

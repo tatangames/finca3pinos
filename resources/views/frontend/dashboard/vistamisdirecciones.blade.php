@@ -462,15 +462,17 @@
                         <span class="label"><span>📍</span><span>{{ __('meta.addresses') }}</span></span>
                         <span class="hint">→</span>
                     </a>
-                    <a class="{{ $is('profile') }}" href="#">
+                    <a class="{{ $is('profile') }}" href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.view.perfil', [], false)) }}">
                         <span class="label"><span>⚙️</span><span>{{ __('meta.profile') }}</span></span>
                         <span class="hint">→</span>
                     </a>
-                    <a href="#" id="logoutLink">
-                        <span class="label"><span>🚪</span><span>{{ __('meta.logout') }}</span></span>
-                        <span class="hint">→</span>
+
+                    <a href="#" id="logoutLinkPerfil">
+                        <span class="label"><span>🚪</span><span>{{ __('meta.logout') }}</span></span><span class="hint">→</span>
                     </a>
-                    <form id="logoutForm" method="POST" action="#" style="display:none">@csrf</form>
+                    <form id="logoutForm" method="POST" action="{{ route('user.logout') }}" style="display:none;">
+                        @csrf
+                    </form>
                 </nav>
             </aside>
 
@@ -551,6 +553,19 @@
             </div>
         </div>
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const logoutLink = document.getElementById('logoutLinkPerfil');
+            const logoutForm = document.getElementById('logoutForm');
+            if (logoutLink && logoutForm) {
+                logoutLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    logoutForm.submit();
+                });
+            }
+        });
+    </script>
 
     <script>
 

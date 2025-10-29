@@ -227,8 +227,8 @@ return [
     'address_was_detele' => 'The address was deleted successfully.',
     'edit_address' => 'Edit address',
     'save_changes' => 'Save changes',
-
-
+    'billing_information' => 'Billing Information',
+    'back' => 'Go back',
 
 
 

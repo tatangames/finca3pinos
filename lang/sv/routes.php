@@ -19,6 +19,9 @@ return [
     'newdirection' => 'nueva-direccion',
     'editdirection' => 'editar-direccion/{iddirection}',
     'updatedirection' => 'actualizar-direccion',
+    'updatebilling' => 'actualizar-perfil',
+
+
 
 
 ];

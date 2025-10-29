@@ -257,11 +257,18 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.editdirection'), [UsuarioAuthController::class, 'vistaEditarDireccion'])
             ->name('user.edit.direction');
 
+        // actualizar direccion
         Route::post(LaravelLocalization::transRoute('routes.updatedirection'), [UsuarioAuthController::class, 'actualizarDireccion'])
             ->name('user.update.direction');
 
 
+        // vista perfil
+        Route::get(LaravelLocalization::transRoute('routes.user_profile'), [UsuarioAuthController::class, 'vistaPerfil'])
+            ->name('user.view.perfil');
 
+        // guardar datos perfil
+        Route::post(LaravelLocalization::transRoute('routes.updatebilling'), [UsuarioAuthController::class, 'actualizarPerfil'])
+            ->name('user.update.perfil');
 
     });
 
