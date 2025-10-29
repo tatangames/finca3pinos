@@ -229,6 +229,11 @@ return [
     'save_changes' => 'Save changes',
     'billing_information' => 'Billing Information',
     'back' => 'Go back',
+    'view_cart' => 'View cart',
+    'product_not_found' => 'No product available.',
+    'added_to_cart' => 'Added to cart',
+    'could_not_add_tocart' => 'Could not add to cart',
+
 
 
 

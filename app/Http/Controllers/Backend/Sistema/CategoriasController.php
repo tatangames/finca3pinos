@@ -379,23 +379,32 @@ class CategoriasController extends Controller
             // ===== 3) i18n =====
 
             foreach ($regiones as $region) {
-                // Crea/obtiene el contenedor por region_id + key
+                // Crear/obtener contenedor por region_id + key
                 $content = RegionContent::firstOrCreate(
                     ['region_id' => $region->id, 'key' => $keySinEspacios],
                     []
                 );
 
-                if ($tr) {
-                    RegionContentTranslation::updateOrCreate(
-                        ['content_id' => $content->id, 'locale' => $region->locale],
-                        [
-                            'title' => $tr['title'] ?? '',
-                            'body'  => $tr['body']  ?? '',
-                            'slug'  => $tr['slug']  ?? '',
-                        ]
-                    );
-                }
+                // OJO: reasignar $tr dentro de este foreach
+                $tr = $translations[$region->locale] ?? null;
+
+                // Normaliza valores (evita nulls)
+                $title = isset($tr['title']) ? (string) $tr['title'] : '';
+                $body  = isset($tr['body'])  ? (string) $tr['body']  : '';
+                $slug  = isset($tr['slug'])  ? (string) $tr['slug']  : '';
+
+                // Si no hay datos para esta locale, puedes decidir saltar o crear vacío
+                // Aquí creamos/actualizamos aunque sea vacío para mantener consistencia
+                RegionContentTranslation::updateOrCreate(
+                    ['content_id' => $content->id, 'locale' => $region->locale],
+                    [
+                        'title' => $title,
+                        'body'  => $body,
+                        'slug'  => $slug,
+                    ]
+                );
             }
+
 
             DB::commit();
             return ['success' => 3];

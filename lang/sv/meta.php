@@ -231,10 +231,10 @@ return [
     'save_changes' => 'Guardar cambios',
     'billing_information' => 'información de facturación',
     'back' => 'volver',
-
-
-
-
+    'view_cart' => 'Ver carrito',
+    'product_not_found' => 'Producto no encontrado.',
+    'added_to_cart' => 'Agregado al carrito',
+    'could_not_add_tocart' => 'No se pudo agregar al carrito.',
 
 
 

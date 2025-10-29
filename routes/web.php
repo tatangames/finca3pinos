@@ -18,6 +18,7 @@ use App\Http\Controllers\Frontend\Sistema\UsuarioAuthController;
 use App\Http\Controllers\Frontend\Sistema\FrontendController;
 use App\Http\Controllers\Frontend\Sistema\DashboardController;
 use App\Http\Controllers\Frontend\Sistema\PasswordResetController;
+use App\Http\Controllers\Frontend\Sistema\CartController;
 
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
@@ -273,6 +274,22 @@ Route::middleware(['detect.country.locale'])->group(function () {
     });
 
 });
+
+
+// Página del carrito
+Route::get('/carrito', [CartController::class,'index'])->name('cart.index');
+
+// AJAX
+Route::post('/cart/add',   [CartController::class,'add'])->name('cart.add');
+Route::get ('/cart/count', [CartController::class,'count'])->name('cart.count');
+
+// Opcional
+Route::delete('/cart/clear', [CartController::class,'clear'])->name('cart.clear');
+
+
+
+
+
 
 // CARGA IMAGENES PARA GALERIA SIN LOCALIZACION
 Route::get('/galeria/cargar', [FrontendController::class, 'cargarGaleria'])

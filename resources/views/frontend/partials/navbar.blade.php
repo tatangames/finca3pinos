@@ -41,7 +41,7 @@
                     <li class="only-desktop">
                         <div class="cart-navbar">
                             <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}"
-                               class="shop_table cart" title="Ver carrito">
+                               class="shop_table cart" title="{{ __('meta.view_cart') }}">
                                 <span class="header-cart-count count">0</span>
                                 <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                             </a>
@@ -94,10 +94,10 @@
                     <ul class="nav navbar-nav">
                         <li class="only-mobile">
                             <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}"
-                               class="cart-icon mob cart-link">
+                               class="shop_table cart" title="{{ __('meta.view_cart') }}">
                                 <span class="header-cart-count count">0</span>
-                                <i class="fa fa-shopping-cart"></i>
-                                <span>Carrito</span>
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                <span>{{ __('meta.view_cart') }}</span>
                             </a>
                         </li>
 
@@ -259,6 +259,23 @@
 
 
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const res = await fetch(`{{ route('cart.count') }}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+            if (typeof data.count !== 'undefined') {
+                document.querySelectorAll('.header-cart-count.count')
+                    .forEach(el => el.textContent = data.count);
+            }
+        } catch (e) {
+            console.error('Error obteniendo el conteo del carrito:', e);
+        }
+    });
+</script>
 
 
 <script>

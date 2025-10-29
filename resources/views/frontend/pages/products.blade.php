@@ -3,6 +3,7 @@
 @section('title', __('meta.title'))
 
 @section('content')
+    <link rel="stylesheet" href="{{ asset('css/toastr.min.css') }}">
 
     <style>
         /* ===== Fondo de sección ===== */
@@ -407,7 +408,9 @@
     @if(!$arrayProductos)
         <section class="product-section">
             <div class="product-container">
-                <p style="color:#ccc;text-align:center;margin:24px 0">No hay producto disponible.</p>
+                <p style="color:#ccc;text-align:center;margin:24px 0">
+                    {{ __('meta.product_not_found') }}
+                </p>
             </div>
         </section>
     @else
@@ -417,25 +420,23 @@
                 @forelse($arrayProductos as $prod)
                     @php
                         $isArray = is_array($prod);
-                        $id            = $isArray ? ($prod['id'] ?? null) : ($prod->id ?? null);
-                        $img           = $isArray ? ($prod['imagen'] ?? '') : ($prod->imagen ?? '');
-                        $titulo        = $isArray ? ($prod['titulo'] ?? '') : ($prod->titulo ?? '');
-                        $desc          = $isArray ? ($prod['descripcion'] ?? '') : ($prod->descripcion ?? '');
-                        $precio        = $isArray ? ($prod['precio'] ?? 0) : ($prod->precio ?? 0);
-                        $precioFormat  = $isArray ? ($prod['precioFormat'] ?? null) : ($prod->precioFormat ?? null);
+                        $id             = $isArray ? ($prod['id'] ?? null) : ($prod->id ?? null);
+                        $img            = $isArray ? ($prod['imagen'] ?? '') : ($prod->imagen ?? '');
+                        $titulo         = $isArray ? ($prod['titulo'] ?? '') : ($prod->titulo ?? '');
+                        $desc           = $isArray ? ($prod['descripcion'] ?? '') : ($prod->descripcion ?? '');
+                        $precio         = $isArray ? ($prod['precio'] ?? 0) : ($prod->precio ?? 0);
+                        $precioFormat   = $isArray ? ($prod['precioFormat'] ?? null) : ($prod->precioFormat ?? null);
                         $presentaciones = $isArray ? ($prod['presentaciones'] ?? []) : ($prod->presentaciones ?? []);
                         $disponible     = $isArray ? ($prod['disponible'] ?? 1) : ($prod->disponible ?? 1);
                     @endphp
 
                     <div class="product-card">
-
                         {{-- Media --}}
                         <div class="product-media">
                             <div class="media-box">
-                                <img
-                                    src="{{ asset('storage/archivos/' . $img) }}"
-                                    alt="{{ $titulo ?: 'Producto' }}"
-                                    onerror="this.src='{{ asset('images/no-image.png') }}'">
+                                <img src="{{ asset('storage/archivos/' . $img) }}"
+                                     alt="{{ $titulo ?: 'Producto' }}"
+                                     onerror="this.src='{{ asset('images/no-image.png') }}'">
                             </div>
                         </div>
 
@@ -485,37 +486,45 @@
                             @endif
 
                             {{-- Cantidad --}}
-                            <div class="quantity-row">
-                                <label for="cantidad_{{ $id ?? 1 }}">Cantidad</label>
-                                <div class="qty-control">
-                                    <button type="button" class="qty-btn" onclick="stepQty({{ $id ?? 1 }}, -1)">−</button>
-                                    <input type="number"
-                                           id="cantidad_{{ $id ?? 1 }}"
-                                           name="cantidad"
-                                           min="1"
-                                           max="100"
-                                           value="1"
-                                           class="quantity-input"
-                                           oninput="validarNumero(this)">
-                                    <button type="button" class="qty-btn" onclick="stepQty({{ $id ?? 1 }}, 1)">+</button>
+                            @if($disponible != 0)
+                                <div class="quantity-row">
+                                    <label for="cantidad_{{ $id ?? 1 }}">Cantidad</label>
+                                    <div class="qty-control">
+                                        <button type="button" class="qty-btn" onclick="stepQty({{ $id ?? 1 }}, -1)">−</button>
+                                        <input type="number"
+                                               id="cantidad_{{ $id ?? 1 }}"
+                                               name="cantidad"
+                                               min="1" max="100" value="1"
+                                               class="quantity-input"
+                                               oninput="validarNumero(this)">
+                                        <button type="button" class="qty-btn" onclick="stepQty({{ $id ?? 1 }}, 1)">+</button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {{-- Botón carrito --}}
-                            <button type="button" class="btn-cart" onclick="agregarAlCarrito({{ $id ?? 1 }})">
-                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                                {{ __('meta.product_v2') }}
-                            </button>
+                                {{-- Botón carrito --}}
+                                <button type="button" class="btn-cart" onclick="agregarAlCarrito({{ $id ?? 1 }})">
+                                    <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                    {{ __('meta.product_v2') }}
+                                </button>
+                            @endif
 
                         </div>
                     </div>
                 @empty
-                    <p style="color:#ccc;text-align:center;margin:24px 0"></p>
+                    <p style="color:#ccc;text-align:center;margin:24px 0">
+                        {{ __('meta.product_not_found') }}
+                    </p>
                 @endforelse
 
             </div>
         </section>
     @endif
+
+
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/toastr.min.js') }}"></script>
+    <script src="{{ asset('js/axios.min.js') }}"></script>
+
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')
@@ -539,14 +548,56 @@
             input.value = v;
         }
 
+        const i18n = {
+            addToCartMessage:      "{{ __('meta.added_to_cart') }}",
+            noAddToCartMessage:         "{{ __('meta.could_not_add_tocart') }}",
+
+        };
+
         // Agregar al carrito: ejemplo con lectura de presentacion + cantidad
-        function agregarAlCarrito(productId) {
+        async function agregarAlCarrito(productId) {
+            // botón que disparó la acción
+            const btn = event?.currentTarget || document.querySelector(`button[onclick="agregarAlCarrito(${productId})"]`);
+            if (btn) { btn.disabled = true; btn.style.opacity = .7; }
+
             const select = document.getElementById(`presentacion_${productId}`);
             const presentacionId = select ? select.value : null;
-            const cantidad = document.getElementById(`cantidad_${productId}`)?.value || 1;
+            const cantidad = parseInt(document.getElementById(`cantidad_${productId}`)?.value || 1, 10);
 
-            // TODO: aquí integras tu lógica (Axios/Fetch) para agregar al carrito
-            // console.log({ productId, presentacionId, cantidad });
+            const body = new URLSearchParams();
+            body.append('product_id', productId);
+            body.append('quantity', isNaN(cantidad) ? 1 : cantidad);
+            if (presentacionId) body.append('presentacionId', presentacionId);
+
+            try {
+                const res = await fetch(`{{ route('cart.add') }}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    },
+                    body
+                });
+
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+
+                const data = await res.json();
+                if (data?.ok) {
+                    document.querySelectorAll('.header-cart-count.count')
+                        .forEach(el => el.textContent = data.count);
+
+                    toastr.success(i18n.addToCartMessage);
+
+
+                } else {
+                    toastr.error(i18n.noAddToCartMessage);
+                }
+            } catch (e) {
+                toastr.error(i18n.noAddToCartMessage);
+            } finally {
+                if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+            }
         }
     </script>
 @endsection

@@ -233,7 +233,10 @@ return [
     'save_changes' => '변경 사항 저장',
     'billing_information' => '결제 정보',
     'back' => '뒤로가기',
-
+    'view_cart' => '장바구니 보기',
+    'product_not_found' => '상품이 없습니다.',
+    'added_to_cart' => '장바구니에 추가됨',
+    'could_not_add_tocart' => '장바구니에 추가할 수 없습니다',
 
 
 ];

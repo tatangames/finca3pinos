@@ -593,10 +593,6 @@
                 return;
             }
 
-
-
-
-
             // Recolectar traducciones dinámicas
             const cont = document.getElementById('langs-editar');
             const locales = (cont.dataset.locales || '').split(',').filter(Boolean);
