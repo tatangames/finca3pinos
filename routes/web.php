@@ -271,6 +271,13 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::post(LaravelLocalization::transRoute('routes.updatebilling'), [UsuarioAuthController::class, 'actualizarPerfil'])
             ->name('user.update.perfil');
 
+
+        //vista carrito de compras
+        Route::get(LaravelLocalization::transRoute('routes.cart'), [UsuarioAuthController::class, 'vistaCarritoDeCompras'])
+            ->name('user.cart');
+
+
+
     });
 
 });

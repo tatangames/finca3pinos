@@ -40,7 +40,7 @@
                     {{-- Carrito --}}
                     <li class="only-desktop">
                         <div class="cart-navbar">
-                            <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}"
+                            <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.cart', [], false)) }}"
                                class="shop_table cart" title="{{ __('meta.view_cart') }}">
                                 <span class="header-cart-count count">0</span>
                                 <i class="fa fa-shopping-cart" aria-hidden="true"></i>
@@ -93,7 +93,7 @@
                 <div class="nav-mob">
                     <ul class="nav navbar-nav">
                         <li class="only-mobile">
-                            <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}"
+                            <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.cart', [], false)) }}"
                                class="shop_table cart" title="{{ __('meta.view_cart') }}">
                                 <span class="header-cart-count count">0</span>
                                 <i class="fa fa-shopping-cart" aria-hidden="true"></i>

@@ -20,7 +20,7 @@ return [
     'editdirection' => 'editar-direccion/{iddirection}',
     'updatedirection' => 'actualizar-direccion',
     'updatebilling' => 'actualizar-perfil',
-
+    'cart' => 'carrito',
 
 
 

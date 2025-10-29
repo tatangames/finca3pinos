@@ -29,7 +29,7 @@ class UsuarioAuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:web')->except(['showLoginFormUsuario', 'loginUsuario', 'showIngresarCorreoForm',
-        'solicitarCodigoCorreo', 'showResetPasswordForm', 'showtokenInvalid', 'registroCliente']);
+        'solicitarCodigoCorreo', 'showResetPasswordForm', 'showtokenInvalid', 'registroCliente', 'vistaCarritoDeCompras']);
     }
 
     public function showLoginFormUsuario()
@@ -671,6 +671,16 @@ class UsuarioAuthController extends Controller
         }
     }
 
+
+
+
+    public function vistaCarritoDeCompras()
+    {
+
+
+
+        return view('frontend.pages.cart');
+    }
 
 
 
