@@ -16,9 +16,10 @@ use App\Http\Controllers\Backend\Sistema\PaisesController;
 // ======================== FRONTEND =============================
 use App\Http\Controllers\Frontend\Sistema\UsuarioAuthController;
 use App\Http\Controllers\Frontend\Sistema\FrontendController;
-use App\Http\Controllers\Frontend\Sistema\DashboardController;
+use App\Http\Controllers\Frontend\Sistema\OrderController;
 use App\Http\Controllers\Frontend\Sistema\PasswordResetController;
 use App\Http\Controllers\Frontend\Sistema\CartController;
+use App\Http\Controllers\Frontend\Sistema\CheckoutController;
 
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
@@ -278,8 +279,32 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
 
 
-    });
 
+
+
+        // ✅ Checkout protegido: requiere login y carrito con items
+        Route::middleware(['auth:web','cart.notempty'])->group(function () {
+            Route::get(LaravelLocalization::transRoute('routes.checkout'), [CheckoutController::class, 'show'])
+                ->name('checkout.show');
+
+            Route::post(LaravelLocalization::transRoute('routes.checkout_post'), [CheckoutController::class, 'place'])
+                ->name('checkout.place');
+        });
+
+        // ✅ Gracias (puede ser pública o sólo para auth, como prefieras)
+        Route::get(LaravelLocalization::transRoute('routes.thanks'), [OrderController::class, 'thanks'])
+            ->name('checkout.thanks');
+
+
+
+
+
+
+
+
+
+
+    });
 });
 
 

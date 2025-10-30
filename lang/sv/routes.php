@@ -22,6 +22,8 @@ return [
     'updatebilling' => 'actualizar-perfil',
     'cart' => 'carrito',
 
-
+    'checkout' => 'pago',
+    'checkout_post' => 'pago',
+    'thanks' => 'gracias/{order}',
 
 ];

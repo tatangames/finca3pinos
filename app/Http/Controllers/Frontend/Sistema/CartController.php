@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Frontend\Sistema;
 
+use App\Traits\HandlesCart;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cookie;
 class CartController extends Controller
 {
 
-    protected function cart()
-    {
-        $key = auth()->check() ? 'user_'.auth()->id() : 'guest_'.session()->getId();
-        return Cart::session($key);
-    }
+    use HandlesCart;
+
+
 
 
     // POST /cart/add  (AJAX)
@@ -68,7 +68,7 @@ class CartController extends Controller
                 ],
             ]);
         } else {
-            $cart->add([
+            $this->cart()->add([
                 'id'        => $lineId,
                 'name'      => $name,
                 'price'     => $price,
@@ -186,12 +186,6 @@ class CartController extends Controller
         ]);
     }
 
-    private function calcSubtotal(array $cart): float
-    {
-        $s = 0;
-        foreach ($cart as $it) $s += $it['price'] * $it['qty'];
-        return round($s, 2);
-    }
 
 
 

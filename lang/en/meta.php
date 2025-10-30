@@ -233,7 +233,7 @@ return [
     'product_not_found' => 'No product available.',
     'added_to_cart' => 'Added to cart',
     'could_not_add_tocart' => 'Could not add to cart',
-
+    'your_cart_empty' => 'Your cart is empty',
 
 
 

@@ -873,8 +873,9 @@
                                             </tbody>
                                         </table>
                                         <div class="wc-proceed-to-checkout">
-                                            <a href="#" class="checkout-button button alt wc-forward btn">
-                                                Proceed to checkout
+                                            <a href="{{ route('checkout.show') }}"
+                                               class="checkout-button button alt wc-forward btn">
+                                                {{ __('meta.proceed_to_checkout') }}
                                             </a>
                                         </div>
                                     </div>

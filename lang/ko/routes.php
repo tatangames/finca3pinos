@@ -23,6 +23,8 @@ return [
     'cart' => 'cart',
 
 
-
+    'checkout' => 'checkout',                // GET
+    'checkout_post' => 'checkout',           // POST (misma URL)
+    'thanks' => 'thanks/{order}',            // página de gracias
 
 ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Traits\HandlesCart;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,15 +11,13 @@ use Darryldecode\Cart\Facades\CartFacade as Cart;
 
 class SetCartInstance
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
+    use HandlesCart;
+
     public function handle($request, Closure $next)
     {
-        $owner = Auth::id() ?: $request->session()->getId();
-        Cart::session($owner);
+        // Garantiza que existe cookie del carrito y usa la misma clave siempre
+        $this->cartKey();
+
         return $next($request);
     }
 }

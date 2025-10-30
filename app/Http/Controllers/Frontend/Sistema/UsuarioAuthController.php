@@ -12,6 +12,7 @@ use App\Models\Pais;
 use App\Models\Producto;
 use App\Models\ProductosPresentacion;
 use App\Models\Usuario;
+use App\Traits\HandlesCart;
 use Carbon\Carbon;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -29,6 +30,9 @@ use Illuminate\Support\Facades\DB;
 
 class UsuarioAuthController extends Controller
 {
+
+    use HandlesCart;
+
     public function __construct()
     {
         $this->middleware('auth:web')->except(['showLoginFormUsuario', 'loginUsuario', 'showIngresarCorreoForm',
@@ -84,11 +88,10 @@ class UsuarioAuthController extends Controller
         return ['success' => 2, 'message' => __('meta.incorrect_data')];
     }
 
-    public function logoutUsuario(Request $request){
+    public function logoutUsuario(Request $request)
+    {
         Auth::guard('web')->logout();
-        $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect()->route('user.index');
     }
 
@@ -674,12 +677,6 @@ class UsuarioAuthController extends Controller
         }
     }
 
-    protected function cart()
-    {
-        // Usa una clave consistente para invitados/usuarios
-        $key = auth()->check() ? 'user_'.auth()->id() : 'guest_'.session()->getId();
-        return Cart::session($key);
-    }
 
 
     public function vistaCarritoDeCompras()

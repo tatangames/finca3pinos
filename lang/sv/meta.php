@@ -235,6 +235,7 @@ return [
     'product_not_found' => 'Producto no encontrado.',
     'added_to_cart' => 'Agregado al carrito',
     'could_not_add_tocart' => 'No se pudo agregar al carrito.',
+    'your_cart_empty' => 'Tu carrito esta vacío',
 
 
 
