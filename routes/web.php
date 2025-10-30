@@ -283,8 +283,6 @@ Route::middleware(['detect.country.locale'])->group(function () {
 });
 
 
-// Página del carrito
-Route::get('/carrito', [CartController::class,'index'])->name('cart.index');
 
 // AJAX
 Route::post('/cart/add',   [CartController::class,'add'])->name('cart.add');
@@ -294,7 +292,8 @@ Route::get ('/cart/count', [CartController::class,'count'])->name('cart.count');
 Route::delete('/cart/clear', [CartController::class,'clear'])->name('cart.clear');
 
 
-
+Route::post('/cart/update', [CartController::class, 'updateItem'])->name('cart.update');
+Route::post('/cart/remove', [CartController::class, 'removeItem'])->name('cart.remove');
 
 
 

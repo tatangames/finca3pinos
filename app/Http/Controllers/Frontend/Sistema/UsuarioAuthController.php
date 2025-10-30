@@ -9,8 +9,11 @@ use App\Models\Direcciones;
 use App\Models\DireccionFacturacion;
 use App\Models\Municipio;
 use App\Models\Pais;
+use App\Models\Producto;
+use App\Models\ProductosPresentacion;
 use App\Models\Usuario;
 use Carbon\Carbon;
+use Darryldecode\Cart\Facades\CartFacade as Cart;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -671,19 +674,98 @@ class UsuarioAuthController extends Controller
         }
     }
 
-
+    protected function cart()
+    {
+        // Usa una clave consistente para invitados/usuarios
+        $key = auth()->check() ? 'user_'.auth()->id() : 'guest_'.session()->getId();
+        return Cart::session($key);
+    }
 
 
     public function vistaCarritoDeCompras()
     {
+        $cart = $this->cart();
+        $content = $cart->getContent(); // CartCollection
 
+        if ($content->isEmpty()) {
+            $items = [];
+            $subtotal = 0;
+            return view('frontend.pages.cart', compact('items','subtotal'));
+        }
 
+        // Reunir product_ids
+        $productIds = [];
+        $presIds    = [];
 
-        return view('frontend.pages.cart');
+        foreach ($content as $row) {
+            // ID puede venir “15:3” o “15”
+            $parts = explode(':', (string)$row->id);
+            $pid = (int)($row->attributes->get('product_id') ?? $parts[0] ?? 0);
+            if ($pid) $productIds[] = $pid;
+
+            $pres = (int)($row->attributes->get('presentacion_id') ?? ($parts[1] ?? 0));
+            if ($pres) $presIds[] = $pres;
+        }
+
+        $productos = Producto::whereIn('id', array_unique($productIds))
+            ->where('activo',1)->get()->keyBy('id');
+
+        $presentaciones = $presIds
+            ? ProductosPresentacion::whereIn('id', array_unique($presIds))
+                ->where('activo',1)->get()->keyBy('id')
+            : collect();
+
+        $items = [];
+        $subtotal = 0;
+
+        foreach ($content as $row) {
+            $lineId = (string)$row->id;
+            $parts  = explode(':', $lineId);
+
+            $pid  = (int)($row->attributes->get('product_id') ?? $parts[0] ?? 0);
+            $pres = (int)($row->attributes->get('presentacion_id') ?? ($parts[1] ?? 0));
+            $qty  = (int)$row->quantity;
+
+            $prod = $productos->get($pid);
+            if (!$prod || $qty <= 0) continue;
+
+            // Recalcular nombre y precio por seguridad
+            $rcProd = getRegionContent($prod->content_key);
+            $tituloProd = $rcProd['title'] ?? ($row->name ?? 'Producto');
+
+            $price = (float)($prod->precio ?? $row->price ?? 0);
+            $tituloPres = null;
+
+            if ($pres && $presentaciones->has($pres)) {
+                $presObj = $presentaciones->get($pres);
+                $rcPres  = getRegionContent($presObj->content_key);
+                $tituloPres = $rcPres['title'] ?? null;
+                if (!is_null($presObj->precio)) $price = (float)$presObj->precio;
+            }
+
+            $name = $tituloPres ? "{$tituloProd} — {$tituloPres}" : $tituloProd;
+            $rowTotal = $price * $qty;
+            $subtotal += $rowTotal;
+
+            $imageUrl = $prod->imagen
+                ? asset('storage/archivos/' . ltrim($prod->imagen, '/'))
+                : asset('images/placeholder.png');
+
+            $items[] = [
+                'row_id'    => $lineId, // <-- Usaremos este para update/remove
+                'product_id'=> $pid,
+                'pres_id'   => $pres ?: null,
+                'name'      => $name,
+                'slug'      => $rcProd['slug'] ?? null,
+                'image'     => $imageUrl,
+                'price'     => $price,
+                'qty'       => $qty,
+                'row_total' => $rowTotal,
+            ];
+        }
+
+        return view('frontend.pages.cart', compact('items','subtotal'));
     }
-
-
-
 
 
 

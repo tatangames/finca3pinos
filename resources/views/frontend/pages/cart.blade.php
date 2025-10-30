@@ -818,42 +818,45 @@
                                             <th class="product-subtotal">Subtotal</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
-                                        <tr class="woocommerce-cart-form__cart-item cart_item">
-                                            <td class="product-remove">
-                                                <a href="#" class="remove" aria-label="Remove item" data-product_id="2071" data-product_sku="">×</a>
-                                            </td>
-                                            <td class="product-thumbnail">
-                                                <a href="#">
-                                                    <img src="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item3-300x300.jpg"
-                                                         alt="Ethiopian Aroma - 100g" width="300" height="300">
-                                                </a>
-                                            </td>
-                                            <td class="product-name" data-title="Product">Ethiopian Aroma - 100g</td>
-                                            <td class="product-price" data-title="Price">
-                                                <span class="woocommerce-Price-amount amount"><bdi>$9.00</bdi></span>
-                                            </td>
-                                            <td class="product-quantity" data-title="Quantity">
-                                                <div class="quantity">
-                                                    <input type="number" class="input-text qty text" value="1" min="0" step="1">
-                                                </div>
-                                            </td>
-                                            <td class="product-subtotal" data-title="Subtotal">
-                                                <span class="woocommerce-Price-amount amount"><bdi>$9.00</bdi></span>
-                                            </td>
-                                        </tr>
 
-                                        <!-- Fila de acciones sin cupón -->
+                                        <tbody id="cart-body">
+                                        @forelse($items as $item)
+                                            <tr class="woocommerce-cart-form__cart-item cart_item"
+                                                data-row="{{ $item['row_id'] }}">
+                                                <td class="product-remove">
+                                                    <a href="#" class="remove" aria-label="Remove item">×</a>
+                                                </td>
+                                                <td class="product-thumbnail">
+                                                    <img src="{{ $item['image'] }}"
+                                                         alt="{{ $item['name'] }}"
+                                                         width="120"
+                                                         height="120"
+                                                         style="border-radius: 8px; object-fit: cover;">
+                                                </td>
+                                                <td class="product-name">{{ $item['name'] }}</td>
+                                                <td class="product-price"><span class="amount"><bdi>${{ number_format($item['price'],2) }}</bdi></span></td>
+                                                <td class="product-quantity">
+                                                    <div class="quantity">
+                                                        <input type="number" class="input-text qty text qty-input"
+                                                               value="{{ $item['qty'] }}" min="0" step="1">
+                                                    </div>
+                                                </td>
+                                                <td class="product-subtotal">
+                                                    <span class="amount row-total"><bdi>${{ number_format($item['row_total'],2) }}</bdi></span>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr><td colspan="6" class="text-center">Tu carrito está vacío.</td></tr>
+                                        @endforelse
+
                                         <tr>
-                                            <td colspan="6" class="actions" style="text-align: right;">
-                                                <button type="submit" class="button btn" name="update_cart" value="Update cart">
-                                                    Update cart
-                                                </button>
-                                                <input type="hidden" id="woocommerce-cart-nonce" name="woocommerce-cart-nonce" value="1ddef4ce79">
-                                                <input type="hidden" name="_wp_http_referer" value="/cart/">
+                                            <td colspan="6" class="actions" style="text-align:right;">
+                                                <button type="button" class="button btn" id="btn-update-all">Update cart</button>
                                             </td>
                                         </tr>
                                         </tbody>
+
+
                                     </table>
                                 </form>
 
@@ -864,7 +867,8 @@
                                             <tbody>
                                             <tr class="cart-subtotal">
                                                 <th>Subtotal</th>
-                                                <td data-title="Subtotal"><span class="price-badge">$9.00</span></td>
+                                                <td data-title="Subtotal"><span class="price-badge" id="subtotal-badge">${{ number_format($subtotal,2) }}</span></td>
+
                                             </tr>
                                             </tbody>
                                         </table>
@@ -888,15 +892,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}"></script>
@@ -904,9 +899,96 @@
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const body = document.getElementById('cart-body');
+            const subtotalBadge = document.getElementById('subtotal-badge');
+
+            axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+            axios.defaults.headers.common['X-CSRF-TOKEN'] =
+                document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
 
+
+
+            // Eliminar
+            body.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.remove');
+                if (!btn) return;
+                e.preventDefault();
+                const tr = btn.closest('tr[data-row]');
+                const rowId = tr.dataset.row;
+
+                try {
+                    const { data } = await axios.post("{{ route('cart.remove') }}", { row_id: rowId });
+
+                    tr.remove();
+                    subtotalBadge.textContent = '$' + Number(data.subtotal).toFixed(2);
+
+                    // Si el carrito quedó vacío
+                    if (!body.querySelector('tr[data-row]')) {
+                        body.insertAdjacentHTML(
+                            'afterbegin',
+                            '<tr><td colspan="6" class="text-center">Tu carrito está vacío.</td></tr>'
+                        );
+                    }
+
+                    // 🔹 Dispara evento global para actualizar el navbar
+                    window.dispatchEvent(new CustomEvent('cart:updated', {
+                        detail: { count: data.count, subtotal: data.subtotal }
+                    }));
+
+                } catch {
+                    toastr.error('No se pudo eliminar.');
+                }
+            });
+
+            // === BOTÓN "UPDATE CART" ===
+            document.getElementById('btn-update-all')?.addEventListener('click', async () => {
+                const rows = body.querySelectorAll('tr[data-row]');
+                if (!rows.length) return toastr.info('Tu carrito está vacío.');
+
+                let subtotalAcum = 0;
+                let totalItems = 0;
+
+                try {
+                    // Recorremos todas las filas visibles
+                    for (const tr of rows) {
+                        const input = tr.querySelector('.qty-input');
+                        if (!input) continue;
+                        const rowId = tr.dataset.row;
+                        const qty = parseInt(input.value || '0', 10);
+
+                        // Llamada individual para cada fila
+                        const { data } = await axios.post("{{ route('cart.update') }}", { row_id: rowId, qty });
+
+                        // Actualiza subtotal de la fila
+                        tr.querySelector('.row-total bdi').textContent = '$' + Number(data.rowTotal).toFixed(2);
+
+                        subtotalAcum = Number(data.subtotal); // se actualiza con cada respuesta
+                        totalItems   = data.count;
+                    }
+
+                    // Actualiza subtotal global y notificación
+                    subtotalBadge.textContent = '$' + subtotalAcum.toFixed(2);
+                    toastr.success('Carrito actualizado correctamente.');
+
+                    // 🔹 Actualiza el contador del navbar (evento global)
+                    window.dispatchEvent(new CustomEvent('cart:updated', {
+                        detail: { count: totalItems, subtotal: subtotalAcum }
+                    }));
+
+                } catch (err) {
+                    console.error(err);
+                    toastr.error('Ocurrió un error al actualizar el carrito.');
+                }
+            });
+
+
+            document.getElementById('btn-update-all')?.addEventListener('click', () => toastr.success('Carrito actualizado'));
+        });
     </script>
+
+
 
 
     {{-- Superior (Newsletter) block --}}
