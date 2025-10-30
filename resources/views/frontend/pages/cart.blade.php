@@ -6,7 +6,10 @@
 
     <style>
 
-        /* ---- Quita fondo/padding del wrapper de CF7 ---- */
+        /* ============================================================
+   LIMPIEZA DE FONDOS Y ENVOLTURAS
+   ============================================================ */
+
         #like_sc_contact_form_7_122453212,
         #like_sc_contact_form_7_122453212.form-bg-default,
         #like_sc_contact_form_7_122453212 .wpcf7,
@@ -17,16 +20,16 @@
             padding: 0 !important;
         }
 
-        /* WPBakery custom bg que suele meter gris */
         #like_sc_contact_form_7_122453212 .vc_custom_1505582392596 {
             background: transparent !important;
             padding: 0 !important;
             border-radius: 0 !important;
         }
 
-        /* =========================
-           Card principal del formulario
-           ========================= */
+        /* ============================================================
+           CARD PRINCIPAL DEL FORMULARIO
+           ============================================================ */
+
         .contact-card {
             background: #ffffff;
             border-radius: 16px;
@@ -35,7 +38,6 @@
             overflow: hidden;
         }
 
-        /* Limpia fondos de envoltorios CF7 */
         .contact-card p,
         .contact-card label,
         .contact-card .wpcf7-form-control-wrap {
@@ -43,22 +45,23 @@
             margin-bottom: 12px;
         }
 
-        /* =========================
-           Tipografía base inputs
-           ========================= */
+        /* ============================================================
+           TIPOGRAFÍA Y INPUTS
+           ============================================================ */
+
         .contact-card .wpcf7-form-control {
-            font-weight: 400 !important; /* quita negrita */
+            font-weight: 400 !important;
             font-family: "Roboto", system-ui, -apple-system, Segoe UI, Arial, sans-serif;
             color: #333;
             letter-spacing: 0.2px;
         }
 
-        /* =========================
-           Inputs y Textareas
-           ========================= */
         .contact-card input[type="text"],
         .contact-card input[type="email"],
-        .contact-card textarea {
+        .contact-card textarea,
+        #contact-form input[type="text"],
+        #contact-form input[type="email"],
+        #contact-form textarea {
             width: 100%;
             background: #fafafa;
             border: 1px solid rgba(0, 0, 0, 0.12);
@@ -69,14 +72,12 @@
             transition: all 0.2s ease;
         }
 
-        /* Placeholders más suaves */
         .contact-card input::placeholder,
         .contact-card textarea::placeholder {
             color: #9a9a9a;
             font-weight: 400;
         }
 
-        /* Forzar minúsculas en email sin inline */
         #correo-form {
             text-transform: lowercase;
         }
@@ -84,7 +85,9 @@
         /* Foco elegante */
         .contact-card input[type="text"]:focus,
         .contact-card input[type="email"]:focus,
-        .contact-card textarea:focus {
+        .contact-card textarea:focus,
+        #contact-form input:focus,
+        #contact-form textarea:focus {
             border-color: #c6a471;
             background: #fff;
             box-shadow: 0 0 0 3px rgba(198, 164, 113, 0.15);
@@ -104,9 +107,10 @@
             -webkit-text-fill-color: #333;
         }
 
-        /* =========================
-           Botón Enviar (aplica a submit y button)
-           ========================= */
+        /* ============================================================
+           BOTONES - ENVIAR Y SUBMIT
+           ============================================================ */
+
         .contact-card input[type="submit"],
         .contact-card input[type="button"],
         .contact-card .wpcf7-submit {
@@ -129,9 +133,16 @@
             box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
         }
 
-        /* =========================
-           Mensaje de éxito / error CF7
-           ========================= */
+        #btn-enviar:disabled,
+        button[disabled] {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* ============================================================
+           MENSAJES DE ÉXITO / ERROR
+           ============================================================ */
+
         .contact-card .wpcf7-response-output {
             margin: 14px 0 0 !important;
             border-radius: 10px !important;
@@ -139,9 +150,10 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
-        /* =========================
-           Distribución dos columnas
-           ========================= */
+        /* ============================================================
+           DISTRIBUCIÓN DOS COLUMNAS
+           ============================================================ */
+
         .contact-two-col {
             display: grid !important;
             grid-template-columns: 1fr;
@@ -167,9 +179,10 @@
             padding-bottom: 0 !important;
         }
 
-        /* =========================
-           Social / Íconos de contacto
-           ========================= */
+        /* ============================================================
+           DATOS DE CONTACTO E ÍCONOS
+           ============================================================ */
+
         .contact-card .fa {
             color: #d2aa6d;
             font-size: 18px;
@@ -190,9 +203,10 @@
             margin: 10px 0;
         }
 
-        /* =========================
-           Mini botones redes
-           ========================= */
+        /* ============================================================
+           BOTONES REDES SOCIALES
+           ============================================================ */
+
         .contact-card .social-cta {
             display: flex;
             flex-wrap: wrap;
@@ -238,99 +252,6 @@
             fill: #111;
         }
 
-        /* =========================
-           Acciones
-           ========================= */
-        .contact-card__actions {
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-        }
-
-        /* =========================
-           Errores de campo
-           ========================= */
-        .field-error {
-            color: #d93025;
-            font-size: .85rem;
-            margin-top: 6px;
-            line-height: 1.3;
-        }
-
-        .field-error:empty {
-            display: none;
-        }
-
-        .is-invalid {
-            border-color: #d93025 !important;
-            box-shadow: none !important;
-        }
-
-        /* =========================
-           Contador de caracteres
-           ========================= */
-        .char-counter {
-            font-size: .85rem;
-            text-align: right;
-            opacity: .85;
-            margin-top: 4px;
-        }
-
-        .char-counter.warning {
-            color: #c77d00;
-        }
-
-        .char-counter.danger {
-            color: #d93025;
-        }
-
-        /* Reafirmar bordes/colores del form */
-        #contact-form input[type="text"],
-        #contact-form input[type="email"],
-        #contact-form textarea {
-            border: 1px solid rgba(0, 0, 0, 0.12);
-            background: #fafafa;
-            transition: all 0.2s ease;
-        }
-
-        #contact-form input:focus,
-        #contact-form textarea:focus {
-            border-color: #c6a471;
-            background: #fff;
-        }
-
-        #btn-enviar:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3; /* gris claro */
-            border-top: 3px solid #d2aa6d; /* dorado marca */
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        button[disabled] {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-
         .social-list {
             display: flex;
             gap: 10px;
@@ -349,7 +270,7 @@
             border-radius: 50%;
             overflow: hidden;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            transition: transform .3s ease, box-shadow .3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .social-list li a:hover {
@@ -361,6 +282,490 @@
             width: 35px;
             height: 35px;
             object-fit: contain;
+        }
+
+        /* ============================================================
+           ACCIONES Y VALIDACIÓN
+           ============================================================ */
+
+        .contact-card__actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .field-error {
+            color: #d93025;
+            font-size: 0.85rem;
+            margin-top: 6px;
+            line-height: 1.3;
+        }
+
+        .field-error:empty {
+            display: none;
+        }
+
+        .is-invalid {
+            border-color: #d93025 !important;
+            box-shadow: none !important;
+        }
+
+        /* ============================================================
+           CONTADOR DE CARACTERES
+           ============================================================ */
+
+        .char-counter {
+            font-size: 0.85rem;
+            text-align: right;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .char-counter.warning {
+            color: #c77d00;
+        }
+
+        .char-counter.danger {
+            color: #d93025;
+        }
+
+        /* ============================================================
+           SPINNER LOADING
+           ============================================================ */
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #d2aa6d;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============================================================
+           WOOCOMMERCE - CARRITO
+           ============================================================ */
+
+        /* Ocultar cupón */
+        .woocommerce .actions .coupon,
+        .woocommerce .coupon,
+        .woocommerce-cart-form .coupon {
+            display: none !important;
+        }
+
+        /* Acciones - Botón Update Cart */
+        .woocommerce .actions {
+            text-align: right;
+            padding-top: 10px;
+        }
+
+        .woocommerce .actions .button[name="update_cart"],
+        .button.btn[name="update_cart"] {
+            background: #d2aa6d !important;
+            border: none !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+            padding: 10px 18px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+
+        .woocommerce .actions .button[name="update_cart"]:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        /* ============================================================
+           TABLA DEL CARRITO
+           ============================================================ */
+
+        .shop_table.cart thead th {
+            background: #c0a277;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .shop_table.cart tbody tr.cart_item td {
+            padding: 12px 10px;
+            vertical-align: middle;
+        }
+
+        .shop_table.cart tbody tr.cart_item {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .shop_table.cart td.product-thumbnail img {
+            width: 120px;
+            height: auto;
+            border-radius: 6px;
+        }
+
+        /* ============================================================
+           CANTIDAD (INPUT)
+           ============================================================ */
+
+        .shop_table.cart td.product-quantity {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .shop_table.cart .quantity {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shop_table.cart .quantity .input-text.qty {
+            width: 60px;
+            height: 36px;
+            padding: 4px 8px;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 6px;
+            outline: none;
+            font-weight: 500;
+            font-size: 15px;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+
+        .shop_table.cart .quantity .input-text.qty:focus {
+            border-color: #d2aa6d;
+            box-shadow: 0 0 0 2px rgba(210, 170, 109, 0.15);
+        }
+
+        /* ============================================================
+           BOTÓN ELIMINAR (X)
+           ============================================================ */
+
+        .shop_table.cart td.product-remove {
+            width: 60px;
+            text-align: center;
+            vertical-align: middle;
+            padding: 12px 10px;
+        }
+
+        .shop_table.cart td.product-remove .remove {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50% !important;
+            background: #fff3e0;
+            color: #d62d20;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none !important;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            line-height: 1;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .shop_table.cart td.product-remove .remove:hover {
+            background: #e74c3c;
+            color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ============================================================
+           TOTALES DEL CARRITO
+           ============================================================ */
+
+        .cart-collaterals {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .cart_totals {
+            width: 420px;
+            max-width: 100%;
+        }
+
+        .cart_totals h2 {
+            display: none;
+        }
+
+        .cart_totals .shop_table {
+            width: 100%;
+            border: none;
+            border-radius: 0;
+            overflow: visible;
+        }
+
+        .cart_totals .shop_table th,
+        .cart_totals .shop_table td {
+            padding: 12px 16px;
+        }
+
+        .cart_totals .order-total th,
+        .cart_totals .order-total td {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .cart_totals .cart-subtotal td {
+            text-align: right;
+        }
+
+        .cart_totals .cart-subtotal td .price-badge {
+            display: inline-block;
+            padding: 8px 12px;
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            font-weight: 700;
+            letter-spacing: 0.1px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ============================================================
+           BOTÓN CHECKOUT
+           ============================================================ */
+
+        .wc-proceed-to-checkout .checkout-button {
+            display: inline-block;
+            width: auto;
+            margin-top: 14px;
+            background: #d2aa6d !important;
+            border-radius: 10px !important;
+            padding: 12px 24px !important;
+            font-weight: 700 !important;
+            color: #fff !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+        }
+
+        .wc-proceed-to-checkout .checkout-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        /* ============================================================
+           RESPONSIVE - MOBILE
+           ============================================================ */
+
+        @media (max-width: 991px) {
+            .cart-collaterals {
+                justify-content: center;
+            }
+
+            .cart_totals {
+                width: 100%;
+            }
+
+            .shop_table.cart td.product-thumbnail img {
+                width: 100px;
+            }
+        }
+
+
+
+
+        /* Botón X perfectamente circular, desktop y móvil */
+        .woocommerce table.shop_table.cart td.product-remove > a.remove,
+        table.shop_table.cart td.product-remove > a.remove {
+            display: inline-grid !important;
+            place-items: center !important;
+            width: 30px !important;
+            height: 30px !important;
+            aspect-ratio: 1 / 1;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            border-radius: 50% !important;
+            line-height: 1 !important;
+            background: #fff3e0 !important;
+            color: #d62d20 !important;
+            border: 1px solid rgba(0,0,0,.1) !important;
+            font-size: 18px !important;
+            text-decoration: none !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Algunos themes dibujan la X con :before y añaden medidas/padding */
+        .woocommerce a.remove:before {
+            position: static !important;  /* evita offsets raros */
+            display: inline !important;
+            width: auto !important;
+            height: auto !important;
+            line-height: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Opcional: hover */
+        .woocommerce table.shop_table.cart td.product-remove > a.remove:hover {
+            background: #e74c3c !important;
+            color: #fff !important;
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0,0,0,.15);
+        }
+
+        /* QTY sin flechas nativas */
+        .shop_table.cart .quantity .input-text.qty,
+        .woocommerce .quantity .qty,
+        input[type="number"] {
+            -moz-appearance: textfield;   /* Firefox */
+            appearance: textfield;        /* Estándar */
+        }
+
+        /* Chrome / Edge / Safari (WebKit) */
+        .shop_table.cart .quantity .input-text.qty::-webkit-outer-spin-button,
+        .shop_table.cart .quantity .input-text.qty::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+
+        /* Elimina el borde cuadrado del contenedor de totales */
+        .cart_totals .shop_table,
+        .cart_totals .shop_table td,
+        .cart_totals .shop_table th {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        /* Asegura bordes redondeados limpios */
+        .cart_totals {
+            border: none !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            background: transparent !important;
+        }
+
+
+
+        /* ===========================
+   CART — MOBILE OPTIMIZADO
+   =========================== */
+        @media (max-width: 640px) {
+
+            /* 1) Layout tipo card por fila */
+            .shop_table.cart thead { display: none !important; }
+
+            .shop_table.cart tbody tr.cart_item {
+                display: grid !important;
+                grid-template-columns: 36px 64px 1fr;     /* remove | thumb | info */
+                grid-template-areas:
+    "remove thumb name"
+    "remove thumb qty"
+    "remove thumb subtotal";
+                gap: 8px 10px;
+                padding: 10px 8px !important;
+                border: 1px solid rgba(0,0,0,.06);
+                border-radius: 12px;
+                margin-bottom: 10px;
+            }
+
+            /* 2) Asignar áreas */
+            .shop_table.cart td.product-remove   { grid-area: remove; align-self: start; text-align: left; }
+            .shop_table.cart td.product-thumbnail{ grid-area: thumb; }
+            .shop_table.cart td.product-name     { grid-area: name; }
+            .shop_table.cart td.product-quantity { grid-area: qty; }
+            .shop_table.cart td.product-subtotal { grid-area: subtotal; text-align: right; }
+
+            /* 3) Miniaturas y textos */
+            .shop_table.cart td.product-thumbnail img {
+                width: 64px; height: auto; border-radius: 8px;
+            }
+            .shop_table.cart td { padding: 0 !important; }
+            .shop_table.cart td.product-name { font-size: 15px; line-height: 1.25; }
+
+            /* 4) Cantidad compacta */
+            .shop_table.cart .quantity { justify-content: flex-start; }
+            .shop_table.cart .quantity .input-text.qty {
+                width: 56px; height: 34px; font-size: 14px;
+            }
+
+            /* 5) Botón X clicable y alineado */
+            .woocommerce table.shop_table.cart td.product-remove > a.remove {
+                width: 32px !important; height: 32px !important; font-size: 18px !important;
+            }
+
+            /* 6) Quitar labels automáticos de Woo en mobile (para no duplicar) */
+            table.shop_table_responsive tr td::before { display: none !important; }
+
+            /* 7) Totales a ancho completo + botón grande */
+            .cart-collaterals { justify-content: stretch; }
+            .cart_totals { width: 100%; max-width: 100%; }
+            .cart_totals .shop_table td,
+            .cart_totals .shop_table th { padding: 8px 10px; }
+
+            .wc-proceed-to-checkout .checkout-button {
+                width: 100% !important;
+                padding: 14px 18px !important;
+                font-size: 16px !important;
+                border-radius: 12px !important;
+            }
+
+            /* 8) Respiro general del contenedor */
+            .text-page .entry-content .woocommerce { padding: 0 8px; }
+        }
+
+        @media (max-width: 640px) {
+
+            /* ===== Diferenciar precio vs subtotal ===== */
+            .shop_table.cart td.product-price {
+                color: #777 !important;
+                font-size: 14px !important;
+                font-weight: 500;
+                margin-top: 4px;
+            }
+
+            .shop_table.cart td.product-subtotal {
+                color: #111 !important;
+                font-size: 16px !important;
+                font-weight: 700 !important;
+                margin-top: 2px;
+            }
+
+            /* Orden y alineación más clara */
+            .shop_table.cart td.product-price,
+            .shop_table.cart td.product-subtotal {
+                display: block;
+                text-align: right;
+            }
+
+            /* Separar visualmente los valores */
+            .shop_table.cart tbody tr.cart_item {
+                padding-bottom: 14px !important;
+            }
+
+            /* (Opcional) añadir etiqueta sutil al precio */
+            .shop_table.cart td.product-price::before {
+                content: "Precio:";
+                color: #999;
+                font-size: 12px;
+                font-weight: 400;
+                margin-right: 4px;
+            }
+
+            /* (Opcional) añadir etiqueta sutil al subtotal */
+            .shop_table.cart td.product-subtotal::before {
+                content: "Subtotal:";
+                color: #999;
+                font-size: 12px;
+                font-weight: 400;
+                margin-right: 4px;
+            }
         }
 
 
@@ -401,16 +806,12 @@
                         <div class="entry-content clearfix" id="entry-div">
                             <div class="woocommerce">
                                 <div class="woocommerce-notices-wrapper"></div>
-                                <form class="woocommerce-cart-form" action="https://coffeeking.like-themes.com/cart/"
-                                      method="post">
-                                    <table class="shop_table shop_table_responsive cart woocommerce-cart-form__contents"
-                                           cellspacing="0">
+                                <form class="woocommerce-cart-form" action="https://coffeeking.like-themes.com/cart/" method="post">
+                                    <table class="shop_table shop_table_responsive cart woocommerce-cart-form__contents" cellspacing="0">
                                         <thead>
                                         <tr>
-                                            <th class="product-remove"><span
-                                                    class="screen-reader-text">Remove item</span></th>
-                                            <th class="product-thumbnail"><span class="screen-reader-text">Thumbnail image</span>
-                                            </th>
+                                            <th class="product-remove"><span class="screen-reader-text">Remove item</span></th>
+                                            <th class="product-thumbnail"><span class="screen-reader-text">Thumbnail image</span></th>
                                             <th class="product-name">Product</th>
                                             <th class="product-price">Price</th>
                                             <th class="product-quantity">Quantity</th>
@@ -419,89 +820,64 @@
                                         </thead>
                                         <tbody>
                                         <tr class="woocommerce-cart-form__cart-item cart_item">
-                                            <td class="product-remove"><a
-                                                    href="https://coffeeking.like-themes.com/cart/?remove_item=d6deddc2d42271e71c038b636b2044d0&amp;_wpnonce=1ddef4ce79"
-                                                    class="remove" aria-label="Remove Ephiopian Aroma - 100g from cart"
-                                                    data-product_id="2071" data-product_sku="">×</a></td>
-                                            <td class="product-thumbnail"><a
-                                                    href="https://coffeeking.like-themes.com/product/ephiopian-aroma/?attribute_weight=100g"><img
-                                                        fetchpriority="high" decoding="async" width="300" height="300"
-                                                        src="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item3-300x300.jpg"
-                                                        class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
-                                                        alt="Ephiopian Aroma - 100g"
-                                                        srcset="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item3-300x300.jpg 300w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item3-150x150.jpg 150w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item3-600x600.jpg 600w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item3-100x100.jpg 100w, https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item3.jpg 623w"
-                                                        sizes="(max-width: 300px) 100vw, 300px"></a></td>
-                                            <td class="product-name" data-title="Product"><a
-                                                    href="https://coffeeking.like-themes.com/product/ephiopian-aroma/?attribute_weight=100g">Ephiopian
-                                                    Aroma - 100g</a></td>
-                                            <td class="product-price" data-title="Price"><span
-                                                    class="woocommerce-Price-amount amount"><bdi><span
-                                                            class="woocommerce-Price-currencySymbol">$</span>9.00</bdi></span>
+                                            <td class="product-remove">
+                                                <a href="#" class="remove" aria-label="Remove item" data-product_id="2071" data-product_sku="">×</a>
+                                            </td>
+                                            <td class="product-thumbnail">
+                                                <a href="#">
+                                                    <img src="https://coffeeking.like-themes.com/wp-content/uploads/2017/09/coffee_item3-300x300.jpg"
+                                                         alt="Ethiopian Aroma - 100g" width="300" height="300">
+                                                </a>
+                                            </td>
+                                            <td class="product-name" data-title="Product">Ethiopian Aroma - 100g</td>
+                                            <td class="product-price" data-title="Price">
+                                                <span class="woocommerce-Price-amount amount"><bdi>$9.00</bdi></span>
                                             </td>
                                             <td class="product-quantity" data-title="Quantity">
-                                                <div class="quantity"><label class="screen-reader-text"
-                                                                             for="quantity_6902555ad57bf">Ephiopian
-                                                        Aroma - 100g quantity</label> <input type="number"
-                                                                                             id="quantity_6902555ad57bf"
-                                                                                             class="input-text qty text"
-                                                                                             name="cart[d6deddc2d42271e71c038b636b2044d0][qty]"
-                                                                                             value="1"
-                                                                                             aria-label="Product quantity"
-                                                                                             min="0" max="" step="1"
-                                                                                             placeholder=""
-                                                                                             inputmode="numeric"
-                                                                                             autocomplete="off"><span
-                                                        class="more"></span><span class="less"></span></div>
+                                                <div class="quantity">
+                                                    <input type="number" class="input-text qty text" value="1" min="0" step="1">
+                                                </div>
                                             </td>
-                                            <td class="product-subtotal" data-title="Subtotal"><span
-                                                    class="woocommerce-Price-amount amount"><bdi><span
-                                                            class="woocommerce-Price-currencySymbol">$</span>9.00</bdi></span>
+                                            <td class="product-subtotal" data-title="Subtotal">
+                                                <span class="woocommerce-Price-amount amount"><bdi>$9.00</bdi></span>
                                             </td>
                                         </tr>
+
+                                        <!-- Fila de acciones sin cupón -->
                                         <tr>
-                                            <td colspan="6" class="actions">
-                                                <div class="coupon"><label for="coupon_code" class="screen-reader-text">Coupon:</label>
-                                                    <input type="text" name="coupon_code" class="input-text"
-                                                           id="coupon_code" value="" placeholder="Coupon code">
-                                                    <button type="submit" class="button btn" name="apply_coupon"
-                                                            value="Apply coupon">Apply coupon
-                                                    </button>
-                                                </div>
-                                                <button type="submit" class="button btn" name="update_cart"
-                                                        value="Update cart" disabled="">Update cart
+                                            <td colspan="6" class="actions" style="text-align: right;">
+                                                <button type="submit" class="button btn" name="update_cart" value="Update cart">
+                                                    Update cart
                                                 </button>
-                                                <input type="hidden" id="woocommerce-cart-nonce"
-                                                       name="woocommerce-cart-nonce" value="1ddef4ce79"><input
-                                                    type="hidden" name="_wp_http_referer" value="/cart/"></td>
+                                                <input type="hidden" id="woocommerce-cart-nonce" name="woocommerce-cart-nonce" value="1ddef4ce79">
+                                                <input type="hidden" name="_wp_http_referer" value="/cart/">
+                                            </td>
                                         </tr>
                                         </tbody>
                                     </table>
                                 </form>
+
+                                <!-- Totales -->
                                 <div class="cart-collaterals">
-                                    <div class="cart_totals "><h2>Cart totals</h2>
+                                    <div class="cart_totals">
                                         <table cellspacing="0" class="shop_table shop_table_responsive">
                                             <tbody>
                                             <tr class="cart-subtotal">
                                                 <th>Subtotal</th>
-                                                <td data-title="Subtotal"><span class="woocommerce-Price-amount amount"><bdi><span
-                                                                class="woocommerce-Price-currencySymbol">$</span>9.00</bdi></span>
-                                                </td>
-                                            </tr>
-                                            <tr class="order-total">
-                                                <th>Total</th>
-                                                <td data-title="Total"><strong><span
-                                                            class="woocommerce-Price-amount amount"><bdi><span
-                                                                    class="woocommerce-Price-currencySymbol">$</span>9.00</bdi></span></strong>
-                                                </td>
+                                                <td data-title="Subtotal"><span class="price-badge">$9.00</span></td>
                                             </tr>
                                             </tbody>
                                         </table>
-                                        <div class="wc-proceed-to-checkout"><a
-                                                href="https://coffeeking.like-themes.com/checkout/"
-                                                class="checkout-button button alt wc-forward btn"> Proceed to
-                                                checkout</a></div>
+                                        <div class="wc-proceed-to-checkout">
+                                            <a href="#" class="checkout-button button alt wc-forward btn">
+                                                Proceed to checkout
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
+
+
+
                             </div>
                         </div>
                     </article>
