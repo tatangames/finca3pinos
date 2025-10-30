@@ -41,13 +41,228 @@
         .card-ship{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;margin:10px 0}
         .card-ship .h{padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06);font-weight:600}
         .card-ship .b{padding:14px}
+
+
+        /* ====== GUTTERS/LATERALES DEL CHECKOUT ====== */
+        .checkout-shell{max-width:1200px;margin:0 auto;padding:0 16px;}
+        @media (min-width:992px){ .checkout-shell{padding:0 28px;} }
+
+        /* ====== Encabezado de pasos más compacto ====== */
+        .checkout-steps{margin:6px 0 10px; gap:10px;}
+        .step{padding:6px 10px;}
+        .step-dot{width:24px;height:24px;font-size:.9rem}
+
+        /* ====== Columna + tarjetas más compactas ====== */
+        .checkout-wrap{gap:16px;} /* antes 24px */
+        .card{border-radius:14px}
+        .card-h{padding:12px 14px}
+        .card-b{padding:14px}
+
+        /* ====== Tu bloque de envío (más “aire” y compacto) ====== */
+        .card-ship{border-radius:14px; margin:12px 0; box-shadow:0 1px 8px rgba(0,0,0,.04);}
+        .card-ship .h{padding:12px 16px}
+        .card-ship .b{padding:16px 16px}
+
+        /* ====== Inputs un poco más pequeños ====== */
+        .control{padding:8px 10px;border-radius:10px}
+
+
+        /* ===== Contenedor estilo “barra” ===== */
+        .steps-bar{
+            background:#f1f6ff;              /* similar al azul claro de la imagen */
+            border-radius:14px;
+            padding:16px 18px;
+            border:1px solid rgba(42,88,255,.05);
+        }
+
+        /* ===== Tabs estilo cápsula ===== */
+        .checkout-steps{
+            display:flex; align-items:center; justify-content:flex-start;
+            gap:36px;                         /* más aire entre pasos */
+            margin:0;                         /* sin márgenes extra */
+        }
+
+        /* item sin fondo/blanco; solo texto + círculo */
+        .step{
+            display:flex; align-items:center; gap:10px;
+            background:transparent; border:0; padding:0;
+            color:#1f2937;                    /* texto gris oscuro */
+            font-weight:500;
+            user-select:none;
+        }
+
+        /* círculo base negro (pendiente) */
+        .step-dot{
+            width:32px; height:32px; border-radius:999px;
+            display:grid; place-items:center;
+            font-weight:700; font-size:.95rem;
+            background:#111; color:#fff;
+            box-shadow:0 1px 0 rgba(0,0,0,.08) inset;
+        }
+
+        /* activos y completados = azules */
+        .step.active .step-dot,
+        .step.done   .step-dot{
+            background:#2a58ff; color:#fff;
+        }
+
+        /* color del texto cuando está activo o done */
+        .step.active span:last-child,
+        .step.done   span:last-child{
+            color:#2a58ff;
+        }
+
+        /* compactar en móvil */
+        @media(max-width:768px){
+            .checkout-steps{gap:18px}
+            .step-dot{width:28px;height:28px;font-size:.85rem}
+            .step span:last-child{font-size:.9rem}
+        }
+
+        /* (opcional) cursor/hover */
+        .step{cursor:default}
+        .step.done, .step.active{cursor:pointer}
+        .step:hover .step-dot{filter:brightness(.96)}
+
+
+        /* ===== Centrar y limitar ancho de los pasos ===== */
+        .steps-bar {
+            background: #f1f6ff;
+            border-radius: 14px;
+            padding: 14px 22px;
+            border: 1px solid rgba(42,88,255,.05);
+
+            /* centrado */
+            display: flex;
+            justify-content: center;
+        }
+
+        .checkout-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            max-width: 700px;       /* <-- limita el ancho total de los tabs */
+            width: 100%;
+        }
+
+        /* ===== Ajuste visual ===== */
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1f2937;
+            font-weight: 500;
+            background: transparent;
+            border: 0;
+        }
+
+        .step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            background: #111;
+            color: #fff;
+        }
+
+        .step.active .step-dot,
+        .step.done .step-dot {
+            background: #2a58ff;
+            color: #fff;
+        }
+
+        .step.active span:last-child,
+        .step.done span:last-child {
+            color: #2a58ff;
+        }
+
+        /* ===== Compacto en móviles ===== */
+        @media (max-width:768px) {
+            .checkout-steps { gap: 20px; max-width: 100%; }
+            .step-dot { width: 28px; height: 28px; font-size: .85rem; }
+            .step span:last-child { font-size: .9rem; }
+        }
+
+
+        /* ===== Separación vertical entre los bloques ===== */
+        .checkout-wrap {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+            margin-top: 22px; /* <--- separa los bloques del encabezado de tabs */
+        }
+
+        @media(max-width:992px){
+            .checkout-wrap{
+                grid-template-columns: 1fr;
+                margin-top: 18px; /* menos margen en móviles */
+            }
+        }
+
+        .card-ship {
+            margin-top: 12px;
+        }
+
+
+
+        /* === Centrado y márgenes laterales iguales al header === */
+        .checkout-shell {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px; /* Aumenta el padding lateral */
+        }
+
+        /* === Espaciado superior entre tabs y contenido === */
+        .checkout-wrap {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+            margin-top: 26px;
+            padding: 0 32px; /* <-- da margen lateral igual en el contenido */
+        }
+
+        /* Ajuste en móvil */
+        @media (max-width: 992px) {
+            .checkout-wrap {
+                grid-template-columns: 1fr;
+                padding: 0 16px;  /* menos padding en pantallas pequeñas */
+                margin-top: 18px;
+            }
+        }
+
+
+        .addr-card{
+            border:1px solid rgba(0,0,0,.1);
+            border-radius:10px;
+            padding:10px 12px;
+            background:#fff;
+        }
+        .addr-title{font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:8px;}
+        .addr-badge{
+            font-size:.75rem; background:#eef2ff; color:#384cff; border:1px solid #dbe3ff;
+            padding:2px 8px; border-radius:999px;
+        }
+        .addr-line{color:#374151; font-size:.95rem;}
+        .addr-empty{padding:8px 0;}
+
+
+
+
     </style>
 
     {{-- ====== Encabezado de pasos ====== --}}
-    <div class="checkout-steps" id="stepsHead">
-        <div class="step active" data-step="1"><span class="step-dot">1</span> Envío</div>
-        <div class="step"        data-step="2"><span class="step-dot">2</span> Facturación</div>
-        <div class="step"        data-step="3"><span class="step-dot">3</span> Pago</div>
+
+    <div class="checkout-shell">
+        <div class="steps-bar">
+            <div class="checkout-steps" id="stepsHead">
+                <div class="step active" data-step="1"><span class="step-dot">1</span> <span>Envío</span></div>
+                <div class="step done"   data-step="2"><span class="step-dot">2</span> <span>Facturación</span></div>
+                <div class="step"        data-step="3"><span class="step-dot">3</span> <span>Pago</span></div>
+            </div>
+        </div>
     </div>
 
     <div class="checkout-wrap">
@@ -79,6 +294,39 @@
                                     </option>
                                 @endforeach
                             </select>
+
+                            @php
+                                $addrSelected = $addresses->firstWhere('id', $selectedAddressId);
+                            @endphp
+
+
+                            {{-- Preview de la dirección seleccionada --}}
+                            <div id="addrPreview" class="addr-preview" style="margin-top:10px">
+                                @if($addrSelected)
+                                    <div class="addr-card">
+                                        <div class="addr-title">
+                                            {{ $addrSelected->nombre }}
+                                            @if((int)$addrSelected->predeterminado === 1)
+                                                <span class="addr-badge">Predeterminada</span>
+                                            @endif
+                                        </div>
+                                        <div class="addr-line">{{ $addrSelected->direccion }}</div>
+                                        <div class="addr-line">
+                                            {{ $addrSelected->ciudad ? $addrSelected->ciudad.', ' : '' }}
+                                            {{ $addrSelected->estado ? $addrSelected->estado.' ' : '' }}
+                                            {{ $addrSelected->zipcode ?? '' }}
+                                        </div>
+                                        @if($addrSelected->telefono)
+                                            <div class="addr-line">Tel: {{ $addrSelected->telefono }}</div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="addr-empty muted">Selecciona una dirección para ver los detalles.</div>
+                                @endif
+                            </div>
+
+
+
                             <input type="hidden" name="envio_id" id="envio_id" value="{{ $selectedAddressId }}">
                             <div style="display:flex;justify-content:flex-end;margin-top:12px">
                                 <button class="btn btn-primary" id="btnToStep2">Siguiente</button>
@@ -184,7 +432,32 @@
     <script src="{{ asset('js/axios.min.js') }}"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
 
+
     <script>
+        // ¿hay direcciones? (variable global)
+        const HAS_ADDRESSES = {{ $addresses->isNotEmpty() ? 'true' : 'false' }};
+
+        const ADDRESS_MAP = {!! json_encode(
+      $addresses->keyBy('id')->map(function($a){
+          return [
+              'id'            => (int) $a->id,
+              'nombre'        => $a->nombre,
+              'direccion'     => $a->direccion,
+              'ciudad'        => $a->ciudad,
+              'estado'        => $a->estado,
+              'zipcode'       => $a->zipcode,
+              'telefono'      => $a->telefono,
+              'predeterminado'=> (int) $a->predeterminado,
+          ];
+      })->toArray()
+  , JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!};
+    </script>
+
+
+
+    <script>
+
+
         (function(){
             const stepsHead = document.getElementById('stepsHead');
             const panes = {1:tab('tab1'), 2:tab('tab2'), 3:tab('tab3')};
@@ -202,7 +475,7 @@
             }
 
             // Si no hay direcciones, bloquea la navegación hacia el paso 2
-            const hasAddresses = {{ $addresses->isNotEmpty() ? 'true' : 'false' }};
+            const hasAddresses = HAS_ADDRESSES;
             if(hasAddresses){
                 document.getElementById('shipping_address')?.addEventListener('change', e=>{
                     document.getElementById('envio_id').value = e.target.value;
@@ -262,6 +535,51 @@
 
             function val(id){ return (document.getElementById(id)?.value || '').trim(); }
         })();
+
+
+        function renderAddrPreview(id){
+            const box = document.getElementById('addrPreview');
+            const a = ADDRESS_MAP[id];
+            if(!box) return;
+            if(!a){
+                box.innerHTML = `<div class="addr-empty muted">Selecciona una dirección para ver los detalles.</div>`;
+                return;
+            }
+            box.innerHTML = `
+                    <div class="addr-card">
+                      <div class="addr-title">
+                        ${a.nombre ?? ''}
+                        ${a.predeterminado === 1 ? '<span class="addr-badge">Predeterminada</span>' : ''}
+                      </div>
+                      <div class="addr-line">${a.direccion ?? ''}</div>
+                      <div class="addr-line">
+                        ${(a.ciudad ? a.ciudad+', ' : '')}${(a.estado ? a.estado+' ' : '')}${a.zipcode ?? ''}
+                      </div>
+                      ${a.telefono ? `<div class="addr-line">Tel: ${a.telefono}</div>` : ''}
+                    </div>`;
+        }
+
+        if(hasAddresses){
+            const sel = document.getElementById('shipping_address');
+            const hidden = document.getElementById('envio_id');
+
+            // pintar al cargar
+            renderAddrPreview(hidden?.value || sel?.value);
+
+            sel?.addEventListener('change', e=>{
+                hidden.value = e.target.value;
+                renderAddrPreview(e.target.value);
+            });
+
+            document.getElementById('btnToStep2')?.addEventListener('click', ()=>{
+                const v = sel.value;
+                if(!v){ toastr.error('Selecciona una dirección de envío.'); return; }
+                go(2);
+            });
+        }
+
+
+
     </script>
 
     {{-- Superior (Newsletter) block --}}
