@@ -253,6 +253,50 @@
 
     </style>
 
+
+    <style>
+
+        .pay-tabs{display:flex;gap:8px;margin-bottom:10px}
+        .pay-tab{padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:#1c2435;color:#e6efff}
+        .pay-tab.active{outline:2px solid #2a58ff33}
+
+        .pay-grid{display:grid;grid-template-columns:420px 1fr;gap:20px}
+        @media (max-width: 992px){.pay-grid{grid-template-columns:1fr}}
+
+        .pay-left .pay-info{border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:12px}
+        .switch-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+        .switch{position:relative;width:44px;height:24px;display:inline-block}
+        .switch input{opacity:0;width:0;height:0}
+        .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#394156;border-radius:999px;transition:.2s}
+        .slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+        .switch input:checked + .slider{background:#2a58ff}
+        .switch input:checked + .slider:before{transform:translateX(20px)}
+
+        .cc-scene{perspective:1000px}
+        .cc-card{width:100%;max-width:360px;aspect-ratio: 16/10;border-radius:16px;position:relative;transform-style:preserve-3d;transition:transform .5s;margin:auto;background:linear-gradient(135deg,#2d6bff,#4b9dff)}
+        .cc-face{position:absolute;inset:0;border-radius:16px;color:#fff;padding:16px;backface-visibility:hidden}
+        .cc-front .cc-row{display:flex;justify-content:space-between;align-items:center}
+        .cc-chip{width:36px;height:26px;border-radius:6px;background:linear-gradient(45deg,#f6d365,#fda085);box-shadow:0 2px 8px rgba(0,0,0,.25)}
+        .cc-brand{font-weight:800;letter-spacing:.5px}
+        .cc-number{margin-top:24px;font:700 22px/1.2 ui-sans-serif,system-ui,Segoe UI;padding:6px 0;letter-spacing:2px}
+        .cc-row.info{display:flex;justify-content:space-between;margin-top:10px}
+        .cc-row .lbl{font-size:10px;opacity:.8}
+        .cc-row .val{font-size:14px;letter-spacing:.5px}
+
+        .cc-back{transform:rotateY(180deg);background:linear-gradient(135deg,#3752e6,#5eb1ff)}
+        .cc-strip{height:40px;background:#111;margin-top:22px;border-radius:4px}
+        .cc-cvc-box{background:#fff;color:#111;margin:20px 16px 0;border-radius:6px;padding:6px 10px;width:120px}
+        .cc-brand-mini{position:absolute;bottom:10px;right:14px;font-weight:800}
+        .cc-card.flip{transform:rotateY(180deg)}
+
+        .pay-right .cards-logos{display:flex;gap:16px;align-items:center;margin:10px 0 6px}
+        .pay-right .logo{font-size:12px;opacity:.8;border:1px solid var(--border);padding:2px 8px;border-radius:999px}
+        .check-terms{display:block;margin:10px 0}
+        .actions{display:flex;justify-content:space-between;margin-top:8px}
+
+
+    </style>
+
     {{-- ====== Encabezado de pasos ====== --}}
 
     <div class="checkout-shell">
@@ -368,6 +412,21 @@
                             </div>
                         </div>
 
+
+                        {{-- === País de Facturación === --}}
+                        <label style="margin-top:10px">País</label>
+                        <select id="bill_pais" class="control">
+                            <option value="">{{ __('meta.select') }}</option>
+                            @foreach($paises as $p)
+                                <option value="{{ $p->id }}"
+                                    {{ (int)($billing_country_id ?? 0) === (int)$p->id ? 'selected' : '' }}>
+                                    {{ $p->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+
+
+
                         <label style="margin-top:10px">Dirección</label>
                         <input id="bill_dir" class="control"
                                value="{{ $billing->direccion ?? '' }}" placeholder="Calle, número, referencias">
@@ -386,7 +445,7 @@
                         <div class="row2" style="margin-top:10px">
                             <div>
                                 <label>Código Postal</label>
-                                <input id="bill_zip" class="control" value="{{ $billing->zipcode ?? '' }}">
+                                <input id="bill_zip" class="control" value="{{ $billing->codigo_postal ?? '' }}">
                             </div>
                             <div style="display:flex;align-items:end;gap:10px">
                                 <button class="btn btn-light" id="btnBack1">Volver</button>
@@ -402,22 +461,109 @@
             {{-- ========= Paso 3: PAGO ========= --}}
             <div class="tab-pane" id="tab3">
                 <div class="card">
-                    <div class="card-h">Pago</div>
+                    <div class="card-h">Pago con tarjeta</div>
                     <div class="card-b">
-                        <p class="muted">Selecciona un método de pago:</p>
-                        <div class="row2">
-                            <label class="control" style="display:flex;align-items:center;gap:10px">
-                                <input type="radio" name="pay_method" value="card" checked> Tarjeta
-                            </label>
-                            <label class="control" style="display:flex;align-items:center;gap:10px">
-                                <input type="radio" name="pay_method" value="cod"> Contra Entrega
-                            </label>
+
+                        {{-- Tabs (solo 1 por ahora) --}}
+                        <div class="pay-tabs">
+                            <button type="button" class="pay-tab active">💳 Pago con tarjeta</button>
                         </div>
 
-                        <div style="display:flex;justify-content:space-between;margin-top:14px">
-                            <button class="btn btn-light" id="btnBack2">Volver</button>
-                            <button class="btn btn-danger" id="btnPlaceOrder">Proceder a Pagar</button>
+                        <div class="pay-grid">
+                            {{-- Lado izquierdo: tarjeta animada + opcional cuotas --}}
+                            <div class="pay-left">
+
+                                <!-- Tarjeta animada -->
+                                <div class="cc-scene">
+                                    <div class="cc-card" id="ccCard">
+                                        <!-- Frente -->
+                                        <div class="cc-face cc-front">
+                                            <div class="cc-row">
+                                                <span class="cc-chip"></span>
+                                                <span class="cc-brand" id="ccBrand">VISA</span>
+                                            </div>
+                                            <div class="cc-number" id="ccNumberText">#### #### #### ####</div>
+                                            <div class="cc-row info">
+                                                <div>
+                                                    <div class="lbl">NOMBRE</div>
+                                                    <div class="val" id="ccNameText">TARJETAHABIENTE</div>
+                                                </div>
+                                                <div>
+                                                    <div class="lbl">EXPIRA</div>
+                                                    <div class="val"><span id="ccMM">MM</span>/<span id="ccYY">AA</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Dorso -->
+                                        <div class="cc-face cc-back">
+                                            <div class="cc-strip"></div>
+                                            <div class="cc-cvc-box">
+                                                <div class="lbl">CVC</div>
+                                                <div class="cvc" id="ccCvcText">•••</div>
+                                            </div>
+                                            <div class="cc-brand-mini" id="ccBrandBack">VISA</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Lado derecho: formulario --}}
+                            <div class="pay-right">
+                                <form id="cardForm" autocomplete="off" novalidate>
+                                    <div class="form-group">
+                                        <label>Número de Tarjeta</label>
+                                        <input class="control" id="cardNumber" inputmode="numeric" placeholder="4111 1111 1111 1111" maxlength="19">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Nombre de la tarjeta</label>
+                                        <input class="control" id="cardName" placeholder="Como aparece en la tarjeta" maxlength="40">
+                                    </div>
+
+                                    <div class="row2">
+                                        <div>
+                                            <label>Mes</label>
+                                            <select class="control" id="cardMM">
+                                                <option value="">MM</option>
+                                                @for($m=1; $m<=12; $m++)
+                                                    <option value="{{ str_pad($m,2,'0',STR_PAD_LEFT) }}">{{ str_pad($m,2,'0',STR_PAD_LEFT) }}</option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label>Año</label>
+                                            <select class="control" id="cardYY">
+                                                <option value="">AA</option>
+                                                @php $y = (int) date('y'); @endphp
+                                                @for($i=0; $i<=12; $i++)
+                                                    <option value="{{ sprintf('%02d',$y+$i) }}">{{ sprintf('%02d',$y+$i) }}</option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>CVC</label>
+                                        <input class="control" id="cardCVC" inputmode="numeric" placeholder="•••" maxlength="4">
+                                    </div>
+
+                                    <div class="cards-logos">
+                                        <span class="logo">VISA</span>
+                                        <span class="logo">Mastercard</span>
+                                        <span class="logo">AmEx</span>
+                                        <span class="logo">Ambiente Seguro</span>
+                                    </div>
+
+
+
+                                    <div class="actions">
+                                        <button class="btn btn-light" type="button" id="btnBack2">Volver</button>
+                                        <button class="btn btn-danger" type="submit" id="btnPay">Proceder a Pagar</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -444,6 +590,17 @@
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
+
+
+
+    <script>
+        const PAISES_MAP = {!! json_encode(
+        $paises->keyBy('id')->map(fn($p)=>$p->nombre)->toArray(),
+        JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
+    ) !!};
+    </script>
+
+
     <script>
         const HAS_ADDRESSES = {{ $addresses->isNotEmpty() ? 'true' : 'false' }};
         const ADDRESS_MAP = {!! json_encode(
@@ -498,11 +655,19 @@
 
             document.getElementById('btnToStep3')?.addEventListener('click', ()=>{
                 const nombre = val('bill_nombre'), dir = val('bill_dir');
+                const idPais = (document.getElementById('bill_pais')?.value || '').trim();
+
+                if(!idPais){
+                    toastr.warning('Selecciona el país de facturación.');
+                    return;
+                }
                 if(!nombre || !dir){
                     toastr.warning('Completa al menos Nombre de facturación y Dirección.');
                     return;
                 }
                 const payload = {
+                    id_paises: parseInt(idPais, 10),
+                    pais_nombre: PAISES_MAP[idPais] || null,
                     nombre,
                     telefono: val('bill_tel'),
                     direccion: dir,
@@ -513,6 +678,7 @@
                 document.getElementById('bill_payload').value = JSON.stringify(payload);
                 go(3);
             });
+
 
             document.getElementById('btnBack2')?.addEventListener('click', ()=> go(2));
 
@@ -567,6 +733,7 @@
             }
 
             const lines = [];
+            if(a.nombre)       lines.push(`<div class="addr-line"><strong>Nombre:</strong> ${a.nombre}</div>`);
             if(a.direccion)    lines.push(`<div class="addr-line"><strong>Dirección:</strong> ${a.direccion}</div>`);
             if(a.pais)         lines.push(`<div class="addr-line"><strong>País:</strong> ${a.pais}</div>`);
             if(a.departamento) lines.push(`<div class="addr-line"><strong>Departamento:</strong> ${a.departamento}</div>`);
@@ -578,10 +745,6 @@
 
             box.innerHTML = `
       <div class="addr-card">
-          <div class="addr-title">
-              ${a.nombre ?? ''}
-              ${a.predeterminado === 1 ? '<span class="addr-badge">Predeterminada</span>' : ''}
-          </div>
           ${lines.length ? lines.join('') : '<div class="addr-empty muted">Sin datos adicionales.</div>'}
       </div>`;
         }
@@ -607,6 +770,146 @@
             });
         });
     </script>
+
+
+
+    <script>
+        (function(){
+            // === Helpers ===
+            const $ = (s)=>document.querySelector(s);
+            const brandByPan = (pan) => {
+                if(/^3[47]/.test(pan)) return 'AMEX';
+                if(/^4/.test(pan))     return 'VISA';
+                if(/^5[1-5]/.test(pan) || /^2(2[2-9]|[3-6]\d|7[01])/.test(pan)) return 'Mastercard';
+                if(/^6(?:011|5)/.test(pan)) return 'Discover';
+                return 'CARD';
+            };
+            const luhn = (num)=>{
+                let sum=0, dbl=false;
+                for(let i=num.length-1;i>=0;i--){
+                    let d = +num[i];
+                    if(dbl){ d*=2; if(d>9) d-=9; }
+                    sum+=d; dbl=!dbl;
+                }
+                return sum%10===0;
+            };
+            const formatPan = (s, isAmex)=> {
+                const d = s.replace(/\D/g,'').slice(0, isAmex?15:16);
+                let out='';
+                for(let i=0;i<d.length;i++){
+                    out += d[i];
+                    if(isAmex && (i===3||i===9)) out+=' ';
+                    else if(!isAmex && i%4===3 && i!==d.length-1) out+=' ';
+                }
+                return out;
+            };
+
+            // === DOM refs ===
+            const card = $('#ccCard');
+            const nInp = $('#cardNumber');
+            const nameInp = $('#cardName');
+            const mmSel = $('#cardMM');
+            const yySel = $('#cardYY');
+            const cvcInp = $('#cardCVC');
+
+            const nTxt = $('#ccNumberText');
+            const nameTxt = $('#ccNameText');
+            const mmTxt = $('#ccMM');
+            const yyTxt = $('#ccYY');
+            const cvcTxt = $('#ccCvcText');
+            const brandFront = $('#ccBrand');
+            const brandBack  = $('#ccBrandBack');
+
+            // === Number typing ===
+            function updateBrandAndFormat(){
+                const raw = nInp.value.replace(/\D/g,'');
+                const isAmex = /^3[47]/.test(raw);
+                nInp.value   = formatPan(nInp.value, isAmex);
+                const b = brandByPan(raw);
+                brandFront.textContent = b; brandBack.textContent = b;
+                nTxt.textContent = nInp.value || '#### #### #### ####';
+            }
+            nInp.addEventListener('input', updateBrandAndFormat);
+            nInp.addEventListener('blur', ()=>{ // opcional marca inválido
+                const raw = nInp.value.replace(/\D/g,'');
+                if(raw.length>=13 && !luhn(raw)){
+                    toastr.warning('Verifica el número de tarjeta (Luhn inválido).');
+                }
+            });
+
+            // === Name ===
+            nameInp.addEventListener('input', ()=>{
+                const v = nameInp.value.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ\s\.]/g,'').toUpperCase().slice(0,26);
+                nameInp.value = v;
+                nameTxt.textContent = v || 'TARJETAHABIENTE';
+            });
+
+            // === Fecha ===
+            mmSel.addEventListener('change', ()=> mmTxt.textContent = mmSel.value || 'MM');
+            yySel.addEventListener('change', ()=> yyTxt.textContent = yySel.value || 'AA');
+
+            // === CVC & flip ===
+            cvcInp.addEventListener('focus', ()=> card.classList.add('flip'));
+            cvcInp.addEventListener('blur',  ()=> card.classList.remove('flip'));
+            cvcInp.addEventListener('input', ()=>{
+                cvcInp.value = cvcInp.value.replace(/\D/g,'').slice(0,4);
+                cvcTxt.textContent = cvcInp.value.padEnd(3,'•');
+            });
+
+            // === Back button keeps tu navegación ===
+            $('#btnBack2')?.addEventListener('click', ()=> {
+                // ya tienes go(2) arriba; lo reutilizamos:
+                if(typeof go==='function') go(2);
+            });
+
+            // === Envío del pago (NO enviar PAN/CVC al backend) ===
+            // En producción, tokeniza con tu gateway (Stripe, PayPal, Wompi, etc.)
+            $('#cardForm').addEventListener('submit', async (e)=>{
+                e.preventDefault();
+
+
+                const panRaw = nInp.value.replace(/\D/g,'');
+                const mm = mmSel.value, yy = yySel.value, cvc = cvcInp.value;
+
+                if(panRaw.length<13 || !luhn(panRaw)) { toastr.error('Número de tarjeta inválido.'); return; }
+                if(!(+mm>=1 && +mm<=12)) { toastr.error('Mes inválido.'); return; }
+                if(!yy) { toastr.error('Año inválido.'); return; }
+                if(cvc.length<3) { toastr.error('CVC inválido.'); return; }
+
+                // Solo mandamos metadata NO sensible
+                const payment = {
+                    method: 'card',
+                    brand: brandByPan(panRaw),
+                    last4: panRaw.slice(-4),
+                    holder: nameInp.value.trim(),
+                    exp: `${mm}/${yy}`,
+                    cuotas: $('#cuotasToggle').checked ? true : false
+                };
+
+                try{
+                    const envio_id = document.getElementById('envio_id')?.value || null;
+                    const billing  = document.getElementById('bill_payload')?.value || null;
+
+                    const {data} = await axios.post('{{ route('checkout.place') }}', {
+                        envio_id,
+                        billing: billing ? JSON.parse(billing) : null,
+                        pay_method: 'card',
+                        payment_meta: payment
+                    });
+
+                    // Éxito UX
+                    Swal.fire({icon:'success', title:'Pago procesado', text:'Tu pedido ha sido creado.'});
+                    // Redirige si tu backend devuelve URL
+                    if(data?.redirect){ window.location.href = data.redirect; }
+
+                }catch(err){
+                    console.error(err);
+                    Swal.fire({icon:'error', title:'No se pudo procesar el pago', text:'Intenta nuevamente.'});
+                }
+            });
+        })();
+    </script>
+
 
 
     {{-- Superior (Newsletter) block --}}

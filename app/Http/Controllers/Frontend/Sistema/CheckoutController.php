@@ -41,26 +41,29 @@ class CheckoutController extends Controller
             "),
             ]);
 
-        // dirección seleccionada (predeterminada o la primera)
         $selectedAddress = optional(
             $addresses->firstWhere('predeterminado', 1) ?? $addresses->first()
         );
 
-        // calcular envío según la dirección seleccionada (o 0 si no hay direcciones)
         $shipping = (float) ($selectedAddress->precio_envio ?? 0.0);
         $total    = $subtotal + $shipping;
 
-
-
-
-
-        // <-- ESTOS FALTABAN
+        // Facturación
         $billing = DireccionFacturacion::where('id_usuario', auth()->id())->first();
-        $selectedAddressId = $selectedAddress->id ?? null;
+        $selectedAddressId   = $selectedAddress->id ?? null;
+
+        // === NUEVO: países para el select de facturación
+        $paises = DB::table('paises')
+            ->where('activo', 1)
+            ->orderBy('nombre')
+            ->get(['id','nombre']);
+
+        $billing_country_id = $billing->id_paises ?? null;
 
         return view('frontend.pages.checkout', compact(
             'items', 'subtotal', 'shipping', 'total',
-            'billing', 'addresses', 'selectedAddressId'
+            'billing', 'addresses', 'selectedAddressId',
+            'paises', 'billing_country_id'
         ));
     }
 
