@@ -598,6 +598,21 @@
         </aside>
     </div>
 
+
+
+
+    <!-- Modal 3DS -->
+    <div id="w3dsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999;">
+        <div style="max-width:480px; width:100%; margin:40px auto; background:#fff; border-radius:8px; overflow:hidden;">
+            <div style="padding:10px; display:flex; justify-content:space-between; align-items:center;">
+                <strong>Verificación bancaria</strong>
+                <button id="w3dsClose" type="button">Cerrar</button>
+            </div>
+            <iframe id="w3dsFrame" style="width:100%; height:520px; border:0;"></iframe>
+        </div>
+    </div>
+
+
     {{-- ======= Librerías ======= --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
