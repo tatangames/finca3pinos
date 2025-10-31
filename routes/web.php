@@ -21,6 +21,7 @@ use App\Http\Controllers\Frontend\Sistema\PasswordResetController;
 use App\Http\Controllers\Frontend\Sistema\CartController;
 use App\Http\Controllers\Frontend\Sistema\CheckoutController;
 use App\Http\Controllers\Frontend\Pagos\WompiController;
+use App\Http\Controllers\Frontend\Pagos\WompiSandboxController;
 
 
 
@@ -103,6 +104,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/galeria/borrar', [AdminAuthController::class,'borrarGaleria']);
     Route::post('/galeria/informacion', [AdminAuthController::class,'informacionGaleria']);
     Route::post('/galeria/editar', [AdminAuthController::class,'editarGaleria']);
+
+    Route::post('/galeria/prueba', [AdminAuthController::class,'pruebaGaleria']);
+
+    //Route::get('/prueba-wompi', [AdminAuthController::class, 'pruebaGaleria']);
+
 
     // NUEVO IDIOMA
     // Mostrar formulario (region destino dinámica)
@@ -286,10 +292,21 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
 
 
+        // Endpoint que tokeniza y cobra SIN 3DS (solo sandbox)
+        Route::post('/checkout/pagar-no3ds', [WompiSandboxController::class, 'pagarNo3ds'])
+            ->name('checkout.pay.no3ds');
+
+
+
+        Route::get(LaravelLocalization::transRoute('routes.checkout'), [CheckoutController::class, 'show'])
+            ->name('checkout.show');
+
+
+        Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
+
         // ✅ Checkout protegido: requiere login y carrito con items
-        Route::middleware(['auth:web','cart.notempty'])->group(function () {
-            Route::get(LaravelLocalization::transRoute('routes.checkout'), [CheckoutController::class, 'show'])
-                ->name('checkout.show');
+       /* Route::middleware(['auth:web','cart.notempty'])->group(function () {
+
 
             Route::post(LaravelLocalization::transRoute('routes.checkout_post'), [CheckoutController::class, 'place'])
                 ->name('checkout.place');
@@ -304,7 +321,8 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
 
 
-
+        Route::get('/wompi/no3ds', [WompiController::class, 'form'])->name('wompi.form');
+        Route::post('/wompi/no3ds/pagar', [WompiController::class, 'pagarSin3ds'])->name('wompi.pagar.sin3ds');*/
 
 
 
@@ -331,7 +349,6 @@ Route::get('/galeria/cargar', [FrontendController::class, 'cargarGaleria'])
     ->name('galeria.cargar');
 
 
-Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
 
 
 Route::prefix('pagos/wompi')->group(function () {
@@ -339,3 +356,4 @@ Route::prefix('pagos/wompi')->group(function () {
     Route::get ('/return', [WompiController::class, 'return'])->name('wompi.return');
     Route::post('/notify', [WompiController::class, 'notify'])->name('wompi.notify');
 });
+

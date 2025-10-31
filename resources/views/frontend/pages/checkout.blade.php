@@ -296,9 +296,7 @@
 
 
     </style>
-
     {{-- ====== Encabezado de pasos ====== --}}
-
     <div class="checkout-shell">
         <div class="steps-bar">
             <div class="checkout-steps" id="stepsHead">
@@ -332,7 +330,7 @@
                                 @foreach($addresses as $a)
                                     @php
                                         $label = trim(($a->pais_nombre ?? '—') . ' — ' . ($a->direccion ?? ''));
-                                        $label = \Illuminate\Support\Str::limit($label, 60); // <-- límite
+                                        $label = \Illuminate\Support\Str::limit($label, 60);
                                     @endphp
                                     <option value="{{ $a->id }}" {{ (int)$selectedAddressId===(int)$a->id ? 'selected' : '' }}>
                                         {{ $label }}
@@ -344,13 +342,12 @@
                                 $addrSelected = $addresses->firstWhere('id', $selectedAddressId);
                             @endphp
 
-
                             {{-- Preview de la dirección seleccionada --}}
                             <div id="addrPreview" class="addr-preview" style="margin-top:10px">
                                 @if($addrSelected)
                                     <div class="addr-card">
                                         @if($addrSelected->nombre)
-                                            <div class="addr-line"><strong>Nombre:</strong> {{ $addrSelected->direccion }}</div>
+                                            <div class="addr-line"><strong>Nombre:</strong> {{ $addrSelected->nombre }}</div>
                                         @endif
                                         @if($addrSelected->direccion)
                                             <div class="addr-line"><strong>Dirección:</strong> {{ $addrSelected->direccion }}</div>
@@ -382,9 +379,6 @@
                                 @endif
                             </div>
 
-
-
-
                             <input type="hidden" name="envio_id" id="envio_id" value="{{ $selectedAddressId }}">
                             <div style="display:flex;justify-content:flex-end;margin-top:12px">
                                 <button class="btn btn-primary" id="btnToStep2">Siguiente</button>
@@ -412,8 +406,7 @@
                             </div>
                         </div>
 
-
-                        {{-- === País de Facturación === --}}
+                        {{-- País --}}
                         <label style="margin-top:10px">País</label>
                         <select id="bill_pais" class="control">
                             <option value="">{{ __('meta.select') }}</option>
@@ -424,8 +417,6 @@
                                 </option>
                             @endforeach
                         </select>
-
-
 
                         <label style="margin-top:10px">Dirección</label>
                         <input id="bill_dir" class="control"
@@ -461,113 +452,135 @@
             {{-- ========= Paso 3: PAGO ========= --}}
             <div class="tab-pane" id="tab3">
                 <div class="card">
-                    <div class="card-h">Pago con tarjeta</div>
+                    <div class="card-h">Pago con tarjeta (Sandbox, sin 3DS)</div>
                     <div class="card-b">
-
-                        {{-- Tabs (solo 1 por ahora) --}}
-                        <div class="pay-tabs">
-                            <button type="button" class="pay-tab active">💳 Pago con tarjeta</button>
-                        </div>
-
                         <div class="pay-grid">
-                            {{-- Lado izquierdo: tarjeta animada + opcional cuotas --}}
+                            {{-- PREVIEW TARJETA (opcional; IDs necesarios si quieres animación) --}}
                             <div class="pay-left">
-
-                                <!-- Tarjeta animada -->
                                 <div class="cc-scene">
-                                    <div class="cc-card" id="ccCard">
-                                        <!-- Frente -->
+                                    <div id="ccCard" class="cc-card">
                                         <div class="cc-face cc-front">
                                             <div class="cc-row">
-                                                <span class="cc-chip"></span>
-                                                <span class="cc-brand" id="ccBrand">VISA</span>
+                                                <div class="cc-chip"></div>
+                                                <div id="ccBrand" class="cc-brand">CARD</div>
                                             </div>
-                                            <div class="cc-number" id="ccNumberText">#### #### #### ####</div>
+                                            <div id="ccNumberText" class="cc-number">#### #### #### ####</div>
                                             <div class="cc-row info">
                                                 <div>
                                                     <div class="lbl">NOMBRE</div>
-                                                    <div class="val" id="ccNameText">TARJETAHABIENTE</div>
+                                                    <div id="ccNameText" class="val">TARJETAHABIENTE</div>
                                                 </div>
                                                 <div>
-                                                    <div class="lbl">EXPIRA</div>
+                                                    <div class="lbl">VENCE</div>
                                                     <div class="val"><span id="ccMM">MM</span>/<span id="ccYY">AA</span></div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <!-- Dorso -->
                                         <div class="cc-face cc-back">
                                             <div class="cc-strip"></div>
-                                            <div class="cc-cvc-box">
-                                                <div class="lbl">CVC</div>
-                                                <div class="cvc" id="ccCvcText">•••</div>
-                                            </div>
-                                            <div class="cc-brand-mini" id="ccBrandBack">VISA</div>
+                                            <div class="cc-cvc-box"><span id="ccCvcText">•••</span></div>
+                                            <div id="ccBrandBack" class="cc-brand-mini">CARD</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {{-- Lado derecho: formulario --}}
+                            {{-- FORMULARIO NO 3DS --}}
                             <div class="pay-right">
-                                <form id="cardForm" autocomplete="off" novalidate>
+                                <form id="cardFormNo3ds" autocomplete="off" novalidate>
+                                    @csrf
                                     <div class="form-group">
                                         <label>Número de Tarjeta</label>
-                                        <input class="control" id="cardNumber" inputmode="numeric" placeholder="4111 1111 1111 1111" maxlength="19">
+                                        <input class="control" id="cardNumber" inputmode="numeric" placeholder="4242 4242 4242 4242" maxlength="19">
                                     </div>
-
                                     <div class="form-group">
-                                        <label>Nombre de la tarjeta</label>
-                                        <input class="control" id="cardName" placeholder="Como aparece en la tarjeta" maxlength="40">
+                                        <label>Nombre en la tarjeta</label>
+                                        <input class="control" id="cardName" placeholder="Como aparece en la tarjeta" maxlength="60">
                                     </div>
-
                                     <div class="row2">
                                         <div>
                                             <label>Mes</label>
                                             <select class="control" id="cardMM">
                                                 <option value="">MM</option>
-                                                @for($m=1; $m<=12; $m++)
-                                                    <option value="{{ str_pad($m,2,'0',STR_PAD_LEFT) }}">{{ str_pad($m,2,'0',STR_PAD_LEFT) }}</option>
+                                                @for($m=1;$m<=12;$m++)
+                                                    <option value="{{ $m }}">{{ str_pad($m,2,'0',STR_PAD_LEFT) }}</option>
                                                 @endfor
                                             </select>
                                         </div>
                                         <div>
                                             <label>Año</label>
                                             <select class="control" id="cardYY">
-                                                <option value="">AA</option>
-                                                @php $y = (int) date('y'); @endphp
-                                                @for($i=0; $i<=12; $i++)
-                                                    <option value="{{ sprintf('%02d',$y+$i) }}">{{ sprintf('%02d',$y+$i) }}</option>
+                                                <option value="">AAAA</option>
+                                                @php $y = (int) date('Y'); @endphp
+                                                @for($i=0;$i<=12;$i++)
+                                                    <option value="{{ $y+$i }}">{{ $y+$i }}</option>
                                                 @endfor
                                             </select>
                                         </div>
                                     </div>
-
                                     <div class="form-group">
                                         <label>CVC</label>
-                                        <input class="control" id="cardCVC" inputmode="numeric" placeholder="•••" maxlength="4">
+                                        <input class="control" id="cardCVC" inputmode="numeric" placeholder="123" maxlength="4">
                                     </div>
 
-                                    <div class="cards-logos">
-                                        <span class="logo">VISA</span>
-                                        <span class="logo">Mastercard</span>
-                                        <span class="logo">AmEx</span>
-                                        <span class="logo">Ambiente Seguro</span>
+                                    {{-- Datos cliente --}}
+                                    <div class="row2">
+                                        <div>
+                                            <label>Nombre</label>
+                                            <input class="control" id="cliNombre" value="{{ auth()->user()->name ?? '' }}">
+                                        </div>
+                                        <div>
+                                            <label>Apellido</label>
+                                            <input class="control" id="cliApellido" value="">
+                                        </div>
+                                    </div>
+                                    <div class="row2">
+                                        <div>
+                                            <label>Email</label>
+                                            <input class="control" id="cliEmail" value="{{ auth()->user()->email ?? '' }}">
+                                        </div>
+                                        <div>
+                                            <label>Teléfono</label>
+                                            <input class="control" id="cliTel" placeholder="503xxxxxxxx">
+                                        </div>
                                     </div>
 
-
+                                    {{-- Dirección --}}
+                                    <div class="form-group">
+                                        <label>Dirección</label>
+                                        <input class="control" id="cliDir" placeholder="Calle, número, referencias">
+                                    </div>
+                                    <div class="row2">
+                                        <div>
+                                            <label>Ciudad</label>
+                                            <input class="control" id="cliCiudad" placeholder="Santa Ana">
+                                        </div>
+                                        <div>
+                                            <label>Código Postal</label>
+                                            <input class="control" id="cliZip" placeholder="2201">
+                                        </div>
+                                    </div>
+                                    <div class="row2">
+                                        <div>
+                                            <label>ID País</label>
+                                            <input class="control" id="cliPaisId" value="1">
+                                        </div>
+                                        <div>
+                                            <label>ID Región</label>
+                                            <input class="control" id="cliRegionId" value="12">
+                                        </div>
+                                    </div>
 
                                     <div class="actions">
                                         <button class="btn btn-light" type="button" id="btnBack2">Volver</button>
-                                        <button class="btn btn-danger" type="submit" id="btnPay">Proceder a Pagar</button>
+                                        <button class="btn btn-danger" type="submit" id="btnPayNo3ds">Pagar (sin 3DS)</button>
                                     </div>
                                 </form>
                             </div>
-                        </div>
-
+                        </div> {{-- pay-grid --}}
                     </div>
                 </div>
             </div>
-
         </div>
 
         {{-- =================== COLUMNA DERECHA (Resumen) =================== --}}
@@ -585,7 +598,7 @@
         </aside>
     </div>
 
-    {{-- ======= Librerías que ya usas ======= --}}
+    {{-- ======= Librerías ======= --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}"></script>
@@ -600,34 +613,31 @@
 
     <script>
         const PAISES_MAP = {!! json_encode(
-        $paises->keyBy('id')->map(fn($p)=>$p->nombre)->toArray(),
-        JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
-    ) !!};
-    </script>
-
-
-    <script>
+            $paises->keyBy('id')->map(fn($p)=>$p->nombre)->toArray(),
+            JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
+        ) !!};
         const HAS_ADDRESSES = {{ $addresses->isNotEmpty() ? 'true' : 'false' }};
         const ADDRESS_MAP = {!! json_encode(
-  $addresses->keyBy('id')->map(function($a){
-      return [
-          'id'            => (int) $a->id,
-          'nombre'        => $a->nombre,
-          'direccion'     => $a->direccion,
-          'pais'          => $a->pais_nombre ?? null,
-          'departamento'  => $a->depto_nombre ?? null,
-          'municipio'     => $a->muni_nombre ?? null,
-          'ciudad'        => $a->ciudad,
-          'estado'        => $a->estado,
-          'zipcode'       => $a->zipcode,
-          'telefono'      => $a->telefono,
-          'predeterminado'=> (int) $a->predeterminado,
-          'precio_envio'  => (float) ($a->precio_envio ?? 0), // <-- clave correcta
-      ];
-  })->toArray()
-, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!};
+            $addresses->keyBy('id')->map(function($a){
+                return [
+                    'id'            => (int) $a->id,
+                    'nombre'        => $a->nombre,
+                    'direccion'     => $a->direccion,
+                    'pais'          => $a->pais_nombre ?? null,
+                    'departamento'  => $a->depto_nombre ?? null,
+                    'municipio'     => $a->muni_nombre ?? null,
+                    'ciudad'        => $a->ciudad,
+                    'estado'        => $a->estado,
+                    'zipcode'       => $a->zipcode,
+                    'telefono'      => $a->telefono,
+                    'predeterminado'=> (int) $a->predeterminado,
+                    'precio_envio'  => (float) ($a->precio_envio ?? 0),
+                ];
+            })->toArray()
+        , JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!};
     </script>
 
+    {{-- ======= Navegación de pasos + resumen por dirección ======= --}}
     <script>
         (function(){
             const stepsHead = document.getElementById('stepsHead');
@@ -643,9 +653,10 @@
                 panes[step].classList.add('active');
                 window.scrollTo({top: stepsHead.offsetTop-8, behavior:'smooth'});
             }
+            // expone go para otros bloques
+            window.go = go;
 
-            const hasAddresses = HAS_ADDRESSES;
-            if(hasAddresses){
+            if(HAS_ADDRESSES){
                 document.getElementById('shipping_address')?.addEventListener('change', e=>{
                     document.getElementById('envio_id').value = e.target.value;
                 });
@@ -684,45 +695,7 @@
                 go(3);
             });
 
-
             document.getElementById('btnBack2')?.addEventListener('click', ()=> go(2));
-
-            document.getElementById('btnPlaceOrder')?.addEventListener('click', async ()=> {
-                const envio_id = document.getElementById('envio_id')?.value || null;
-                const billing  = document.getElementById('bill_payload')?.value || null;
-                const pay      = document.querySelector('input[name="pay_method"]:checked')?.value || 'card';
-
-                if(!envio_id){ toastr.error('Selecciona una dirección de envío.'); return; }
-
-                try {
-                    // 1) Crear orden
-                    const place = await axios.post('{{ route('checkout.place') }}', {
-                        envio_id,
-                        billing: billing ? JSON.parse(billing) : null,
-                        pay_method: pay
-                    });
-
-                    if(!place.data?.ok || !place.data?.order_code){
-                        throw new Error('No se pudo crear la orden');
-                    }
-
-                    // 2) Crear sesión de Wompi
-                    const wompi = await axios.post('{{ route('wompi.create') }}', {
-                        order_code: place.data.order_code
-                    });
-
-                    if(!wompi.data?.ok || !wompi.data?.redirect){
-                        throw new Error('Wompi no devolvió URL de checkout');
-                    }
-
-                    // 3) Redirigir a Wompi
-                    window.location.href = wompi.data.redirect;
-
-                } catch (e) {
-                    console.error('checkout→wompi error', e?.response?.data || e);
-                    toastr.error((e?.response?.data?.msg) || 'No se pudo procesar el pedido.');
-                }
-            });
 
             stepsHead.addEventListener('click', (ev)=>{
                 const node = ev.target.closest('.step'); if(!node) return;
@@ -735,17 +708,14 @@
             function val(id){ return (document.getElementById(id)?.value || '').trim(); }
         })();
 
-        /* ===================================================
-           FUNCIONES ADICIONALES: PREVIEW + RESUMEN ACTUALIZABLE
-        =================================================== */
-
+        // Resumen por dirección
         function money(n){ return '$' + Number(n||0).toFixed(2); }
 
         function updateSummaryByAddress(id){
             const a = ADDRESS_MAP[id];
             if(!a) return;
             const subtotal = Number((document.getElementById('sum-subtotal').innerText || '0').replace(/[^0-9.]/g,''));
-            const shipping = Number(a.precio_envio || 0); // <-- usa precio_envio
+            const shipping = Number(a.precio_envio || 0);
             document.getElementById('sum-shipping').innerText = money(shipping);
             document.getElementById('sum-total').innerText    = money(subtotal + shipping);
         }
@@ -758,7 +728,6 @@
                 box.innerHTML = `<div class="addr-empty muted">Selecciona una dirección para ver los detalles.</div>`;
                 return;
             }
-
             const lines = [];
             if(a.nombre)       lines.push(`<div class="addr-line"><strong>Nombre:</strong> ${a.nombre}</div>`);
             if(a.direccion)    lines.push(`<div class="addr-line"><strong>Dirección:</strong> ${a.direccion}</div>`);
@@ -769,27 +738,18 @@
             if(a.estado)       lines.push(`<div class="addr-line"><strong>Estado/Provincia:</strong> ${a.estado}</div>`);
             if(a.zipcode)      lines.push(`<div class="addr-line"><strong>Código Postal:</strong> ${a.zipcode}</div>`);
             if(a.telefono)     lines.push(`<div class="addr-line"><strong>Teléfono:</strong> ${a.telefono}</div>`);
-
-            box.innerHTML = `
-      <div class="addr-card">
-          ${lines.length ? lines.join('') : '<div class="addr-empty muted">Sin datos adicionales.</div>'}
-      </div>`;
+            box.innerHTML = `<div class="addr-card">${lines.length ? lines.join('') : '<div class="addr-empty muted">Sin datos adicionales.</div>'}</div>`;
         }
 
-        /* ===================================================
-           EVENTO: CAMBIO DE DIRECCIÓN
-        =================================================== */
         document.addEventListener('DOMContentLoaded', ()=>{
             if(!HAS_ADDRESSES) return;
             const sel    = document.getElementById('shipping_address');
             const hidden = document.getElementById('envio_id');
             const current = (hidden?.value || sel?.value);
-
             if(current){
                 renderAddrPreview(current);
                 updateSummaryByAddress(current);
             }
-
             sel?.addEventListener('change', e=>{
                 hidden.value = e.target.value;
                 renderAddrPreview(e.target.value);
@@ -798,12 +758,12 @@
         });
     </script>
 
-
-
+    {{-- ======= Tarjeta animada (blindada a null) ======= --}}
     <script>
         (function(){
-            // === Helpers ===
             const $ = (s)=>document.querySelector(s);
+
+            // Helpers
             const brandByPan = (pan) => {
                 if(/^3[47]/.test(pan)) return 'AMEX';
                 if(/^4/.test(pan))     return 'VISA';
@@ -811,138 +771,135 @@
                 if(/^6(?:011|5)/.test(pan)) return 'Discover';
                 return 'CARD';
             };
-            const luhn = (num)=>{
-                let sum=0, dbl=false;
-                for(let i=num.length-1;i>=0;i--){
-                    let d = +num[i];
-                    if(dbl){ d*=2; if(d>9) d-=9; }
-                    sum+=d; dbl=!dbl;
+            const luhn = (num)=>{ let sum=0,dbl=false; for(let i=num.length-1;i>=0;i--){ let d=+num[i]; if(dbl){d*=2;if(d>9)d-=9;} sum+=d; dbl=!dbl;} return sum%10===0; };
+            const formatPan = (s,isAmex)=>{ const d=s.replace(/\D/g,'').slice(0,isAmex?15:16); let out=''; for(let i=0;i<d.length;i++){ out+=d[i]; if(isAmex && (i===3||i===9)) out+=' '; else if(!isAmex && i%4===3 && i!==d.length-1) out+=' '; } return out; };
+            const setTxt = (el,val)=>{ if(el) el.textContent = val; };
+
+            // Refs (tolerantes)
+            const nInp = $('#cardNumber'), nameInp = $('#cardName'), mmSel = $('#cardMM'), yySel = $('#cardYY'), cvcInp = $('#cardCVC');
+            const nTxt = $('#ccNumberText'), nameTxt = $('#ccNameText'), mmTxt = $('#ccMM'), yyTxt = $('#ccYY'), cvcTxt = $('#ccCvcText');
+            const brandFront = $('#ccBrand'), brandBack = $('#ccBrandBack'), card = $('#ccCard');
+
+            if (nInp) {
+                function updateBrandAndFormat(){
+                    const raw = nInp.value.replace(/\D/g,'');
+                    const isAmex = /^3[47]/.test(raw);
+                    nInp.value   = formatPan(nInp.value, isAmex);
+                    const b = brandByPan(raw);
+                    setTxt(brandFront, b);
+                    setTxt(brandBack,  b);
+                    setTxt(nTxt, nInp.value || '#### #### #### ####');
                 }
-                return sum%10===0;
-            };
-            const formatPan = (s, isAmex)=> {
-                const d = s.replace(/\D/g,'').slice(0, isAmex?15:16);
-                let out='';
-                for(let i=0;i<d.length;i++){
-                    out += d[i];
-                    if(isAmex && (i===3||i===9)) out+=' ';
-                    else if(!isAmex && i%4===3 && i!==d.length-1) out+=' ';
-                }
-                return out;
-            };
-
-            // === DOM refs ===
-            const card = $('#ccCard');
-            const nInp = $('#cardNumber');
-            const nameInp = $('#cardName');
-            const mmSel = $('#cardMM');
-            const yySel = $('#cardYY');
-            const cvcInp = $('#cardCVC');
-
-            const nTxt = $('#ccNumberText');
-            const nameTxt = $('#ccNameText');
-            const mmTxt = $('#ccMM');
-            const yyTxt = $('#ccYY');
-            const cvcTxt = $('#ccCvcText');
-            const brandFront = $('#ccBrand');
-            const brandBack  = $('#ccBrandBack');
-
-            // === Number typing ===
-            function updateBrandAndFormat(){
-                const raw = nInp.value.replace(/\D/g,'');
-                const isAmex = /^3[47]/.test(raw);
-                nInp.value   = formatPan(nInp.value, isAmex);
-                const b = brandByPan(raw);
-                brandFront.textContent = b; brandBack.textContent = b;
-                nTxt.textContent = nInp.value || '#### #### #### ####';
+                nInp.addEventListener('input', updateBrandAndFormat);
+                nInp.addEventListener('blur', ()=>{
+                    const raw = nInp.value.replace(/\D/g,'');
+                    if(raw.length>=13 && !luhn(raw)){
+                        toastr.warning('Verifica el número de tarjeta (Luhn inválido).');
+                    }
+                });
             }
-            nInp.addEventListener('input', updateBrandAndFormat);
-            nInp.addEventListener('blur', ()=>{ // opcional marca inválido
-                const raw = nInp.value.replace(/\D/g,'');
-                if(raw.length>=13 && !luhn(raw)){
-                    toastr.warning('Verifica el número de tarjeta (Luhn inválido).');
-                }
-            });
+            if (nameInp) {
+                nameInp.addEventListener('input', ()=>{
+                    const v = nameInp.value.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ\s\.]/g,'').toUpperCase().slice(0,26);
+                    nameInp.value = v;
+                    setTxt(nameTxt, v || 'TARJETAHABIENTE');
+                });
+            }
+            mmSel?.addEventListener('change', ()=> setTxt(mmTxt, mmSel.value || 'MM'));
+            yySel?.addEventListener('change', ()=> setTxt(yyTxt, yySel.value || 'AA'));
 
-            // === Name ===
-            nameInp.addEventListener('input', ()=>{
-                const v = nameInp.value.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ\s\.]/g,'').toUpperCase().slice(0,26);
-                nameInp.value = v;
-                nameTxt.textContent = v || 'TARJETAHABIENTE';
-            });
+            if (cvcInp) {
+                cvcInp.addEventListener('focus', ()=> card?.classList.add('flip'));
+                cvcInp.addEventListener('blur',  ()=> card?.classList.remove('flip'));
+                cvcInp.addEventListener('input', ()=>{
+                    cvcInp.value = cvcInp.value.replace(/\D/g,'').slice(0,4);
+                    setTxt(cvcTxt, (cvcInp.value||'').padEnd(3,'•'));
+                });
+            }
 
-            // === Fecha ===
-            mmSel.addEventListener('change', ()=> mmTxt.textContent = mmSel.value || 'MM');
-            yySel.addEventListener('change', ()=> yyTxt.textContent = yySel.value || 'AA');
-
-            // === CVC & flip ===
-            cvcInp.addEventListener('focus', ()=> card.classList.add('flip'));
-            cvcInp.addEventListener('blur',  ()=> card.classList.remove('flip'));
-            cvcInp.addEventListener('input', ()=>{
-                cvcInp.value = cvcInp.value.replace(/\D/g,'').slice(0,4);
-                cvcTxt.textContent = cvcInp.value.padEnd(3,'•');
-            });
-
-            // === Back button keeps tu navegación ===
-            $('#btnBack2')?.addEventListener('click', ()=> {
-                // ya tienes go(2) arriba; lo reutilizamos:
-                if(typeof go==='function') go(2);
-            });
-
-
+            // Botón volver
+            $('#btnBack2')?.addEventListener('click', ()=> { if (typeof window.go==='function') window.go(2); });
         })();
     </script>
 
-
-
+    {{-- ======= Submit NO 3DS ======= --}}
     <script>
-        (() => {
-            const $ = (s)=>document.querySelector(s);
+        document.addEventListener('DOMContentLoaded', () => {
+            const $ = s => document.querySelector(s);
+            const money = n => '$' + Number(n || 0).toFixed(2);
 
-            $('#cardForm').addEventListener('submit', async (e) => {
+            const form = document.getElementById('cardFormNo3ds');
+            if (!form) return;
+
+            form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                // Validaciones locales mínimas (opcional)
-                const nInp = $('#cardNumber'), mmSel = $('#cardMM'), yySel = $('#cardYY'), cvcInp = $('#cardCVC');
-                const panRaw = nInp.value.replace(/\D/g,'');
-                if(panRaw.length < 13){ toastr.error('Número de tarjeta inválido.'); return; }
-                if(!mmSel.value || !yySel.value){ toastr.error('Fecha inválida.'); return; }
-                if((cvcInp.value||'').length < 3){ toastr.error('CVC inválido.'); return; }
+                const pan = ($('#cardNumber')?.value || '').replace(/\D/g,'');
+                const mm  = parseInt($('#cardMM')?.value || 0, 10);
+                const yy  = parseInt($('#cardYY')?.value || 0, 10);
+                const cvc = ($('#cardCVC')?.value || '').replace(/\D/g,'');
+
+                if (pan.length < 13 || !mm || !yy || cvc.length < 3) {
+                    toastr.error('Completa los datos de la tarjeta.');
+                    return;
+                }
+
+                const sumText = document.getElementById('sum-total')?.innerText || '';
+                const monto = Number(sumText.replace(/[^0-9.]/g,'')) || 10.00;
+
+                const payload = {
+                    numeroTarjeta: pan,
+                    cvv: cvc,
+                    mesVencimiento: mm,
+                    anioVencimiento: yy,
+                    nombreTarjeta: ($('#cardName')?.value || '').trim(),
+
+                    emailCliente: ($('#cliEmail')?.value || '').trim(),
+                    nombreCliente: ($('#cliNombre')?.value || '').trim(),
+                    apellidoCliente: ($('#cliApellido')?.value || '').trim(),
+                    telefonoCliente: ($('#cliTel')?.value || '').replace(/\D/g,''),
+
+                    direccionCliente: ($('#cliDir')?.value || '').trim(),
+                    ciudadCliente: ($('#cliCiudad')?.value || '').trim(),
+                    idPais: parseInt($('#cliPaisId')?.value || 0, 10),
+                    idRegion: parseInt($('#cliRegionId')?.value || 0, 10),
+                    codigoPostal: ($('#cliZip')?.value || '').trim(),
+
+                    monto: monto,
+                    moneda: 'USD',
+                    referencia: 'F3P-' + Date.now()
+                };
 
                 try {
-                    const envio_id = document.getElementById('envio_id')?.value || null;
-                    const billing  = document.getElementById('bill_payload')?.value || null;
-                    if(!envio_id){ toastr.error('Selecciona una dirección de envío.'); return; }
+                    const url = "{{ route('checkout.pay.no3ds') }}";
+                    const resp = await axios.post(url, payload);
 
-                    // 1) Crear orden
-                    const place = await axios.post('{{ route('checkout.place') }}', {
-                        envio_id,
-                        billing: billing ? JSON.parse(billing) : null,
-                        pay_method: 'card'
-                    });
-                    if(!place.data?.ok || !place.data?.order_code) throw new Error('No se pudo crear la orden');
-
-                    // 2) Iniciar Wompi
-                    const wompi = await axios.post('{{ route('wompi.create') }}', {
-                        order_code: place.data.order_code
-                    });
-                    if(!wompi.data?.ok || !wompi.data?.redirect) throw new Error('Wompi sin redirect');
-
-                    // 3) Ir a Wompi
-                    window.location.href = wompi.data.redirect;
-
+                    if (resp?.data?.esAprobada) {
+                        Swal.fire({
+                            icon:'success',
+                            title:'Pago aprobado',
+                            html: `
+                                <div style="text-align:left">
+                                  <div><b>Transacción:</b> ${resp.data.idTransaccion}</div>
+                                  <div><b>Autorización:</b> ${resp.data.codigoAutorizacion || '-'}</div>
+                                  <div><b>Monto:</b> ${money(resp.data.monto)}</div>
+                                </div>
+                            `
+                        });
+                    } else {
+                        throw new Error(resp?.data?.mensaje || 'Pago no aprobado');
+                    }
                 } catch (err) {
-                    console.error(err);
-                    Swal.fire({icon:'error', title:'No se pudo iniciar el pago', text: (err?.response?.data?.msg)||'Intenta nuevamente.'});
+                    console.error(err?.response?.data || err);
+                    toastr.error(
+                        (err?.response?.data?.mensaje)
+                        || (err?.response?.data?.error)
+                        || 'No se pudo procesar el pago.'
+                    );
                 }
             });
-        })();
+        });
     </script>
-
-
-
-
-
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')

@@ -7,8 +7,10 @@ use App\Models\Direcciones;
 use App\Models\DireccionFacturacion;
 use App\Models\Order;
 use App\Models\Producto;
+use App\Models\Usuario;
 use App\Traits\HandlesCart;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -23,8 +25,10 @@ class CheckoutController extends Controller
         $items    = $cart->getContent();
         $subtotal = $cart->getSubTotal();
 
+        $userId = Auth::guard('web')->id();
+
         $addresses = Direcciones::query()
-            ->where('direcciones.id_usuario', auth()->id())
+            ->where('direcciones.id_usuario', $userId)
             ->leftJoin('paises',        'paises.id',        '=', 'direcciones.id_paises')
             ->leftJoin('departamentos', 'departamentos.id', '=', 'direcciones.id_departamento')
             ->leftJoin('municipios',    'municipios.id',    '=', 'direcciones.id_municipio')
@@ -43,6 +47,7 @@ class CheckoutController extends Controller
                 END AS precio_envio
             "),
             ]);
+
 
         $selectedAddress = optional(
             $addresses->firstWhere('predeterminado', 1) ?? $addresses->first()

@@ -7,6 +7,7 @@
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
 @stop
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 <style>
     table{
@@ -21,7 +22,7 @@
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                <button type="button" onclick="prueba()" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus-square"></i>
                     Nueva Imagen
                 </button>
@@ -556,6 +557,35 @@
                 .catch((error) => {
                     closeLoading();
                     toastr.error('Error al actualizar');
+                });
+        }
+
+
+        function prueba () {
+            openLoading();
+
+            axios.post('/admin/galeria/prueba', {}, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+                .then(({ data }) => {
+                    closeLoading();
+                    console.log(data);
+
+                    if (data.ok) {
+                        toastr.success('Pago de prueba ejecutado');
+                    } else {
+                        toastr.error(`Error: ${data.step || 'desconocido'} - ${data.status || ''}`);
+                        // ayuda para depurar:
+                        console.log('Detalle error WOMPI:', data.body || data.error || data);
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Fallo la petición');
+                    console.error(error?.response?.data || error);
                 });
         }
 

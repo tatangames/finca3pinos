@@ -20,6 +20,8 @@ use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
+use Illuminate\Support\Facades\Http;
+
 
 class AdminAuthController extends Controller
 {
@@ -576,6 +578,116 @@ class AdminAuthController extends Controller
 
 
 
+
+
+
+    public function pruebaGaleria(Request $request)
+    {
+
+
+
+        // === Datos de prueba (puedes pasarlos por request también) ===
+        $amount   = 10.00;         // 10.00 USD
+        $currency = 'USD';
+
+        $card = [
+            'number'     => '4242424242424242', // aprobada sandbox
+            'cvc'        => '123',
+            'exp_month'  => '12',               // 2 dígitos
+            'exp_year'   => '30',               // 2 dígitos (2030)
+            'card_holder'=> 'Jose Perez',
+        ];
+
+        // === Headers exigidos por Wompi SV ===
+        $headers = [
+            'Accept'             => 'application/json',
+            'Content-Type'       => 'application/json',
+            'user-principal-id'  => env('WOMPI_USER_PRINCIPAL_ID'),
+            'x-api-key'          => env('WOMPI_API_KEY'),
+        ];
+
+        try {
+            // 1) TOKENIZAR TARJETA (endpoint sandbox para SV)
+            $tokenizeUrl = rtrim(env('WOMPI_TOKENIZE_URL'), '/'); // ej: https://api.wompi.sv/Tokenizacion
+            $tokPayload  = [
+                'numeroTarjeta'   => $card['number'],
+                'cvv'             => $card['cvc'],
+                'mesVencimiento'  => (int)$card['exp_month'],
+                'anioVencimiento' => (int)$card['exp_year'],
+                'titular'         => $card['card_holder'],
+            ];
+
+            $tokResp = Http::withHeaders($headers)->post($tokenizeUrl, $tokPayload);
+
+            if ($tokResp->failed()) {
+                return response()->json([
+                    'ok'    => false,
+                    'step'  => 'tokenizacion',
+                    'status'=> $tokResp->status(),
+                    'body'  => $tokResp->json() ?? $tokResp->body(),
+                    'sent'  => $tokPayload,
+                ], 400);
+            }
+
+            $tokBody  = $tokResp->json();
+            // Ajusta según el nombre exacto donde venga el token (ej. data.id, token, etc.)
+            $tokenId  = data_get($tokBody, 'data.id') ?? data_get($tokBody, 'token') ?? null;
+
+            if (!$tokenId) {
+                return response()->json([
+                    'ok'   => false,
+                    'step' => 'tokenizacion',
+                    'msg'  => 'No se obtuvo el token de la tarjeta',
+                    'raw'  => $tokBody
+                ], 400);
+            }
+
+            // 2) CREAR TRANSACCIÓN (cargo con el token)
+            $chargeUrl   = rtrim(env('WOMPI_CHARGE_URL'), '/'); // ej: https://api.wompi.sv/TransaccionCompra
+            $reference   = 'F3P-' . uniqid();
+
+            $chargePayload = [
+                'token'            => $tokenId,
+                'monto'            => round($amount, 2),  // En SV suele ir en unidades (10.00)
+                'moneda'           => $currency,          // USD
+                'descripcion'      => 'Compra prueba Finca 3 Pinos',
+                'referencia'       => $reference,
+                'emailCliente'     => 'cliente@example.com',
+
+                // Opcionales según tu configuración:
+                // 'cuotas'        => 1,
+                // '3ds'           => [ ... ],
+                // 'device'        => request()->userAgent(),
+            ];
+
+            $chResp = Http::withHeaders($headers)->post($chargeUrl, $chargePayload);
+
+            if ($chResp->failed()) {
+                return response()->json([
+                    'ok'     => false,
+                    'step'   => 'cargo',
+                    'status' => $chResp->status(),
+                    'body'   => $chResp->json() ?? $chResp->body(),
+                    'sent'   => $chargePayload,
+                    'token'  => $tokBody,
+                ], 400);
+            }
+
+            return response()->json([
+                'ok'              => true,
+                'reference'       => $reference,
+                'token_response'  => $tokBody,
+                'charge_response' => $chResp->json(),
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::info('error: '.$e->getMessage());
+            return response()->json([
+                'ok'    => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
 
 
