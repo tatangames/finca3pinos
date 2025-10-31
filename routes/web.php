@@ -304,6 +304,8 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
         Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
 
+
+
         // ✅ Checkout protegido: requiere login y carrito con items
        /* Route::middleware(['auth:web','cart.notempty'])->group(function () {
 
@@ -323,6 +325,31 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
         Route::get('/wompi/no3ds', [WompiController::class, 'form'])->name('wompi.form');
         Route::post('/wompi/no3ds/pagar', [WompiController::class, 'pagarSin3ds'])->name('wompi.pagar.sin3ds');*/
+
+
+
+
+
+
+
+        Route::post('/checkout/pagar-3ds', [WompiSandboxController::class, 'pagar3ds'])
+            ->name('wompi.pay.intent'); // ← tu JS postea aquí
+
+        Route::get('/checkout/3ds/redirect', [WompiSandboxController::class, 'redirect3ds'])
+            ->name('wompi.redirect');   // ← urlRedirect 3DS
+
+        Route::get('/checkout/tx-status', [WompiSandboxController::class, 'txStatus'])
+            ->name('wompi.tx.status');  // ← polling en tu JS
+
+// Opcional (muy recomendado)
+        Route::post('/webhook/wompi', [WompiSandboxController::class, 'webhook'])
+            ->name('wompi.webhook');
+
+
+
+
+
+
 
 
 

@@ -576,6 +576,11 @@
                                         <button class="btn btn-danger" type="submit" id="btnPayNo3ds">Pagar (sin 3DS)</button>
                                     </div>
                                 </form>
+
+                                <div class="actions" style="margin-top:12px">
+                                    <button class="btn btn-primary" type="button" id="btnPlaceOrder">Pagar (seguro)</button>
+                                </div>
+
                             </div>
                         </div> {{-- pay-grid --}}
                     </div>
@@ -839,82 +844,113 @@
 
     {{-- ======= Submit NO 3DS ======= --}}
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        (function(){
             const $ = s => document.querySelector(s);
-            const money = n => '$' + Number(n || 0).toFixed(2);
+            const money = n => '$' + Number(n||0).toFixed(2);
 
-            const form = document.getElementById('cardFormNo3ds');
-            if (!form) return;
+            const modal   = $('#w3dsModal');
+            const frame   = $('#w3dsFrame');
+            const btnClose= $('#w3dsClose');
 
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
+            function open3DS(url){
+                frame.src = url;
+                modal.style.display = 'block';
+            }
+            function close3DS(){
+                frame.src = 'about:blank';
+                modal.style.display = 'none';
+            }
+            btnClose.addEventListener('click', close3DS);
 
-                const pan = ($('#cardNumber')?.value || '').replace(/\D/g,'');
-                const mm  = parseInt($('#cardMM')?.value || 0, 10);
-                const yy  = parseInt($('#cardYY')?.value || 0, 10);
-                const cvc = ($('#cardCVC')?.value || '').replace(/\D/g,'');
-
-                if (pan.length < 13 || !mm || !yy || cvc.length < 3) {
-                    toastr.error('Completa los datos de la tarjeta.');
-                    return;
+            async function pollStatus(txId, tries=40, delayMs=3000){
+                for(let i=0; i<tries; i++){
+                    await new Promise(r=>setTimeout(r, delayMs));
+                    const st = await axios.get("{{ route('wompi.tx.status') }}", { params:{ id: txId }});
+                    const estado = st?.data?.estado; // adapta: 'APROBADA','DECLINADA','FALLIDA','PENDIENTE'
+                    if (estado === 'APROBADA')   return { ok:true, data: st.data };
+                    if (estado === 'DECLINADA' || estado === 'FALLIDA') return { ok:false, data: st.data };
                 }
+                return { ok:false, data:{ mensaje:'Tiempo de espera agotado' } };
+            }
 
-                const sumText = document.getElementById('sum-total')?.innerText || '';
-                const monto = Number(sumText.replace(/[^0-9.]/g,'')) || 10.00;
-
-                const payload = {
-                    numeroTarjeta: pan,
-                    cvv: cvc,
-                    mesVencimiento: mm,
-                    anioVencimiento: yy,
-                    nombreTarjeta: ($('#cardName')?.value || '').trim(),
-
-                    emailCliente: ($('#cliEmail')?.value || '').trim(),
-                    nombreCliente: ($('#cliNombre')?.value || '').trim(),
-                    apellidoCliente: ($('#cliApellido')?.value || '').trim(),
-                    telefonoCliente: ($('#cliTel')?.value || '').replace(/\D/g,''),
-
-                    direccionCliente: ($('#cliDir')?.value || '').trim(),
-                    ciudadCliente: ($('#cliCiudad')?.value || '').trim(),
-                    idPais: parseInt($('#cliPaisId')?.value || 0, 10),
-                    idRegion: parseInt($('#cliRegionId')?.value || 0, 10),
-                    codigoPostal: ($('#cliZip')?.value || '').trim(),
-
-                    monto: monto,
-                    moneda: 'USD',
-                    referencia: 'F3P-' + Date.now()
-                };
-
+            // Botón principal "Pagar" (el seguro / con 3DS)
+            document.getElementById('btnPlaceOrder')?.addEventListener('click', async ()=>{
                 try {
-                    const url = "{{ route('checkout.pay.no3ds') }}";
-                    const resp = await axios.post(url, payload);
+                    // 1) Reúne datos (como ya lo haces)
+                    const envio_id = document.getElementById('envio_id')?.value || null;
+                    const billing  = document.getElementById('bill_payload')?.value || null;
+                    if(!envio_id){ toastr.error('Selecciona una dirección de envío.'); return; }
 
-                    if (resp?.data?.esAprobada) {
+                    // 2) Crea orden en tu backend
+                    const place = await axios.post('{{ route('checkout.place') }}', {
+                        envio_id,
+                        billing: billing ? JSON.parse(billing) : null,
+                        pay_method: 'card'
+                    });
+                    if(!place.data?.ok || !place.data?.order_code) throw new Error('No se pudo crear la orden');
+
+                    // 3) Inicia el pago en tu backend (crear transacción / intent)
+                    //    IMPORTANTE: aquí tú NO envías PAN/CVC; idealmente usas token de tarjeta o campos hospedados.
+                    const intent = await axios.post('{{ route('wompi.pay.intent') }}', {
+                        order_code: place.data.order_code,
+                        // si tienes tokenizado en cliente: token_pm: 'tok_xxx'
+                    });
+
+                    // 4) Respuestas posibles del backend (nombres de campos a adaptar a Wompi):
+                    // - { esAprobada:true, idTransaccion, codigoAutorizacion, monto }
+                    // - { requiere3ds:true, url3ds, idTransaccion }
+                    // - { ok:false, mensaje:'...' }
+
+                    if (intent?.data?.esAprobada) {
                         Swal.fire({
-                            icon:'success',
-                            title:'Pago aprobado',
+                            icon:'success', title:'Pago aprobado',
                             html: `
-                                <div style="text-align:left">
-                                  <div><b>Transacción:</b> ${resp.data.idTransaccion}</div>
-                                  <div><b>Autorización:</b> ${resp.data.codigoAutorizacion || '-'}</div>
-                                  <div><b>Monto:</b> ${money(resp.data.monto)}</div>
-                                </div>
-                            `
+            <div style="text-align:left">
+              <div><b>Transacción:</b> ${intent.data.idTransaccion}</div>
+              <div><b>Autorización:</b> ${intent.data.codigoAutorizacion||'-'}</div>
+              <div><b>Monto:</b> ${money(intent.data.monto)}</div>
+            </div>`
                         });
-                    } else {
-                        throw new Error(resp?.data?.mensaje || 'Pago no aprobado');
+                        return;
                     }
-                } catch (err) {
-                    console.error(err?.response?.data || err);
-                    toastr.error(
-                        (err?.response?.data?.mensaje)
-                        || (err?.response?.data?.error)
-                        || 'No se pudo procesar el pago.'
-                    );
+
+                    if (intent?.data?.requiere3ds && intent?.data?.url3ds) {
+                        // 5) Abre el desafío 3DS en iframe (sin salir de la página)
+                        open3DS(intent.data.url3ds);
+
+                        // 6) Espera resultado (polling al backend)
+                        const res = await pollStatus(intent.data.idTransaccion);
+
+                        close3DS();
+
+                        if (res.ok) {
+                            const d = res.data;
+                            Swal.fire({
+                                icon:'success', title:'Pago aprobado',
+                                html: `
+              <div style="text-align:left">
+                <div><b>Transacción:</b> ${d.idTransaccion||''}</div>
+                <div><b>Autorización:</b> ${d.codigoAutorizacion||'-'}</div>
+                <div><b>Monto:</b> ${money(d.monto||0)}</div>
+              </div>`
+                            });
+                        } else {
+                            toastr.error(res?.data?.mensaje || 'Pago no aprobado');
+                        }
+                        return;
+                    }
+
+                    throw new Error(intent?.data?.mensaje || 'No se pudo procesar el pago');
+
+                } catch (e) {
+                    console.error(e?.response?.data || e);
+                    Swal.fire({icon:'error', title:'Error', text:(e?.response?.data?.mensaje)||'Ha ocurrido un error al procesar el pago.'});
                 }
             });
-        });
+
+        })();
     </script>
+
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')
