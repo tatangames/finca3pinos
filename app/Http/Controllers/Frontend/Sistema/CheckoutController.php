@@ -7,6 +7,7 @@ use App\Models\Direcciones;
 use App\Models\DireccionFacturacion;
 use App\Traits\HandlesCart;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
@@ -18,25 +19,51 @@ class CheckoutController extends Controller
         $cart     = $this->cart();
         $items    = $cart->getContent();
         $subtotal = $cart->getSubTotal();
-        $shipping = 0;
-        $tax      = 0;
-        $total    = $subtotal + $shipping + $tax;
 
-        $billing   = DireccionFacturacion::where('id_usuario', auth()->id())->first();
+        $addresses = Direcciones::query()
+            ->where('direcciones.id_usuario', auth()->id())
+            ->leftJoin('paises',        'paises.id',        '=', 'direcciones.id_paises')
+            ->leftJoin('departamentos', 'departamentos.id', '=', 'direcciones.id_departamento')
+            ->leftJoin('municipios',    'municipios.id',    '=', 'direcciones.id_municipio')
+            ->orderByDesc('direcciones.predeterminado')
+            ->latest('direcciones.id')
+            ->get([
+                'direcciones.*',
+                DB::raw('paises.nombre        as pais_nombre'),
+                DB::raw('departamentos.nombre as depto_nombre'),
+                DB::raw('municipios.nombre    as muni_nombre'),
+                DB::raw("
+                CASE
+                    WHEN direcciones.id_paises = 1
+                        THEN COALESCE(municipios.precio_envio, 0)
+                    ELSE COALESCE(paises.precio_envio, 0)
+                END AS precio_envio
+            "),
+            ]);
 
-        $addresses = Direcciones::where('id_usuario', auth()->id())
-            ->orderByDesc('predeterminado')
-            ->latest('id')
-            ->get();
-
-        $selectedAddressId = optional(
+        // dirección seleccionada (predeterminada o la primera)
+        $selectedAddress = optional(
             $addresses->firstWhere('predeterminado', 1) ?? $addresses->first()
-        )->id;
+        );
+
+        // calcular envío según la dirección seleccionada (o 0 si no hay direcciones)
+        $shipping = (float) ($selectedAddress->precio_envio ?? 0.0);
+        $total    = $subtotal + $shipping;
+
+
+
+
+
+        // <-- ESTOS FALTABAN
+        $billing = DireccionFacturacion::where('id_usuario', auth()->id())->first();
+        $selectedAddressId = $selectedAddress->id ?? null;
 
         return view('frontend.pages.checkout', compact(
-            'items','subtotal','shipping','tax','total','billing','addresses','selectedAddressId'
+            'items', 'subtotal', 'shipping', 'total',
+            'billing', 'addresses', 'selectedAddressId'
         ));
     }
+
 
 
 

@@ -328,4 +328,3 @@ Route::get('/galeria/cargar', [FrontendController::class, 'cargarGaleria'])
 
 
 
-

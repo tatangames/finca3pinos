@@ -286,11 +286,12 @@
                             <label for="shipping_address" style="display:block;margin-bottom:6px">Selecciona una dirección</label>
                             <select id="shipping_address" class="control">
                                 @foreach($addresses as $a)
+                                    @php
+                                        $label = trim(($a->pais_nombre ?? '—') . ' — ' . ($a->direccion ?? ''));
+                                        $label = \Illuminate\Support\Str::limit($label, 60); // <-- límite
+                                    @endphp
                                     <option value="{{ $a->id }}" {{ (int)$selectedAddressId===(int)$a->id ? 'selected' : '' }}>
-                                        {{ $a->nombre }} — {{ $a->direccion }}
-                                        {{ $a->ciudad ? ', '.$a->ciudad : '' }}
-                                        {{ $a->estado ? ', '.$a->estado : '' }}
-                                        {{ $a->zipcode ? ', '.$a->zipcode : '' }}
+                                        {{ $label }}
                                     </option>
                                 @endforeach
                             </select>
@@ -304,26 +305,39 @@
                             <div id="addrPreview" class="addr-preview" style="margin-top:10px">
                                 @if($addrSelected)
                                     <div class="addr-card">
-                                        <div class="addr-title">
-                                            {{ $addrSelected->nombre }}
-                                            @if((int)$addrSelected->predeterminado === 1)
-                                                <span class="addr-badge">Predeterminada</span>
-                                            @endif
-                                        </div>
-                                        <div class="addr-line">{{ $addrSelected->direccion }}</div>
-                                        <div class="addr-line">
-                                            {{ $addrSelected->ciudad ? $addrSelected->ciudad.', ' : '' }}
-                                            {{ $addrSelected->estado ? $addrSelected->estado.' ' : '' }}
-                                            {{ $addrSelected->zipcode ?? '' }}
-                                        </div>
+                                        @if($addrSelected->nombre)
+                                            <div class="addr-line"><strong>Nombre:</strong> {{ $addrSelected->direccion }}</div>
+                                        @endif
+                                        @if($addrSelected->direccion)
+                                            <div class="addr-line"><strong>Dirección:</strong> {{ $addrSelected->direccion }}</div>
+                                        @endif
+                                        @if($addrSelected->pais_nombre)
+                                            <div class="addr-line"><strong>País:</strong> {{ $addrSelected->pais_nombre }}</div>
+                                        @endif
+                                        @if($addrSelected->depto_nombre)
+                                            <div class="addr-line"><strong>Departamento:</strong> {{ $addrSelected->depto_nombre }}</div>
+                                        @endif
+                                        @if($addrSelected->muni_nombre)
+                                            <div class="addr-line"><strong>Municipio:</strong> {{ $addrSelected->muni_nombre }}</div>
+                                        @endif
+                                        @if($addrSelected->ciudad)
+                                            <div class="addr-line"><strong>Ciudad:</strong> {{ $addrSelected->ciudad }}</div>
+                                        @endif
+                                        @if($addrSelected->estado)
+                                            <div class="addr-line"><strong>Estado/Provincia:</strong> {{ $addrSelected->estado }}</div>
+                                        @endif
+                                        @if($addrSelected->zipcode)
+                                            <div class="addr-line"><strong>Código Postal:</strong> {{ $addrSelected->zipcode }}</div>
+                                        @endif
                                         @if($addrSelected->telefono)
-                                            <div class="addr-line">Tel: {{ $addrSelected->telefono }}</div>
+                                            <div class="addr-line"><strong>Teléfono:</strong> {{ $addrSelected->telefono }}</div>
                                         @endif
                                     </div>
                                 @else
                                     <div class="addr-empty muted">Selecciona una dirección para ver los detalles.</div>
                                 @endif
                             </div>
+
 
 
 
@@ -411,15 +425,14 @@
         </div>
 
         {{-- =================== COLUMNA DERECHA (Resumen) =================== --}}
-        <aside>
+        <aside style="margin-top: 11px">
             <div class="card">
                 <div class="card-h">Resumen de la Orden</div>
                 <div class="card-b">
                     <ul class="summary">
-                        <li><span>Subtotal</span><span>${{ number_format($subtotal,2) }}</span></li>
-                        <li><span>Envío</span><span>${{ number_format($shipping,2) }}</span></li>
-                        <li><span>Impuestos</span><span>${{ number_format($tax,2) }}</span></li>
-                        <li class="total"><span>Total a Pagar</span><span>${{ number_format($total,2) }}</span></li>
+                        <li><span>Subtotal</span><span id="sum-subtotal">${{ number_format($subtotal,2) }}</span></li>
+                        <li><span>Envío</span><span id="sum-shipping">${{ number_format($shipping,2) }}</span></li>
+                        <li class="total"><span>Total a Pagar</span><span id="sum-total">${{ number_format($total,2) }}</span></li>
                     </ul>
                 </div>
             </div>
@@ -431,38 +444,33 @@
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
-
-
     <script>
-        // ¿hay direcciones? (variable global)
         const HAS_ADDRESSES = {{ $addresses->isNotEmpty() ? 'true' : 'false' }};
-
         const ADDRESS_MAP = {!! json_encode(
-      $addresses->keyBy('id')->map(function($a){
-          return [
-              'id'            => (int) $a->id,
-              'nombre'        => $a->nombre,
-              'direccion'     => $a->direccion,
-              'ciudad'        => $a->ciudad,
-              'estado'        => $a->estado,
-              'zipcode'       => $a->zipcode,
-              'telefono'      => $a->telefono,
-              'predeterminado'=> (int) $a->predeterminado,
-          ];
-      })->toArray()
-  , JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!};
+  $addresses->keyBy('id')->map(function($a){
+      return [
+          'id'            => (int) $a->id,
+          'nombre'        => $a->nombre,
+          'direccion'     => $a->direccion,
+          'pais'          => $a->pais_nombre ?? null,
+          'departamento'  => $a->depto_nombre ?? null,
+          'municipio'     => $a->muni_nombre ?? null,
+          'ciudad'        => $a->ciudad,
+          'estado'        => $a->estado,
+          'zipcode'       => $a->zipcode,
+          'telefono'      => $a->telefono,
+          'predeterminado'=> (int) $a->predeterminado,
+          'precio_envio'  => (float) ($a->precio_envio ?? 0), // <-- clave correcta
+      ];
+  })->toArray()
+, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!};
     </script>
 
-
-
     <script>
-
-
         (function(){
             const stepsHead = document.getElementById('stepsHead');
             const panes = {1:tab('tab1'), 2:tab('tab2'), 3:tab('tab3')};
             function tab(id){return document.getElementById(id);}
-
             function go(step){
                 [...stepsHead.querySelectorAll('.step')].forEach((s,i)=>{
                     const idx=i+1;
@@ -474,7 +482,6 @@
                 window.scrollTo({top: stepsHead.offsetTop-8, behavior:'smooth'});
             }
 
-            // Si no hay direcciones, bloquea la navegación hacia el paso 2
             const hasAddresses = HAS_ADDRESSES;
             if(hasAddresses){
                 document.getElementById('shipping_address')?.addEventListener('change', e=>{
@@ -518,7 +525,6 @@
                     const {data} = await axios.post('{{ route('checkout.place') }}', {
                         envio_id, billing: billing ? JSON.parse(billing) : null, pay_method: pay
                     });
-
                 }catch(e){
                     toastr.error('No se pudo procesar el pedido. Revisa los datos e inténtalo de nuevo.');
                     console.error(e);
@@ -530,12 +536,26 @@
                 const step = +node.dataset.step;
                 const current = [...stepsHead.querySelectorAll('.step')]
                     .findIndex(s=>s.classList.contains('active')) + 1;
-                if(step < current) go(step);   // solo permitir ir atrás con el header
+                if(step < current) go(step);
             });
 
             function val(id){ return (document.getElementById(id)?.value || '').trim(); }
         })();
 
+        /* ===================================================
+           FUNCIONES ADICIONALES: PREVIEW + RESUMEN ACTUALIZABLE
+        =================================================== */
+
+        function money(n){ return '$' + Number(n||0).toFixed(2); }
+
+        function updateSummaryByAddress(id){
+            const a = ADDRESS_MAP[id];
+            if(!a) return;
+            const subtotal = Number((document.getElementById('sum-subtotal').innerText || '0').replace(/[^0-9.]/g,''));
+            const shipping = Number(a.precio_envio || 0); // <-- usa precio_envio
+            document.getElementById('sum-shipping').innerText = money(shipping);
+            document.getElementById('sum-total').innerText    = money(subtotal + shipping);
+        }
 
         function renderAddrPreview(id){
             const box = document.getElementById('addrPreview');
@@ -545,42 +565,49 @@
                 box.innerHTML = `<div class="addr-empty muted">Selecciona una dirección para ver los detalles.</div>`;
                 return;
             }
+
+            const lines = [];
+            if(a.direccion)    lines.push(`<div class="addr-line"><strong>Dirección:</strong> ${a.direccion}</div>`);
+            if(a.pais)         lines.push(`<div class="addr-line"><strong>País:</strong> ${a.pais}</div>`);
+            if(a.departamento) lines.push(`<div class="addr-line"><strong>Departamento:</strong> ${a.departamento}</div>`);
+            if(a.municipio)    lines.push(`<div class="addr-line"><strong>Municipio:</strong> ${a.municipio}</div>`);
+            if(a.ciudad)       lines.push(`<div class="addr-line"><strong>Ciudad:</strong> ${a.ciudad}</div>`);
+            if(a.estado)       lines.push(`<div class="addr-line"><strong>Estado/Provincia:</strong> ${a.estado}</div>`);
+            if(a.zipcode)      lines.push(`<div class="addr-line"><strong>Código Postal:</strong> ${a.zipcode}</div>`);
+            if(a.telefono)     lines.push(`<div class="addr-line"><strong>Teléfono:</strong> ${a.telefono}</div>`);
+
             box.innerHTML = `
-                    <div class="addr-card">
-                      <div class="addr-title">
-                        ${a.nombre ?? ''}
-                        ${a.predeterminado === 1 ? '<span class="addr-badge">Predeterminada</span>' : ''}
-                      </div>
-                      <div class="addr-line">${a.direccion ?? ''}</div>
-                      <div class="addr-line">
-                        ${(a.ciudad ? a.ciudad+', ' : '')}${(a.estado ? a.estado+' ' : '')}${a.zipcode ?? ''}
-                      </div>
-                      ${a.telefono ? `<div class="addr-line">Tel: ${a.telefono}</div>` : ''}
-                    </div>`;
+      <div class="addr-card">
+          <div class="addr-title">
+              ${a.nombre ?? ''}
+              ${a.predeterminado === 1 ? '<span class="addr-badge">Predeterminada</span>' : ''}
+          </div>
+          ${lines.length ? lines.join('') : '<div class="addr-empty muted">Sin datos adicionales.</div>'}
+      </div>`;
         }
 
-        if(hasAddresses){
-            const sel = document.getElementById('shipping_address');
+        /* ===================================================
+           EVENTO: CAMBIO DE DIRECCIÓN
+        =================================================== */
+        document.addEventListener('DOMContentLoaded', ()=>{
+            if(!HAS_ADDRESSES) return;
+            const sel    = document.getElementById('shipping_address');
             const hidden = document.getElementById('envio_id');
+            const current = (hidden?.value || sel?.value);
 
-            // pintar al cargar
-            renderAddrPreview(hidden?.value || sel?.value);
+            if(current){
+                renderAddrPreview(current);
+                updateSummaryByAddress(current);
+            }
 
             sel?.addEventListener('change', e=>{
                 hidden.value = e.target.value;
                 renderAddrPreview(e.target.value);
+                updateSummaryByAddress(e.target.value);
             });
-
-            document.getElementById('btnToStep2')?.addEventListener('click', ()=>{
-                const v = sel.value;
-                if(!v){ toastr.error('Selecciona una dirección de envío.'); return; }
-                go(2);
-            });
-        }
-
-
-
+        });
     </script>
+
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')
