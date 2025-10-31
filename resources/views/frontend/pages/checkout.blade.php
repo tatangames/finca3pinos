@@ -591,7 +591,12 @@
     <script src="{{ asset('js/axios.min.js') }}"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
 
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+        axios.defaults.headers.common['X-CSRF-TOKEN'] =
+            document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    </script>
 
     <script>
         const PAISES_MAP = {!! json_encode(
@@ -682,18 +687,40 @@
 
             document.getElementById('btnBack2')?.addEventListener('click', ()=> go(2));
 
-            document.getElementById('btnPlaceOrder')?.addEventListener('click', async ()=>{
+            document.getElementById('btnPlaceOrder')?.addEventListener('click', async ()=> {
                 const envio_id = document.getElementById('envio_id')?.value || null;
                 const billing  = document.getElementById('bill_payload')?.value || null;
                 const pay      = document.querySelector('input[name="pay_method"]:checked')?.value || 'card';
 
-                try{
-                    const {data} = await axios.post('{{ route('checkout.place') }}', {
-                        envio_id, billing: billing ? JSON.parse(billing) : null, pay_method: pay
+                if(!envio_id){ toastr.error('Selecciona una dirección de envío.'); return; }
+
+                try {
+                    // 1) Crear orden
+                    const place = await axios.post('{{ route('checkout.place') }}', {
+                        envio_id,
+                        billing: billing ? JSON.parse(billing) : null,
+                        pay_method: pay
                     });
-                }catch(e){
-                    toastr.error('No se pudo procesar el pedido. Revisa los datos e inténtalo de nuevo.');
-                    console.error(e);
+
+                    if(!place.data?.ok || !place.data?.order_code){
+                        throw new Error('No se pudo crear la orden');
+                    }
+
+                    // 2) Crear sesión de Wompi
+                    const wompi = await axios.post('{{ route('wompi.create') }}', {
+                        order_code: place.data.order_code
+                    });
+
+                    if(!wompi.data?.ok || !wompi.data?.redirect){
+                        throw new Error('Wompi no devolvió URL de checkout');
+                    }
+
+                    // 3) Redirigir a Wompi
+                    window.location.href = wompi.data.redirect;
+
+                } catch (e) {
+                    console.error('checkout→wompi error', e?.response?.data || e);
+                    toastr.error((e?.response?.data?.msg) || 'No se pudo procesar el pedido.');
                 }
             });
 
@@ -862,53 +889,58 @@
                 if(typeof go==='function') go(2);
             });
 
-            // === Envío del pago (NO enviar PAN/CVC al backend) ===
-            // En producción, tokeniza con tu gateway (Stripe, PayPal, Wompi, etc.)
-            $('#cardForm').addEventListener('submit', async (e)=>{
+
+        })();
+    </script>
+
+
+
+    <script>
+        (() => {
+            const $ = (s)=>document.querySelector(s);
+
+            $('#cardForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-
+                // Validaciones locales mínimas (opcional)
+                const nInp = $('#cardNumber'), mmSel = $('#cardMM'), yySel = $('#cardYY'), cvcInp = $('#cardCVC');
                 const panRaw = nInp.value.replace(/\D/g,'');
-                const mm = mmSel.value, yy = yySel.value, cvc = cvcInp.value;
+                if(panRaw.length < 13){ toastr.error('Número de tarjeta inválido.'); return; }
+                if(!mmSel.value || !yySel.value){ toastr.error('Fecha inválida.'); return; }
+                if((cvcInp.value||'').length < 3){ toastr.error('CVC inválido.'); return; }
 
-                if(panRaw.length<13 || !luhn(panRaw)) { toastr.error('Número de tarjeta inválido.'); return; }
-                if(!(+mm>=1 && +mm<=12)) { toastr.error('Mes inválido.'); return; }
-                if(!yy) { toastr.error('Año inválido.'); return; }
-                if(cvc.length<3) { toastr.error('CVC inválido.'); return; }
-
-                // Solo mandamos metadata NO sensible
-                const payment = {
-                    method: 'card',
-                    brand: brandByPan(panRaw),
-                    last4: panRaw.slice(-4),
-                    holder: nameInp.value.trim(),
-                    exp: `${mm}/${yy}`,
-                    cuotas: $('#cuotasToggle').checked ? true : false
-                };
-
-                try{
+                try {
                     const envio_id = document.getElementById('envio_id')?.value || null;
                     const billing  = document.getElementById('bill_payload')?.value || null;
+                    if(!envio_id){ toastr.error('Selecciona una dirección de envío.'); return; }
 
-                    const {data} = await axios.post('{{ route('checkout.place') }}', {
+                    // 1) Crear orden
+                    const place = await axios.post('{{ route('checkout.place') }}', {
                         envio_id,
                         billing: billing ? JSON.parse(billing) : null,
-                        pay_method: 'card',
-                        payment_meta: payment
+                        pay_method: 'card'
                     });
+                    if(!place.data?.ok || !place.data?.order_code) throw new Error('No se pudo crear la orden');
 
-                    // Éxito UX
-                    Swal.fire({icon:'success', title:'Pago procesado', text:'Tu pedido ha sido creado.'});
-                    // Redirige si tu backend devuelve URL
-                    if(data?.redirect){ window.location.href = data.redirect; }
+                    // 2) Iniciar Wompi
+                    const wompi = await axios.post('{{ route('wompi.create') }}', {
+                        order_code: place.data.order_code
+                    });
+                    if(!wompi.data?.ok || !wompi.data?.redirect) throw new Error('Wompi sin redirect');
 
-                }catch(err){
+                    // 3) Ir a Wompi
+                    window.location.href = wompi.data.redirect;
+
+                } catch (err) {
                     console.error(err);
-                    Swal.fire({icon:'error', title:'No se pudo procesar el pago', text:'Intenta nuevamente.'});
+                    Swal.fire({icon:'error', title:'No se pudo iniciar el pago', text: (err?.response?.data?.msg)||'Intenta nuevamente.'});
                 }
             });
         })();
     </script>
+
+
+
 
 
 

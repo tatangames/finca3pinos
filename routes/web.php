@@ -20,11 +20,15 @@ use App\Http\Controllers\Frontend\Sistema\OrderController;
 use App\Http\Controllers\Frontend\Sistema\PasswordResetController;
 use App\Http\Controllers\Frontend\Sistema\CartController;
 use App\Http\Controllers\Frontend\Sistema\CheckoutController;
+use App\Http\Controllers\Frontend\Pagos\WompiController;
+
+
+
+
+
 
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
-
-use Illuminate\Support\Str;
 
 
 // === RUTAS ADMIN SIN AUTH ===
@@ -327,4 +331,11 @@ Route::get('/galeria/cargar', [FrontendController::class, 'cargarGaleria'])
     ->name('galeria.cargar');
 
 
+Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
 
+
+Route::prefix('pagos/wompi')->group(function () {
+    Route::post('/create', [WompiController::class, 'create'])->name('wompi.create');
+    Route::get ('/return', [WompiController::class, 'return'])->name('wompi.return');
+    Route::post('/notify', [WompiController::class, 'notify'])->name('wompi.notify');
+});
