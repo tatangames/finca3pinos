@@ -11,11 +11,18 @@ class WompiController extends Controller
 {
     protected string $api;
     protected string $auth;
+    protected array  $jsonHeaders;
 
     public function __construct()
     {
         $this->api  = rtrim(env('WOMPI_SV_API',  'https://api.wompi.sv'), '/');
         $this->auth = rtrim(env('WOMPI_SV_AUTH', 'https://id.wompi.sv/connect/token'), '/');
+
+        // cabeceras JSON base (sin Authorization; se inyecta en cada request)
+        $this->jsonHeaders = [
+            'Accept'       => 'application/json',
+            'Content-Type' => 'application/json',
+        ];
     }
 
     /** OAuth2 Client Credentials -> access_token (cacheado) */
@@ -245,33 +252,37 @@ class WompiController extends Controller
             return response()->json(['ok' => false, 'mensaje' => 'Falta idTransaccion'], 422);
         }
 
-        $url = "{$this->apiBase}/TransaccionCompra/{$id}";
-        $headers = [
-            'Accept'            => 'application/json',
-            'Content-Type'      => 'application/json',
-            'user-principal-id' => env('WOMPI_USER_PRINCIPAL_ID'),
-            'x-api-key'         => env('WOMPI_API_KEY'),
-        ];
+        $url = "{$this->api}/TransaccionCompra/{$id}";
 
         try {
-            $res = Http::withHeaders($headers)->get($url);
+            $res = Http::withHeaders($this->jsonHeaders + [
+                    'Authorization' => 'Bearer '.$this->token(), // 👈 igual que en tokenización/3DS
+                ])->get($url);
 
             Log::info('WOMPI STATUS RESP', [
                 'id'     => $id,
                 'status' => $res->status(),
-                'body'   => $res->json(), // 👈 Esto te mostrará todo el JSON
+                'body'   => $res->json(),            // 👈 log JSON completo
             ]);
 
-            $data = $res->json() ?? [];
+            // Si Wompi responde error, devuélvelo claro
+            if (!$res->ok()) {
+                $j   = $res->json() ?? [];
+                $msg = $j['mensaje']
+                    ?? (is_array($j['mensajes'] ?? null) ? implode(' | ', $j['mensajes']) : 'No se pudo consultar el estado');
+                return response()->json(['ok'=>false, 'mensaje'=>$msg, 'raw'=>$j], 422);
+            }
+
+            $data   = $res->json() ?? [];
             $estado = strtoupper($data['estado'] ?? 'DESCONOCIDO');
 
             return response()->json([
                 'ok'            => true,
                 'idTransaccion' => $data['idTransaccion'] ?? $id,
                 'estado'        => $estado,
-                'monto'         => $data['monto'] ?? null,
+                'monto'         => $data['monto']  ?? null,
                 'moneda'        => $data['moneda'] ?? null,
-                'raw'           => $data, // opcional para debug
+                'raw'           => $data, // deja esto mientras pruebas
             ]);
         } catch (\Throwable $e) {
             Log::error('WOMPI STATUS ERROR', [
@@ -279,12 +290,13 @@ class WompiController extends Controller
                 'message' => $e->getMessage(),
             ]);
             return response()->json([
-                'ok' => false,
+                'ok'      => false,
                 'mensaje' => 'Error al consultar el estado',
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
+
 
 
     /** 4) URL de retorno usada dentro del iframe/popup para cerrar tu modal */
