@@ -896,7 +896,7 @@
                     if (st === 'APROBADA') {
                         // TODO: marca orden pagada en backend / limpia carrito / redirige
                         Swal.fire({icon:'success', title:'Pago aprobado', text:`Tx ${r.data.idTransaccion}`});
-                        // location.href = "{{ route('checkout.thanks') }}";
+
                     } else if (st === 'PENDIENTE') {
                         Swal.fire({icon:'info', title:'Pago pendiente', text:'En breve confirmaremos con tu banco.'});
                     } else {
