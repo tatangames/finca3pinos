@@ -263,11 +263,5 @@ class WompiController extends Controller
         return response()->view('payments.wompi_return', compact('id','est'));
     }
 
-    /** 5) Webhook (solo log en sandbox) */
-    public function notify(Request $r)
-    {
-        $payload = $r->all();
-        Log::info('WOMPI WEBHOOK', $payload);
-        return response()->json(['ok'=>true]);
-    }
+
 }

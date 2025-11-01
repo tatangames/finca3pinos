@@ -301,11 +301,9 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::post('/wompi/3ds',       [WompiController::class, 'pay3ds'])->name('wompi.pay.3ds');
         Route::get('/wompi/tx-status',  [WompiController::class, 'txStatus'])->name('wompi.tx.status');
 
-// flujo de retorno (abre dentro del iframe o popup y hace postMessage para cerrar tu modal)
+        // flujo de retorno (abre dentro del iframe o popup y hace postMessage para cerrar tu modal)
         Route::get('/pagos/wompi/return', [WompiController::class, 'return'])->name('wompi.return');
 
-// webhook (solo loguea para pruebas)
-        Route::post('/pagos/wompi/notify', [WompiController::class, 'notify'])->name('wompi.notify');
 
 
 

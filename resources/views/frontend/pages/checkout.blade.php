@@ -875,25 +875,38 @@
                 frame.src = 'about:blank';
                 modal.style.display = 'none';
             }
+
+            window.__open3DS  = open3DS;   // <--- agrega esto
+            window.__close3DS = close3DS;  // <--- y esto
+
             btnClose?.addEventListener('click', close3DS);
 
             // Escucha el retorno (desde wompi_return.blade.php)
+            // Pon esto en tu JS del checkout (ya fuera del iframe)
             window.addEventListener('message', async (ev)=>{
                 if (!ev?.data || ev.data.type !== 'WOMPI_3DS_DONE') return;
-                close3DS();
-                // Opcional: re-consulta estado
+
+                // cierra modal / popup
+                if (window.__close3DS) window.__close3DS();
+
                 try {
-                    const st = await axios.get("{{ route('wompi.tx.status') }}", { params:{ id: ev.data.idTransaccion }});
-                    const estado = st?.data?.estado;
-                    if (estado === 'APROBADA') {
-                        Swal.fire({icon:'success', title:'Pago aprobado', text:`Transacción ${ev.data.idTransaccion}`});
+                    const r  = await axios.get("{{ route('wompi.tx.status') }}", { params:{ id: ev.data.idTransaccion }});
+                    const st = (r?.data?.estado || '').toUpperCase(); // APROBADA|DECLINADA|FALLIDA|PENDIENTE
+
+                    if (st === 'APROBADA') {
+                        // TODO: marca orden pagada en backend / limpia carrito / redirige
+                        Swal.fire({icon:'success', title:'Pago aprobado', text:`Tx ${r.data.idTransaccion}`});
+                        // location.href = "{{ route('checkout.thanks') }}";
+                    } else if (st === 'PENDIENTE') {
+                        Swal.fire({icon:'info', title:'Pago pendiente', text:'En breve confirmaremos con tu banco.'});
                     } else {
-                        toastr.error('Pago no aprobado: ' + (estado || ''));
+                        Swal.fire({icon:'error', title:'Pago no aprobado', text:`Estado: ${st || 'Desconocido'}`});
                     }
-                } catch(e) {
+                } catch (e) {
                     toastr.error('No se pudo verificar el resultado.');
                 }
             });
+
 
             // === BOTÓN Pagar (seguro / 3DS) ===
             // === BOTÓN Pagar (seguro / 3DS) ===
