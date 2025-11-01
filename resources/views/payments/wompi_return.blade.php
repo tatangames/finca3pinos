@@ -3,37 +3,68 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Procesando...</title>
+    <title>Procesando pago...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #fafafa;
+            color: #333;
+            margin: 0;
+            padding: 2rem;
+            text-align: center;
+        }
+        .wrap {
+            max-width: 480px;
+            margin: 80px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+            padding: 32px 20px;
+        }
+        h2 {
+            margin-top: 0;
+            font-weight: 600;
+            color: #2a2a2a;
+        }
+        p {
+            margin: 12px 0 0;
+            color: #666;
+        }
+        .loader {
+            margin: 24px auto;
+            border: 5px solid #eee;
+            border-top: 5px solid #d2aa6d;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+    </style>
     <script>
-        window.addEventListener('message', async (ev)=>{
-            if (!ev?.data || ev.data.type !== 'WOMPI_3DS_DONE') return;
-
-            // cierra modal/iframe o popup
-            if (window.__close3DS) window.__close3DS();
-
+        // Al cargar esta página (dentro del iframe/popup de 3DS),
+        // notifica al parent o al opener que el flujo 3DS terminó.
+        window.addEventListener('DOMContentLoaded', function() {
+            const payload = {
+                type: "WOMPI_3DS_DONE",
+                idTransaccion: "{{ $id ?? '' }}",
+                estado: "{{ $est ?? '' }}"
+            };
             try {
-                const r = await axios.get("{{ route('wompi.tx.status') }}", { params:{ id: ev.data.idTransaccion }});
-                const st = (r?.data?.estado || '').toUpperCase(); // APROBADA|DECLINADA|FALLIDA|PENDIENTE|...
-                if (st === 'APROBADA') {
-                    Swal.fire({icon:'success', title:'Pago aprobado', text:`Tx ${ev.data.idTransaccion}`});
-                    // TODO: aquí marcas orden como pagada, limpias carrito, rediriges al "gracias", etc.
-                } else if (st === 'PENDIENTE') {
-                    Swal.fire({icon:'info', title:'Pago pendiente', text:'En breve confirmaremos con tu banco.'});
-                } else {
-                    Swal.fire({icon:'error', title:'Pago no aprobado', text:`Estado: ${st || 'Desconocido'}`});
-                }
+                if (window.opener) window.opener.postMessage(payload, "*");
+                if (window.parent) window.parent.postMessage(payload, "*");
             } catch (e) {
-                toastr.error('No se pudo verificar el resultado.');
+                console.error('postMessage error', e);
             }
         });
-
     </script>
 </head>
-<body style="font-family:system-ui; text-align:center; padding:2rem">
-<h2>Procesando resultado del pago...</h2>
-<p>Puedes cerrar esta ventana.</p>
+<body>
+<div class="wrap">
+    <div class="loader"></div>
+    <h2>Procesando resultado del pago...</h2>
+    <p>Puedes cerrar esta ventana una vez completado.</p>
+</div>
 </body>
 </html>
-
-
-
