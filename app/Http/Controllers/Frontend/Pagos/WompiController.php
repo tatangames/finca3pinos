@@ -136,7 +136,7 @@ class WompiController extends Controller
         ]);
 
         // ===== total demo =====
-        $monto = (float) (session('cart_total') ?? 10.00);
+        $monto = (float) (session('cart_total') ?? 0.01);
         $monto = number_format($monto, 2, '.', ''); // "10.00"
         $order = 'F3P-'.now()->format('Ymd-His');
 
