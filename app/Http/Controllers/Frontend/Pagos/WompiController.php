@@ -168,7 +168,7 @@ class WompiController extends Controller
             ];
             $usaCrudo = true;
 
-            \Log::info('WOMPI 3DS usando CRUDO (masked)', [
+            Log::info('WOMPI 3DS usando CRUDO (masked)', [
                 'last4' => substr($pan, -4), 'mm'=>$mm, 'yy4'=>$yy4
             ]);
         } elseif (!empty($v['token'])) {
@@ -176,7 +176,7 @@ class WompiController extends Controller
                 'token' => $v['token'],
                 'cvv'   => preg_replace('/\D+/', '', $v['cvv']),
             ];
-            \Log::info('WOMPI 3DS usando TOKEN');
+            Log::info('WOMPI 3DS usando TOKEN');
         } else {
             return response()->json(['ok'=>false,'mensaje'=>'Faltan datos de tarjeta'], 422);
         }
@@ -205,7 +205,7 @@ class WompiController extends Controller
             'codigoPostal' => (string) data_get($v,'billing.codigo_postal','2201'),
         ];
 
-        \Log::info('WOMPI 3DS INPUT', [
+        Log::info('WOMPI 3DS INPUT', [
             'order'    => $order,
             'usaCrudo' => $usaCrudo,
             'idPais'   => $idPaisCode,
@@ -217,14 +217,14 @@ class WompiController extends Controller
             ]),
         ]);
 
-        $res = \Http::withHeaders([
+        $res = Http::withHeaders([
             'Accept'        => 'application/json',
             'Content-Type'  => 'application/json',
             'Authorization' => 'Bearer '.$this->token(),
         ])->post("{$this->api}/TransaccionCompra/3DS", $body);
 
         $json = $res->json();
-        \Log::info('WOMPI 3DS RESP', ['status'=>$res->status(), 'json'=>$json]);
+        Log::info('WOMPI 3DS RESP', ['status'=>$res->status(), 'json'=>$json]);
 
         if (!$res->ok()) {
             $msg = $json['mensaje'] ?? (is_array($json['mensajes'] ?? null) ? implode(' | ', $json['mensajes']) : 'No se pudo iniciar 3DS');
@@ -246,56 +246,67 @@ class WompiController extends Controller
     public function txStatus(Request $r)
     {
         $id = $r->query('id');
-
-        if (!$id) {
-            Log::warning('WOMPI STATUS llamado sin id');
-            return response()->json(['ok' => false, 'mensaje' => 'Falta idTransaccion'], 422);
-        }
+        if (!$id) return response()->json(['ok'=>false,'mensaje'=>'Falta idTransaccion'], 422);
 
         $url = "{$this->api}/TransaccionCompra/{$id}";
 
         try {
             $res = Http::withHeaders($this->jsonHeaders + [
-                    'Authorization' => 'Bearer '.$this->token(), // 👈 igual que en tokenización/3DS
+                    'Authorization' => 'Bearer '.$this->token(),
                 ])->get($url);
 
             Log::info('WOMPI STATUS RESP', [
                 'id'     => $id,
                 'status' => $res->status(),
-                'body'   => $res->json(),            // 👈 log JSON completo
+                'body'   => $res->json(),
             ]);
 
-            // Si Wompi responde error, devuélvelo claro
             if (!$res->ok()) {
                 $j   = $res->json() ?? [];
                 $msg = $j['mensaje']
                     ?? (is_array($j['mensajes'] ?? null) ? implode(' | ', $j['mensajes']) : 'No se pudo consultar el estado');
-                return response()->json(['ok'=>false, 'mensaje'=>$msg, 'raw'=>$j], 422);
+                return response()->json(['ok'=>false,'mensaje'=>$msg,'raw'=>$j], 422);
             }
 
-            $data   = $res->json() ?? [];
-            $estado = strtoupper($data['estado'] ?? 'DESCONOCIDO');
+            $j  = $res->json() ?? [];
+            $aprobada  = (bool) ($j['esAprobada'] ?? false);
+            $resultado = (string) ($j['resultadoTransaccion'] ?? '');
+            $mensaje   = (string) ($j['mensaje'] ?? '');
+            $authCode  = $j['codigoAutorizacion'] ?? null;
+
+            // Mapeo de estado legible para el front
+            $estado = $aprobada ? 'APROBADA'
+                : (stripos($resultado, 'Declinada') !== false ? 'DECLINADA'
+                    : (stripos($resultado, 'Pendiente') !== false ? 'PENDIENTE'
+                        : 'FALLIDA'));
+
+            // Texto explicativo corto
+            $detalle = $mensaje ?: (
+            $estado === 'DECLINADA' ? 'Transacción declinada por el emisor.' :
+                ($estado === 'PENDIENTE' ? 'Transacción pendiente de confirmación bancaria.' :
+                    ($estado === 'APROBADA' ? 'Pago aprobado.' : 'No fue posible completar el pago.'))
+            );
 
             return response()->json([
-                'ok'            => true,
-                'idTransaccion' => $data['idTransaccion'] ?? $id,
-                'estado'        => $estado,
-                'monto'         => $data['monto']  ?? null,
-                'moneda'        => $data['moneda'] ?? null,
-                'raw'           => $data, // deja esto mientras pruebas
+                'ok'             => true,
+                'idTransaccion'  => $j['idTransaccion'] ?? $id,
+                'estado'         => $estado,
+                'detalle'        => $detalle,                 // <-- para mostrar en el modal
+                'resultado'      => $resultado,               // info cruda por si la quieres
+                'codigoMensaje'  => $mensaje ?: null,
+                'codigoAutorizacion' => $authCode,
+                'monto'          => $j['monto']  ?? null,
+                'moneda'         => $j['moneda'] ?? null,
+                'raw'            => $j,                       // deja mientras pruebas
             ]);
         } catch (\Throwable $e) {
-            Log::error('WOMPI STATUS ERROR', [
-                'id'      => $id,
-                'message' => $e->getMessage(),
-            ]);
+            Log::error('WOMPI STATUS ERROR', ['id'=>$id, 'message'=>$e->getMessage()]);
             return response()->json([
-                'ok'      => false,
-                'mensaje' => 'Error al consultar el estado',
-                'error'   => $e->getMessage(),
+                'ok'=>false, 'mensaje'=>'Error al consultar el estado', 'error'=>$e->getMessage()
             ], 500);
         }
     }
+
 
 
 

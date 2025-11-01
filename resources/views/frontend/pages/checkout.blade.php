@@ -891,24 +891,23 @@
 
                 try {
                     const r  = await axios.get("{{ route('wompi.tx.status') }}", { params:{ id: ev.data.idTransaccion }});
-                    const st = (r?.data?.estado || '').toUpperCase(); // APROBADA|DECLINADA|FALLIDA|PENDIENTE
+                    const st = (r?.data?.estado || '').toUpperCase();
+                    const detalle = r?.data?.detalle || r?.data?.resultado || r?.data?.codigoMensaje || '';
 
                     if (st === 'APROBADA') {
-                        // TODO: marca orden pagada en backend / limpia carrito / redirige
-                        Swal.fire({icon:'success', title:'Pago aprobado', text:`Tx ${r.data.idTransaccion}`});
-
+                        Swal.fire({icon:'success', title:'Pago aprobado', html:`Tx: ${r.data.idTransaccion}<br>${detalle}`});
                     } else if (st === 'PENDIENTE') {
-                        Swal.fire({icon:'info', title:'Pago pendiente', text:'En breve confirmaremos con tu banco.'});
+                        Swal.fire({icon:'info', title:'Pago pendiente', text: detalle || 'En breve confirmaremos con tu banco.'});
                     } else {
-                        Swal.fire({icon:'error', title:'Pago no aprobado', text:`Estado: ${st || 'Desconocido'}`});
+                        Swal.fire({icon:'error', title:'Pago no aprobado', html:`Estado: ${st}<br>${detalle || ''}`});
                     }
+
                 } catch (e) {
                     toastr.error('No se pudo verificar el resultado.');
                 }
             });
 
 
-            // === BOTÓN Pagar (seguro / 3DS) ===
             // === BOTÓN Pagar (seguro / 3DS) ===
             document.getElementById('btnPlaceOrder')?.addEventListener('click', async ()=>{
                 try{
