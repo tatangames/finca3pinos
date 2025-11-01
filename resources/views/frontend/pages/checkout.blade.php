@@ -891,26 +891,58 @@
 
                 try {
                     const r  = await axios.get("{{ route('wompi.tx.status') }}", { params:{ id: ev.data.idTransaccion }});
-                    const st = (r?.data?.estado || '').toUpperCase();
+                    const st = (r?.data?.estado || '').toUpperCase(); // APROBADA|DECLINADA|FALLIDA|PENDIENTE
                     const detalle = r?.data?.detalle || r?.data?.resultado || r?.data?.codigoMensaje || '';
 
                     if (st === 'APROBADA') {
-                        Swal.fire({icon:'success', title:'Pago aprobado', html:`Tx: ${r.data.idTransaccion}<br>${detalle}`});
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pago aprobado',
+                            html: `Transacción: <b>${r.data.idTransaccion}</b><br>${detalle}`
+                        });
+
                     } else if (st === 'PENDIENTE') {
-                        Swal.fire({icon:'info', title:'Pago pendiente', text: detalle || 'En breve confirmaremos con tu banco.'});
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Pago pendiente',
+                            text: detalle || 'En breve confirmaremos con tu banco.'
+                        });
+
+                    } else if (st === 'DECLINADA') {
+                        // 👇 Tip UX: mensaje amable según lo que diga el emisor
+                        const hint = (detalle && /EMISOR|ISSUER|BANCO/i.test(detalle))
+                            ? 'Tu banco rechazó la operación. Intenta con otra tarjeta o contacta al emisor.'
+                            : 'La transacción fue declinada. Puedes intentar nuevamente o usar otro medio de pago.';
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Pago no aprobado',
+                            html: `Estado: <b>${st}</b><br>${detalle}<br><small>${hint}</small>`
+                        });
+
                     } else {
-                        Swal.fire({icon:'error', title:'Pago no aprobado', html:`Estado: ${st}<br>${detalle || ''}`});
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Pago no aprobado',
+                            html: `Estado: <b>${st}</b><br>${detalle || 'Error desconocido.'}`
+                        });
                     }
 
                 } catch (e) {
                     toastr.error('No se pudo verificar el resultado.');
                 }
+
             });
 
 
             // === BOTÓN Pagar (seguro / 3DS) ===
-            document.getElementById('btnPlaceOrder')?.addEventListener('click', async ()=>{
+            document.getElementById('btnPlaceOrder')?.addEventListener('click', async ()=> {
+                const btn = document.getElementById('btnPlaceOrder');
+                const lock = (on)=> { if(!btn) return; btn.disabled = !!on; btn.dataset.loading = on ? '1' : ''; };
+
                 try{
+                    lock(true);
+
                     const envio_id = document.getElementById('envio_id')?.value || null;
                     const billing  = document.getElementById('bill_payload')?.value || null;
                     if (!envio_id) { toastr.error('Selecciona una dirección de envío.'); return; }
@@ -922,18 +954,31 @@
                     const exp_y  = document.querySelector('#cardYY')?.value || '';
                     const cvv    = document.querySelector('#cardCVC')?.value || '';
 
-                    if (!/^\d{13,19}$/.test(number)) { toastr.error('Número de tarjeta inválido'); return; }
-                    if (!/^\d{1,2}$/.test(exp_m) || +exp_m<1 || +exp_m>12) { toastr.error('Mes inválido'); return; }
-                    if (!/^\d{4}$/.test(exp_y)) { toastr.error('Año inválido (AAAA)'); return; }
-                    if (!/^\d{3,4}$/.test(cvv)) { toastr.error('CVV inválido'); return; }
+                    if (!/^\d{13,19}$/.test(number)) { Swal.fire({icon:'error', title:'Tarjeta inválida', text:'Número de tarjeta inválido'}); return; }
+                    if (!/^\d{1,2}$/.test(exp_m) || +exp_m<1 || +exp_m>12) { Swal.fire({icon:'error', title:'Tarjeta inválida', text:'Mes inválido'}); return; }
+                    if (!/^\d{4}$/.test(exp_y)) { Swal.fire({icon:'error', title:'Tarjeta inválida', text:'Año inválido (AAAA)'}); return; }
+                    if (!/^\d{3,4}$/.test(cvv)) { Swal.fire({icon:'error', title:'Tarjeta inválida', text:'CVV inválido'}); return; }
 
-                    // (Opcional) tokeniza igual, pero 3DS usará PAN/EXP/CVV
-                    const tokRes = await axios.post("{{ route('wompi.tokenize') }}", {
-                        number, cvc: cvv, exp_m, exp_y
-                    });
-                    const token = tokRes.data?.ok ? tokRes.data.token : null;
+                    // --- TOKENIZAR (muestra Swal si falla y DETIENE el flujo) ---
+                    let token = null;
+                    try {
+                        const tokRes = await axios.post("{{ route('wompi.tokenize') }}", {
+                            number, cvc: cvv, exp_m, exp_y
+                        });
+                        if (!tokRes.data?.ok) {
+                            throw new Error(tokRes.data?.mensaje || 'Tokenización fallida');
+                        }
+                        token = tokRes.data.token;
+                    } catch (e) {
+                        // extrae mensaje amigable
+                        const d = e?.response?.data || {};
+                        const apiMsgs = Array.isArray(d?.raw?.mensajes) ? d.raw.mensajes.join(' | ') : null;
+                        const msg = d?.mensaje || apiMsgs || e?.message || 'No se pudo tokenizar la tarjeta';
+                        Swal.fire({icon:'error', title:'Tarjeta inválida', text: msg});
+                        return; // 👈 no continúes a 3DS
+                    }
 
-                    // Iniciar 3DS – enviamos crudo + (token por si tuvieras futuro uso)
+                    // Iniciar 3DS – enviamos crudo + (token por si lo quieres usar luego)
                     const pay = await axios.post("{{ route('wompi.pay.3ds') }}", {
                         token,
                         numero: number,
@@ -951,14 +996,20 @@
                     } else if (pay?.data?.ok) {
                         Swal.fire({icon:'success', title:'Pago aprobado', text:`Transacción ${pay.data.idTransaccion||''}`});
                     } else {
-                        toastr.error(pay?.data?.mensaje || 'No se pudo iniciar el pago');
+                        const msg = pay?.data?.mensaje || 'No se pudo iniciar el pago';
+                        Swal.fire({icon:'error', title:'No se pudo iniciar el pago', text: msg});
                     }
+
                 } catch(e){
-                    const msg = e?.response?.data?.mensaje || e?.message || 'Error al procesar el pago';
+                    const d = e?.response?.data || {};
+                    const msg = d?.mensaje || e?.message || 'Error al procesar el pago';
                     console.error('WOMPI 3DS ERROR', e);
-                    toastr.error(msg);
+                    Swal.fire({icon:'error', title:'Error', text: msg});
+                } finally {
+                    lock(false);
                 }
             });
+
 
         })();
     </script>

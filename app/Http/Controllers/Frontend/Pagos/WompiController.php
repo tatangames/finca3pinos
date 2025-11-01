@@ -100,8 +100,11 @@ class WompiController extends Controller
         ])->post("{$this->api}/Tokenizacion", $payload);
 
         if (!$res->ok()) {
-            Log::error('WOMPI tokenization FAIL', ['status'=>$res->status(), 'body'=>$res->json()]);
-            return response()->json(['ok'=>false, 'mensaje'=>$res->json('mensaje') ?? 'Error tokenizando'], 422);
+            $err = $res->json() ?? [];
+            $msg = $err['mensaje']
+                ?? (is_array($err['mensajes'] ?? null) ? implode(' | ', $err['mensajes']) : 'Error tokenizando');
+            Log::error('WOMPI tokenization FAIL', ['status'=>$res->status(), 'body'=>$err]);
+            return response()->json(['ok'=>false, 'mensaje'=>$msg, 'raw'=>$err], 422);
         }
 
         $j = $res->json();
