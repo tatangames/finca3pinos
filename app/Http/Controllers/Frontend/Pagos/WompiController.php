@@ -239,18 +239,53 @@ class WompiController extends Controller
     public function txStatus(Request $r)
     {
         $id = $r->query('id');
-        if (!$id) return response()->json(['estado'=>'DESCONOCIDO']);
 
-        $res = Http::withHeaders([
-            'Accept'        => 'application/json',
-            'Authorization' => 'Bearer '.$this->token(),
-        ])->get("{$this->api}/TransaccionCompra/{$id}");
+        if (!$id) {
+            Log::warning('WOMPI STATUS llamado sin id');
+            return response()->json(['ok' => false, 'mensaje' => 'Falta idTransaccion'], 422);
+        }
 
-        $json = $res->json();
-        Log::info('WOMPI STATUS', ['id'=>$id, 'resp'=>$json]);
+        $url = "{$this->apiBase}/TransaccionCompra/{$id}";
+        $headers = [
+            'Accept'            => 'application/json',
+            'Content-Type'      => 'application/json',
+            'user-principal-id' => env('WOMPI_USER_PRINCIPAL_ID'),
+            'x-api-key'         => env('WOMPI_API_KEY'),
+        ];
 
-        return response()->json($json ?: ['estado'=>'DESCONOCIDO']);
+        try {
+            $res = Http::withHeaders($headers)->get($url);
+
+            Log::info('WOMPI STATUS RESP', [
+                'id'     => $id,
+                'status' => $res->status(),
+                'body'   => $res->json(), // 👈 Esto te mostrará todo el JSON
+            ]);
+
+            $data = $res->json() ?? [];
+            $estado = strtoupper($data['estado'] ?? 'DESCONOCIDO');
+
+            return response()->json([
+                'ok'            => true,
+                'idTransaccion' => $data['idTransaccion'] ?? $id,
+                'estado'        => $estado,
+                'monto'         => $data['monto'] ?? null,
+                'moneda'        => $data['moneda'] ?? null,
+                'raw'           => $data, // opcional para debug
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('WOMPI STATUS ERROR', [
+                'id'      => $id,
+                'message' => $e->getMessage(),
+            ]);
+            return response()->json([
+                'ok' => false,
+                'mensaje' => 'Error al consultar el estado',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
+
 
     /** 4) URL de retorno usada dentro del iframe/popup para cerrar tu modal */
     public function return(Request $r)
