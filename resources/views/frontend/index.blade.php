@@ -5,8 +5,6 @@
 @section('content')
 
     <style>
-
-
         .hero-geisha {
             --bg-dark: #0d0d0d;
             --text-light: #f4f4f4;
@@ -512,7 +510,6 @@
 
     </style>
 
-
     <div class="container">
         <!-- Content -->
         <div class="margin-disabled">
@@ -527,11 +524,8 @@
                                     <div class="vc_column-inner">
                                         <div class="wpb_wrapper">
                                             <div class="es-resp">
-
                                                 <div class="hidden-xl hidden-lg hidden-md hidden-xs"
                                                      style="height: 64px;"></div>
-
-
                                             </div>
                                             <div id="like_sc_sliders_87130229">
                                                 <div class="slider-sc swiper-container" data-autoplay="4000"
@@ -554,11 +548,13 @@
                                                                         </p>
                                                                         <div class="btn-group">
                                                                             <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(),
-                                                                    route('user.ourcoffee', [], false)) }}" class="btn btn-primary"
+                                                                    route('user.ourcoffee', [], false)) }}"
+                                                                               class="btn btn-primary"
                                                                                style="color: white">{{ __('meta.coffee_v6') }}</a>
 
 
-                                                                            <a href="#productos"
+                                                                            <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(),
+                                                                    route('user.products', [], false)) }}"
                                                                                class="btn btn-primary js-scroll"
                                                                                style="color:white">
                                                                                 {{ __('meta.coffee_v5') }}
@@ -570,8 +566,7 @@
                                                                         <img
                                                                             src="{{ asset('images/presentacion1.jpg') }}"
 
-
-                                                                            alt="Café Geisha Finca 3 Pinos"
+                                                                            alt="{{ __('meta.title') }}"
                                                                             loading="lazy"
                                                                             decoding="async"
                                                                         /></div>

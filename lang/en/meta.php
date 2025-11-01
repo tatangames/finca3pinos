@@ -234,6 +234,10 @@ return [
     'added_to_cart' => 'Added to cart',
     'could_not_add_tocart' => 'Could not add to cart',
     'your_cart_empty' => 'Your cart is empty',
+    'message_is_required' => 'Message is required.',
+    'msg_not_send' => 'We couldn’t process your request at this time.'
+
+
 
 
 

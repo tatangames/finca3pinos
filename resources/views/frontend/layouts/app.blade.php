@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="es-SV">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
@@ -10,6 +10,8 @@
 
     <style>img:is([sizes="auto" i], [sizes^="auto," i]) { contain-intrinsic-size: 3000px 1500px }</style>
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
+
+    <meta http-equiv="content-language" content="es-SV">
 
     {{-- Core & Theme CSS --}}
     <link rel="stylesheet" id="dashicons-css" href="{{ asset('frontend/css/dashicons.min.css') }}" media="all">
@@ -106,7 +108,6 @@
 <script type="text/javascript" src="{{ asset('frontend/js/pace.js') }}" id="pace-js"></script>
 <script type="text/javascript" src="{{ asset('frontend/js/js_composer_front.min.js') }}" id="wpb_composer_front_js-js"></script>
 <script type="text/javascript" src="{{ asset('frontend/js/vc-waypoints.min.js') }}" id="vc_waypoints-js"></script>
-<script type="text/javascript" src="{{ asset('frontend/js/skrollr.min.js') }}" id="vc_jquery_skrollr_js-js"></script>
 
 
 @stack('scripts')

@@ -8,8 +8,11 @@ use App\Models\Categoria;
 use App\Models\Galeria;
 use App\Models\Producto;
 use App\Models\ProductosPresentacion;
+use App\Models\RegistroContactos;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -20,11 +23,14 @@ use Illuminate\Support\Facades\Cache;
 
 class FrontendController extends Controller
 {
+
+    // vista principal
     public function vistaIndex()
     {
         return view('frontend.index');
     }
 
+    // vista nuestro cafe
     public function vistaOurCoffee(){
 
         return view('frontend.pages.ourcoffee', [
@@ -32,15 +38,13 @@ class FrontendController extends Controller
         ]);
     }
 
-
-
+    // vista galeria
     public function vistaGallery()
     {
         $limitFirst = 24;
 
         $arrayGaleria = Galeria::where('activo', 1)
             ->orderBy('posicion', 'ASC')
-            //->orderBy('id', 'ASC')
             ->take($limitFirst)
             ->get()
             ->map(function ($item) {
@@ -56,11 +60,11 @@ class FrontendController extends Controller
         $lastPos = $last?->posicion ?? 0;
         $lastId  = $last?->id ?? 0;
 
-
         return view('frontend.pages.gallery', compact('arrayGaleria', 'limitFirst', 'lastPos', 'lastId'));
     }
 
 
+    // cargar galeria por scroll
     public function cargarGaleria(Request $request)
     {
         abort_unless($request->ajax(), 403);
@@ -105,12 +109,14 @@ class FrontendController extends Controller
         ]);
     }
 
+
+    // vista contacto
     public function vistaContact(){
         return view('frontend.pages.contact');
     }
 
-
-    public function send(Request $request)
+    // envio de informacion de contacto
+    public function enviarInformacionContacto(Request $request)
     {
         $rules = [
             'name'    => ['required', 'string', 'max:100'],
@@ -119,9 +125,9 @@ class FrontendController extends Controller
         ];
 
         $attributes = [
-            'name'    => __('meta.contact_v5'),
-            'email'   => __('meta.contact_v6'),
-            'message' => __('meta.contact_v7'),
+            'name'    => __('meta.name_required'),
+            'email'   => __('meta.contact_v12'),
+            'message' => __('meta.message_is_required'),
         ];
 
         $validator = Validator::make($request->all(), $rules, [], $attributes);
@@ -141,23 +147,31 @@ class FrontendController extends Controller
         ];
 
         try {
-            // ✅ Envía el correo a tu Gmail (por ejemplo)
-           // Mail::to('tatangamess@gmail.com')->send(new ContactMail($data));
+            // 1️⃣ Guardar el contacto en la base de datos
+            DB::transaction(function () use ($data) {
+                RegistroContactos::create([
+                    'fecha'   => now('America/El_Salvador'),
+                    'nombre'  => $data['name'],
+                    'correo'  => $data['email'],
+                    'mensaje' => $data['message'],
+                ]);
+            });
 
-            return response()->json([
-                'ok'      => true,
-                'message' => __('meta.contact_ok'),
+            // 2️⃣ Enviar correo (sin afterCommit)
+            Mail::to('tatangamess@gmail.com')->queue(new ContactMail($data));
+
+           return ['success' => 1];
+
+        } catch (\Throwable $e) {
+            Log::error('Contacto: error al guardar o encolar email', [
+                'msg' => $e->getMessage(),
             ]);
-        } catch (\Exception $e) {
-            // ✅ En caso de error, puedes registrar el fallo
-            Log::error('Error al enviar correo: ' . $e->getMessage());
 
-            return response()->json([
-                'ok'      => false,
-                'message' => 'No se pudo enviar el correo. Intente más tarde.',
-            ], 500);
+            return ['success' => 99];
         }
     }
+
+
 
     function limitarTexto($texto, $limite = 80) {
         return strlen($texto) > $limite ? substr($texto, 0, $limite) . '...' : $texto;

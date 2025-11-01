@@ -4,7 +4,12 @@
 
 @section('content')
 
+
     <style>
+
+        /* ============================================================
+   FORMULARIO DE CONTACTO — FINCA 3 PINOS
+   ============================================================ */
 
         /* ---- Quita fondo/padding del wrapper de CF7 ---- */
         #like_sc_contact_form_7_122453212,
@@ -17,7 +22,7 @@
             padding: 0 !important;
         }
 
-        /* WPBakery custom bg que suele meter gris */
+        /* WPBakery custom bg */
         #like_sc_contact_form_7_122453212 .vc_custom_1505582392596 {
             background: transparent !important;
             padding: 0 !important;
@@ -25,14 +30,17 @@
         }
 
         /* =========================
-           Card principal del formulario
+           CARD PRINCIPAL DEL FORMULARIO
            ========================= */
         .contact-card {
             background: #ffffff;
             border-radius: 16px;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-            padding: 22px;
+            padding: 26px;
             overflow: hidden;
+            font-size: 16.5px;
+            line-height: 1.6;
+            letter-spacing: 0.35px;
         }
 
         /* Limpia fondos de envoltorios CF7 */
@@ -44,17 +52,28 @@
         }
 
         /* =========================
-           Tipografía base inputs
+           TIPOGRAFÍA BASE INPUTS
            ========================= */
         .contact-card .wpcf7-form-control {
-            font-weight: 400 !important;    /* quita negrita */
+            font-weight: 400 !important;
             font-family: "Roboto", system-ui, -apple-system, Segoe UI, Arial, sans-serif;
             color: #333;
             letter-spacing: 0.2px;
         }
 
         /* =========================
-           Inputs y Textareas
+           LABELS DE CAMPOS
+           ========================= */
+        .contact-card label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700; /* títulos de campo bold */
+            color: #222;
+            letter-spacing: 0.25px;
+        }
+
+        /* =========================
+           INPUTS Y TEXTAREAS
            ========================= */
         .contact-card input[type="text"],
         .contact-card input[type="email"],
@@ -63,9 +82,10 @@
             background: #fafafa;
             border: 1px solid rgba(0, 0, 0, 0.12);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 13px 14px;
             outline: none;
-            font-size: 15px;
+            font-size: 16px;
+            line-height: 1.45;
             transition: all 0.2s ease;
         }
 
@@ -76,7 +96,7 @@
             font-weight: 400;
         }
 
-        /* Forzar minúsculas en email sin inline */
+        /* Forzar minúsculas en email */
         #correo-form {
             text-transform: lowercase;
         }
@@ -92,11 +112,11 @@
 
         /* Ajuste textarea */
         .contact-card textarea {
-            min-height: 160px;
+            min-height: 190px;
             resize: vertical;
         }
 
-        /* Autofill (Chrome) */
+        /* Autofill Chrome */
         .contact-card input:-webkit-autofill,
         .contact-card textarea:-webkit-autofill {
             -webkit-box-shadow: 0 0 0 1000px #fff inset;
@@ -105,32 +125,40 @@
         }
 
         /* =========================
-           Botón Enviar (aplica a submit y button)
+           BOTÓN ENVIAR
            ========================= */
         .contact-card input[type="submit"],
         .contact-card input[type="button"],
-        .contact-card .wpcf7-submit {
+        .contact-card .wpcf7-submit,
+        #btn-enviar {
             background: #c6a471 !important;
             color: #fff !important;
             border: none !important;
             font-weight: 700 !important;
-            padding: 12px 28px !important;
+            padding: 14px 32px !important;
             border-radius: 10px !important;
             cursor: pointer !important;
             transition: all 0.25s ease !important;
             display: inline-block !important;
+            font-size: 16px;
         }
 
         .contact-card input[type="submit"]:hover,
         .contact-card input[type="button"]:hover,
-        .contact-card .wpcf7-submit:hover {
+        .contact-card .wpcf7-submit:hover,
+        #btn-enviar:hover {
             background: #b8935e !important;
             transform: translateY(-2px);
             box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
         }
 
+        #btn-enviar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         /* =========================
-           Mensaje de éxito / error CF7
+           MENSAJE DE ÉXITO / ERROR CF7
            ========================= */
         .contact-card .wpcf7-response-output {
             margin: 14px 0 0 !important;
@@ -140,12 +168,12 @@
         }
 
         /* =========================
-           Distribución dos columnas
+           DISTRIBUCIÓN DOS COLUMNAS
            ========================= */
         .contact-two-col {
             display: grid !important;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 24px;
             align-items: stretch;
         }
 
@@ -168,7 +196,7 @@
         }
 
         /* =========================
-           Social / Íconos de contacto
+           SOCIAL / ÍCONOS DE CONTACTO
            ========================= */
         .contact-card .fa {
             color: #d2aa6d;
@@ -191,7 +219,7 @@
         }
 
         /* =========================
-           Mini botones redes
+           MINI BOTONES REDES
            ========================= */
         .contact-card .social-cta {
             display: flex;
@@ -226,7 +254,7 @@
         .contact-card .social-cta .tt .tt-ico { width: 16px; height: 16px; fill: #111; }
 
         /* =========================
-           Acciones
+           ACCIONES
            ========================= */
         .contact-card__actions {
             margin-top: 10px;
@@ -235,14 +263,17 @@
         }
 
         /* =========================
-           Errores de campo
+           ERRORES DE CAMPO (NO BOLD)
            ========================= */
         .field-error {
-            color: #d93025;
-            font-size: .85rem;
+            color: #e60000 !important; /* rojo brillante */
+            font-weight: 400 !important;
             margin-top: 6px;
+            font-size: 0.9rem;
             line-height: 1.3;
+            letter-spacing: .2px;
         }
+
         .field-error:empty { display: none; }
 
         .is-invalid {
@@ -251,40 +282,24 @@
         }
 
         /* =========================
-           Contador de caracteres
+           CONTADOR DE CARACTERES
            ========================= */
         .char-counter {
-            font-size: .85rem;
+            font-size: .9rem;
             text-align: right;
             opacity: .85;
-            margin-top: 4px;
+            margin-top: 6px;
+            letter-spacing: .25px;
         }
         .char-counter.warning { color: #c77d00; }
         .char-counter.danger  { color: #d93025; }
 
-        /* Reafirmar bordes/colores del form */
-        #contact-form input[type="text"],
-        #contact-form input[type="email"],
-        #contact-form textarea {
-            border: 1px solid rgba(0,0,0,0.12);
-            background: #fafafa;
-            transition: all 0.2s ease;
-        }
-
-        #contact-form input:focus,
-        #contact-form textarea:focus {
-            border-color: #c6a471;
-            background: #fff;
-        }
-
-        #btn-enviar:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
+        /* =========================
+           SPINNER / ESTADO DE ENVÍO
+           ========================= */
         .spinner {
-            border: 3px solid #f3f3f3;         /* gris claro */
-            border-top: 3px solid #d2aa6d;     /* dorado marca */
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #d2aa6d;
             border-radius: 50%;
             width: 16px;
             height: 16px;
@@ -293,7 +308,6 @@
             vertical-align: middle;
             margin-right: 8px;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -304,8 +318,9 @@
             cursor: not-allowed;
         }
 
-
-
+        /* =========================
+           SOCIAL LIST (PARTE IZQUIERDA)
+           ========================= */
         .social-list {
             display: flex;
             gap: 10px;
@@ -340,6 +355,9 @@
 
 
     </style>
+
+
+
 
     <header class="page-header like-parallax"
             style="background-image: url('{{ asset('images/inner_parallax.jpg') }}');
@@ -444,7 +462,7 @@
                                                         <!-- CARD CONTACT -->
                                                         <section class="contact-card">
 
-                                                            <form id="contact-form">
+                                                            <form id="contact-form" style="background: white">
                                                                 @csrf
 
                                                                 <p>
@@ -459,7 +477,7 @@
                                                                 </p>
 
                                                                 <p>
-                                                                    <label>{{ __('meta.contact_v6') }}<br>
+                                                                    <label>{{ __('meta.email_address') }}<br>
                                                                         <input size="40" maxlength="100"
                                                                                id="correo-form"
                                                                                class="wpcf7-form-control wpcf7-email wpcf7-validates-as-required wpcf7-text wpcf7-validates-as-email"
@@ -478,11 +496,12 @@
                                                                                   class="wpcf7-form-control wpcf7-textarea"
                                                                         ></textarea>
                                                                     </label>
-                                                                <div class="char-counter"><span id="msg-count">0</span>/2000
-                                                                </div>
+
                                                                 <label class="field-error"
                                                                        data-error-for="your-message"></label>
                                                                 </p>
+                                                                <div class="char-counter"><span id="msg-count">0</span>/2000
+                                                                </div>
 
                                                                 <p class="contact-card__actions">
                                                                     <button type="button"
@@ -521,15 +540,16 @@
                                 </div>
                             </section>
                             <div class="vc_row-full-width vc_clearfix"></div>
-
                         </div>
                     </article>
                 </div>
-
             </div>
         </div>
-
     </div>
+
+
+
+
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}"></script>
@@ -576,31 +596,36 @@
             let msgCampoRequerido = "";
             let msgCorreoNoValido = "";
             let msgEnviado = "";
+            let msgNoEnviado = "";
 
             switch (currentLocale) {
                 case 'sv':
                     msgCampoRequerido = "{{ __('meta.contact_v9') }}"; // 'Campo requerido' en sv
                     msgCorreoNoValido = "{{ __('meta.contact_v10') }}"; // 'Correo no válido' en sv
                     msgEnviado = "{{ __('meta.contact_v11') }}";
+                    msgNoEnviado = "{{ __('meta.msg_not_send') }}";
                     break;
                 case 'en':
                     msgCampoRequerido = "{{ __('meta.contact_v9', [], 'en') }}";
                     msgCorreoNoValido = "{{ __('meta.contact_v10', [], 'en') }}";
                     msgEnviado = "{{ __('meta.contact_v11', [], 'en') }}";
+                    msgNoEnviado = "{{ __('meta.msg_not_send') }}";
                     break;
                 case 'ko':
                     msgCampoRequerido = "{{ __('meta.contact_v9', [], 'ko') }}";
                     msgCorreoNoValido = "{{ __('meta.contact_v10', [], 'ko') }}";
                     msgEnviado = "{{ __('meta.contact_v11', [], 'ko') }}";
+                    msgNoEnviado = "{{ __('meta.msg_not_send') }}";
                     break;
                 default: // español u otro
                     msgCampoRequerido = "{{ __('meta.contact_v9', [], 'es') }}";
                     msgCorreoNoValido = "{{ __('meta.contact_v10', [], 'es') }}";
-                    msgEnviado = "{{ __('meta.contact_v11', [], 'es') }}";
+                    msgEnviado = "{{ __('meta.contact_v11', [], 'es') }}"; // correo enviado
+                    msgNoEnviado = "{{ __('meta.msg_not_send') }}";
                     break;
             }
 
-            return { msgCampoRequerido, msgCorreoNoValido, msgEnviado };
+            return { msgCampoRequerido, msgCorreoNoValido, msgEnviado, msgNoEnviado };
         }
 
         function enviarFormulario() {
@@ -617,7 +642,7 @@
             errorEmail.textContent = '';
             errorMsg.textContent   = '';
 
-            const { msgCampoRequerido, msgCorreoNoValido, msgEnviado } = getContactMessages();
+            const { msgCampoRequerido, msgCorreoNoValido, msgEnviado, msgNoEnviado } = getContactMessages();
 
             let valido = true;
 
@@ -677,12 +702,15 @@
             // Enviar con Axios
             axios.post('{{ route('contact.send') }}', data)
                 .then(response => {
-                    if (response.data.ok) {
+                    if (response.data.success === 1) {
                         nameInput.value = '';
                         emailInput.value = '';
                         msgInput.value = '';
 
                         mensajeEnviado(msgEnviado)
+                    }else{
+                        // error: intentar de nuevo
+                        mensajeNoEnviado(msgNoEnviado)
                     }
                 })
                 .catch(error => {
@@ -691,7 +719,6 @@
                         if (errores.name)    showError(errorName, errores.name[0]);
                         if (errores.email)   showError(errorEmail, errores.email[0]);
                         if (errores.message) showError(errorMsg, errores.message[0]);
-
                     }
                 })
                 .finally(() => {
@@ -706,11 +733,23 @@
             Swal.fire({
                 position: "top-end",
                 icon: "success",
-                title: mensaje,
+                title: mensaje, // dice: correo enviado
                 showConfirmButton: false,
                 timer: 1500
             });
         }
+
+        function mensajeNoEnviado(mensaje){
+
+            Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: mensaje, // dice: correo enviado
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
 
     </script>
 

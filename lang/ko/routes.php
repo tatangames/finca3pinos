@@ -22,9 +22,13 @@ return [
     'updatebilling' => 'update-billing',
     'cart' => 'cart',
 
-
     'checkout' => 'checkout',                // GET
     'checkout_post' => 'checkout',           // POST (misma URL)
     'thanks' => 'thanks/{order}',            // página de gracias
+
+
+    'message_is_required' => '메시지는 필수 항목입니다.',
+
+
 
 ];

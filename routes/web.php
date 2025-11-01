@@ -200,20 +200,24 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
         Route::get('/', [FrontendController::class, 'vistaIndex'])->name('user.index');
 
-
+        // vista nuestra cafe
         Route::get(LaravelLocalization::transRoute('routes.our_coffee'), [FrontendController::class, 'vistaOurCoffee'])
             ->name('user.ourcoffee');
 
+        // vista productos
         Route::get(LaravelLocalization::transRoute('routes.products'), [FrontendController::class, 'vistaProducts'])
             ->name('user.products');
 
+        // vista galeria
         Route::get(LaravelLocalization::transRoute('routes.gallery'), [FrontendController::class, 'vistaGallery'])
             ->name('user.gallery');
 
+        // vista contacto
         Route::get(LaravelLocalization::transRoute('routes.contact'), [FrontendController::class, 'vistaContact'])
             ->name('user.contact');
 
-        Route::post(LaravelLocalization::transRoute('routes.contact'), [FrontendController::class, 'send'])
+        // envio de contacto
+        Route::post(LaravelLocalization::transRoute('routes.contact'), [FrontendController::class, 'enviarInformacionContacto'])
             ->name('contact.send');
 
         Route::get(LaravelLocalization::transRoute('routes.login'), [UsuarioAuthController::class, 'showLoginFormUsuario'])
