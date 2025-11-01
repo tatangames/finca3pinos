@@ -353,11 +353,7 @@
             object-fit: contain;
         }
 
-
     </style>
-
-
-
 
     <header class="page-header like-parallax"
             style="background-image: url('{{ asset('images/inner_parallax.jpg') }}');
@@ -407,12 +403,12 @@
                                                     <ul class="social-icons-list   vc_custom_1581347997161 icon-weight-bold"
                                                         id="like_sc_header_424390489">
                                                         <li class=""><span class="fa fa-phone"></span><span
-                                                                class="head">(+503) 7620-6851</span></li>
+                                                                class="head" style="font-weight: 300">(+503) 7620-6851</span></li>
                                                         <li class=""><span class="fa fa-envelope"></span><span
-                                                                class="head" style="text-transform: lowercase">info@finca3pinos.com</span>
+                                                                class="head" style="text-transform: lowercase; font-weight: 300">info@finca3pinos.com</span>
                                                         </li>
                                                         <li class=""><span class="fa fa-map-marker"></span><span
-                                                                class="head">{{ __('meta.contact_v3') }}</span>
+                                                                class="head" style="font-weight: 300; ">{{ __('meta.contact_v3') }}</span>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -547,9 +543,6 @@
         </div>
     </div>
 
-
-
-
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}"></script>
@@ -557,7 +550,6 @@
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
 
     <script>
-
 
         document.addEventListener("DOMContentLoaded", function () {
             const textarea = document.getElementById("mensaje-form");
