@@ -3,198 +3,271 @@
 namespace App\Http\Controllers\Frontend\Pagos;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Models\OrderPayment;
-use App\Services\WompiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Validator;
+
 class WompiController extends Controller
 {
+    protected string $api;
+    protected string $auth;
 
-    public function __construct(private WompiService $wompi){}
-
-    public function create(Request $request)
+    public function __construct()
     {
-        // ===== 1) Log de entrada + validación clara =====
-        Log::info('wompi.create INPUT', [
-            'payload' => $request->all(),
-            'ip'      => $request->ip(),
-        ]);
+        $this->api  = rtrim(env('WOMPI_SV_API',  'https://api.wompi.sv'), '/');
+        $this->auth = rtrim(env('WOMPI_SV_AUTH', 'https://id.wompi.sv/connect/token'), '/');
+    }
 
-        $v = Validator::make($request->all(), [
-            'order_code'  => ['required', 'string', 'max:60', 'exists:orders,code'],
-            'description' => ['nullable', 'string', 'max:255'],
-            'customer'    => ['nullable', 'array'], // si lo mandas, que sea objeto/array real
-        ], [
-            'order_code.required' => 'Falta el código de la orden.',
-            'order_code.exists'   => 'La orden no existe.',
-        ]);
-
-        if ($v->fails()) {
-            return response()->json([
-                'ok'     => false,
-                'why'    => 'validation',
-                'errors' => $v->errors(),
-            ], 422);
+    /** OAuth2 Client Credentials -> access_token (cacheado) */
+    protected function token(): string
+    {
+        $cacheKey = 'wompi_access_token';
+        if (cache()->has($cacheKey)) {
+            return (string) cache()->get($cacheKey);
         }
 
-        $data  = $v->validated();
-        $order = Order::where('code', $data['order_code'])->with(['shippingAddress', 'billingAddress', 'user'])->firstOrFail();
+        $res = Http::asForm()->post($this->auth, [
+            'grant_type'    => 'client_credentials',
+            'audience'      => 'wompi_api',
+            'client_id'     => env('WOMPI_APP_ID'),
+            'client_secret' => env('WOMPI_SECRET'),
+        ]);
 
-        // ===== 2) Monto desde la BD (seguro). Ajusta centavos según tu Wompi =====
-        $useCents     = true; // <-- pon false si tu integración NO usa centavos
-        $amountCents  = (int) round($order->grand_total * 100);
-        $amountForApi = $useCents ? $amountCents : (float) $order->grand_total;
+        if (!$res->ok()) {
+            Log::error('WOMPI OAuth error', ['status'=>$res->status(), 'body'=>$res->json()]);
+            abort(500, 'No se pudo autenticar con Wompi');
+        }
 
-        // ===== 3) Datos de contexto =====
-        $description = $data['description'] ?? ('Orden '.$order->code);
-        $customer    = $data['customer'] ?? [
-            'name'  => optional($order->billingAddress)->name
-                ?? optional($order->shippingAddress)->name
-                    ?? optional($order->user)->name,
-            'email' => optional($order->user)->email,
-            'phone' => optional($order->shippingAddress)->phone,
+        $access = (string) $res->json('access_token');
+        $ttl    = max(60, ((int) $res->json('expires_in', 3600)) - 60);
+        cache()->put($cacheKey, $access, $ttl);
+
+        return $access;
+    }
+
+    /** 1) TOKENIZACIÓN: recibe PAN/CVC/exp del browser, llama a Wompi y devuelve token */
+    public function tokenize(Request $r)
+    {
+        $v = $r->validate([
+            'number' => ['required','string'],
+            'cvc'    => ['required','string','max:4'],
+            'exp_m'  => ['required','string'],
+            'exp_y'  => ['required','string'],
+        ]);
+
+        // VALIDACIÓN + NORMALIZACIÓN
+        $pan = preg_replace('/\D+/', '', (string) $v['number']); // solo dígitos
+        $mm  = (string) $v['exp_m'];
+        $yy4 = preg_replace('/\D+/', '', (string) $v['exp_y']); // debe ser AAAA
+
+        if (strlen($pan) < 13 || strlen($pan) > 19) {
+            return response()->json(['ok'=>false,'mensaje'=>'Número de tarjeta inválido'], 422);
+        }
+        if (!preg_match('/^\d{1,2}$/', $mm) || (int)$mm < 1 || (int)$mm > 12) {
+            return response()->json(['ok'=>false,'mensaje'=>'Mes de vencimiento inválido'], 422);
+        }
+        if (!preg_match('/^\d{4}$/', $yy4)) {
+            return response()->json(['ok'=>false,'mensaje'=>'El año de vencimiento debe tener 4 dígitos (AAAA)'], 422);
+        }
+        $mm2 = str_pad($mm, 2, '0', STR_PAD_LEFT);
+        $cvv = preg_replace('/\D+/', '', (string) $v['cvc']);
+
+        // PAYLOAD EXACTO QUE ESPERA WOMPI (sin guiones y con AAAA)
+        $payload = [
+            'numeroTarjeta'   => $pan,
+            'cvv'             => $cvv,
+            'mesVencimiento'  => (int) $mm2,   // pueden aceptar numérico; si prefieres string usa $mm2
+            'anioVencimiento' => (int) $yy4,   // **AÑO EN 4 DÍGITOS**
         ];
 
-        // ===== 4) Llamada a Wompi (usa tu servicio) =====
-        try {
-            $res = $this->wompi->createCheckout([
-                'order_id'    => $order->code,           // referencia interna
-                'amount'      => $amountForApi,          // int (centavos) o decimal según $useCents
-                'currency'    => $order->currency,       // 'USD' / 'COP' / etc.
-                'description' => $description,
-                'customer'    => $customer,
-                'return_url'  => config('wompi.return'),
-                'notify_url'  => config('wompi.notify'),
-            ]);
-        } catch (\Throwable $e) {
-            Log::error('Wompi create exception', ['order' => $order->code, 'ex' => $e->getMessage()]);
-            return response()->json([
-                'ok'  => false,
-                'why' => 'exception',
-                'msg' => 'No se pudo contactar a Wompi.',
-            ], 502);
-        }
-
-        if (empty($res) || empty($res['ok'])) {
-            Log::error('Wompi create error (sin ok)', ['order' => $order->code, 'res' => $res]);
-            return response()->json([
-                'ok'  => false,
-                'why' => 'wompi',
-                'msg' => 'No se pudo iniciar el pago con Wompi.',
-            ], 502);
-        }
-
-        if (empty($res['redirect_url']) || empty($res['session_id'])) {
-            Log::error('Wompi create error (faltan campos)', ['order' => $order->code, 'res' => $res]);
-            return response()->json([
-                'ok'  => false,
-                'why' => 'wompi_payload',
-                'msg' => 'Respuesta inválida de Wompi.',
-            ], 502);
-        }
-
-        // ===== 5) Registrar intento de pago =====
-        OrderPayment::create([
-            'order_id'         => $order->id,
-            'gateway'          => 'wompi',
-            'gateway_env'      => config('wompi.env'),
-            'method'           => 'card',
-            'status'           => 'initiated',
-            'amount'           => $order->grand_total,            // en tu DB lo guardas legible (no centavos)
-            'currency'         => $order->currency,
-            'token'            => $res['session_id'],
-            'request_payload'  => $res['raw'] ?? null,            // si tu servicio guarda raw
-            'response_payload' => $res['raw'] ?? null,
+        Log::info('WOMPI tokenization INPUT (masked)', [
+            'pan_last4' => substr($pan, -4),
+            'mm' => $mm2,
+            'yy4'=> $yy4,
         ]);
 
-        // ===== 6) Marcar orden como pendiente de pago =====
-        $order->update([
-            'pay_gateway' => 'wompi',
-            'pay_token'   => $res['session_id'],
-            'status'      => 'payment_pending',
-        ]);
+        $res = Http::withHeaders([
+            'Accept'        => 'application/json',
+            'Content-Type'  => 'application/json',
+            'Authorization' => 'Bearer '.$this->token(),
+        ])->post("{$this->api}/Tokenizacion", $payload);
 
-        // ===== 7) Respuesta al front =====
+        if (!$res->ok()) {
+            Log::error('WOMPI tokenization FAIL', ['status'=>$res->status(), 'body'=>$res->json()]);
+            return response()->json(['ok'=>false, 'mensaje'=>$res->json('mensaje') ?? 'Error tokenizando'], 422);
+        }
+
+        $j = $res->json();
+        Log::info('WOMPI tokenization OK', $j);
+
         return response()->json([
-            'ok'       => true,
-            'redirect' => $res['redirect_url'],
+            'ok'    => true,
+            'token' => $j['token'] ?? ($j['idToken'] ?? null),
+            'brand' => $j['marca'] ?? null,
+            'last4' => $j['ultimos4'] ?? substr($payload['numeroTarjeta'], -4),
+        ]);
+    }
+
+    /** 2) COMPRA 3DS: usa token + cvv, crea transacción y devuelve url para iframe/popup */
+    public function pay3ds(Request $r)
+    {
+        $v = $r->validate([
+            'envio_id' => ['required'],
+            'billing'  => ['nullable','array'],
+
+            // crudo (prioritario para tu tenant)
+            'numero'   => ['nullable','string'],
+            'exp_m'    => ['nullable','string'],
+            'exp_y'    => ['nullable','string'], // AAAA
+            'cvv'      => ['required','string','max:4'],
+
+            // token (opcional)
+            'token'    => ['nullable','string'],
+        ]);
+
+        // ===== total demo =====
+        $monto = (float) (session('cart_total') ?? 10.00);
+        $monto = number_format($monto, 2, '.', ''); // "10.00"
+        $order = 'F3P-'.now()->format('Ymd-His');
+
+        // ===== normalizaciones cliente =====
+        $tel = preg_replace('/\D+/', '', (string) data_get($v,'billing.telefono','50370000000'));
+        if (strlen($tel) < 8) $tel = '50370000000';
+
+        // ===== TARJETA: prioridad CRUDO =====
+        $tarjeta = [];
+        $usaCrudo = false;
+
+        if (!empty($v['numero']) && !empty($v['exp_m']) && !empty($v['exp_y'])) {
+            $pan = preg_replace('/\D+/', '', (string) $v['numero']);
+            $mm  = (int) $v['exp_m'];
+            $yy4 = preg_replace('/\D+/', '', (string) $v['exp_y']);
+
+            if (strlen($pan) < 13 || strlen($pan) > 19) {
+                return response()->json(['ok'=>false,'mensaje'=>'Número de tarjeta inválido'], 422);
+            }
+            if ($mm < 1 || $mm > 12) {
+                return response()->json(['ok'=>false,'mensaje'=>'Mes de vencimiento inválido'], 422);
+            }
+            if (!preg_match('/^\d{4}$/', $yy4)) {
+                return response()->json(['ok'=>false,'mensaje'=>'El año de vencimiento debe tener 4 dígitos (AAAA)'], 422);
+            }
+
+            $tarjeta = [
+                'numeroTarjeta'   => $pan,
+                'mesVencimiento'  => $mm,
+                'anioVencimiento' => (int) $yy4,
+                'cvv'             => preg_replace('/\D+/', '', $v['cvv']),
+            ];
+            $usaCrudo = true;
+
+            \Log::info('WOMPI 3DS usando CRUDO (masked)', [
+                'last4' => substr($pan, -4), 'mm'=>$mm, 'yy4'=>$yy4
+            ]);
+        } elseif (!empty($v['token'])) {
+            $tarjeta = [
+                'token' => $v['token'],
+                'cvv'   => preg_replace('/\D+/', '', $v['cvv']),
+            ];
+            \Log::info('WOMPI 3DS usando TOKEN');
+        } else {
+            return response()->json(['ok'=>false,'mensaje'=>'Faltan datos de tarjeta'], 422);
+        }
+
+        // ===== País/Región FIJOS (solo El Salvador) =====
+        $idPaisCode   = 'SV';     // El Salvador (ISO-3166-1 alpha-2)
+        $idRegionCode = 'SV-SA';  // Santa Ana por defecto (ISO-3166-2)
+        // Si quieres fijar San Salvador sería 'SV-SS', La Libertad 'SV-LI', etc.
+
+        $body = [
+            'tarjetaCreditoDebido' => $tarjeta,
+            'monto'        => (float) $monto,
+            'moneda'       => env('WOMPI_CURRENCY', 'USD'),
+            'descripcion'  => "Orden {$order}",
+            'urlRedirect'  => env('WOMPI_RETURN_URL'),
+
+            'nombre'       => auth()->user()->name ?? 'Cliente',
+            'apellido'     => 'Web',
+            'email'        => auth()->user()->email ?? 'cliente@example.com',
+            'telefono'     => $tel,
+            'direccion'    => (string) data_get($v,'billing.direccion','—'),
+            'ciudad'       => (string) data_get($v,'billing.ciudad','Santa Ana'),
+
+            'idPais'       => $idPaisCode,    // <-- fijo
+            'idRegion'     => $idRegionCode,  // <-- fijo (ajústalo si quieres otro depto)
+            'codigoPostal' => (string) data_get($v,'billing.codigo_postal','2201'),
+        ];
+
+        \Log::info('WOMPI 3DS INPUT', [
+            'order'    => $order,
+            'usaCrudo' => $usaCrudo,
+            'idPais'   => $idPaisCode,
+            'idRegion' => $idRegionCode,
+            'body'     => array_merge($body, [
+                'tarjetaCreditoDebido' => $usaCrudo
+                    ? ['last4'=>substr($tarjeta['numeroTarjeta'],-4),'mm'=>$tarjeta['mesVencimiento'],'yy4'=>$tarjeta['anioVencimiento']]
+                    : ['token'=>data_get($tarjeta,'token')]
+            ]),
+        ]);
+
+        $res = \Http::withHeaders([
+            'Accept'        => 'application/json',
+            'Content-Type'  => 'application/json',
+            'Authorization' => 'Bearer '.$this->token(),
+        ])->post("{$this->api}/TransaccionCompra/3DS", $body);
+
+        $json = $res->json();
+        \Log::info('WOMPI 3DS RESP', ['status'=>$res->status(), 'json'=>$json]);
+
+        if (!$res->ok()) {
+            $msg = $json['mensaje'] ?? (is_array($json['mensajes'] ?? null) ? implode(' | ', $json['mensajes']) : 'No se pudo iniciar 3DS');
+            return response()->json(['ok'=>false, 'mensaje'=>$msg], 422);
+        }
+
+        return response()->json([
+            'ok'            => true,
+            'requiere3ds'   => true,
+            'url3ds'        => $json['urlCompletarPago3Ds'] ?? null,
+            'idTransaccion' => $json['idTransaccion']      ?? null,
         ]);
     }
 
 
-    public function return(Request $request)
+
+
+    /** 3) Consultar estado por idTransaccion (para polling o postMessage) */
+    public function txStatus(Request $r)
     {
-        // El estado final lo confirmas por webhook.
-        return view('pagos.retorno', [
-            'token' => $request->get('id') ?? $request->get('session') ?? null,
-        ]);
+        $id = $r->query('id');
+        if (!$id) return response()->json(['estado'=>'DESCONOCIDO']);
+
+        $res = Http::withHeaders([
+            'Accept'        => 'application/json',
+            'Authorization' => 'Bearer '.$this->token(),
+        ])->get("{$this->api}/TransaccionCompra/{$id}");
+
+        $json = $res->json();
+        Log::info('WOMPI STATUS', ['id'=>$id, 'resp'=>$json]);
+
+        return response()->json($json ?: ['estado'=>'DESCONOCIDO']);
     }
 
-    public function notify(Request $request)
+    /** 4) URL de retorno usada dentro del iframe/popup para cerrar tu modal */
+    public function return(Request $r)
     {
-        $raw = $request->getContent();
-        $sig = $request->header('Wompi-Signature') ?? $request->header('X-Signature') ?? '';
+        $id  = $r->query('idTransaccion');
+        $est = $r->query('estado'); // APROBADA|DECLINADA|FALLIDA|PENDIENTE
+        Log::info('WOMPI RETURN HIT', ['id'=>$id, 'estado'=>$est]);
 
-        if (!$this->wompi->verifyWebhook($sig, $raw)) {
-            Log::warning('Wompi firma inválida');
-            return response('invalid', 400);
-        }
+        // Vista minimal que hace postMessage al abrirse
+        return response()->view('payments.wompi_return', compact('id','est'));
+    }
 
-        $payload = $request->json()->all();
-        Log::info('Wompi notify', $payload);
-
-        // Mapea campos reales según evento: approved/declined/pending, order_id, transaction_id...
-        $orderCode = $payload['order_id'] ?? ($payload['data']['order_id'] ?? null);
-        $status    = strtolower($payload['status'] ?? ($payload['data']['status'] ?? ''));
-        $txnId     = $payload['transaction_id'] ?? ($payload['data']['id'] ?? null);
-        $amount    = isset($payload['amount']) ? (float) $payload['amount'] : null;
-
-        if(!$orderCode) return response('no order', 400);
-
-        $order = Order::where('code', $orderCode)->first();
-        if(!$order) return response('not found', 404);
-
-        $payment = OrderPayment::where('order_id', $order->id)
-            ->where('gateway','wompi')
-            ->latest()->first();
-
-        if($payment){
-            $payment->transaction_id  = $txnId;
-            $payment->response_payload = $payload;
-            $payment->status = match($status){
-                'approved','paid','successful' => 'approved',
-                'failed','declined'            => 'failed',
-                default                        => 'pending',
-            };
-            if($amount && !$payment->amount) $payment->amount = $amount/100; // si vino en centavos
-            $payment->save();
-        }
-
-        // Validación simple de monto (opcional)
-        // if($amount && (int)round($order->grand_total*100) !== (int)$amount) { ... }
-
-        switch ($status) {
-            case 'approved':
-            case 'paid':
-            case 'successful':
-                $order->status = 'paid';
-                $order->paid_at = now();
-                $order->save();
-                break;
-            case 'failed':
-            case 'declined':
-                $order->status = 'failed';
-                $order->save();
-                break;
-            default:
-                // pending / review
-                $order->status = 'payment_pending';
-                $order->save();
-        }
-
-        return response('ok', 200);
+    /** 5) Webhook (solo log en sandbox) */
+    public function notify(Request $r)
+    {
+        $payload = $r->all();
+        Log::info('WOMPI WEBHOOK', $payload);
+        return response()->json(['ok'=>true]);
     }
 }

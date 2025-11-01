@@ -90,7 +90,7 @@ class CheckoutController extends Controller
         $subTotal = (float) $cart->getSubTotal();
 
         // === Dirección de envío seleccionada ===
-        $addr = \App\Models\Direcciones::query()
+        $addr = Direcciones::query()
             ->where('direcciones.id', $data['envio_id'])
             ->leftJoin('paises','paises.id','=','direcciones.id_paises')
             ->leftJoin('departamentos','departamentos.id','=','direcciones.id_departamento')

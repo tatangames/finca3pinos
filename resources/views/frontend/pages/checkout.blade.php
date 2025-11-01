@@ -296,6 +296,9 @@
 
 
     </style>
+
+
+
     {{-- ====== Encabezado de pasos ====== --}}
     <div class="checkout-shell">
         <div class="steps-bar">
@@ -702,14 +705,12 @@
                     return;
                 }
                 const payload = {
-                    id_paises: parseInt(idPais, 10),
+                    id_paises: parseInt(idPais, 10),   // <--- ya lo tenías como id del select
+                    id_region: 12,                     // <--- si tienes el depto del envío/facturación
                     pais_nombre: PAISES_MAP[idPais] || null,
-                    nombre,
-                    telefono: val('bill_tel'),
-                    direccion: dir,
-                    ciudad:   val('bill_ciudad'),
-                    estado:   val('bill_estado'),
-                    zipcode:  val('bill_zip')
+                    nombre, telefono: val('bill_tel'), direccion: dir,
+                    ciudad: val('bill_ciudad'), estado: val('bill_estado'),
+                    zipcode: val('bill_zip')
                 };
                 document.getElementById('bill_payload').value = JSON.stringify(payload);
                 go(3);
@@ -842,114 +843,114 @@
         })();
     </script>
 
-    {{-- ======= Submit NO 3DS ======= --}}
+
     <script>
         (function(){
             const $ = s => document.querySelector(s);
-            const money = n => '$' + Number(n||0).toFixed(2);
 
-            const modal   = $('#w3dsModal');
-            const frame   = $('#w3dsFrame');
-            const btnClose= $('#w3dsClose');
+            // Reutiliza tu modal/iframe ya existente
+            const modal = $('#w3dsModal');
+            const frame = $('#w3dsFrame');
+            const btnClose = $('#w3dsClose');
 
             function open3DS(url){
+                frame.onload = null;
                 frame.src = url;
                 modal.style.display = 'block';
+
+                // Fallback: si el banco bloquea iframe, prueba popup
+                let loaded = false;
+                frame.onload = ()=> loaded = true;
+                setTimeout(()=>{
+                    if (!loaded) {
+                        frame.src = 'about:blank';
+                        modal.style.display = 'none';
+                        const w=520,h=680,left=(screen.width-w)/2,top=(screen.height-h)/2;
+                        const pop = window.open(url,'wompi3ds',`width=${w},height=${h},left=${left},top=${top},resizable,scrollbars`);
+                        if (!pop || pop.closed) window.location.href = url; // último recurso
+                    }
+                }, 4000);
             }
             function close3DS(){
                 frame.src = 'about:blank';
                 modal.style.display = 'none';
             }
-            btnClose.addEventListener('click', close3DS);
+            btnClose?.addEventListener('click', close3DS);
 
-            async function pollStatus(txId, tries=40, delayMs=3000){
-                for(let i=0; i<tries; i++){
-                    await new Promise(r=>setTimeout(r, delayMs));
-                    const st = await axios.get("{{ route('wompi.tx.status') }}", { params:{ id: txId }});
-                    const estado = st?.data?.estado; // adapta: 'APROBADA','DECLINADA','FALLIDA','PENDIENTE'
-                    if (estado === 'APROBADA')   return { ok:true, data: st.data };
-                    if (estado === 'DECLINADA' || estado === 'FALLIDA') return { ok:false, data: st.data };
-                }
-                return { ok:false, data:{ mensaje:'Tiempo de espera agotado' } };
-            }
-
-            // Botón principal "Pagar" (el seguro / con 3DS)
-            document.getElementById('btnPlaceOrder')?.addEventListener('click', async ()=>{
+            // Escucha el retorno (desde wompi_return.blade.php)
+            window.addEventListener('message', async (ev)=>{
+                if (!ev?.data || ev.data.type !== 'WOMPI_3DS_DONE') return;
+                close3DS();
+                // Opcional: re-consulta estado
                 try {
-                    // 1) Reúne datos (como ya lo haces)
+                    const st = await axios.get("{{ route('wompi.tx.status') }}", { params:{ id: ev.data.idTransaccion }});
+                    const estado = st?.data?.estado;
+                    if (estado === 'APROBADA') {
+                        Swal.fire({icon:'success', title:'Pago aprobado', text:`Transacción ${ev.data.idTransaccion}`});
+                    } else {
+                        toastr.error('Pago no aprobado: ' + (estado || ''));
+                    }
+                } catch(e) {
+                    toastr.error('No se pudo verificar el resultado.');
+                }
+            });
+
+            // === BOTÓN Pagar (seguro / 3DS) ===
+            // === BOTÓN Pagar (seguro / 3DS) ===
+            document.getElementById('btnPlaceOrder')?.addEventListener('click', async ()=>{
+                try{
                     const envio_id = document.getElementById('envio_id')?.value || null;
                     const billing  = document.getElementById('bill_payload')?.value || null;
-                    if(!envio_id){ toastr.error('Selecciona una dirección de envío.'); return; }
+                    if (!envio_id) { toastr.error('Selecciona una dirección de envío.'); return; }
 
-                    // 2) Crea orden en tu backend
-                    const place = await axios.post('{{ route('checkout.place') }}', {
+                    // normaliza campos de tarjeta
+                    const rawNumber = (document.querySelector('#cardNumber')?.value || '');
+                    const number = rawNumber.replace(/\D+/g,''); // solo dígitos
+                    const exp_m  = document.querySelector('#cardMM')?.value || '';
+                    const exp_y  = document.querySelector('#cardYY')?.value || '';
+                    const cvv    = document.querySelector('#cardCVC')?.value || '';
+
+                    if (!/^\d{13,19}$/.test(number)) { toastr.error('Número de tarjeta inválido'); return; }
+                    if (!/^\d{1,2}$/.test(exp_m) || +exp_m<1 || +exp_m>12) { toastr.error('Mes inválido'); return; }
+                    if (!/^\d{4}$/.test(exp_y)) { toastr.error('Año inválido (AAAA)'); return; }
+                    if (!/^\d{3,4}$/.test(cvv)) { toastr.error('CVV inválido'); return; }
+
+                    // (Opcional) tokeniza igual, pero 3DS usará PAN/EXP/CVV
+                    const tokRes = await axios.post("{{ route('wompi.tokenize') }}", {
+                        number, cvc: cvv, exp_m, exp_y
+                    });
+                    const token = tokRes.data?.ok ? tokRes.data.token : null;
+
+                    // Iniciar 3DS – enviamos crudo + (token por si tuvieras futuro uso)
+                    const pay = await axios.post("{{ route('wompi.pay.3ds') }}", {
+                        token,
+                        numero: number,
+                        exp_m,
+                        exp_y,       // AAAA
+                        cvv,
                         envio_id,
                         billing: billing ? JSON.parse(billing) : null,
-                        pay_method: 'card'
-                    });
-                    if(!place.data?.ok || !place.data?.order_code) throw new Error('No se pudo crear la orden');
-
-                    // 3) Inicia el pago en tu backend (crear transacción / intent)
-                    //    IMPORTANTE: aquí tú NO envías PAN/CVC; idealmente usas token de tarjeta o campos hospedados.
-                    const intent = await axios.post('{{ route('wompi.pay.intent') }}', {
-                        order_code: place.data.order_code,
-                        // si tienes tokenizado en cliente: token_pm: 'tok_xxx'
                     });
 
-                    // 4) Respuestas posibles del backend (nombres de campos a adaptar a Wompi):
-                    // - { esAprobada:true, idTransaccion, codigoAutorizacion, monto }
-                    // - { requiere3ds:true, url3ds, idTransaccion }
-                    // - { ok:false, mensaje:'...' }
-
-                    if (intent?.data?.esAprobada) {
-                        Swal.fire({
-                            icon:'success', title:'Pago aprobado',
-                            html: `
-            <div style="text-align:left">
-              <div><b>Transacción:</b> ${intent.data.idTransaccion}</div>
-              <div><b>Autorización:</b> ${intent.data.codigoAutorizacion||'-'}</div>
-              <div><b>Monto:</b> ${money(intent.data.monto)}</div>
-            </div>`
-                        });
-                        return;
+                    if (pay?.data?.requiere3ds && pay.data.url3ds) {
+                        window.__open3DS ? window.__open3DS(pay.data.url3ds)
+                            : (document.getElementById('w3dsFrame').src = pay.data.url3ds,
+                                document.getElementById('w3dsModal').style.display = 'block');
+                    } else if (pay?.data?.ok) {
+                        Swal.fire({icon:'success', title:'Pago aprobado', text:`Transacción ${pay.data.idTransaccion||''}`});
+                    } else {
+                        toastr.error(pay?.data?.mensaje || 'No se pudo iniciar el pago');
                     }
-
-                    if (intent?.data?.requiere3ds && intent?.data?.url3ds) {
-                        // 5) Abre el desafío 3DS en iframe (sin salir de la página)
-                        open3DS(intent.data.url3ds);
-
-                        // 6) Espera resultado (polling al backend)
-                        const res = await pollStatus(intent.data.idTransaccion);
-
-                        close3DS();
-
-                        if (res.ok) {
-                            const d = res.data;
-                            Swal.fire({
-                                icon:'success', title:'Pago aprobado',
-                                html: `
-              <div style="text-align:left">
-                <div><b>Transacción:</b> ${d.idTransaccion||''}</div>
-                <div><b>Autorización:</b> ${d.codigoAutorizacion||'-'}</div>
-                <div><b>Monto:</b> ${money(d.monto||0)}</div>
-              </div>`
-                            });
-                        } else {
-                            toastr.error(res?.data?.mensaje || 'Pago no aprobado');
-                        }
-                        return;
-                    }
-
-                    throw new Error(intent?.data?.mensaje || 'No se pudo procesar el pago');
-
-                } catch (e) {
-                    console.error(e?.response?.data || e);
-                    Swal.fire({icon:'error', title:'Error', text:(e?.response?.data?.mensaje)||'Ha ocurrido un error al procesar el pago.'});
+                } catch(e){
+                    const msg = e?.response?.data?.mensaje || e?.message || 'Error al procesar el pago';
+                    console.error('WOMPI 3DS ERROR', e);
+                    toastr.error(msg);
                 }
             });
 
         })();
     </script>
+
 
 
     {{-- Superior (Newsletter) block --}}

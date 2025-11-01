@@ -287,17 +287,7 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.cart'), [UsuarioAuthController::class, 'vistaCarritoDeCompras'])
             ->name('user.cart');
 
-
-
-
-
-
-        // Endpoint que tokeniza y cobra SIN 3DS (solo sandbox)
-        Route::post('/checkout/pagar-no3ds', [WompiSandboxController::class, 'pagarNo3ds'])
-            ->name('checkout.pay.no3ds');
-
-
-
+        // ver vista checkout
         Route::get(LaravelLocalization::transRoute('routes.checkout'), [CheckoutController::class, 'show'])
             ->name('checkout.show');
 
@@ -306,49 +296,16 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
 
 
-        // ✅ Checkout protegido: requiere login y carrito con items
-       /* Route::middleware(['auth:web','cart.notempty'])->group(function () {
 
+        Route::post('/wompi/tokenize',  [WompiController::class, 'tokenize'])->name('wompi.tokenize');
+        Route::post('/wompi/3ds',       [WompiController::class, 'pay3ds'])->name('wompi.pay.3ds');
+        Route::get('/wompi/tx-status',  [WompiController::class, 'txStatus'])->name('wompi.tx.status');
 
-            Route::post(LaravelLocalization::transRoute('routes.checkout_post'), [CheckoutController::class, 'place'])
-                ->name('checkout.place');
-        });
+// flujo de retorno (abre dentro del iframe o popup y hace postMessage para cerrar tu modal)
+        Route::get('/pagos/wompi/return', [WompiController::class, 'return'])->name('wompi.return');
 
-        // ✅ Gracias (puede ser pública o sólo para auth, como prefieras)
-        Route::get(LaravelLocalization::transRoute('routes.thanks'), [OrderController::class, 'thanks'])
-            ->name('checkout.thanks');
-
-
-
-
-
-
-        Route::get('/wompi/no3ds', [WompiController::class, 'form'])->name('wompi.form');
-        Route::post('/wompi/no3ds/pagar', [WompiController::class, 'pagarSin3ds'])->name('wompi.pagar.sin3ds');*/
-
-
-
-
-
-
-
-        Route::post('/checkout/pagar-3ds', [WompiSandboxController::class, 'pagar3ds'])
-            ->name('wompi.pay.intent'); // ← tu JS postea aquí
-
-        Route::get('/checkout/3ds/redirect', [WompiSandboxController::class, 'redirect3ds'])
-            ->name('wompi.redirect');   // ← urlRedirect 3DS
-
-        Route::get('/checkout/tx-status', [WompiSandboxController::class, 'txStatus'])
-            ->name('wompi.tx.status');  // ← polling en tu JS
-
-// Opcional (muy recomendado)
-        Route::post('/webhook/wompi', [WompiSandboxController::class, 'webhook'])
-            ->name('wompi.webhook');
-
-
-
-
-
+// webhook (solo loguea para pruebas)
+        Route::post('/pagos/wompi/notify', [WompiController::class, 'notify'])->name('wompi.notify');
 
 
 
@@ -376,11 +333,4 @@ Route::get('/galeria/cargar', [FrontendController::class, 'cargarGaleria'])
     ->name('galeria.cargar');
 
 
-
-
-Route::prefix('pagos/wompi')->group(function () {
-    Route::post('/create', [WompiController::class, 'create'])->name('wompi.create');
-    Route::get ('/return', [WompiController::class, 'return'])->name('wompi.return');
-    Route::post('/notify', [WompiController::class, 'notify'])->name('wompi.notify');
-});
 
