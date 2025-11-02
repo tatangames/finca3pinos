@@ -41,10 +41,6 @@ return [
     'gallery_finca3pinos' => 'Gallery Finca3Pinos',
     'loading' => 'Loading...',
     'siguenos' => 'Follow us',
-
-
-
-    // === VISTA NUESTRO CAFE ===
     'coffee_v1' => 'Geisha Coffee Finca 3 Pinos — Metapán',
     'coffee_v2' => 'Excellence from the Alotepec-Metapán Mountain Range',
     'coffee_v3' => 'One of the highest and most renowned regions of El Salvador, located on the border with Honduras and Guatemala; ideal for specialty coffees with bright acidity and floral aromas.',
@@ -103,11 +99,6 @@ return [
     'coffee_v56' => 'Geisha Coffee from the Alotepec–Metapán Mountain Range.',
     'coffee_v57' => 'Tradition, innovation, and respect for the land in every cup.',
     'coffee_v58' => 'Explore',
-
-
-
-
-    // === VISTA CONTACTO ===
     'coffee_v0' => 'Geisha Coffee • Metapán, El Salvador',
     'contact_v1' => 'Do you have any questions about our coffees or would you like to place a special order? At Finca 3 Pinos, we’re here to assist you. Send us a message, and one of our specialists will get back to you as soon as possible.',
     'contact_v2' => 'Contact us',
@@ -123,16 +114,12 @@ return [
     'contact_v12' => 'Email is required.',
     'contact_v13' => 'Enter a valid email.',
     'contact_v14' => 'Password is required.',
-
-
     'contact_ok'    => 'Thanks! We received your message and will get back to you soon.',
     'sending'       => 'Sending...',
     'unknown_error' => 'An unexpected error occurred. Please try again.',
     'network_error' => 'Could not reach the server. Check your connection.',
     'derechos' => 'Finca 3 Pinos — All rights reserved.',
-
     'out_of_stock' => 'Out of stock.',
-
     'product_v1' => 'Select your coffee',
     'product_v2' => 'Add to cart',
     'product_v3' => 'Presentation',
@@ -147,7 +134,6 @@ return [
     'product_v12' => 'To continue, click the button below:',
     'product_v13' => 'If the button doesn’t work, copy and paste this link into your browser:',
     'product_v14' => 'If you didn’t make this request, you can safely ignore this email.',
-
     'product_v15' => 'Hello,',
     'product_v16' => 'We have received a request to reset your account password for',
     'product_v17' => 'If you made this request, click the button below to set a new password:',
@@ -155,11 +141,6 @@ return [
     'product_v19' => 'Thank you,',
     'product_v20' => 'The team',
     'product_v21' => 'This email was generated automatically. Please do not reply to this message.',
-
-
-
-
-
     'create_account' => 'Create an account',
     'email_address' => 'Email address',
     'password' => 'Password',
@@ -186,7 +167,6 @@ return [
     'password.reset' => 'Your password has been reset.',
     'name_required' => 'The name is required.',
     'email_repetido' => 'The email address is already registered.',
-
     'orders' => 'Orders',
     'addresses' => 'Addresses',
     'profile' => 'Profile',
@@ -237,8 +217,7 @@ return [
     'message_is_required' => 'Message is required.',
     'msg_not_send' => 'We couldn’t process your request at this time.',
     'error_login_google' => 'We couldn’t complete the sign-in with Google. Please try again.',
-
-
+    'edit' => 'Editar',
 
 
 ];

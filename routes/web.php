@@ -280,7 +280,7 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.newdirection'), [UsuarioAuthController::class, 'vistaNuevaDireccion'])
             ->name('user.new.direction');
 
-        // vista editare direccion
+        // vista editar direccion
         Route::get(LaravelLocalization::transRoute('routes.editdirection'), [UsuarioAuthController::class, 'vistaEditarDireccion'])
             ->name('user.edit.direction');
 

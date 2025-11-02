@@ -347,6 +347,39 @@
 
         .hidden-hard{display:none!important;visibility:hidden!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
 
+        /* Paleta */
+        :root, .theme-light { --error:#e53935; }
+
+        /* Mensaje de error que agregas con JS */
+        .address-form .form-group .error-text{
+            color: var(--error) !important;
+            font-weight: 500 !important;
+            font-size: 12px !important;
+            margin-top: 4px !important;
+            display: block !important;
+        }
+
+        /* Pinta el label cuando hay error en el grupo */
+        .address-form .form-group.has-error > label{
+            color: var(--error) !important;
+        }
+
+        /* Borde rojo del control con error */
+        .address-form .form-group.has-error input,
+        .address-form .form-group.has-error select,
+        .address-form .form-group.has-error textarea{
+            border-color: var(--error) !important;
+            box-shadow: 0 0 0 1px rgba(229,57,53,.15) !important;
+        }
+
+        /* (Opcional) si alguna librería usa label.error */
+        .address-form label.error{
+            color: var(--error) !important;
+            font-weight:600 !important;
+            font-size:12px !important;
+            margin-top:4px !important;
+            display:block !important;
+        }
 
 
     </style>
@@ -522,348 +555,12 @@
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}"></script>
 
-    <script>
-        /* ==========================
-           SELECTORES BASE
-        ========================== */
-        const selPais = document.getElementById('pais');
-        const selDep  = document.getElementById('departamento');
-        const selMun  = document.getElementById('municipio');
 
-        const boxDep       = document.getElementById('bloque-departamento');
-        const boxMun       = document.getElementById('bloque-municipio');
-        const boxCity      = document.getElementById('bloque-ciudad');
-        const boxProvincia = document.getElementById('bloque-provincia');
-        const boxPostal    = document.getElementById('bloque-postal');
-
-        const inpCity      = document.getElementById('ciudad-usuario');
-        const inpProvincia = document.getElementById('provincia-usuario');
-        const inpPostal    = document.getElementById('postal-usuario');
-
-        /* ==========================
-           HELPERS GENERALES
-        ========================== */
-        const resetSelect = (el) => { if (el) el.selectedIndex = 0; };
-
-        const toggleBlock = (wrap, control, visible, required = false) => {
-            if (!wrap || !control) return;
-            wrap.classList.toggle('hidden', !visible);
-            wrap.style.display = visible ? '' : 'none';
-            control.disabled = !visible;
-            control.required = !!(visible && required);
-            if (!visible) {
-                if (control.tagName === 'SELECT') resetSelect(control);
-                else control.value = '';
-            }
-        };
-
-        /* ==========================
-           HARD HIDE/SHOW (genérico)
-        ========================== */
-        function forceHideBlockHard(wrapEl, controlEl) {
-            if (!wrapEl || !controlEl) return;
-
-            const prevName = controlEl.getAttribute('name');
-            if (prevName && !controlEl.dataset.prevName) controlEl.dataset.prevName = prevName;
-            controlEl.removeAttribute('name');
-
-            controlEl.disabled = true;
-            controlEl.required = false;
-            controlEl.hidden = true;
-            controlEl.setAttribute('aria-hidden', 'true');
-            controlEl.classList.add('hidden-hard');
-            controlEl.style.display = 'none';
-
-            const wrappers = ['select-wrap','field','row','col','form-row','form-item','grid','form-group'];
-            let p = controlEl.parentElement;
-            while (p && p !== document) {
-                if (p === wrapEl || wrappers.some(c => p.classList && p.classList.contains(c))) {
-                    p.classList.add('hidden-hard');
-                    p.style.display = 'none';
-                }
-                p = p.parentElement;
-            }
-            wrapEl.classList.add('hidden-hard');
-            wrapEl.style.display = 'none';
-        }
-
-        function forceShowBlockHard(wrapEl, controlEl) {
-            if (!wrapEl || !controlEl) return;
-
-            if (controlEl.dataset.prevName) controlEl.setAttribute('name', controlEl.dataset.prevName);
-
-            controlEl.disabled = false;
-            controlEl.hidden = false;
-            controlEl.removeAttribute('aria-hidden');
-            controlEl.classList.remove('hidden-hard');
-            controlEl.style.display = '';
-
-            let p = controlEl.parentElement;
-            while (p && p !== document) {
-                p.classList?.remove('hidden-hard');
-                p.style.display = '';
-                p = p.parentElement;
-            }
-            wrapEl.classList.remove('hidden-hard');
-            wrapEl.style.display = '';
-        }
-
-        /* ==========================
-           HARD HIDE/SHOW específicos
-        ========================== */
-        let municipioPrevName = null;
-        function forceHideMunicipioHard() {
-            if (!selMun) return;
-            if (municipioPrevName === null) municipioPrevName = selMun.getAttribute('name') || 'municipio';
-            selMun.removeAttribute('name');
-            selMun.disabled = true; selMun.required = false; selMun.hidden = true;
-            selMun.setAttribute('aria-hidden', 'true');
-            selMun.classList.add('hidden-hard'); selMun.style.display = 'none';
-
-            const wrappers = ['select-wrap','field','row','col','form-row','form-item','grid','form-group'];
-            const fg = selMun.closest('.form-group');
-            if (fg) { fg.classList.add('hidden-hard'); fg.style.display = 'none'; }
-            let p = selMun.parentElement;
-            while (p && p !== document) {
-                const match = wrappers.some(c => p.classList && p.classList.contains(c));
-                if (match) { p.classList.add('hidden-hard'); p.style.display = 'none'; }
-                p = p.parentElement;
-            }
-            if (boxMun) { boxMun.classList.add('hidden-hard'); boxMun.style.display = 'none'; }
-        }
-        function forceShowMunicipioHard() {
-            if (!selMun) return;
-            if (municipioPrevName) selMun.setAttribute('name', municipioPrevName);
-            selMun.disabled = false; selMun.hidden = false;
-            selMun.removeAttribute('aria-hidden');
-            selMun.classList.remove('hidden-hard'); selMun.style.display = '';
-            const fg = selMun.closest('.form-group');
-            if (fg) { fg.classList.remove('hidden-hard'); fg.style.display = ''; }
-            let p = selMun.parentElement;
-            while (p && p !== document) { p.classList?.remove('hidden-hard'); p.style.display = ''; p = p.parentElement; }
-            if (boxMun) { boxMun.classList.remove('hidden-hard'); boxMun.style.display = ''; }
-        }
-
-        let departamentoPrevName = null;
-        function forceHideDepartamentoHard() {
-            if (!selDep) return;
-            if (departamentoPrevName === null) departamentoPrevName = selDep.getAttribute('name') || 'departamento';
-            selDep.removeAttribute('name');
-            selDep.disabled = true; selDep.required = false; selDep.hidden = true;
-            selDep.setAttribute('aria-hidden', 'true');
-            selDep.classList.add('hidden-hard'); selDep.style.display = 'none';
-
-            const wrappers = ['select-wrap','field','row','col','form-row','form-item','grid','form-group'];
-            const fg = selDep.closest('.form-group');
-            if (fg) { fg.classList.add('hidden-hard'); fg.style.display = 'none'; }
-            let p = selDep.parentElement;
-            while (p && p !== document) {
-                const match = wrappers.some(c => p.classList && p.classList.contains(c));
-                if (match) { p.classList.add('hidden-hard'); p.style.display = 'none'; }
-                p = p.parentElement;
-            }
-            if (boxDep) { boxDep.classList.add('hidden-hard'); boxDep.style.display = 'none'; }
-        }
-        function forceShowDepartamentoHard() {
-            if (!selDep) return;
-            if (departamentoPrevName) selDep.setAttribute('name', departamentoPrevName);
-            selDep.disabled = false; selDep.hidden = false;
-            selDep.removeAttribute('aria-hidden');
-            selDep.classList.remove('hidden-hard'); selDep.style.display = '';
-            const fg = selDep.closest('.form-group');
-            if (fg) { fg.classList.remove('hidden-hard'); fg.style.display = ''; }
-            let p = selDep.parentElement;
-            while (p && p !== document) { p.classList?.remove('hidden-hard'); p.style.display = ''; p = p.parentElement; }
-            if (boxDep) { boxDep.classList.remove('hidden-hard'); boxDep.style.display = ''; }
-        }
-
-        /* ==========================
-           FILTROS DE OPCIONES
-        ========================== */
-        const filtrarDepartamentos = (idPais) => {
-            if (!selDep) return;
-            [...selDep.options].forEach(opt => {
-                if (opt.value === '') return (opt.hidden = false);
-                opt.hidden = parseInt(opt.dataset.pais || '0', 10) !== idPais;
-            });
-            const ok = [...selDep.options].some(o => !o.hidden && o.value === selDep.value);
-            if (!ok) resetSelect(selDep);
-        };
-        const filtrarMunicipios = (idDep) => {
-            if (!selMun) return;
-            [...selMun.options].forEach(opt => {
-                if (opt.value === '') return (opt.hidden = false);
-                opt.hidden = parseInt(opt.dataset.departamento || '0', 10) !== idDep;
-            });
-            const ok = [...selMun.options].some(o => !o.hidden && o.value === selMun.value);
-            if (!ok) resetSelect(selMun);
-        };
-
-        /* ==========================
-           LÓGICA POR PAÍS (con preservación)
-        ========================== */
-        function aplicarEstadoPorPais(rawId, { preserve = true } = {}) {
-            const id = parseInt(rawId, 10) || 0;
-            const isES = id === 1; // El Salvador
-            const isUS = id === 2; // Estados Unidos
-
-            const prevDep = preserve && selDep ? selDep.value : '';
-            const prevMun = preserve && selMun ? selMun.value : '';
-
-            // 🔧 SOLO limpiar cuando NO preservamos (cambio manual de país)
-            if (!preserve) {
-                if (inpCity)      inpCity.value = '';
-                if (inpProvincia) inpProvincia.value = '';
-                if (inpPostal)    inpPostal.value = '';
-            }
-
-            if (!id) {
-                toggleBlock(boxCity,      inpCity,      false);
-                toggleBlock(boxProvincia, inpProvincia, false);
-                toggleBlock(boxPostal,    inpPostal,    false);
-                forceHideDepartamentoHard();
-                forceHideMunicipioHard();
-                return;
-            }
-
-            if (isES) {
-                forceShowDepartamentoHard();
-                filtrarDepartamentos(1);
-
-                if (selDep) {
-                    const canKeepDep = preserve && [...selDep.options].some(o => !o.hidden && o.value === prevDep);
-                    if (canKeepDep) selDep.value = prevDep;
-                    toggleBlock(boxDep, selDep, true, true);
-                }
-
-                forceShowMunicipioHard();
-
-                if (selDep && selDep.value) filtrarMunicipios(parseInt(selDep.value, 10));
-                if (selMun) {
-                    const canKeepMun = preserve && [...selMun.options].some(o => !o.hidden && o.value === prevMun);
-                    if (canKeepMun) selMun.value = prevMun;
-                }
-                toggleBlock(boxMun, selMun, true, true);
-
-                // HARD HIDE para campos que no aplican en ES (NO borra valor cuando preserve = true)
-                forceHideBlockHard(boxCity,      inpCity);
-                forceHideBlockHard(boxProvincia, inpProvincia);
-                forceHideBlockHard(boxPostal,    inpPostal);
-                return;
-            }
-
-            if (isUS) {
-                forceShowDepartamentoHard();
-                filtrarDepartamentos(2);
-
-                if (selDep) {
-                    const canKeepDep = preserve && [...selDep.options].some(o => !o.hidden && o.value === prevDep);
-                    if (canKeepDep) selDep.value = prevDep;
-                    toggleBlock(boxDep, selDep, true, true);
-                }
-
-                resetSelect(selMun);
-                toggleBlock(boxMun, selMun, false);
-                forceHideMunicipioHard();
-
-                // Mostrar y habilitar ciudad/estado/postal sin borrar su value
-                forceShowBlockHard(boxCity,      inpCity);
-                forceShowBlockHard(boxProvincia, inpProvincia);
-                forceShowBlockHard(boxPostal,    inpPostal);
-                inpCity.required = true; inpProvincia.required = true; inpPostal.required = true;
-                return;
-            }
-
-            // Otros países
-            forceHideDepartamentoHard();
-            forceHideMunicipioHard();
-            forceShowBlockHard(boxCity,      inpCity);
-            forceShowBlockHard(boxProvincia, inpProvincia);
-            forceShowBlockHard(boxPostal,    inpPostal);
-            inpCity.required = true; inpProvincia.required = true; inpPostal.required = true;
-        }
-
-        /* ==========================
-           LISTENERS
-        ========================== */
-        selPais?.addEventListener('change', function () {
-            clearFormForCountryChange();
-            aplicarEstadoPorPais(this.value, { preserve: false }); // usuario cambió país → no preservar
-        });
-
-        selDep?.addEventListener('change', function () {
-            const idPais = parseInt(selPais?.value || '0', 10);
-            if (idPais === 1) {
-                const depId = parseInt(this.value || '0', 10);
-                filtrarMunicipios(depId);
-                forceShowMunicipioHard();
-                // si municipio actual no pertenece, reset
-                const ok = [...selMun.options].some(o => !o.hidden && o.value === selMun.value);
-                if (!ok) resetSelect(selMun);
-                toggleBlock(boxMun, selMun, true, true);
-            } else {
-                toggleBlock(boxMun, selMun, false);
-                forceHideMunicipioHard();
-            }
-        });
-
-        /* ==========================
-           INIT
-        ========================== */
-        document.addEventListener('DOMContentLoaded', () => {
-            aplicarEstadoPorPais(selPais?.value || '0', { preserve: true });
-            const idPais = parseInt(selPais?.value || '0', 10);
-            if (idPais === 1 && selDep?.value) {
-                filtrarMunicipios(parseInt(selDep.value || '0', 10));
-                forceShowMunicipioHard();
-                toggleBlock(boxMun, selMun, true, true);
-            }
-        });
-
-        /* ==========================
-           LIMPIEZA AL CAMBIAR PAÍS
-        ========================== */
-        function clearFormForCountryChange() {
-            const form = document.getElementById('address-form');
-            if (!form) return;
-
-            form.querySelectorAll('input, select, textarea').forEach(el => {
-                if (el.id === 'pais' || el.name === '_token') return;
-                if (el.tagName === 'SELECT') el.selectedIndex = 0;
-                else if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
-                else el.value = '';
-            });
-
-            form.querySelectorAll('.form-group').forEach(fg => {
-                fg.classList.remove('has-error');
-                fg.querySelector('.error-text')?.remove();
-            });
-        }
-
-        /* ==========================
-           PLACEHOLDER VISUAL EN SELECT
-        ========================== */
-        (function(){
-            function paintPlaceholder(sel){
-                if(!sel) return;
-                const empty = !sel.value || sel.value === '';
-                sel.classList.toggle('is-placeholder', empty);
-            }
-            ['pais','departamento','municipio'].forEach(id=>{
-                const el = document.getElementById(id);
-                if(!el) return;
-                paintPlaceholder(el);
-                el.addEventListener('change', ()=>paintPlaceholder(el));
-            });
-        })();
-    </script>
-
-
-
-
-
-
-
+    <style>
+        #bloque-municipio.hidden,
+        #bloque-departamento.hidden,
+        .form-group.hidden { display:none !important; }
+    </style>
     <script>
         (function () {
             const form   = document.getElementById('address-form');
@@ -878,18 +575,18 @@
             const inpDirOpt    = document.getElementById('direccionopcional-usuario');
             const inpTelefono  = document.getElementById('telefono-usuario');
             const inpCiudad    = document.getElementById('ciudad-usuario');
-            const inpProvincia = document.getElementById('provincia-usuario'); // name="estado" en el form
-            const inpPostal    = document.getElementById('postal-usuario');    // name="zipcode" en el form
+            const inpProvincia = document.getElementById('provincia-usuario');
+            const inpPostal    = document.getElementById('postal-usuario');
             const inpAddressId = form?.querySelector('input[name="address_id"]');
 
-            // Wrappers (bloques)
+            // Wrappers
             const boxDep       = document.getElementById('bloque-departamento');
             const boxMun       = document.getElementById('bloque-municipio');
             const boxCity      = document.getElementById('bloque-ciudad');
             const boxProvincia = document.getElementById('bloque-provincia');
             const boxPostal    = document.getElementById('bloque-postal');
 
-            // Form-groups para errores
+            // Form-groups
             const fgPais   = selPais?.closest('.form-group');
             const fgDep    = selDep?.closest('.form-group');
             const fgMun    = selMun?.closest('.form-group');
@@ -897,7 +594,10 @@
             const fgDir    = inpDireccion?.closest('.form-group');
             const fgTel    = inpTelefono?.closest('.form-group');
 
-            // i18n
+            // Refs directos
+            const grpDep = selDep?.closest('.form-group');
+            const grpMun = selMun?.closest('.form-group');
+
             const i18n = {
                 countryRequired:      "{{ __('meta.country_required') }}",
                 nameRequired:         "{{ __('meta.name_required') }}",
@@ -910,7 +610,6 @@
                 saving:               "{{ __('meta.saving') }}"
             };
 
-            // ===== Utilidades UI =====
             function isVisibleControl(ctrl){
                 if(!ctrl) return false;
                 const group = ctrl.closest('.form-group') || ctrl;
@@ -939,15 +638,128 @@
                 control.addEventListener('blur', handler);
             }
 
-            // ===== Toggle sin borrar valor (clave para edición) =====
             function toggleBlockNoClear(wrap, control, visible, required = false){
                 if(!wrap || !control) return;
                 wrap.classList.toggle('hidden', !visible);
                 wrap.style.display = visible ? '' : 'none';
                 control.disabled   = !visible;
                 control.required   = !!(visible && required);
-                // Importante: NO se limpia el valor al ocultar
+                if(!visible && control.tagName === 'INPUT'){
+                    control.value = '';
+                }
             }
+
+            const resetSelect = (el) => { if (el) el.selectedIndex = 0; };
+
+            function clearSelectToPlaceholder(select){
+                if(!select) return;
+                const first = select.options[0] ? select.options[0].cloneNode(true) : null;
+                select.innerHTML = '';
+                if(first) select.appendChild(first);
+                resetSelect(select);
+                select.classList.add('is-placeholder');
+            }
+
+            function toggleMunicipio(visible, required = false){
+                if (boxMun){
+                    boxMun.classList.toggle('hidden', !visible);
+                    boxMun.style.display = visible ? '' : 'none';
+                }
+                if (grpMun){
+                    grpMun.classList.toggle('hidden', !visible);
+                    grpMun.style.display = visible ? '' : 'none';
+                }
+                if (selMun){
+                    selMun.disabled = !visible;
+                    selMun.required = !!(visible && required);
+                    if (!visible) clearSelectToPlaceholder(selMun);
+                }
+            }
+            function toggleDepartamento(visible, required = false){
+                if (boxDep){
+                    boxDep.classList.toggle('hidden', !visible);
+                    boxDep.style.display = visible ? '' : 'none';
+                }
+                if (grpDep){
+                    grpDep.classList.toggle('hidden', !visible);
+                    grpDep.style.display = visible ? '' : 'none';
+                }
+                if (selDep){
+                    selDep.disabled = !visible;
+                    selDep.required = !!(visible && required);
+                    if (!visible) resetSelect(selDep);
+                }
+            }
+
+// IDs iniciales que vienen de la vista (si existen)
+            const INITIAL = {
+                pais: parseInt(selPais?.value || '0', 10),
+                dep:  parseInt(selDep?.value  || '0', 10),
+                mun:  (function(){
+                    if(!selMun) return 0;
+                    const v = parseInt(selMun.value || '0', 10);
+                    return Number.isNaN(v) ? 0 : v;
+                })()
+            };
+
+
+
+
+
+            // ===== MASTER de Municipios =====
+            const MUNICIPIO_MASTER = (() => {
+                if(!selMun) return [];
+                return Array.from(selMun.options).map(o => ({
+                    value: o.value,
+                    label: o.textContent,
+                    dep:   o.getAttribute('data-departamento') || o.dataset.departamento || '',
+                    isPlaceholder: o.value === ''
+                }));
+            })();
+
+            function fillMunicipiosByDepartamento(depId, preselectId = null){
+                if(!selMun) return;
+                clearSelectToPlaceholder(selMun);
+                const frag = document.createDocumentFragment();
+                let hasPreselect = false;
+
+                MUNICIPIO_MASTER
+                    .filter(o => !o.isPlaceholder && parseInt(o.dep || '0',10) === depId)
+                    .forEach(o => {
+                        const opt = document.createElement('option');
+                        opt.value = o.value;
+                        opt.textContent = o.label;
+                        opt.setAttribute('data-departamento', o.dep);
+                        if(preselectId && String(preselectId) === String(o.value)){
+                            opt.selected = true;
+                            hasPreselect = true;
+                        }
+                        frag.appendChild(opt);
+                    });
+
+                selMun.appendChild(frag);
+
+                // Si no hay preselect válido, deja el placeholder
+                if(!hasPreselect){
+                    resetSelect(selMun);
+                    selMun.classList.add('is-placeholder');
+                } else {
+                    selMun.classList.remove('is-placeholder');
+                }
+            }
+
+
+            // ===== Filtro de departamentos por país (require data-pais en <option>) =====
+            const filtrarDepartamentos = (idPais) => {
+                if (!selDep) return;
+                [...selDep.options].forEach(opt => {
+                    if (opt.value === '') return (opt.hidden = false);
+                    opt.hidden = parseInt(opt.dataset.pais || '0', 10) !== idPais;
+                });
+                const ok = [...selDep.options].some(o => !o.hidden && o.value === selDep.value);
+                if (!ok) resetSelect(selDep);
+                selDep.classList.toggle('is-placeholder', !selDep.value);
+            };
 
             // ===== Validación =====
             function validate(){
@@ -969,16 +781,26 @@
                 if(!inpTelefono || !inpTelefono.value.trim()){
                     setError(fgTel, i18n.phoneRequired); ok = false;
                 }
-                // ES: municipio requerido
-                if(paisId === 1 && selMun && isVisibleControl(selMun)){
-                    if(selMun.value === '' || selMun.selectedIndex === 0){
-                        setError(fgMun, i18n.municipalityRequired); ok = false;
+
+                // Reglas por país:
+                if(paisId === 1){
+                    // El Salvador: Departamento + Municipio requeridos
+                    if(selDep && isVisibleControl(selDep)){
+                        if(selDep.value === '' || selDep.selectedIndex === 0){
+                            setError(fgDep, i18n.departmentRequired); ok = false;
+                        }
                     }
-                }
-                // US: departamento requerido
-                if(paisId === 2 && selDep && isVisibleControl(selDep)){
-                    if(selDep.value === '' || selDep.selectedIndex === 0){
-                        setError(fgDep, i18n.departmentRequired); ok = false;
+                    if(selMun && isVisibleControl(selMun)){
+                        if(selMun.value === '' || selMun.selectedIndex === 0){
+                            setError(fgMun, i18n.municipalityRequired); ok = false;
+                        }
+                    }
+                } else if (paisId === 2){
+                    // Estados Unidos: solo Departamento (estado)
+                    if(selDep && isVisibleControl(selDep)){
+                        if(selDep.value === '' || selDep.selectedIndex === 0){
+                            setError(fgDep, i18n.departmentRequired); ok = false;
+                        }
                     }
                 }
                 return ok;
@@ -1011,112 +833,148 @@
                     }
                 }
             }
-
             function getVal(el){ return (el?.value ?? '').trim(); }
 
-            // ===== Filtros dependientes =====
-            const resetSelect = (el) => { if (el) el.selectedIndex = 0; };
+            // ===== Lógica por país (CIUDAD/PROVINCIA/POSTAL ocultos para ES) =====
 
-            const filtrarDepartamentos = (idPais) => {
-                if (!selDep) return;
-                [...selDep.options].forEach(opt => {
-                    if (opt.value === '') return (opt.hidden = false);
-                    opt.hidden = parseInt(opt.dataset.pais || '0', 10) !== idPais;
-                });
-                const ok = [...selDep.options].some(o => !o.hidden && o.value === selDep.value);
-                if (!ok) resetSelect(selDep);
-            };
 
-            const filtrarMunicipios = (idDep) => {
-                if (!selMun) return;
-                [...selMun.options].forEach(opt => {
-                    if (opt.value === '') return (opt.hidden = false);
-                    opt.hidden = parseInt(opt.dataset.departamento || '0', 10) !== idDep;
-                });
-                const ok = [...selMun.options].some(o => !o.hidden && o.value === selMun.value);
-                if (!ok) resetSelect(selMun);
-            };
 
-            // ===== Lógica por país (sin borrar valores al ocultar) =====
+                // === Helpers "duros" para mostrar/ocultar ===
+                function hardHide(wrap, ctrl){
+                if(!wrap || !ctrl) return;
+                wrap.classList.add('hidden','hidden-hard');
+                wrap.setAttribute('hidden','hidden');
+                wrap.style.display   = 'none';
+                wrap.style.visibility= 'hidden';
+                ctrl.disabled = true;
+                ctrl.required = false;
+                if (ctrl.tagName === 'INPUT') ctrl.value = '';
+            }
+                function hardShow(wrap, ctrl, required=false){
+                if(!wrap || !ctrl) return;
+                wrap.classList.remove('hidden','hidden-hard');
+                wrap.removeAttribute('hidden');
+                wrap.style.display   = '';       // deja que el CSS natural aplique
+                wrap.style.visibility= '';
+                ctrl.disabled = false;
+                ctrl.required = !!required;
+            }
+
+
             function aplicarEstadoPorPais(rawId){
-                const id = parseInt(rawId, 10) || 0;
-                const isES = id === 1; // El Salvador
-                const isUS = id === 2; // Estados Unidos
+                const id  = parseInt(rawId, 10) || 0;
+                const isES = id === 1;
+                const isUS = id === 2;
 
-                if (!id){
-                    toggleBlockNoClear(boxCity,      inpCiudad,   false);
-                    toggleBlockNoClear(boxProvincia, inpProvincia,false);
-                    toggleBlockNoClear(boxPostal,    inpPostal,   false);
-                    toggleBlockNoClear(boxDep,       selDep,      false);
-                    toggleBlockNoClear(boxMun,       selMun,      false);
-                    return;
-                }
+                // Asegura que estas variables existen en tu scope (ya las tienes arriba)
+                // boxDep, boxMun, boxCity, boxProvincia, boxPostal
+                // selDep, selMun, inpCiudad, inpProvincia, inpPostal
 
                 if (isES){
-                    // Dep/Mun visibles y requeridos
-                    toggleBlockNoClear(boxDep, selDep, true, true);
+                    // 🇸🇻 El Salvador: Dep + Mun visibles, ciudad/estado/postal ocultos
+                    hardShow(boxDep, selDep, true);
+                    hardShow(boxMun, selMun, true);
+
+                    hardHide(boxCity,      inpCiudad);
+                    hardHide(boxProvincia, inpProvincia); // ← Estado
+                    hardHide(boxPostal,    inpPostal);
+
                     filtrarDepartamentos(1);
-
-                    const depId = parseInt(selDep?.value || '0', 10);
-                    if (depId) filtrarMunicipios(depId);
-                    toggleBlockNoClear(boxMun, selMun, true, true);
-
-                    // Ocultar ciudad/estado/postal (sin limpiar valores)
-                    toggleBlockNoClear(boxCity,      inpCiudad,    false);
-                    toggleBlockNoClear(boxProvincia, inpProvincia, false);
-                    toggleBlockNoClear(boxPostal,    inpPostal,    false);
                     return;
                 }
 
                 if (isUS){
-                    // Solo departamento (requerido)
-                    toggleBlockNoClear(boxDep, selDep, true, true);
-                    filtrarDepartamentos(2);
-                    // Municipio off
-                    toggleBlockNoClear(boxMun, selMun, false);
+                    // 🇺🇸 Estados Unidos: Dep visible, Mun oculto
+                    hardShow(boxDep, selDep, true);
+                    hardHide(boxMun, selMun);
 
-                    // Ciudad/Estado/Postal ON (requeridos)
-                    toggleBlockNoClear(boxCity,      inpCiudad,    true, true);
-                    toggleBlockNoClear(boxProvincia, inpProvincia, true, true);
-                    toggleBlockNoClear(boxPostal,    inpPostal,    true, true);
+                    // Ciudad y Postal visibles, Estado oculto
+                    hardShow(boxCity,      inpCiudad,    true);
+                    hardHide(boxProvincia, inpProvincia);   // ← ocultar solo Estado
+                    hardShow(boxPostal,    inpPostal,    true);
+
+                    filtrarDepartamentos(2);
+                    clearSelectToPlaceholder(selMun);
                     return;
                 }
 
-                // Otros países: no dep/mun — sí ciudad/estado/postal
-                toggleBlockNoClear(boxDep, selDep, false);
-                toggleBlockNoClear(boxMun, selMun, false);
-                toggleBlockNoClear(boxCity,      inpCiudad,    true, true);
-                toggleBlockNoClear(boxProvincia, inpProvincia, true, true);
-                toggleBlockNoClear(boxPostal,    inpPostal,    true, true);
+
+
+                // 🌎 Otros países: ocultar Dep y Mun, mostrar todos los demás
+                hardHide(boxDep, selDep);
+                hardHide(boxMun, selMun);
+
+                hardShow(boxCity,      inpCiudad,    true);
+                hardShow(boxProvincia, inpProvincia, true);  // ← Estado visible solo aquí
+                hardShow(boxPostal,    inpPostal,    true);
+
+                resetSelect(selDep);
+                clearSelectToPlaceholder(selMun);
             }
 
-            // ===== Country / Dep listeners =====
+                // === Refuerzos en los listeners (pequeño ajuste) ===
+                selPais?.addEventListener('change', function(){
+                aplicarEstadoPorPais(this.value);
+                const paisId = parseInt(this.value || '0', 10);
+
+                if (paisId === 1){
+                const depId = parseInt(selDep?.value || '0', 10);
+                if (depId) { fillMunicipiosByDepartamento(depId); }
+                else { clearSelectToPlaceholder(selMun); }
+            } else {
+                clearSelectToPlaceholder(selMun);
+            }
+
+                // En caso de que alguna hoja de estilo “reactive” algo, refuerza en el siguiente frame
+                requestAnimationFrame(()=>aplicarEstadoPorPais(this.value));
+            });
+
+
+
+
+
+
+
+    // ===== Listeners =====
             selPais?.addEventListener('change', function(){
                 aplicarEstadoPorPais(this.value);
-                // NO limpiamos valores de inputs ocultos
-                if (parseInt(this.value || '0',10) !== 1){
-                    // si no es ES, el municipio se deshabilita/oculta
-                    resetSelect(selMun);
-                }
-                if (parseInt(this.value || '0',10) === 1){
-                    // Si es ES y ya hay dep, filtra municipios
+                const paisId = parseInt(this.value || '0', 10);
+
+                if (paisId === 1){
                     const depId = parseInt(selDep?.value || '0', 10);
-                    if (depId) filtrarMunicipios(depId);
+                    toggleMunicipio(true, true);
+                    if (depId){
+                        fillMunicipiosByDepartamento(depId);
+                    } else {
+                        clearSelectToPlaceholder(selMun);
+                    }
+                } else {
+                    // Cualquier país ≠ 1: asegúrate de limpiar municipio para no arrastrar valor viejo
+                    toggleMunicipio(paisId === 2 ? false : false);
+                    clearSelectToPlaceholder(selMun);
                 }
             });
 
             selDep?.addEventListener('change', function(){
                 const idPais = parseInt(selPais?.value || '0', 10);
+                const depId  = parseInt(this.value || '0', 10);
+
                 if (idPais === 1){
-                    const depId = parseInt(this.value || '0', 10);
-                    filtrarMunicipios(depId);
-                    toggleBlockNoClear(boxMun, selMun, true, true);
+                    toggleMunicipio(true, true);
+                    if (depId){
+                        fillMunicipiosByDepartamento(depId);
+                    } else {
+                        clearSelectToPlaceholder(selMun);
+                    }
+                } else if (idPais === 2){
+                    toggleMunicipio(false);
                 } else {
-                    toggleBlockNoClear(boxMun, selMun, false);
+                    toggleMunicipio(false);
+                    toggleDepartamento(false);
                 }
             });
 
-            // ===== Placeholder visual en selects =====
+            // Placeholder visual
             (function(){
                 function paintPlaceholder(sel){
                     if(!sel) return;
@@ -1134,10 +992,36 @@
             // ===== INIT =====
             document.addEventListener('DOMContentLoaded', () => {
                 aplicarEstadoPorPais(selPais?.value || '0');
+
                 const idPais = parseInt(selPais?.value || '0', 10);
-                if (idPais === 1 && selDep?.value){
-                    filtrarMunicipios(parseInt(selDep.value || '0', 10));
-                    toggleBlockNoClear(boxMun, selMun, true, true);
+
+                if (idPais === 1){
+                    const depId = parseInt(selDep?.value || '0', 10);
+                    toggleDepartamento(true, true);
+                    toggleMunicipio(true, true);
+
+                    if (depId){
+                        // ← Usa el municipio inicial SÓLO en el init
+                        fillMunicipiosByDepartamento(depId, INITIAL.mun || null);
+                    } else {
+                        clearSelectToPlaceholder(selMun);
+                    }
+
+                    toggleBlockNoClear(boxCity,      inpCiudad,    false, false);
+                    toggleBlockNoClear(boxProvincia, inpProvincia, false, false);
+                    toggleBlockNoClear(boxPostal,    inpPostal,    false, false);
+                } else if (idPais === 2){
+                    toggleDepartamento(true, true);
+                    toggleMunicipio(false);
+                    toggleBlockNoClear(boxCity,      inpCiudad,    true,  true);
+                    toggleBlockNoClear(boxProvincia, inpProvincia, true,  true);
+                    toggleBlockNoClear(boxPostal,    inpPostal,    true,  true);
+                } else {
+                    toggleDepartamento(false);
+                    toggleMunicipio(false);
+                    toggleBlockNoClear(boxCity,      inpCiudad,    true,  true);
+                    toggleBlockNoClear(boxProvincia, inpProvincia, true,  true);
+                    toggleBlockNoClear(boxPostal,    inpPostal,    true,  true);
                 }
             });
 
@@ -1150,7 +1034,6 @@
 
                 const fd = new FormData(form);
 
-                // Normalizar claves críticas (aunque inputs estén disabled)
                 fd.set('address_id',        inpAddressId?.value || '{{ $address->id }}');
                 fd.set('pais',              selPais?.value || '');
                 fd.set('departamento',      selDep?.value || '');
@@ -1160,23 +1043,18 @@
                 fd.set('direccion_opcional',getVal(inpDirOpt));
                 fd.set('telefono',          getVal(inpTelefono));
                 fd.set('ciudad',            getVal(inpCiudad));
-
-                // IMPORTANTE: backend espera 'provincia' y 'postal'
-                fd.set('provincia',         getVal(inpProvincia)); // aunque el input se llame "estado"
-                fd.set('postal',            getVal(inpPostal));    // aunque el input se llame "zipcode"
+                fd.set('provincia',         getVal(inpProvincia));
+                fd.set('postal',            getVal(inpPostal));
 
                 try{
                     setSubmitting(true);
-
                     const res = await axios.post(
-                        UPDATE_URL,
+                        "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.update.direction', ['id' => $address->id], false)) }}",
                         fd,
                         { headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' } }
                     );
-
                     const data = res?.data || {};
                     if (data.success === 1){
-                        // Limpia errores y redirige
                         [fgPais, fgDep, fgMun, fgNombre, fgDir, fgTel].forEach(clearError);
                         const url = data.ruta || "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.address', [], false)) }}";
                         window.location.assign(url);
@@ -1203,29 +1081,6 @@
     </script>
 
 
-
-
-
-
-
-
-    <script>
-        (function(){
-            // Marca el <select> con clase "is-placeholder" cuando está en la opción vacía
-            function paintPlaceholder(sel){
-                if(!sel) return;
-                const empty = !sel.value || sel.value === '';
-                sel.classList.toggle('is-placeholder', empty);
-            }
-            // País / Departamento / Municipio
-            ['pais','departamento','municipio'].forEach(id=>{
-                const el = document.getElementById(id);
-                if(!el) return;
-                paintPlaceholder(el);
-                el.addEventListener('change', ()=>paintPlaceholder(el));
-            });
-        })();
-    </script>
 
 
 @endsection

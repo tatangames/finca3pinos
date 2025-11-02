@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('direccion', 100)->nullable();
             $table->string('ciudad',50)->nullable();
             $table->string('estado', 50)->nullable();
-            $table->string('codigo_postal', 20)->nullable();
+            $table->string('zipcode', 20)->nullable();
             $table->string('telefono', 20)->nullable();
 
             $table->foreign('id_usuario')->references('id')->on('usuarios');

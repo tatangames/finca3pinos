@@ -41,8 +41,6 @@ return [
     'gallery_finca3pinos' => 'Galería Finca3Pinos',
     'loading' => 'Cargando...',
     'siguenos' => 'Síguenos',
-
-    // === VISTA NUESTRO CAFE ===
     'coffee_v0' => 'Café Geisha • Metapán, El Salvador',
     'coffee_v1' => 'Café Geisha Finca 3 Pinos — Metapán',
     'coffee_v2' => 'Excelencia desde la Cordillera Alotepec-Metapán',
@@ -102,13 +100,6 @@ return [
     'coffee_v56' => 'Café Geisha de la Cordillera Alotepec–Metapán.',
     'coffee_v57' => 'Tradición, innovación y respeto por la tierra en cada taza.',
     'coffee_v58' => 'Explorar',
-
-
-
-
-
-
-    // === VISTA CONTACTO ===
     'contact_v1' => '¿Tienes preguntas sobre nuestros cafés o deseas realizar un pedido especial? En Finca 3 Pinos estamos para atenderte. Escríbenos y uno de nuestros especialistas te responderá lo antes posible.',
     'contact_v2' => 'Contáctanos',
     'contact_v3' => 'El Pinar, Cantón Montenegro Metapán, Santa Ana Norte.',
@@ -123,19 +114,12 @@ return [
     'contact_v12' => 'El correo es requerido.',
     'contact_v13' => 'Ingresa un correo válido.',
     'contact_v14' => 'La contraseña es requerida.',
-
-
-
-
     'contact_ok'    => '¡Gracias! Hemos recibido tu mensaje y te responderemos pronto.',
     'sending'       => 'Enviando...',
     'unknown_error' => 'Ocurrió un error inesperado. Intenta de nuevo.',
     'network_error' => 'No fue posible conectar con el servidor. Verifica tu conexión.',
     'derechos' => 'Finca 3 Pinos — Todos los derechos reservados.',
-
     'out_of_stock' => 'No disponible',
-
-
     'product_v1' => 'Selecciona tu café',
     'product_v2' => 'Agregar al carrito',
     'product_v3' => 'Presentación',
@@ -150,7 +134,6 @@ return [
     'product_v12' => 'Para continuar, haz clic en el botón siguiente:',
     'product_v13' => 'Si el botón no funciona, copia y pega este enlace en tu navegador:',
     'product_v14' => 'Si tú no realizaste esta solicitud, puedes ignorar este correo.',
-
     'product_v15' => 'Hola',
     'product_v16' => 'Hemos recibido una solicitud para restablecer tu contraseña de acceso a',
     'product_v17' => 'Si realizaste esta solicitud, haz clic en el siguiente botón para establecer una nueva contraseña:',
@@ -158,9 +141,6 @@ return [
     'product_v19' => 'Gracias,',
     'product_v20' => 'El equipo de',
     'product_v21' => 'Este correo se generó automáticamente, por favor no respondas a este mensaje.',
-
-
-
     'create_account' => 'Crear una cuenta',
     'email_address' => 'Correo electrónico',
     'password' => 'Contraseña',
@@ -187,7 +167,6 @@ return [
     'password_reset' => 'Tu contraseña ha sido restablecida.',
     'name_required' => 'El nombre es requerido.',
     'email_repetido' => 'El correo electrónico ya se encuentra registrado.',
-
     'orders' => 'Ordenes',
     'addresses' => 'Direcciones',
     'profile' => 'Perfil',
@@ -220,8 +199,7 @@ return [
     'saved_successfully' => 'Guardado correctamente.',
     'saving' => 'Guardando...',
     'phone' => 'Teléfono',
-    'delete_question' => '¿Borrar?',
-
+    'delete' => '¿Borrar?',
     'action_will_delete' => 'Esta acción eliminará la dirección seleccionada.',
     'cancel' => 'Cancelar',
     'yes_delete' => 'Sí, borrar',
@@ -236,10 +214,11 @@ return [
     'added_to_cart' => 'Agregado al carrito',
     'could_not_add_tocart' => 'No se pudo agregar al carrito.',
     'your_cart_empty' => 'Tu carrito esta vacío',
-
     'message_is_required' => 'El mensaje es requerido.',
     'msg_not_send' => 'No pudimos procesar tu solicitud en este momento.',
     'error_login_google' => 'No pudimos completar el inicio con Google. Inténtalo de nuevo.',
+    'edit' => 'Editar',
+
 
 
 

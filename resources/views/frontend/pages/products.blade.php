@@ -327,32 +327,32 @@
         }
 
 
-        .product-price{
-            display:inline-block;
-            background:#fff7e8;              /* fondo marfil cálido */
-            color:#b6894c;                   /* dorado de marca */
-            font-weight:600;
-            font-size:1.45rem;
-            padding:8px 14px;
-            border-radius:12px;
-            border:1px solid #f0e2c8;
-            box-shadow:0 2px 6px rgba(0,0,0,.08);
-            letter-spacing:.3px;
-            line-height:1;
-            transition:transform .2s ease, box-shadow .2s ease;
+        .product-price {
+            display: inline-block;
+            background: #fff7e8;
+            color: #b6894c;
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 5px 6px;           /* ← antes 5px 10px: menos ancho */
+            border-radius: 8px;
+            border: 1px solid #f0e2c8;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            letter-spacing: .2px;
+            line-height: 1;
+            transition: transform .2s ease, box-shadow .2s ease;
         }
-        .product-price:hover{
-            transform:translateY(-2px);
-            box-shadow:0 6px 14px rgba(0,0,0,.12);
+        .product-price:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,.12);
         }
+
         @media (max-width:575.98px){
-            .product-price{
-                font-size:1.15rem;
-                padding:6px 12px;
+            .product-price {
+                font-size: 1rem;
+                padding: 4px 5px;       /* ← también más estrecho en móvil */
+                border-radius: 6px;
             }
         }
-
-
 
         /* === Versión compacta de los selectores de cantidad === */
         .qty-control {
@@ -404,6 +404,32 @@
             color: #777;
         }
 
+        /* === Precio compacto y sin estirar === */
+        .product-info .product-price{
+            display: inline-flex !important;   /* evita block/100% */
+            align-items: center;
+            flex: 0 0 auto !important;         /* no crecer en flex */
+            align-self: flex-start;            /* no estirar a lo ancho */
+            width: auto !important;
+            max-width: max-content;
+            white-space: nowrap;               /* no saltos de línea */
+
+            background: #fff7e8;
+            color: #b6894c;
+            font-weight: 700;
+            font-size: 1.15rem !important;     /* más pequeño */
+            line-height: 1;
+            padding: 4px 6px !important;       /* menos ancho */
+            border-radius: 6px !important;
+            border: 1px solid #f0e2c8;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            margin: 6px 0 8px !important;
+        }
+
+        .product-info .product-price:hover{
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,.12);
+        }
 
 
     </style>

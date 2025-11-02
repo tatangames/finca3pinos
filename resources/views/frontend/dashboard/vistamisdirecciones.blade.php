@@ -372,10 +372,6 @@
             opacity: 0.9;
         }
 
-
-
-
-
         .address-card .radio {
             position: absolute;
             left: 14px;
@@ -479,6 +475,7 @@
             {{-- ===== Content (Addresses) ===== --}}
             <div class="account-content" role="region" aria-label="{{ __('meta.addresses') }}">
                 <div class="head">
+                    {{-- ===== TITULO DIRECCIONES ===== --}}
                     <h3>{{ __('meta.addresses') }}</h3>
                 </div>
 
@@ -511,16 +508,19 @@
                                         </form>
                                     </div>
 
+                                    {{-- ===== BOTON EDITAR DIRECCION ===== --}}
                                     <div class="address-tools" aria-label="Actions">
                                         <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.edit.direction', ['iddirection' => $address->id], false)) }}"
                                            title="{{ __('meta.edit') }}"
                                           >✏️</a>
 
+                                        {{-- ===== BOTON ELIMINAR DIRECCION ===== --}}
                                         <a href="javascript:void(0)"
                                            title="{{ __('meta.delete') }}"
                                            onclick="eliminarDireccion({{ $address->id }})">🗑️</a>
                                     </div>
 
+                                    {{-- ===== NOMBRE Y BOTON VERDE ===== --}}
                                     <h4 class="address-title">
                                         {{ $title }}
                                         @if($count !== null)
@@ -528,6 +528,7 @@
                                         @endif
                                     </h4>
 
+                                    {{-- ===== BLOQUE COMPLETO DE LAS DIRECCIONES ===== --}}
                                     <div class="address-body">
                                         {{-- Texto armado en el controlador según id_paises --}}
                                         {!! $address->textoDireccion !!}
@@ -581,7 +582,7 @@
         });
 
         const i18n = {
-            deleteQuestionMessage: "{{ __('meta.delete_question') }}",
+            deleteQuestionMessage: "{{ __('meta.delete') }}",
             willDeleteMessage: "{{ __('meta.action_will_delete') }}",
             cancelMessage: "{{ __('meta.cancel') }}",
             yesDeleteMessage: "{{ __('meta.yes_delete') }}",
@@ -763,9 +764,6 @@
             }
         }
     </script>
-
-
-
 
 
     {{-- Superior (Newsletter) block --}}
