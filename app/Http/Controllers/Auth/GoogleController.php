@@ -20,6 +20,12 @@ class GoogleController extends Controller
     public function handleGoogleCallback()
     {
         try {
+            $loginUrl = LaravelLocalization::localizeURL(
+                route('user.login', [], false)
+            );
+            return redirect()->to($loginUrl)
+                ->with('error', __('meta.error_login_google'));
+
             $googleUser = Socialite::driver('google')->user();
 
             // Busca o crea usuario
@@ -47,7 +53,7 @@ class GoogleController extends Controller
             );
 
             return redirect()->to($loginUrl)
-                ->with('error', 'No pudimos completar el inicio con Google. Inténtalo de nuevo.');
+                ->with('error', __('meta.error_login_google'));
         }
     }
 }
