@@ -218,7 +218,9 @@ return [
     'msg_not_send' => 'No pudimos procesar tu solicitud en este momento.',
     'error_login_google' => 'No pudimos completar el inicio con Google. Inténtalo de nuevo.',
     'edit' => 'Editar',
-
+    'error_updating' => 'Error al actualizar',
+    'not_found_or_does' => 'No encontrada o no pertenece al usuario.',
+    'address_set_default' => 'Dirección establecida como predeterminada.',
 
 
 

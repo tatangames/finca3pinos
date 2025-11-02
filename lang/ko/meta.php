@@ -217,6 +217,11 @@ return [
     'msg_not_send' => '현재 요청을 처리할 수 없습니다.',
     'error_login_google' => '구글 로그인에 실패했습니다. 다시 시도해주세요.',
     'edit' => '수정',
+    'error_updating' => '업데이트 중 오류가 발생했습니다',
+    'not_found_or_does' => '찾을 수 없거나 사용자에게 속하지 않습니다',
+    'address_set_default' => '기본 주소로 설정되었습니다.',
+
+
 
 
 ];

@@ -23,5 +23,6 @@ class Direcciones extends Model
         'estado',
         'zipcode',
         'telefono',
+        'predeterminado'
     ];
 }

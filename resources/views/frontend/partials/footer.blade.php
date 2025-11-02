@@ -142,11 +142,6 @@
 </style>
 
 
-
-
-
-
-
 <section id="block-footer" class="footer-dark">
     <div class="container">
         <div class="row">
@@ -158,7 +153,7 @@
                         <div class="logo-card">
                             <a href="{{ route('user.index') }}" class="footer-logo">
                                 <img src="{{ asset('images/logoindex.png') }}" style="width: 120px" height="120px"
-                                     alt="Finca 3 Pinos - Café Geisha"
+                                     alt="{{ __('meta.finca3pinos') }}"
                                      loading="lazy" decoding="async">
                             </a>
                         </div>

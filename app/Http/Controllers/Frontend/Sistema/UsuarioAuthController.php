@@ -413,18 +413,23 @@ class UsuarioAuthController extends Controller
             // Si no tiene, esta será la predeterminada
             $esPredeterminada = $tieneDireccion ? 0 : 1;
 
+            Log::info("VALORR");
+            Log::info($esPredeterminada);
+
+
+
             Direcciones::create([
-                'id_usuario'         => $userId,            // <- sin espacio
+                'id_usuario'         => $userId,
                 'id_paises'          => $request->pais,
                 'id_departamento'    => $request->departamento,
                 'id_municipio'       => $request->municipio,
-                'nombre'             => $request->nombre,
-                'direccion'          => $request->direccion,
-                'direccion_opcional' => $request->direccion_opcional,
-                'ciudad'             => $request->ciudad,
-                'estado'             => $request->provincia,
-                'zipcode'            => $request->postal,
-                'telefono'           => $request->telefono,
+                'nombre'             => strip_tags($request->nombre),
+                'direccion'          => strip_tags($request->direccion),
+                'direccion_opcional' => strip_tags($request->direccion_opcional),
+                'ciudad'             => strip_tags($request->ciudad),
+                'estado'             => strip_tags($request->provincia),
+                'zipcode'            => strip_tags($request->postal),
+                'telefono'           => strip_tags($request->telefono),
                 'predeterminado'     => $esPredeterminada,
             ]);
 
@@ -455,7 +460,7 @@ class UsuarioAuthController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error($e->getMessage());
-            return ['success' => 0, 'message' => 'Error al actualizar'];
+            return ['success' => 0, 'message' => __('meta.error_updating')];
         }
     }
 
@@ -474,7 +479,7 @@ class UsuarioAuthController extends Controller
 
         if (!$dir) {
             return response()->json(['success' => 0,
-                'msg' => 'No encontrada o no pertenece al usuario']);
+                'msg' => __('meta.not_found_or_does')]);
         }
 
         try {
@@ -526,7 +531,7 @@ class UsuarioAuthController extends Controller
 
             if (!$direccion) {
                 return response()->json(['success' => 0,
-                    'message' => 'Dirección no encontrada.']);
+                    'message' => __('meta.unknown_error')]);
             }
 
             // Quitar el default anterior del mismo usuario
@@ -539,14 +544,14 @@ class UsuarioAuthController extends Controller
 
             return response()->json([
                 'success' => 1,
-                'message' => 'Dirección establecida como predeterminada.'
+                'message' => __('meta.address_set_default')
             ]);
 
         } catch (\Exception $e) {
             Log::error('Error al establecer dirección predeterminada: ' . $e->getMessage());
             return response()->json([
                 'success' => 0,
-                'message' => 'Ocurrió un error al guardar.'
+                'message' => __('meta.unknown_error')
             ]);
         }
     }
@@ -555,7 +560,6 @@ class UsuarioAuthController extends Controller
 
     public function actualizarDireccion(Request $request)
     {
-
         try {
             DB::beginTransaction();
 
@@ -571,13 +575,13 @@ class UsuarioAuthController extends Controller
             $address->id_paises       = $request->pais;
             $address->id_departamento = $request->departamento ?: null;
             $address->id_municipio    = $request->municipio ?: null;
-            $address->nombre          = $request->nombre;
-            $address->direccion       = $request->direccion;
-            $address->direccion_opcional = $request->direccion_opcional;
-            $address->ciudad          = $request->ciudad;
-            $address->estado          = $request->provincia; // viene del input "provincia"
-            $address->zipcode         = $request->postal;    // viene del input "postal"
-            $address->telefono        = $request->telefono;
+            $address->nombre            = trim(strip_tags($request->nombre));
+            $address->direccion         = trim(strip_tags($request->direccion));
+            $address->direccion_opcional= trim(strip_tags($request->direccion_opcional));
+            $address->ciudad            = trim(strip_tags($request->ciudad));
+            $address->estado            = trim(strip_tags($request->provincia)); // input "provincia"
+            $address->zipcode           = trim(strip_tags($request->postal));    // input "postal"
+            $address->telefono          = trim(strip_tags($request->telefono));
 
             $address->save();
 
@@ -591,7 +595,7 @@ class UsuarioAuthController extends Controller
             DB::rollBack();
             return response()->json([
                 'success' => 0,
-                'message' => 'Ocurrió un error al actualizar la dirección.',
+                'message' => __('meta.unknown_error'),
             ]);
         }
     }
@@ -639,8 +643,6 @@ class UsuarioAuthController extends Controller
             'telefono'      => ['nullable','string','max:20'],
         ]);
 
-
-
         try {
             return DB::transaction(function () use ($userId, $data) {
 
@@ -654,14 +656,14 @@ class UsuarioAuthController extends Controller
                         'direccion'     => $data['direccion'] ?? null,
                         'ciudad'        => $data['ciudad'] ?? null,
                         'estado'        => $data['estado'] ?? null,
-                        'codigo_postal' => $data['codigo_postal'] ?? null,
+                        'zipcode'       => $data['codigo_postal'] ?? null,
                         'telefono'      => $data['telefono'] ?? null,
                     ]
                 );
 
                 return response()->json([
                     'success' => 1,
-                    'message' => 'Datos guardados correctamente.',
+                    'message' => __('meta.saved_successfully'),
                 ]);
             });
         } catch (\Throwable $e) {
@@ -672,7 +674,7 @@ class UsuarioAuthController extends Controller
 
             return response()->json([
                 'success' => 0,
-                'message' => 'Ocurrió un error al guardar.',
+                'message' => __('meta.unknown_error'),
             ], 500);
         }
     }

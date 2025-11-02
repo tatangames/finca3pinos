@@ -435,7 +435,7 @@
 
                         {{-- País --}}
                         <div class="form-group" id="bloque-pais">
-                            <label for="pais">{{ __('meta.country') }}</label>
+                            <label for="pais">{{ __('meta.country') }} <span style="color: red">*</span></label>
                             <div class="select-wrap">
                                 <select id="pais" name="pais">
                                     <option value="">{{ __('meta.select') }}</option>
@@ -466,7 +466,7 @@
 
                         {{-- Municipio (solo ES) --}}
                         <div class="form-group" id="bloque-municipio">
-                            <label for="municipio">{{ __('meta.municipality') }}</label>
+                            <label for="municipio">{{ __('meta.municipality') }} <span style="color: red">*</span></label>
                             <div class="select-wrap">
                                 <select id="municipio" name="municipio">
                                     <option value="">{{ __('meta.select') }}</option>
@@ -482,7 +482,7 @@
 
                         {{-- Nombre --}}
                         <div class="form-group">
-                            <label for="nombre-usuario">{{ __('meta.name_and_lastname') }}</label>
+                            <label for="nombre-usuario">{{ __('meta.name_and_lastname') }} <span style="color: red">*</span></label>
                             <input id="nombre-usuario" name="nombre" type="text" maxlength="50"
                                    value="{{ old('nombre', $address->nombre) }}"
                                    placeholder="{{ __('meta.name_and_lastname') }}">
@@ -490,7 +490,7 @@
 
                         {{-- Dirección --}}
                         <div class="form-group">
-                            <label for="direccion-usuario">{{ __('meta.direction') }}</label>
+                            <label for="direccion-usuario">{{ __('meta.direction') }} <span style="color: red">*</span></label>
                             <input id="direccion-usuario" name="direccion" type="text" maxlength="100"
                                    value="{{ old('direccion', $address->direccion) }}"
                                    placeholder="{{ __('meta.input_direction') }}">
@@ -507,7 +507,7 @@
 
                         {{-- Ciudad (para otros países y EE.UU.) --}}
                         <div class="form-group hidden" id="bloque-ciudad" style="margin-top:15px">
-                            <label for="ciudad-usuario">{{ __('meta.city') }}</label>
+                            <label for="ciudad-usuario">{{ __('meta.city') }} </label>
                             <input id="ciudad-usuario" name="ciudad" type="text" maxlength="50"
                                    value="{{ old('ciudad', $address->ciudad) }}"
                                    placeholder="{{ __('meta.city') }}" disabled>
@@ -532,7 +532,7 @@
 
                         {{-- Teléfono --}}
                         <div class="form-group">
-                            <label for="telefono-usuario">{{ __('meta.phone_number') }}</label>
+                            <label for="telefono-usuario">{{ __('meta.phone_number') }} <span style="color: red">*</span></label>
                             <input id="telefono-usuario" name="telefono" type="text" maxlength="20"
                                    value="{{ old('telefono', $address->telefono) }}"
                                    placeholder="{{ __('meta.phone_number') }}">

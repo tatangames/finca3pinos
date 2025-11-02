@@ -820,6 +820,7 @@
                                    style="background-color:#f0f0f0; color:#6c757d; cursor:not-allowed;">
                         </div>
 
+                        <br>
                         <h4 style="text-align: left!important; font-weight: 600" id="textoBilling">{{ __('meta.billing_information') }}</h4>
 
                         {{-- ===== DATOS DE FACTURACIÓN ===== --}}
@@ -978,7 +979,7 @@
                 if (state) {
                     btn.dataset.prevText = btn.innerHTML;
                     btn.disabled = true;
-                    btn.innerHTML = '{{ __("meta.saving") ?? "Guardando..." }}';
+                    btn.innerHTML = '{{ __("meta.saving")}}';
                 } else {
                     btn.disabled = false;
                     if (btn.dataset.prevText) btn.innerHTML = btn.dataset.prevText;

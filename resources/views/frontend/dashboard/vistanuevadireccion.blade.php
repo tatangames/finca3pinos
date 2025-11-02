@@ -775,6 +775,17 @@
             margin-top: 20px !important;
         }
 
+        /* Quitar negrita en mensajes de error */
+        .error-text{
+            font-weight: 400 !important; /* antes 600 */
+        }
+
+        /* (Opcional) si también ves el <label> más pesado al marcar error */
+        .has-error label{
+            font-weight: inherit !important; /* o 400 si lo quieres explícitamente regular */
+        }
+
+
     </style>
 
     @php
@@ -826,7 +837,7 @@
                         <div class="form-row">
                             {{-- País --}}
                             <div class="form-group">
-                                <label for="pais">{{ __('meta.country') }}</label>
+                                <label for="pais">{{ __('meta.country') }} <span style="color: red">*</span></label>
                                 <select id="pais" name="pais">
                                     <option value="">{{ __('meta.select') }}</option>
                                     @foreach(($paises ?? []) as $p)
@@ -848,7 +859,7 @@
 
                             <!-- Municipio -->
                             <div class="form-group" id="bloque-municipio" style="display:none; margin-top: 15px">
-                                <label for="municipio">{{ __('meta.municipality') }}</label>
+                                <label for="municipio">{{ __('meta.municipality') }} <span style="color: red">*</span></label>
                                 <select id="municipio" name="municipio" disabled>
                                     <option value="" disabled selected>{{ __('meta.select') }}</option>
                                     @foreach(($municipios ?? []) as $m)
@@ -861,13 +872,13 @@
 
                             <!-- Nombre -->
                             <div class="form-group">
-                                <label>{{ __('meta.name_and_lastname') }}</label>
+                                <label>{{ __('meta.name_and_lastname') }} <span style="color: red">*</span></label>
                                 <input id="nombre-usuario" type="text" maxlength="50" placeholder="{{ __('meta.name_and_lastname') }}">
                             </div>
 
                             <!-- Dirección -->
                             <div class="form-group">
-                                <label>{{ __('meta.direction') }}</label>
+                                <label>{{ __('meta.direction') }} <span style="color: red">*</span></label>
                                 <input id="direccion-usuario" type="text" maxlength="100" placeholder="{{ __('meta.input_direction') }}">
                             </div>
 
@@ -899,7 +910,7 @@
 
                             <!-- numero de telefono -->
                             <div class="form-group" id="bloque-telefono" style="display:none; margin-top: 15px">
-                                <label>{{ __('meta.phone_number')}}</label>
+                                <label>{{ __('meta.phone_number')}} <span style="color: red">*</span></label>
                                 <input id="telefono-usuario" type="text" maxlength="20" placeholder="{{ __('meta.phone_number') }}">
                             </div>
 
@@ -1055,15 +1066,13 @@
             }
 
             if (isES) {
-                // ES: Departamento + Municipio requeridos. Sin ciudad/provincia/postal
+                // 🇸🇻 El Salvador: Departamento + Municipio requeridos. Sin ciudad/provincia/postal
                 toggleBlock(boxDep, selDep, true,  true);
                 toggleBlock(boxMun, selMun, true,  true);
                 toggleBlock(boxCity, inpCity, false);
                 toggleBlock(boxProvincia, inpProvincia, false);
-                toggleBlock(boxPostal, inpPostal, false);
-
+                toggleBlock(boxPostal, inpPostal, false); // <— OCULTO para país 1
                 filtrarDepartamentos(1);
-                // Oculta municipios hasta seleccionar departamento
                 [...selMun.options].forEach((opt, i) => opt.hidden = i !== 0);
                 return;
             }
@@ -1086,7 +1095,8 @@
             toggleBlock(boxMun, selMun, false);
             toggleBlock(boxCity, inpCity, true,  true);
             toggleBlock(boxProvincia, inpProvincia, true,  true);
-            toggleBlock(boxPostal, inpPostal, false);
+            toggleBlock(boxPostal, inpPostal, true,  true); // <— MOSTRAR para los demás países
+
         }
 
         // Mantén tus listeners tal cual

@@ -218,6 +218,11 @@ return [
     'msg_not_send' => 'We couldn’t process your request at this time.',
     'error_login_google' => 'We couldn’t complete the sign-in with Google. Please try again.',
     'edit' => 'Editar',
+    'error_updating' => 'Error updating',
+    'not_found_or_does' => 'Not found or does not belong to the user',
+    'address_set_default' => 'Address set as default.',
+
+
 
 
 ];
