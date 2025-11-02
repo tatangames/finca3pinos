@@ -227,6 +227,23 @@ return [
     'update_cart' => '장바구니 업데이트',
     'shopping_cart_updated' => '장바구니가 업데이트되었습니다',
     'proceed_to_checkout' => '결제하기',
-    'update' => '업데이트'
+    'update' => '업데이트',
+    'shipping' => '배송',
+    'billing' => '결제 정보',
+    'payment' => '결제',
+    'shipping_address' => '배송지 주소',
+    'dont_have_address' => '등록된 주소가 없습니다. 구매를 계속하려면 주소를 추가해주세요.',
+    'add_address' => '+ 주소 추가',
+    'select_an_address' => '주소를 선택하세요',
+    'select_an_address_to' => '주소를 선택하여 상세 정보를 확인하세요',
+    'next' => '다음',
+    'total_to_pay' => '총 결제 금액',
+    'order_summary' => '주문 요약',
+    'back_verification' => '은행 인증',
+    'close' => '닫기',
+
+
+
+
 
 ];

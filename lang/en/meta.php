@@ -229,5 +229,20 @@ return [
     'shopping_cart_updated' => 'Shopping cart updated',
     'proceed_to_checkout' => 'Proceed to checkout',
     'update' => 'Update',
+    'shipping' => 'Shipping',
+    'billing' => 'Billing',
+    'payment' => 'Payment',
+    'shipping_address' => 'Shipping Address',
+    'dont_have_address' => 'You don’t have any registered addresses. Add one to continue with your purchase.',
+    'add_address' => '+ Add address',
+    'select_an_address' => 'Select an address',
+    'select_an_address_to' => 'Select an address to view the details',
+    'next' => 'Next',
+    'total_to_pay' => 'Total to Pay',
+    'order_summary' => 'Order Summary',
+    'back_verification' => 'Bank verification',
+    'close' => 'Close',
+
+
 
 ];

@@ -250,12 +250,6 @@
 
 
 
-
-    </style>
-
-
-    <style>
-
         .pay-tabs{display:flex;gap:8px;margin-bottom:10px}
         .pay-tab{padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:#1c2435;color:#e6efff}
         .pay-tab.active{outline:2px solid #2a58ff33}
@@ -293,8 +287,6 @@
         .pay-right .logo{font-size:12px;opacity:.8;border:1px solid var(--border);padding:2px 8px;border-radius:999px}
         .check-terms{display:block;margin:10px 0}
         .actions{display:flex;justify-content:space-between;margin-top:8px}
-
-
     </style>
 
 
@@ -303,9 +295,9 @@
     <div class="checkout-shell">
         <div class="steps-bar">
             <div class="checkout-steps" id="stepsHead">
-                <div class="step active" data-step="1"><span class="step-dot">1</span> <span>Envío</span></div>
-                <div class="step done"   data-step="2"><span class="step-dot">2</span> <span>Facturación</span></div>
-                <div class="step"        data-step="3"><span class="step-dot">3</span> <span>Pago</span></div>
+                <div class="step active" data-step="1"><span class="step-dot">1</span> <span>{{ __('meta.shipping')}}</span></div>
+                <div class="step done"   data-step="2"><span class="step-dot">2</span> <span>{{ __('meta.billing')}}</span></div>
+                <div class="step"        data-step="3"><span class="step-dot">3</span> <span>{{ __('meta.payment')}}</span></div>
             </div>
         </div>
     </div>
@@ -317,18 +309,18 @@
             {{-- ========= Paso 1: ENVÍO ========= --}}
             <div class="tab-pane active" id="tab1">
                 <div class="card-ship">
-                    <div class="h">Dirección de Envío</div>
+                    <div class="h">{{ __('meta.shipping_address')}}</div>
                     <div class="b">
                         @if($addresses->isEmpty())
                             <p style="margin-bottom:10px">
-                                No tienes direcciones registradas. Agrega una para continuar con tu compra.
+                                {{ __('meta.dont_have_address')}}
                             </p>
                             <a class="btn btn-primary"
                                href="{{ route('user.address', ['back' => 'checkout']) }}">
-                                + Agregar dirección
+                                {{ __('meta.add_address')}}
                             </a>
                         @else
-                            <label for="shipping_address" style="display:block;margin-bottom:6px">Selecciona una dirección</label>
+                            <label for="shipping_address" style="display:block;margin-bottom:6px"> {{ __('meta.select_an_address')}}</label>
                             <select id="shipping_address" class="control">
                                 @foreach($addresses as $a)
                                     @php
@@ -350,41 +342,41 @@
                                 @if($addrSelected)
                                     <div class="addr-card">
                                         @if($addrSelected->nombre)
-                                            <div class="addr-line"><strong>Nombre:</strong> {{ $addrSelected->nombre }}</div>
+                                            <div class="addr-line"><strong>{{ __('meta.contact_v5')}}:</strong> {{ $addrSelected->nombre }}</div>
                                         @endif
                                         @if($addrSelected->direccion)
-                                            <div class="addr-line"><strong>Dirección:</strong> {{ $addrSelected->direccion }}</div>
+                                            <div class="addr-line"><strong>{{ __('meta.direction')}}:</strong> {{ $addrSelected->direccion }}</div>
                                         @endif
                                         @if($addrSelected->pais_nombre)
-                                            <div class="addr-line"><strong>País:</strong> {{ $addrSelected->pais_nombre }}</div>
+                                            <div class="addr-line"><strong>{{ __('meta.country')}}:</strong> {{ $addrSelected->pais_nombre }}</div>
                                         @endif
                                         @if($addrSelected->depto_nombre)
-                                            <div class="addr-line"><strong>Departamento:</strong> {{ $addrSelected->depto_nombre }}</div>
+                                            <div class="addr-line"><strong>{{ __('meta.department')}}:</strong> {{ $addrSelected->depto_nombre }}</div>
                                         @endif
                                         @if($addrSelected->muni_nombre)
-                                            <div class="addr-line"><strong>Municipio:</strong> {{ $addrSelected->muni_nombre }}</div>
+                                            <div class="addr-line"><strong>{{ __('meta.municipality')}}:</strong> {{ $addrSelected->muni_nombre }}</div>
                                         @endif
                                         @if($addrSelected->ciudad)
-                                            <div class="addr-line"><strong>Ciudad:</strong> {{ $addrSelected->ciudad }}</div>
+                                            <div class="addr-line"><strong>{{ __('meta.city')}}:</strong> {{ $addrSelected->ciudad }}</div>
                                         @endif
                                         @if($addrSelected->estado)
-                                            <div class="addr-line"><strong>Estado/Provincia:</strong> {{ $addrSelected->estado }}</div>
+                                            <div class="addr-line"><strong>{{ __('meta.state_province')}}:</strong> {{ $addrSelected->estado }}</div>
                                         @endif
                                         @if($addrSelected->zipcode)
-                                            <div class="addr-line"><strong>Código Postal:</strong> {{ $addrSelected->zipcode }}</div>
+                                            <div class="addr-line"><strong>{{ __('meta.postal_code')}}:</strong> {{ $addrSelected->zipcode }}</div>
                                         @endif
                                         @if($addrSelected->telefono)
-                                            <div class="addr-line"><strong>Teléfono:</strong> {{ $addrSelected->telefono }}</div>
+                                            <div class="addr-line"><strong>{{ __('meta.phone')}}:</strong> {{ $addrSelected->telefono }}</div>
                                         @endif
                                     </div>
                                 @else
-                                    <div class="addr-empty muted">Selecciona una dirección para ver los detalles.</div>
+                                    <div class="addr-empty muted">{{ __('meta.select_an_address_to')}}</div>
                                 @endif
                             </div>
 
                             <input type="hidden" name="envio_id" id="envio_id" value="{{ $selectedAddressId }}">
                             <div style="display:flex;justify-content:flex-end;margin-top:12px">
-                                <button class="btn btn-primary" id="btnToStep2">Siguiente</button>
+                                <button class="btn btn-primary" id="btnToStep2">{{ __('meta.next')}}</button>
                             </div>
                         @endif
                     </div>
@@ -394,23 +386,23 @@
             {{-- ========= Paso 2: FACTURACIÓN ========= --}}
             <div class="tab-pane" id="tab2">
                 <div class="card">
-                    <div class="card-h">Datos de Facturación</div>
+                    <div class="card-h">{{ __('meta.billing_information')}}</div>
                     <div class="card-b">
                         <div class="row2">
                             <div>
-                                <label>Nombre / Razón social</label>
+                                <label>{{ __('meta.contact_v5')}}</label>
                                 <input id="bill_nombre" class="control"
-                                       value="{{ $billing->nombre ?? '' }}" placeholder="Nombre de facturación">
+                                       value="{{ $billing->nombre ?? '' }}" placeholder="">
                             </div>
                             <div>
-                                <label>Teléfono</label>
+                                <label>{{ __('meta.phone')}}</label>
                                 <input id="bill_tel" class="control"
-                                       value="{{ $billing->telefono ?? '' }}" placeholder="+503 ...">
+                                       value="{{ $billing->telefono ?? '' }}" placeholder="">
                             </div>
                         </div>
 
                         {{-- País --}}
-                        <label style="margin-top:10px">País</label>
+                        <label style="margin-top:10px">{{ __('meta.country')}}</label>
                         <select id="bill_pais" class="control">
                             <option value="">{{ __('meta.select') }}</option>
                             @foreach($paises as $p)
@@ -421,29 +413,29 @@
                             @endforeach
                         </select>
 
-                        <label style="margin-top:10px">Dirección</label>
+                        <label style="margin-top:10px">{{ __('meta.addresses')}}</label>
                         <input id="bill_dir" class="control"
-                               value="{{ $billing->direccion ?? '' }}" placeholder="Calle, número, referencias">
+                               value="{{ $billing->direccion ?? '' }}" placeholder="">
 
                         <div class="row2" style="margin-top:10px">
                             <div>
-                                <label>Ciudad</label>
+                                <label>{{ __('meta.city')}}</label>
                                 <input id="bill_ciudad" class="control" value="{{ $billing->ciudad ?? '' }}">
                             </div>
                             <div>
-                                <label>Estado/Provincia</label>
+                                <label>{{ __('meta.state_province')}}</label>
                                 <input id="bill_estado" class="control" value="{{ $billing->estado ?? '' }}">
                             </div>
                         </div>
 
                         <div class="row2" style="margin-top:10px">
                             <div>
-                                <label>Código Postal</label>
+                                <label>{{ __('meta.postal_code')}}</label>
                                 <input id="bill_zip" class="control" value="{{ $billing->codigo_postal ?? '' }}">
                             </div>
                             <div style="display:flex;align-items:end;gap:10px">
-                                <button class="btn btn-light" id="btnBack1">Volver</button>
-                                <button class="btn btn-primary" id="btnToStep3">Siguiente</button>
+                                <button class="btn btn-light" id="btnBack1">{{ __('meta.back')}}</button>
+                                <button class="btn btn-primary" id="btnToStep3">{{ __('meta.next')}}</button>
                             </div>
                         </div>
 
@@ -455,7 +447,7 @@
             {{-- ========= Paso 3: PAGO ========= --}}
             <div class="tab-pane" id="tab3">
                 <div class="card">
-                    <div class="card-h">Pago con tarjeta (Sandbox, sin 3DS)</div>
+                    <div class="card-h">Pago con tarjeta</div>
                     <div class="card-b">
                         <div class="pay-grid">
                             {{-- PREVIEW TARJETA (opcional; IDs necesarios si quieres animación) --}}
@@ -594,12 +586,12 @@
         {{-- =================== COLUMNA DERECHA (Resumen) =================== --}}
         <aside style="margin-top: 11px">
             <div class="card">
-                <div class="card-h">Resumen de la Orden</div>
+                <div class="card-h">{{ __('meta.order_summary')}}</div>
                 <div class="card-b">
                     <ul class="summary">
-                        <li><span>Subtotal</span><span id="sum-subtotal">${{ number_format($subtotal,2) }}</span></li>
-                        <li><span>Envío</span><span id="sum-shipping">${{ number_format($shipping,2) }}</span></li>
-                        <li class="total"><span>Total a Pagar</span><span id="sum-total">${{ number_format($total,2) }}</span></li>
+                        <li><span>{{ __('meta.subtotal')}}</span><span id="sum-subtotal">${{ number_format($subtotal,2) }}</span></li>
+                        <li><span>{{ __('meta.shipping')}}</span><span id="sum-shipping">${{ number_format($shipping,2) }}</span></li>
+                        <li class="total"><span>{{ __('meta.total_to_pay')}}</span><span id="sum-total">${{ number_format($total,2) }}</span></li>
                     </ul>
                 </div>
             </div>
@@ -613,8 +605,8 @@
     <div id="w3dsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999;">
         <div style="max-width:480px; width:100%; margin:40px auto; background:#fff; border-radius:8px; overflow:hidden;">
             <div style="padding:10px; display:flex; justify-content:space-between; align-items:center;">
-                <strong>Verificación bancaria</strong>
-                <button id="w3dsClose" type="button">Cerrar</button>
+                <strong>{{ __('meta.back_verification')}}</strong>
+                <button id="w3dsClose" type="button">{{ __('meta.close')}}</button>
             </div>
             <iframe id="w3dsFrame" style="width:100%; height:520px; border:0;"></iframe>
         </div>
@@ -658,10 +650,7 @@
                 ];
             })->toArray()
         , JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!};
-    </script>
 
-    {{-- ======= Navegación de pasos + resumen por dirección ======= --}}
-    <script>
         (function(){
             const stepsHead = document.getElementById('stepsHead');
             const panes = {1:tab('tab1'), 2:tab('tab2'), 3:tab('tab3')};
@@ -844,175 +833,6 @@
     </script>
 
 
-    <script>
-        (function(){
-            const $ = s => document.querySelector(s);
-
-            // Reutiliza tu modal/iframe ya existente
-            const modal = $('#w3dsModal');
-            const frame = $('#w3dsFrame');
-            const btnClose = $('#w3dsClose');
-
-            function open3DS(url){
-                frame.onload = null;
-                frame.src = url;
-                modal.style.display = 'block';
-
-                // Fallback: si el banco bloquea iframe, prueba popup
-                let loaded = false;
-                frame.onload = ()=> loaded = true;
-                setTimeout(()=>{
-                    if (!loaded) {
-                        frame.src = 'about:blank';
-                        modal.style.display = 'none';
-                        const w=520,h=680,left=(screen.width-w)/2,top=(screen.height-h)/2;
-                        const pop = window.open(url,'wompi3ds',`width=${w},height=${h},left=${left},top=${top},resizable,scrollbars`);
-                        if (!pop || pop.closed) window.location.href = url; // último recurso
-                    }
-                }, 4000);
-            }
-            function close3DS(){
-                frame.src = 'about:blank';
-                modal.style.display = 'none';
-            }
-
-            window.__open3DS  = open3DS;   // <--- agrega esto
-            window.__close3DS = close3DS;  // <--- y esto
-
-            btnClose?.addEventListener('click', close3DS);
-
-            // Escucha el retorno (desde wompi_return.blade.php)
-            // Pon esto en tu JS del checkout (ya fuera del iframe)
-            window.addEventListener('message', async (ev)=>{
-                if (!ev?.data || ev.data.type !== 'WOMPI_3DS_DONE') return;
-
-                // cierra modal / popup
-                if (window.__close3DS) window.__close3DS();
-
-                try {
-                    const r  = await axios.get("{{ route('wompi.tx.status') }}", { params:{ id: ev.data.idTransaccion }});
-                    const st = (r?.data?.estado || '').toUpperCase(); // APROBADA|DECLINADA|FALLIDA|PENDIENTE
-                    const detalle = r?.data?.detalle || r?.data?.resultado || r?.data?.codigoMensaje || '';
-
-                    if (st === 'APROBADA') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Pago aprobado',
-                            html: `Transacción: <b>${r.data.idTransaccion}</b><br>${detalle}`
-                        });
-
-                    } else if (st === 'PENDIENTE') {
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'Pago pendiente',
-                            text: detalle || 'En breve confirmaremos con tu banco.'
-                        });
-
-                    } else if (st === 'DECLINADA') {
-                        // 👇 Tip UX: mensaje amable según lo que diga el emisor
-                        const hint = (detalle && /EMISOR|ISSUER|BANCO/i.test(detalle))
-                            ? 'Tu banco rechazó la operación. Intenta con otra tarjeta o contacta al emisor.'
-                            : 'La transacción fue declinada. Puedes intentar nuevamente o usar otro medio de pago.';
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Pago no aprobado',
-                            html: `Estado: <b>${st}</b><br>${detalle}<br><small>${hint}</small>`
-                        });
-
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Pago no aprobado',
-                            html: `Estado: <b>${st}</b><br>${detalle || 'Error desconocido.'}`
-                        });
-                    }
-
-                } catch (e) {
-                    toastr.error('No se pudo verificar el resultado.');
-                }
-
-            });
-
-
-            // === BOTÓN Pagar (seguro / 3DS) ===
-            document.getElementById('btnPlaceOrder')?.addEventListener('click', async ()=> {
-                const btn = document.getElementById('btnPlaceOrder');
-                const lock = (on)=> { if(!btn) return; btn.disabled = !!on; btn.dataset.loading = on ? '1' : ''; };
-
-                try{
-                    lock(true);
-
-                    const envio_id = document.getElementById('envio_id')?.value || null;
-                    const billing  = document.getElementById('bill_payload')?.value || null;
-                    if (!envio_id) { toastr.error('Selecciona una dirección de envío.'); return; }
-
-                    // normaliza campos de tarjeta
-                    const rawNumber = (document.querySelector('#cardNumber')?.value || '');
-                    const number = rawNumber.replace(/\D+/g,''); // solo dígitos
-                    const exp_m  = document.querySelector('#cardMM')?.value || '';
-                    const exp_y  = document.querySelector('#cardYY')?.value || '';
-                    const cvv    = document.querySelector('#cardCVC')?.value || '';
-
-                    if (!/^\d{13,19}$/.test(number)) { Swal.fire({icon:'error', title:'Tarjeta inválida', text:'Número de tarjeta inválido'}); return; }
-                    if (!/^\d{1,2}$/.test(exp_m) || +exp_m<1 || +exp_m>12) { Swal.fire({icon:'error', title:'Tarjeta inválida', text:'Mes inválido'}); return; }
-                    if (!/^\d{4}$/.test(exp_y)) { Swal.fire({icon:'error', title:'Tarjeta inválida', text:'Año inválido (AAAA)'}); return; }
-                    if (!/^\d{3,4}$/.test(cvv)) { Swal.fire({icon:'error', title:'Tarjeta inválida', text:'CVV inválido'}); return; }
-
-                    // --- TOKENIZAR (muestra Swal si falla y DETIENE el flujo) ---
-                    let token = null;
-                    try {
-                        const tokRes = await axios.post("{{ route('wompi.tokenize') }}", {
-                            number, cvc: cvv, exp_m, exp_y
-                        });
-                        if (!tokRes.data?.ok) {
-                            throw new Error(tokRes.data?.mensaje || 'Tokenización fallida');
-                        }
-                        token = tokRes.data.token;
-                    } catch (e) {
-                        // extrae mensaje amigable
-                        const d = e?.response?.data || {};
-                        const apiMsgs = Array.isArray(d?.raw?.mensajes) ? d.raw.mensajes.join(' | ') : null;
-                        const msg = d?.mensaje || apiMsgs || e?.message || 'No se pudo tokenizar la tarjeta';
-                        Swal.fire({icon:'error', title:'Tarjeta inválida', text: msg});
-                        return; // 👈 no continúes a 3DS
-                    }
-
-                    // Iniciar 3DS – enviamos crudo + (token por si lo quieres usar luego)
-                    const pay = await axios.post("{{ route('wompi.pay.3ds') }}", {
-                        token,
-                        numero: number,
-                        exp_m,
-                        exp_y,       // AAAA
-                        cvv,
-                        envio_id,
-                        billing: billing ? JSON.parse(billing) : null,
-                    });
-
-                    if (pay?.data?.requiere3ds && pay.data.url3ds) {
-                        window.__open3DS ? window.__open3DS(pay.data.url3ds)
-                            : (document.getElementById('w3dsFrame').src = pay.data.url3ds,
-                                document.getElementById('w3dsModal').style.display = 'block');
-                    } else if (pay?.data?.ok) {
-                        Swal.fire({icon:'success', title:'Pago aprobado', text:`Transacción ${pay.data.idTransaccion||''}`});
-                    } else {
-                        const msg = pay?.data?.mensaje || 'No se pudo iniciar el pago';
-                        Swal.fire({icon:'error', title:'No se pudo iniciar el pago', text: msg});
-                    }
-
-                } catch(e){
-                    const d = e?.response?.data || {};
-                    const msg = d?.mensaje || e?.message || 'Error al procesar el pago';
-                    console.error('WOMPI 3DS ERROR', e);
-                    Swal.fire({icon:'error', title:'Error', text: msg});
-                } finally {
-                    lock(false);
-                }
-            });
-
-
-        })();
-    </script>
 
 
 

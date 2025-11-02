@@ -19,7 +19,13 @@ class CheckoutController extends Controller
 
     use HandlesCart;
 
-    public function show()
+    public function __construct()
+    {
+        $this->middleware('auth:web');
+    }
+
+
+    public function vistaCheckout()
     {
         $cart     = $this->cart();
         $items    = $cart->getContent();

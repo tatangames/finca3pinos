@@ -20,13 +20,9 @@ use App\Http\Controllers\Frontend\Sistema\OrderController;
 use App\Http\Controllers\Frontend\Sistema\PasswordResetController;
 use App\Http\Controllers\Frontend\Sistema\CartController;
 use App\Http\Controllers\Frontend\Sistema\CheckoutController;
-use App\Http\Controllers\Frontend\Pagos\WompiController;
-use App\Http\Controllers\Frontend\Pagos\WompiSandboxController;
 
 
 use App\Http\Controllers\Auth\GoogleController;
-
-
 
 
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -303,45 +299,43 @@ Route::middleware(['detect.country.locale'])->group(function () {
             ->name('user.cart');
 
         // ver vista checkout
-        Route::get(LaravelLocalization::transRoute('routes.checkout'), [CheckoutController::class, 'show'])
+        Route::get(LaravelLocalization::transRoute('routes.checkout'), [CheckoutController::class, 'vistaCheckout'])
             ->name('checkout.show');
 
-
+        // Registrar orden y pagar
         Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
 
 
 
 
-        Route::post('/wompi/tokenize',  [WompiController::class, 'tokenize'])->name('wompi.tokenize');
+
+        // === NO SE USARA, RUTAS WOMPI ===
+       /* Route::post('/wompi/tokenize',  [WompiController::class, 'tokenize'])->name('wompi.tokenize');
         Route::post('/wompi/3ds',       [WompiController::class, 'pay3ds'])->name('wompi.pay.3ds');
         Route::get('/wompi/tx-status',  [WompiController::class, 'txStatus'])->name('wompi.tx.status');
 
         // flujo de retorno (abre dentro del iframe o popup y hace postMessage para cerrar tu modal)
-        Route::get('/pagos/wompi/return', [WompiController::class, 'return'])->name('wompi.return');
-
-
-
-
-
+        Route::get('/pagos/wompi/return', [WompiController::class, 'return'])->name('wompi.return');*/
     });
 });
 
 
 
-// AJAX
+/// ==== RUTAS PARA CARRITO DE COMPRAS ====
+// agregar al carrito
 Route::post('/cart/add',   [CartController::class,'add'])->name('cart.add');
+// conteo de items
 Route::get ('/cart/count', [CartController::class,'count'])->name('cart.count');
-
-// Opcional
+// limpiar carrito completo
 Route::delete('/cart/clear', [CartController::class,'clear'])->name('cart.clear');
-
-
+// actualizar carrito
 Route::post('/cart/update', [CartController::class, 'updateItem'])->name('cart.update');
+// remover item del carrito
 Route::post('/cart/remove', [CartController::class, 'removeItem'])->name('cart.remove');
 
 
 
-// CARGA IMAGENES PARA GALERIA SIN LOCALIZACION
+// ==== CARGA IMAGENES PARA GALERIA ====
 Route::get('/galeria/cargar', [FrontendController::class, 'cargarGaleria'])
     ->name('galeria.cargar');
 

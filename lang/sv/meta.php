@@ -221,7 +221,6 @@ return [
     'error_updating' => 'Error al actualizar',
     'not_found_or_does' => 'No encontrada o no pertenece al usuario.',
     'address_set_default' => 'Dirección establecida como predeterminada.',
-
     'price' => 'Precio',
     'quantity' => 'Cantidad',
     'total' => 'Total',
@@ -230,6 +229,21 @@ return [
     'shopping_cart_updated' => 'carrito de compras actualizado',
     'proceed_to_checkout' => 'Proceder al pago',
     'update' => 'Actualizado',
+    'shipping' => 'Envió',
+    'billing' => 'Facturación',
+    'payment' => 'Pago',
+    'shipping_address' => 'Dirección de Envío',
+    'dont_have_address' => 'No tienes direcciones registradas. Agrega una para continuar con tu compra.',
+    'add_address' => '+ Agregar dirección',
+    'select_an_address' => 'Selecciona una dirección',
+    'select_an_address_to' => 'Selecciona una dirección para ver los detalles',
+    'next' => 'Siguiente',
+    'total_to_pay' => 'Total a pagar',
+    'order_summary' => 'Resumen de la Orden',
+    'back_verification' => 'Verificación bancaria',
+    'close' => 'Cerrar',
+
+
 
 
 
