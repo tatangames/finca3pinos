@@ -8,7 +8,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Mcamara\LaravelLocalization\LaravelLocalization;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization as L10n;
 
 class GoogleController extends Controller
 {
@@ -20,8 +20,8 @@ class GoogleController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            $loginUrl = LaravelLocalization::localizeURL(
-                route('user.login', [], false)
+            $loginUrl = L10n::localizeURL(
+                route('user.login', [], false) // sin duplicar idioma
             );
             return redirect()->to($loginUrl)
                 ->with('error', __('meta.error_login_google'));
