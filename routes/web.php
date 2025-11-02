@@ -24,12 +24,23 @@ use App\Http\Controllers\Frontend\Pagos\WompiController;
 use App\Http\Controllers\Frontend\Pagos\WompiSandboxController;
 
 
+use App\Http\Controllers\Auth\GoogleController;
 
 
 
 
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
+
+
+// ===============================================
+//  RUTAS DE LOGIN CON GOOGLE
+// ===============================================
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])
+    ->name('google.login');
+
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])
+    ->name('google.callback');
 
 
 // === RUTAS ADMIN SIN AUTH ===

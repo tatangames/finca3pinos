@@ -422,6 +422,38 @@
         }
 
 
+        /* ——— Botón Google (estilo oficial) ——— */
+        .social-wrap { margin-top: 14px; }
+        .btn-google{
+            display:flex; align-items:center; justify-content:center; gap:10px;
+            width:100%;
+            background:#fff;
+            color:#3c4043;                 /* texto gris oscuro */
+            border:1px solid #dadce0;      /* borde Google */
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-weight:600;
+            text-decoration:none;
+            box-shadow: 0 1px 1px rgba(0,0,0,.04);
+            transition: box-shadow .2s ease, transform .06s ease, border-color .2s ease;
+        }
+        .btn-google:hover{
+            box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 2px 6px rgba(60,64,67,.15);
+            border-color:#c9ccd1;
+        }
+        .btn-google:active{ transform: translateY(1px); }
+        .btn-google:focus-visible{
+            outline: 3px solid rgba(66,133,244,.35); /* azul Google */
+            outline-offset: 2px;
+        }
+
+        /* Contenedor actual para que sea 1 columna (100% ancho) */
+        .social-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+
+        /* Oculta el botón genérico si lo dejas en el HTML */
+        .btn-social{ display:none; }
+
+
     </style>
 
     <header class="page-header like-parallax"
@@ -493,7 +525,18 @@
 
                         <div class="divider"><span>{{ __('meta.o') }}</span></div>
                         <div class="social-grid">
-                            <a href="" class="btn-social">{{ __('meta.google') }}</a>
+                            <div class="social-wrap">
+                                <a href="{{ route('google.login') }}" class="btn-google" rel="nofollow">
+                                    <!-- Logo “G” oficial SVG -->
+                                    <svg class="g-logo" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+                                        <path fill="#FFC107" d="M43.6 20.5h-1.9V20H24v8h11.3C33.8 31.9 29.3 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.9 5.1 29.7 3 24 3 12.3 3 3 12.3 3 24s9.3 21 21 21c10.5 0 20-7.6 20-21 0-1.3-.1-2.2-.4-3.5z"/>
+                                        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.8 16.3 19.1 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.9 5.1 29.7 3 24 3 16.1 3 9.2 7.6 6.3 14.7z"/>
+                                        <path fill="#4CAF50" d="M24 45c5.2 0 10.1-2 13.7-5.3l-6.3-5.3C29.4 35.5 26.9 36 24 36c-5.2 0-9.7-3.1-11.6-7.5l-6.5 5C8.7 40.2 15.8 45 24 45z"/>
+                                        <path fill="#1976D2" d="M43.6 20.5H24v8h11.3c-1.1 3.1-3.6 5.5-6.6 6.5l6.3 5.3C38.5 36.8 41 31.1 41 24c0-1.3-.1-2.2-.4-3.5z"/>
+                                    </svg>
+                                    <span>{{ __('meta.google') }}</span>
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
