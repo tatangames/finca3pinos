@@ -8,6 +8,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Mcamara\LaravelLocalization\LaravelLocalization;
 
 class GoogleController extends Controller
 {
@@ -32,14 +33,21 @@ class GoogleController extends Controller
                 ]
             );
 
-            Auth::login($user);
+            Auth::guard('web')->login($user, true);
 
             // Redirige a la ruta que mencionaste
             return redirect()->route('user.index');
 
         } catch (\Exception $e) {
-            Log::error('Error al iniciar sesión con Google: '.$e->getMessage());
-            return redirect('/login')->with('error', 'Error al iniciar sesión con Google.');
+            Log::error('Error Google OAuth: '.$e->getMessage());
+
+            // URL de login *localizada* (sin duplicar idioma)
+            $loginUrl = LaravelLocalization::localizeURL(
+                route('user.login', [], false)
+            );
+
+            return redirect()->to($loginUrl)
+                ->with('error', 'No pudimos completar el inicio con Google. Inténtalo de nuevo.');
         }
     }
 }

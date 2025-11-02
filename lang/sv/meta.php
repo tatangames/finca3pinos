@@ -238,7 +238,8 @@ return [
     'your_cart_empty' => 'Tu carrito esta vacío',
 
     'message_is_required' => 'El mensaje es requerido.',
-    'msg_not_send' => 'No pudimos procesar tu solicitud en este momento.'
+    'msg_not_send' => 'No pudimos procesar tu solicitud en este momento.',
+    'error_login_google' => 'No pudimos completar el inicio con Google. Inténtalo de nuevo.',
 
 
 

@@ -238,7 +238,8 @@ return [
     'added_to_cart' => '장바구니에 추가됨',
     'could_not_add_tocart' => '장바구니에 추가할 수 없습니다',
     'your_cart_empty' => '장바구니가 비어 있습니다',
-    'msg_not_send' => '현재 요청을 처리할 수 없습니다.'
+    'msg_not_send' => '현재 요청을 처리할 수 없습니다.',
+    'error_login_google' => '구글 로그인에 실패했습니다. 다시 시도해주세요.',
 
 
 

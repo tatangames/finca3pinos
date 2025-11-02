@@ -491,7 +491,21 @@
                 </div>
 
                 {{-- Mensajes flash (opcional) --}}
+                @if (session('error'))
+                    <div class="auth-alert error" role="alert">
+                        {{ session('error') }}
+                    </div>
+                @endif
 
+                @if ($errors->any())
+                    <div class="auth-alert error" role="alert">
+                        <ul style="margin:0;padding-left:18px">
+                            @foreach ($errors->all() as $err)
+                                <li>{{ $err }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
 
                 {{-- PANE: LOGIN --}}
