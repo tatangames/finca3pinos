@@ -221,8 +221,13 @@ return [
     'error_updating' => 'Error updating',
     'not_found_or_does' => 'Not found or does not belong to the user',
     'address_set_default' => 'Address set as default.',
-
-
-
+    'price' => 'Price',
+    'quantity' => 'Quantity',
+    'total' => 'Total',
+    'subtotal' => 'Subtotal',
+    'update_cart' => 'Update cart',
+    'shopping_cart_updated' => 'Shopping cart updated',
+    'proceed_to_checkout' => 'Proceed to checkout',
+    'update' => 'Update',
 
 ];

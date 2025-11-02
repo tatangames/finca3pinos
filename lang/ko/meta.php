@@ -220,8 +220,13 @@ return [
     'error_updating' => '업데이트 중 오류가 발생했습니다',
     'not_found_or_does' => '찾을 수 없거나 사용자에게 속하지 않습니다',
     'address_set_default' => '기본 주소로 설정되었습니다.',
-
-
-
+    'price' => '가격',
+    'quantity' => '수량',
+    'total' => '합계',
+    'subtotal' => '소계',
+    'update_cart' => '장바구니 업데이트',
+    'shopping_cart_updated' => '장바구니가 업데이트되었습니다',
+    'proceed_to_checkout' => '결제하기',
+    'update' => '업데이트'
 
 ];

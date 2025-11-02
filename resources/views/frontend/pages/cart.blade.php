@@ -3,357 +3,8 @@
 @section('title', __('meta.title'))
 
 @section('content')
-
+    <link rel="stylesheet" href="{{ asset('css/toastr.min.css') }}">
     <style>
-
-        /* ============================================================
-   LIMPIEZA DE FONDOS Y ENVOLTURAS
-   ============================================================ */
-
-        #like_sc_contact_form_7_122453212,
-        #like_sc_contact_form_7_122453212.form-bg-default,
-        #like_sc_contact_form_7_122453212 .wpcf7,
-        #like_sc_contact_form_7_122453212 .wpcf7-form {
-            background: transparent !important;
-            border: 0 !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-        }
-
-        #like_sc_contact_form_7_122453212 .vc_custom_1505582392596 {
-            background: transparent !important;
-            padding: 0 !important;
-            border-radius: 0 !important;
-        }
-
-        /* ============================================================
-           CARD PRINCIPAL DEL FORMULARIO
-           ============================================================ */
-
-        .contact-card {
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-            padding: 22px;
-            overflow: hidden;
-        }
-
-        .contact-card p,
-        .contact-card label,
-        .contact-card .wpcf7-form-control-wrap {
-            background: transparent !important;
-            margin-bottom: 12px;
-        }
-
-        /* ============================================================
-           TIPOGRAFÍA Y INPUTS
-           ============================================================ */
-
-        .contact-card .wpcf7-form-control {
-            font-weight: 400 !important;
-            font-family: "Roboto", system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-            color: #333;
-            letter-spacing: 0.2px;
-        }
-
-        .contact-card input[type="text"],
-        .contact-card input[type="email"],
-        .contact-card textarea,
-        #contact-form input[type="text"],
-        #contact-form input[type="email"],
-        #contact-form textarea {
-            width: 100%;
-            background: #fafafa;
-            border: 1px solid rgba(0, 0, 0, 0.12);
-            border-radius: 10px;
-            padding: 10px 12px;
-            outline: none;
-            font-size: 15px;
-            transition: all 0.2s ease;
-        }
-
-        .contact-card input::placeholder,
-        .contact-card textarea::placeholder {
-            color: #9a9a9a;
-            font-weight: 400;
-        }
-
-        #correo-form {
-            text-transform: lowercase;
-        }
-
-        /* Foco elegante */
-        .contact-card input[type="text"]:focus,
-        .contact-card input[type="email"]:focus,
-        .contact-card textarea:focus,
-        #contact-form input:focus,
-        #contact-form textarea:focus {
-            border-color: #c6a471;
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(198, 164, 113, 0.15);
-        }
-
-        /* Ajuste textarea */
-        .contact-card textarea {
-            min-height: 160px;
-            resize: vertical;
-        }
-
-        /* Autofill (Chrome) */
-        .contact-card input:-webkit-autofill,
-        .contact-card textarea:-webkit-autofill {
-            -webkit-box-shadow: 0 0 0 1000px #fff inset;
-            box-shadow: 0 0 0 1000px #fff inset;
-            -webkit-text-fill-color: #333;
-        }
-
-        /* ============================================================
-           BOTONES - ENVIAR Y SUBMIT
-           ============================================================ */
-
-        .contact-card input[type="submit"],
-        .contact-card input[type="button"],
-        .contact-card .wpcf7-submit {
-            background: #c6a471 !important;
-            color: #fff !important;
-            border: none !important;
-            font-weight: 700 !important;
-            padding: 12px 28px !important;
-            border-radius: 10px !important;
-            cursor: pointer !important;
-            transition: all 0.25s ease !important;
-            display: inline-block !important;
-        }
-
-        .contact-card input[type="submit"]:hover,
-        .contact-card input[type="button"]:hover,
-        .contact-card .wpcf7-submit:hover {
-            background: #b8935e !important;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-        }
-
-        #btn-enviar:disabled,
-        button[disabled] {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        /* ============================================================
-           MENSAJES DE ÉXITO / ERROR
-           ============================================================ */
-
-        .contact-card .wpcf7-response-output {
-            margin: 14px 0 0 !important;
-            border-radius: 10px !important;
-            background: #f7f7f7;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        /* ============================================================
-           DISTRIBUCIÓN DOS COLUMNAS
-           ============================================================ */
-
-        .contact-two-col {
-            display: grid !important;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            align-items: stretch;
-        }
-
-        @media (min-width: 992px) {
-            .contact-two-col {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .contact-two-col > .vc_column_container {
-            width: 100% !important;
-            float: none !important;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-        }
-
-        .contact-two-col .vc_column-inner {
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-        }
-
-        /* ============================================================
-           DATOS DE CONTACTO E ÍCONOS
-           ============================================================ */
-
-        .contact-card .fa {
-            color: #d2aa6d;
-            font-size: 18px;
-            width: 22px;
-            text-align: center;
-        }
-
-        .contact-card .contact-data {
-            margin: 14px 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .contact-card .contact-data li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
-
-        /* ============================================================
-           BOTONES REDES SOCIALES
-           ============================================================ */
-
-        .contact-card .social-cta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 0;
-            margin: 10px 0 0;
-            list-style: none;
-        }
-
-        .contact-card .social-cta .scb {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 600;
-            background: #fff;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            transition: transform 0.12s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-        }
-
-        .contact-card .social-cta .scb:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-        }
-
-        .contact-card .social-cta .fb {
-            color: #1877F2;
-        }
-
-        .contact-card .social-cta .ig {
-            color: #E4405F;
-        }
-
-        .contact-card .social-cta .tt {
-            color: #111;
-        }
-
-        .contact-card .social-cta .tt .tt-ico {
-            width: 16px;
-            height: 16px;
-            fill: #111;
-        }
-
-        .social-list {
-            display: flex;
-            gap: 10px;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .social-list li a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            background: #ffffff;
-            border-radius: 50%;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .social-list li a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .social-icon {
-            width: 35px;
-            height: 35px;
-            object-fit: contain;
-        }
-
-        /* ============================================================
-           ACCIONES Y VALIDACIÓN
-           ============================================================ */
-
-        .contact-card__actions {
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .field-error {
-            color: #d93025;
-            font-size: 0.85rem;
-            margin-top: 6px;
-            line-height: 1.3;
-        }
-
-        .field-error:empty {
-            display: none;
-        }
-
-        .is-invalid {
-            border-color: #d93025 !important;
-            box-shadow: none !important;
-        }
-
-        /* ============================================================
-           CONTADOR DE CARACTERES
-           ============================================================ */
-
-        .char-counter {
-            font-size: 0.85rem;
-            text-align: right;
-            opacity: 0.85;
-            margin-top: 4px;
-        }
-
-        .char-counter.warning {
-            color: #c77d00;
-        }
-
-        .char-counter.danger {
-            color: #d93025;
-        }
-
-        /* ============================================================
-           SPINNER LOADING
-           ============================================================ */
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #d2aa6d;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
         /* ============================================================
            WOOCOMMERCE - CARRITO
            ============================================================ */
@@ -391,22 +42,18 @@
         /* ============================================================
            TABLA DEL CARRITO
            ============================================================ */
-
         .shop_table.cart thead th {
             background: #c0a277;
             color: #fff;
             font-weight: 700;
         }
-
         .shop_table.cart tbody tr.cart_item td {
             padding: 12px 10px;
             vertical-align: middle;
         }
-
         .shop_table.cart tbody tr.cart_item {
             border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         }
-
         .shop_table.cart td.product-thumbnail img {
             width: 120px;
             height: auto;
@@ -416,215 +63,25 @@
         /* ============================================================
            CANTIDAD (INPUT)
            ============================================================ */
-
-        .shop_table.cart td.product-quantity {
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .shop_table.cart .quantity {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
+        .shop_table.cart td.product-quantity { text-align: center; vertical-align: middle; }
+        .shop_table.cart .quantity { display: inline-flex; align-items: center; justify-content: center; }
         .shop_table.cart .quantity .input-text.qty {
-            width: 60px;
-            height: 36px;
-            padding: 4px 8px;
-            text-align: center;
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            border-radius: 6px;
-            outline: none;
-            font-weight: 500;
-            font-size: 15px;
-            color: #333;
-            transition: all 0.2s ease;
+            width: 60px; height: 36px; padding: 4px 8px; text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 6px; outline: none;
+            font-weight: 500; font-size: 15px; color: #333; transition: all 0.2s ease;
         }
-
         .shop_table.cart .quantity .input-text.qty:focus {
             border-color: #d2aa6d;
             box-shadow: 0 0 0 2px rgba(210, 170, 109, 0.15);
-        }
-
-        /* ============================================================
-           BOTÓN ELIMINAR (X)
-           ============================================================ */
-
-        .shop_table.cart td.product-remove {
-            width: 60px;
-            text-align: center;
-            vertical-align: middle;
-            padding: 12px 10px;
-        }
-
-        .shop_table.cart td.product-remove .remove {
-            display: inline-flex !important;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            height: 30px;
-            border-radius: 50% !important;
-            background: #fff3e0;
-            color: #d62d20;
-            font-size: 18px;
-            font-weight: bold;
-            text-decoration: none !important;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            line-height: 1;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-        }
-
-        .shop_table.cart td.product-remove .remove:hover {
-            background: #e74c3c;
-            color: #fff;
-            transform: scale(1.05);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        /* ============================================================
-           TOTALES DEL CARRITO
-           ============================================================ */
-
-        .cart-collaterals {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .cart_totals {
-            width: 420px;
-            max-width: 100%;
-        }
-
-        .cart_totals h2 {
-            display: none;
-        }
-
-        .cart_totals .shop_table {
-            width: 100%;
-            border: none;
-            border-radius: 0;
-            overflow: visible;
-        }
-
-        .cart_totals .shop_table th,
-        .cart_totals .shop_table td {
-            padding: 12px 16px;
-        }
-
-        .cart_totals .order-total th,
-        .cart_totals .order-total td {
-            font-size: 1.4rem;
-            font-weight: 800;
-        }
-
-        .cart_totals .cart-subtotal td {
-            text-align: right;
-        }
-
-        .cart_totals .cart-subtotal td .price-badge {
-            display: inline-block;
-            padding: 8px 12px;
-            background: #fff;
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            border-radius: 8px;
-            font-weight: 700;
-            letter-spacing: 0.1px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-        }
-
-        /* ============================================================
-           BOTÓN CHECKOUT
-           ============================================================ */
-
-        .wc-proceed-to-checkout .checkout-button {
-            display: inline-block;
-            width: auto;
-            margin-top: 14px;
-            background: #d2aa6d !important;
-            border-radius: 10px !important;
-            padding: 12px 24px !important;
-            font-weight: 700 !important;
-            color: #fff !important;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-            transition: transform 0.15s ease, box-shadow 0.2s ease;
-        }
-
-        .wc-proceed-to-checkout .checkout-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-        }
-
-        /* ============================================================
-           RESPONSIVE - MOBILE
-           ============================================================ */
-
-        @media (max-width: 991px) {
-            .cart-collaterals {
-                justify-content: center;
-            }
-
-            .cart_totals {
-                width: 100%;
-            }
-
-            .shop_table.cart td.product-thumbnail img {
-                width: 100px;
-            }
-        }
-
-
-
-
-        /* Botón X perfectamente circular, desktop y móvil */
-        .woocommerce table.shop_table.cart td.product-remove > a.remove,
-        table.shop_table.cart td.product-remove > a.remove {
-            display: inline-grid !important;
-            place-items: center !important;
-            width: 30px !important;
-            height: 30px !important;
-            aspect-ratio: 1 / 1;
-            padding: 0 !important;
-            margin: 0 auto !important;
-            border-radius: 50% !important;
-            line-height: 1 !important;
-            background: #fff3e0 !important;
-            color: #d62d20 !important;
-            border: 1px solid rgba(0,0,0,.1) !important;
-            font-size: 18px !important;
-            text-decoration: none !important;
-            box-sizing: border-box !important;
-        }
-
-        /* Algunos themes dibujan la X con :before y añaden medidas/padding */
-        .woocommerce a.remove:before {
-            position: static !important;  /* evita offsets raros */
-            display: inline !important;
-            width: auto !important;
-            height: auto !important;
-            line-height: 1 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        /* Opcional: hover */
-        .woocommerce table.shop_table.cart td.product-remove > a.remove:hover {
-            background: #e74c3c !important;
-            color: #fff !important;
-            transform: scale(1.05);
-            box-shadow: 0 3px 8px rgba(0,0,0,.15);
         }
 
         /* QTY sin flechas nativas */
         .shop_table.cart .quantity .input-text.qty,
         .woocommerce .quantity .qty,
         input[type="number"] {
-            -moz-appearance: textfield;   /* Firefox */
-            appearance: textfield;        /* Estándar */
+            -moz-appearance: textfield;
+            appearance: textfield;
         }
-
-        /* Chrome / Edge / Safari (WebKit) */
         .shop_table.cart .quantity .input-text.qty::-webkit-outer-spin-button,
         .shop_table.cart .quantity .input-text.qty::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button,
@@ -633,8 +90,59 @@
             margin: 0;
         }
 
+        /* ============================================================
+           BOTÓN ELIMINAR (X)
+           ============================================================ */
+        .shop_table.cart td.product-remove { width: 60px; text-align: center; vertical-align: middle; padding: 12px 10px; }
+        .shop_table.cart td.product-remove .remove {
+            display: inline-flex !important; align-items: center; justify-content: center;
+            width: 30px; height: 30px; border-radius: 50% !important;
+            background: #fff3e0; color: #d62d20; font-size: 18px; font-weight: bold;
+            text-decoration: none !important; border: 1px solid rgba(0, 0, 0, 0.1);
+            line-height: 1; transition: all 0.2s ease; box-sizing: border-box;
+        }
+        .shop_table.cart td.product-remove .remove:hover {
+            background: #e74c3c; color: #fff; transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
 
-        /* Elimina el borde cuadrado del contenedor de totales */
+        /* Botón X consistente en temas */
+        .woocommerce table.shop_table.cart td.product-remove > a.remove,
+        table.shop_table.cart td.product-remove > a.remove {
+            display: inline-grid !important; place-items: center !important;
+            width: 30px !important; height: 30px !important; aspect-ratio: 1/1;
+            padding: 0 !important; margin: 0 auto !important; border-radius: 50% !important;
+            line-height: 1 !important; background: #fff3e0 !important; color: #d62d20 !important;
+            border: 1px solid rgba(0,0,0,.1) !important; font-size: 18px !important;
+            text-decoration: none !important; box-sizing: border-box !important;
+        }
+        .woocommerce a.remove:before {
+            position: static !important; display: inline !important;
+            width: auto !important; height: auto !important; line-height: 1 !important;
+            margin: 0 !important; padding: 0 !important;
+        }
+        .woocommerce table.shop_table.cart td.product-remove > a.remove:hover {
+            background: #e74c3c !important; color: #fff !important;
+            transform: scale(1.05); box-shadow: 0 3px 8px rgba(0,0,0,.15);
+        }
+
+        /* ============================================================
+           TOTALES DEL CARRITO
+           ============================================================ */
+        .cart-collaterals { display: flex; justify-content: flex-end; }
+        .cart_totals { width: 420px; max-width: 100%; }
+        .cart_totals h2 { display: none; }
+        .cart_totals .shop_table { width: 100%; border: none; border-radius: 0; overflow: visible; }
+        .cart_totals .shop_table th, .cart_totals .shop_table td { padding: 12px 16px; }
+        .cart_totals .order-total th, .cart_totals .order-total td { font-size: 1.4rem; font-weight: 800; }
+        .cart_totals .cart-subtotal td { text-align: right; }
+        .cart_totals .cart-subtotal td .price-badge {
+            display: inline-block; padding: 8px 12px; background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 8px;
+            font-weight: 700; letter-spacing: 0.1px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Elimina bordes/ fondo heredados en totales */
         .cart_totals .shop_table,
         .cart_totals .shop_table td,
         .cart_totals .shop_table th {
@@ -642,160 +150,392 @@
             background: transparent !important;
             box-shadow: none !important;
         }
-
-        /* Asegura bordes redondeados limpios */
         .cart_totals {
-            border: none !important;
-            border-radius: 12px !important;
-            overflow: hidden !important;
-            background: transparent !important;
+            border: none !important; border-radius: 12px !important;
+            overflow: hidden !important; background: transparent !important;
         }
 
+        /* ============================================================
+           BOTÓN CHECKOUT
+           ============================================================ */
+        .wc-proceed-to-checkout .checkout-button {
+            display: inline-block; width: auto; margin-top: 14px;
+            background: #d2aa6d !important; border-radius: 10px !important;
+            padding: 12px 24px !important; font-weight: 700 !important; color: #fff !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+        }
+        .wc-proceed-to-checkout .checkout-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
 
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 991px) {
+            .cart-collaterals { justify-content: center; }
+            .cart_totals { width: 100%; }
+            .shop_table.cart td.product-thumbnail img { width: 100px; }
+        }
 
         /* ===========================
-   CART — MOBILE OPTIMIZADO
-   =========================== */
+           CART — MOBILE OPTIMIZADO
+           =========================== */
         @media (max-width: 640px) {
-
-            /* 1) Layout tipo card por fila */
             .shop_table.cart thead { display: none !important; }
-
             .shop_table.cart tbody tr.cart_item {
                 display: grid !important;
-                grid-template-columns: 36px 64px 1fr;     /* remove | thumb | info */
+                grid-template-columns: 36px 64px 1fr;
                 grid-template-areas:
-    "remove thumb name"
-    "remove thumb qty"
-    "remove thumb subtotal";
-                gap: 8px 10px;
-                padding: 10px 8px !important;
-                border: 1px solid rgba(0,0,0,.06);
-                border-radius: 12px;
-                margin-bottom: 10px;
+                    "remove thumb name"
+                    "remove thumb qty"
+                    "remove thumb subtotal";
+                gap: 8px 10px; padding: 10px 8px !important;
+                border: 1px solid rgba(0,0,0,.06); border-radius: 12px; margin-bottom: 10px;
             }
-
-            /* 2) Asignar áreas */
             .shop_table.cart td.product-remove   { grid-area: remove; align-self: start; text-align: left; }
             .shop_table.cart td.product-thumbnail{ grid-area: thumb; }
             .shop_table.cart td.product-name     { grid-area: name; }
             .shop_table.cart td.product-quantity { grid-area: qty; }
             .shop_table.cart td.product-subtotal { grid-area: subtotal; text-align: right; }
 
-            /* 3) Miniaturas y textos */
-            .shop_table.cart td.product-thumbnail img {
-                width: 64px; height: auto; border-radius: 8px;
-            }
+            .shop_table.cart td.product-thumbnail img { width: 64px; height: auto; border-radius: 8px; }
             .shop_table.cart td { padding: 0 !important; }
             .shop_table.cart td.product-name { font-size: 15px; line-height: 1.25; }
 
-            /* 4) Cantidad compacta */
             .shop_table.cart .quantity { justify-content: flex-start; }
-            .shop_table.cart .quantity .input-text.qty {
-                width: 56px; height: 34px; font-size: 14px;
-            }
+            .shop_table.cart .quantity .input-text.qty { width: 56px; height: 34px; font-size: 14px; }
 
-            /* 5) Botón X clicable y alineado */
             .woocommerce table.shop_table.cart td.product-remove > a.remove {
                 width: 32px !important; height: 32px !important; font-size: 18px !important;
             }
-
-            /* 6) Quitar labels automáticos de Woo en mobile (para no duplicar) */
             table.shop_table_responsive tr td::before { display: none !important; }
 
-            /* 7) Totales a ancho completo + botón grande */
             .cart-collaterals { justify-content: stretch; }
             .cart_totals { width: 100%; max-width: 100%; }
-            .cart_totals .shop_table td,
-            .cart_totals .shop_table th { padding: 8px 10px; }
+            .cart_totals .shop_table td, .cart_totals .shop_table th { padding: 8px 10px; }
 
             .wc-proceed-to-checkout .checkout-button {
-                width: 100% !important;
-                padding: 14px 18px !important;
-                font-size: 16px !important;
-                border-radius: 12px !important;
+                width: 100% !important; padding: 14px 18px !important;
+                font-size: 16px !important; border-radius: 12px !important;
             }
 
-            /* 8) Respiro general del contenedor */
             .text-page .entry-content .woocommerce { padding: 0 8px; }
         }
 
         @media (max-width: 640px) {
-
-            /* ===== Diferenciar precio vs subtotal ===== */
             .shop_table.cart td.product-price {
-                color: #777 !important;
-                font-size: 14px !important;
-                font-weight: 500;
-                margin-top: 4px;
+                color: #777 !important; font-size: 14px !important; font-weight: 500; margin-top: 4px;
             }
-
             .shop_table.cart td.product-subtotal {
-                color: #111 !important;
-                font-size: 16px !important;
-                font-weight: 700 !important;
-                margin-top: 2px;
+                color: #111 !important; font-size: 16px !important; font-weight: 700 !important; margin-top: 2px;
             }
-
-            /* Orden y alineación más clara */
             .shop_table.cart td.product-price,
-            .shop_table.cart td.product-subtotal {
-                display: block;
-                text-align: right;
-            }
+            .shop_table.cart td.product-subtotal { display: block; text-align: right; }
 
-            /* Separar visualmente los valores */
-            .shop_table.cart tbody tr.cart_item {
-                padding-bottom: 14px !important;
-            }
-
-            /* (Opcional) añadir etiqueta sutil al precio */
+            .shop_table.cart tbody tr.cart_item { padding-bottom: 14px !important; }
             .shop_table.cart td.product-price::before {
-                content: "Precio:";
-                color: #999;
-                font-size: 12px;
-                font-weight: 400;
-                margin-right: 4px;
+                content: "Precio:"; color: #999; font-size: 12px; font-weight: 400; margin-right: 4px;
             }
-
-            /* (Opcional) añadir etiqueta sutil al subtotal */
             .shop_table.cart td.product-subtotal::before {
-                content: "Subtotal:";
-                color: #999;
-                font-size: 12px;
-                font-weight: 400;
-                margin-right: 4px;
+                content: "Subtotal:"; color: #999; font-size: 12px; font-weight: 400; margin-right: 4px;
             }
         }
 
 
+
+
+        /* ——— Header compacto con máxima prioridad ——— */
+        #heroProducts.page-header--compact{
+            height: 140px !important;
+            min-height: 0 !important;
+            max-height: 140px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            position: relative !important;
+            overflow: clip; /* evita colapsos y márgenes raros */
+        }
+
+        /* Muchos temas inflan con ::before/::after */
+        #heroProducts.page-header--compact::before,
+        #heroProducts.page-header--compact::after{
+            content: none !important;
+            display: none !important;
+        }
+
+        /* Evita padding interno heredado */
+        #heroProducts.page-header--compact > .container{
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* Evita que el margen del H1 “empuje” la altura */
+        /* ===== Título del hero más pequeño, liviano y con margen ===== */
+        #heroProducts.page-header--compact h1{
+            margin: 0 0 8px 24px !important;   /* ← margen izquierdo agregado */
+            color: #fff;
+            font-weight: 200;                  /* menos grueso */
+            line-height: 1.1;
+            font-size: clamp(24px, 4vw, 38px); /* más pequeño */
+            letter-spacing: 0;
+            text-shadow: 0 1px 2px rgba(0,0,0,.25);
+        }
+
+        /* breadcrumbs también alineadas con el margen del título */
+
+
+
+        /* Miga de pan sin margen extra */
+        #heroProducts.page-header--compact .breadcrumbs{
+            margin-left: 24px !important;      /* alinea con el título */
+        }
+
+        /* (opcional) en móvil aún más bajo */
+        @media (max-width: 575.98px){
+            #heroProducts.page-header--compact{ height: 120px !important; max-height:120px !important; }
+        }
+
+        /* ===== HERO COMPACTO CON ESTILO ===== */
+        #heroProducts.page-header--compact{
+            /* altura controlada */
+            height: 180px !important;         /* ← ajusta 160–200 según quieras */
+            min-height: 0 !important;
+            max-height: 180px !important;
+
+            /* reset y layout */
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            position: relative !important;
+            overflow: clip;
+
+            /* fondo */
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+        }
+
+        /* Overlay para recuperar contraste del texto sobre la foto */
+        #heroProducts.page-header--compact::after{
+            content:"";
+            position:absolute; inset:0;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,.45),
+                rgba(0,0,0,.45)
+            );
+            pointer-events:none;
+        }
+
+        /* Contenido centrado verticalmente */
+        #heroProducts.page-header--compact > .container{
+            position: relative;              /* por encima del overlay */
+            z-index: 1;
+            height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center;
+            padding: 0 16px !important;
+        }
+
+        /* Título grande y pesado como en el diseño */
+        #heroProducts.page-header--compact h1{
+            margin: 0 0 10px !important;
+            color: #fff;
+            font-weight: 900;
+            line-height: 1.05;
+            font-size: clamp(32px, 6vw, 56px); /* grande en desktop, adaptable en móvil */
+            letter-spacing: .2px;
+            text-shadow: 0 1px 2px rgba(0,0,0,.25);
+        }
+
+        /* ===== Breadcrumbs estilo imagen ===== */
+        #heroProducts.page-header--compact .breadcrumbs{
+            margin: 0 !important;
+            padding: 0;
+            list-style: none;
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 12px;
+            font-size: clamp(16px, 2.2vw, 28px); /* grande como en la captura */
+            font-weight: 800;
+        }
+
+        /* items */
+        #heroProducts.page-header--compact .breadcrumbs li{
+            display: inline-flex; align-items: center;
+            color: #fff;
+        }
+
+        /* enlace “Finca 3 Pinos” en dorado de marca */
+        #heroProducts.page-header--compact .breadcrumbs a{
+            color: #d2aa6d; text-decoration: none;
+        }
+
+        /* separador › */
+        #heroProducts.page-header--compact .breadcrumbs li + li::before{
+            content: "›";
+            margin: 0 10px;
+            color: rgba(255,255,255,.8);
+            font-weight: 700;
+        }
+
+        /* último item en blanco */
+        #heroProducts.page-header--compact .breadcrumbs .current-item span[property="name"]{
+            color: #fff;
+        }
+
+        /* Responsive: un poco más bajo en móvil si quieres */
+        @media (max-width: 575.98px){
+            #heroProducts.page-header--compact{
+                height: 150px !important;
+                max-height: 150px !important;
+            }
+            #heroProducts.page-header--compact .breadcrumbs{
+                gap: 8px;
+            }
+        }
+
+
+
+        /* ===== HERO COMPACTO — DEFINITIVO (pegar al FINAL) ===== */
+        #heroProducts{
+            height: 160px !important;             /* ← ajusta 140–200 según gusto */
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            position: relative !important;
+            background-position: center !important;
+            background-size: cover !important;
+            background-repeat: no-repeat !important;
+            overflow: clip;
+        }
+
+        /* anula pseudoelementos/parallax del tema */
+        #heroProducts::before,
+        #heroProducts::after{ content: none !important; display: none !important; }
+
+        /* overlay suave para contraste */
+        #heroProducts::after{
+            content:"";
+            position:absolute; inset:0;
+            background: rgba(0,0,0,.35);
+            display:block;
+        }
+
+        /* contenido centrado y con sangría a la izquierda */
+        #heroProducts .container{
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 !important;
+            margin-left: 125px;   /* ← aquí controlas el margen a la izquierda */
+        }
+
+        /* Título: más pequeño y menos bold */
+        #heroProducts h1{
+            margin: 0 0 10px !important;
+            color: #fff;
+            font-weight: 700;
+            line-height: 1.1;
+            font-size: clamp(28px, 5vw, 42px);   /* tamaño final del título */
+        }
+
+        /* Breadcrumbs como en tu imagen */
+        #heroProducts .breadcrumbs{
+            margin: 0 !important;
+            padding: 0;
+            list-style: none;
+            display: flex; align-items: center; gap: 12px;
+            font-weight: 700;
+            font-size: clamp(14px, 2vw, 22px);
+            color: #fff;
+        }
+        #heroProducts .breadcrumbs a{ color:#d2aa6d; text-decoration:none; }
+        #heroProducts .breadcrumbs li + li::before{
+            content:"›"; margin: 0 10px; color: rgba(255,255,255,.9); font-weight:700;
+        }
+
+        @media (max-width:575.98px){
+            #heroProducts{ height: 140px !important; }
+        }
+
+        .margin-default {
+            padding-top: 65px !important;   /* mantienes el padding interno si lo deseas */
+            padding-bottom: 110px;          /* puedes dejarlo igual */
+            margin-top: -40px !important;   /* esto lo sube visualmente */
+        }
+        #btn-update-all {
+            border-radius: 50px;     /* hace el botón redondo */
+            padding: 10px 28px;      /* ajusta el tamaño visual */
+            font-weight: 600;
+            background-color: #d2aa6d;  /* color dorado de tu marca */
+            color: #fff;
+            border: none;
+            transition: background 0.3s;
+        }
+
+        #btn-update-all:hover {
+            background-color: #c0975f;  /* tono más oscuro al pasar el mouse */
+        }
+
+
+        /* Botón "Actualizar carrito" en forma píldora */
+        .woocommerce .actions #btn-update-all,
+        #btn-update-all.button.btn {
+            border-radius: 9999px !important;   /* píldora */
+            padding: 10px 28px !important;
+            background-color: #d2aa6d !important;
+            color: #fff !important;
+            border: none !important;
+            transition: background .3s;
+            display: inline-block;               /* por si algún tema usa display raro */
+        }
+        .woocommerce .actions #btn-update-all:hover,
+        #btn-update-all.button.btn:hover {
+            background-color: #c0975f !important;
+        }
+
     </style>
 
-    <header class="page-header like-parallax"
-            style="background-image: url('{{ asset('images/inner_parallax.jpg') }}');
-               background-size: cover;
-               background-position: center;
-               background-repeat: no-repeat;">
-        <div class="container" bis_skin_checked="1"><h1>{{ __('meta.cart') }}</h1>
+
+    <!-- ===== HEADER (sin like-parallax) ===== -->
+    <header id="heroProducts"
+            style="background-image:url('{{ asset('images/inner_parallax.jpg') }}');">
+        <div class="container">
+            <h1>{{ __('meta.cart')}}</h1>
             <ul class="breadcrumbs" typeof="BreadcrumbList" vocab="https://schema.org/">
-                <li class="home"><span property="itemListElement" typeof="ListItem"><a property="item" typeof="WebPage"
-                                                                                       title="{{ __('meta.go_to_finca3pinos') }}"
-                                                                                       href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), '/') }}"
-                                                                                       class="home"
-                                                                                       bis_skin_checked="1">
-                            <span property="name">{{ __('meta.finca3pinos') }}</span></a><meta property="position"
-                                                                                               content="1"></span></li>
-                <li class="post post-page current-item"><span property="itemListElement" typeof="ListItem"><span
-                            property="name">{{ __('meta.cart') }}</span><meta property="position" content="2"></span>
+                <li class="home">
+        <span property="itemListElement" typeof="ListItem">
+          <a property="item" typeof="WebPage"
+             href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), '/') }}">
+            <span property="name">{{ __('meta.finca3pinos')}}</span>
+          </a>
+          <meta property="position" content="1">
+        </span>
+                </li>
+                <li class="post post-page current-item">
+        <span property="itemListElement" typeof="ListItem">
+          <span property="name">{{ __('meta.cart') }}</span>
+          <meta property="position" content="2">
+        </span>
                 </li>
             </ul>
         </div>
     </header>
-
-
-
-
-
 
 
     <div class="container">
@@ -812,10 +552,10 @@
                                         <tr>
                                             <th class="product-remove"><span class="screen-reader-text">Remove item</span></th>
                                             <th class="product-thumbnail"><span class="screen-reader-text">Thumbnail image</span></th>
-                                            <th class="product-name">Product</th>
-                                            <th class="product-price">Price</th>
-                                            <th class="product-quantity">Quantity</th>
-                                            <th class="product-subtotal">Subtotal</th>
+                                            <th class="product-name">{{ __('meta.products')}}</th>
+                                            <th class="product-price">{{ __('meta.price')}}</th>
+                                            <th class="product-quantity">{{ __('meta.quantity')}}</th>
+                                            <th class="product-subtotal">{{ __('meta.subtotal')}}</th>
                                         </tr>
                                         </thead>
 
@@ -846,17 +586,20 @@
                                                 </td>
                                             </tr>
                                         @empty
-                                            <tr><td colspan="6" class="text-center">Tu carrito está vacío.</td></tr>
+                                            <tr><td colspan="6" class="text-center">{{ __('meta.your_cart_empty')}}</td></tr>
                                         @endforelse
 
                                         <tr>
                                             <td colspan="6" class="actions" style="text-align:right;">
-                                                <button type="button" class="button btn" id="btn-update-all">Update cart</button>
+
+
+                                                <button type="button" class="button btn" id="btn-update-all">{{ __('meta.update_cart')}}</button>
+
+
+
                                             </td>
                                         </tr>
                                         </tbody>
-
-
                                     </table>
                                 </form>
 
@@ -866,9 +609,8 @@
                                         <table cellspacing="0" class="shop_table shop_table_responsive">
                                             <tbody>
                                             <tr class="cart-subtotal">
-                                                <th>Subtotal</th>
+                                                <th>{{ __('meta.subtotal')}}</th>
                                                 <td data-title="Subtotal"><span class="price-badge" id="subtotal-badge">${{ number_format($subtotal,2) }}</span></td>
-
                                             </tr>
                                             </tbody>
                                         </table>
@@ -881,8 +623,6 @@
                                     </div>
                                 </div>
 
-
-
                             </div>
                         </div>
                     </article>
@@ -890,8 +630,6 @@
             </div>
         </div>
     </div>
-
-
 
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
@@ -903,21 +641,27 @@
         document.addEventListener('DOMContentLoaded', () => {
             const body = document.getElementById('cart-body');
             const subtotalBadge = document.getElementById('subtotal-badge');
+            const btnUpdate = document.getElementById('btn-update-all');
 
             axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
             axios.defaults.headers.common['X-CSRF-TOKEN'] =
                 document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-
-
+            const i18n = {
+                errorDesconocidoMessage: "{{ __('meta.unknown_error') }}",
+                cartEmpty: "{{ __('meta.your_cart_empty') }}",
+                carritoActualizadoMessage: "{{ __('meta.update') }}",
+            };
 
             // Eliminar
             body.addEventListener('click', async (e) => {
                 const btn = e.target.closest('.remove');
                 if (!btn) return;
                 e.preventDefault();
+
                 const tr = btn.closest('tr[data-row]');
-                const rowId = tr.dataset.row;
+                const rowId = tr?.dataset.row;
+                if (!rowId) return;
 
                 try {
                     const { data } = await axios.post("{{ route('cart.remove') }}", { row_id: rowId });
@@ -925,75 +669,96 @@
                     tr.remove();
                     subtotalBadge.textContent = '$' + Number(data.subtotal).toFixed(2);
 
-                    // Si el carrito quedó vacío
+                    // Si el carrito quedó vacío -> usar template literal
                     if (!body.querySelector('tr[data-row]')) {
                         body.insertAdjacentHTML(
                             'afterbegin',
-                            '<tr><td colspan="6" class="text-center">Tu carrito está vacío.</td></tr>'
+                            `<tr><td colspan="6" class="text-center">${i18n.cartEmpty}</td></tr>`
                         );
                     }
 
-                    // 🔹 Dispara evento global para actualizar el navbar
+                    // Actualiza navbar
                     window.dispatchEvent(new CustomEvent('cart:updated', {
                         detail: { count: data.count, subtotal: data.subtotal }
                     }));
-
                 } catch {
-                    toastr.error('No se pudo eliminar.');
+                    toastr.error(i18n.errorDesconocidoMessage);
                 }
             });
 
-            // === BOTÓN "UPDATE CART" ===
-            document.getElementById('btn-update-all')?.addEventListener('click', async () => {
+            // === BOTÓN "UPDATE CART" === (único listener)
+            btnUpdate?.addEventListener('click', async () => {
                 const rows = body.querySelectorAll('tr[data-row]');
-                if (!rows.length) return toastr.info('Tu carrito está vacío.');
+                if (!rows.length) {
+                    return toastr.info(i18n.cartEmpty);
+                }
 
-                let subtotalAcum = 0;
-                let totalItems = 0;
+                // Bloquear botón para evitar múltiples clics
+                btnUpdate.disabled = true;
 
                 try {
-                    // Recorremos todas las filas visibles
+                    // Puedes hacerlo en serie o en paralelo; aquí en paralelo:
+                    const requests = [];
                     for (const tr of rows) {
                         const input = tr.querySelector('.qty-input');
                         if (!input) continue;
+
                         const rowId = tr.dataset.row;
                         const qty = parseInt(input.value || '0', 10);
 
-                        // Llamada individual para cada fila
-                        const { data } = await axios.post("{{ route('cart.update') }}", { row_id: rowId, qty });
+                        requests.push(
+                            axios.post("{{ route('cart.update') }}", { row_id: rowId, qty })
+                                .then(({ data }) => {
+                                    // Actualiza total por fila
+                                    const bdi = tr.querySelector('.row-total bdi');
+                                    if (bdi) bdi.textContent = '$' + Number(data.rowTotal).toFixed(2);
 
-                        // Actualiza subtotal de la fila
-                        tr.querySelector('.row-total bdi').textContent = '$' + Number(data.rowTotal).toFixed(2);
+                                    // Si qty llegó a 0 y el backend removió el item, quita la fila
+                                    if (qty === 0) tr.remove();
 
-                        subtotalAcum = Number(data.subtotal); // se actualiza con cada respuesta
-                        totalItems   = data.count;
+                                    return data; // para colectar último subtotal / count
+                                })
+                        );
                     }
 
-                    // Actualiza subtotal global y notificación
-                    subtotalBadge.textContent = '$' + subtotalAcum.toFixed(2);
-                    toastr.success('Carrito actualizado correctamente.');
+                    const results = await Promise.all(requests);
 
-                    // 🔹 Actualiza el contador del navbar (evento global)
+                    // Si se eliminaron todas las filas, agrega mensaje vacío
+                    if (!body.querySelector('tr[data-row]')) {
+                        body.insertAdjacentHTML(
+                            'afterbegin',
+                            `<tr><td colspan="6" class="text-center">${i18n.cartEmpty}</td></tr>`
+                        );
+                    }
+
+                    // Toma el último estado agregado por el backend
+                    const last = results[results.length - 1];
+                    const subtotalAcum = Number(last?.subtotal ?? 0);
+                    const totalItems   = Number(last?.count ?? 0);
+
+                    subtotalBadge.textContent = '$' + subtotalAcum.toFixed(2);
+
+                    // Un solo toast de éxito
+                    toastr.success(i18n.carritoActualizadoMessage);
+
+                    // Actualiza navbar una vez
                     window.dispatchEvent(new CustomEvent('cart:updated', {
                         detail: { count: totalItems, subtotal: subtotalAcum }
                     }));
 
                 } catch (err) {
                     console.error(err);
-                    toastr.error('Ocurrió un error al actualizar el carrito.');
+                    toastr.error(i18n.errorDesconocidoMessage);
+                } finally {
+                    btnUpdate.disabled = false;
                 }
             });
 
-
-            document.getElementById('btn-update-all')?.addEventListener('click', () => toastr.success('Carrito actualizado'));
+            // ⚠️ Eliminado el segundo listener que disparaba otro toastr.success
         });
     </script>
-
-
 
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')
 @endsection
-
-

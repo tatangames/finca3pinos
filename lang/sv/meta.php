@@ -222,6 +222,17 @@ return [
     'not_found_or_does' => 'No encontrada o no pertenece al usuario.',
     'address_set_default' => 'Dirección establecida como predeterminada.',
 
+    'price' => 'Precio',
+    'quantity' => 'Cantidad',
+    'total' => 'Total',
+    'subtotal' => 'Subtotal',
+    'update_cart' => 'Actualizar carrito',
+    'shopping_cart_updated' => 'carrito de compras actualizado',
+    'proceed_to_checkout' => 'Proceder al pago',
+    'update' => 'Actualizado',
+
+
+
 
 
 ];
