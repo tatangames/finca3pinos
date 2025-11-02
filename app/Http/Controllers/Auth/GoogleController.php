@@ -20,12 +20,6 @@ class GoogleController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            $loginUrl = L10n::localizeURL(
-                route('user.login', [], false) // sin duplicar idioma
-            );
-            return redirect()->to($loginUrl)
-                ->with('error', __('meta.error_login_google'));
-
             $googleUser = Socialite::driver('google')->user();
 
             // Busca o crea usuario
@@ -47,11 +41,9 @@ class GoogleController extends Controller
         } catch (\Exception $e) {
             Log::error('Error Google OAuth: '.$e->getMessage());
 
-            // URL de login *localizada* (sin duplicar idioma)
-            $loginUrl = LaravelLocalization::localizeURL(
-                route('user.login', [], false)
+            $loginUrl = L10n::localizeURL(
+                route('user.login', [], false) // sin duplicar idioma
             );
-
             return redirect()->to($loginUrl)
                 ->with('error', __('meta.error_login_google'));
         }
