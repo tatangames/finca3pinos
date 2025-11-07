@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+
 class PagaditoController extends Controller
 {
     use HandlesCart;
@@ -49,6 +50,7 @@ class PagaditoController extends Controller
         }
     }
 
+
     public function init(Request $request)
     {
         $billing = $request->input('billing');
@@ -68,61 +70,68 @@ class PagaditoController extends Controller
         $items  = $cart->getContent();
 
         if ($items->isEmpty()) {
-            return redirect()->route('checkout.show')
-                ->with('error', 'Tu carrito está vacío.');
+            return redirect()->route('checkout.show')->with('error', 'Tu carrito está vacío.');
         }
 
         $subtotal = (float) $cart->getSubTotal();
         if ($subtotal < 1) {
-            return redirect()->route('checkout.show')
-                ->with('error', 'El monto mínimo para pagar con Pagadito es $1.00 USD.');
+            return redirect()->route('checkout.show')->with('error', 'El monto mínimo para pagar con Pagadito es $1.00 USD.');
         }
 
         $amount = number_format($subtotal, 2, '.', '');
-        $ern    = 'F3P-' . time();
 
-        require_once app_path('Libraries/Pagadito.php');
+        $envioId = (int) $request->envio_id;
+        $direccionEnvio = Direcciones::query()
+            ->where('direcciones.id_usuario', $userId)
+            ->where('direcciones.id', $envioId)
+            ->first();
 
-        $Pagadito = new \Pagadito(env('PAGADITO_UID'), env('PAGADITO_WSK'));
+        if (!$direccionEnvio) {
+            return redirect()->route('checkout.show')->with('error', 'La dirección de envío seleccionada no es válida.');
+        }
 
-        if (env('PAGADITO_SANDBOX', true)) {
+        // ======================
+        //  Instanciar Pagadito
+        // ======================
+        $Pagadito = new Pagadito(
+            env('PAGADITO_UID'),
+            env('PAGADITO_WSK')
+        );
+
+        if (filter_var(env('PAGADITO_SANDBOX', true), FILTER_VALIDATE_BOOL)) {
             $Pagadito->mode_sandbox_on();
         }
 
         if (!$Pagadito->connect()) {
-            return back()->with('error',
-                'Error al conectar con Pagadito ('.
-                $Pagadito->get_rs_code().'): '.$Pagadito->get_rs_message()
-            );
+            Log::error('Error al conectar con Pagadito', [
+                'code' => $Pagadito->get_rs_code(),
+                'message' => $Pagadito->get_rs_message(),
+            ]);
+            return back()->with('error', 'Error al conectar con Pagadito (' . $Pagadito->get_rs_code() . '): ' . $Pagadito->get_rs_message());
         }
 
         foreach ($items as $item) {
             $qty   = (int) $item->quantity;
             $price = (float) $item->price;
-
             if ($qty <= 0 || $price <= 0) {
                 return back()->with('error', 'Producto con cantidad o precio inválido.');
             }
-
-            $Pagadito->add_detail(
-                $qty,
-                substr($item->name, 0, 125),
-                number_format($price, 2, '.', '')
-            );
+            $Pagadito->add_detail($qty, mb_substr($item->name, 0, 125), number_format($price, 2, '.', ''));
         }
 
-        // Ejecutar transacción
-        if ($Pagadito->exec_trans($ern, $amount, 'USD')) {
-            // Pagadito se encarga de redirigir al checkout seguro
-            exit;
+        $ern = 'F3P-' . $userId . '-' . time();
+
+        if ($Pagadito->exec_trans($ern)) {
+            exit; // redirige a Pagadito
         }
 
-        return back()->with('error',
-            'No se pudo crear la transacción en Pagadito ('.
-            $Pagadito->get_rs_code().'): '.$Pagadito->get_rs_message()
-        );
+        Log::error('No se pudo crear la transacción en Pagadito', [
+            'code' => $Pagadito->get_rs_code(),
+            'message' => $Pagadito->get_rs_message(),
+        ]);
+
+        return back()->with('error', 'No se pudo crear la transacción en Pagadito (' . $Pagadito->get_rs_code() . '): ' . $Pagadito->get_rs_message());
     }
-
 
 
     public function ok(Request $request)
