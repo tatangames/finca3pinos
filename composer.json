@@ -37,7 +37,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helpers/RegionHelper.php"
+            "app/Helpers/RegionHelper.php",
+            "app/Libraries/Pagadito.php"
         ]
     },
     "autoload-dev": {

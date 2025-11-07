@@ -754,6 +754,18 @@
                 }
             });
 
+            // === BOTÓN "PROCEDER AL CHECKOUT" ===
+            const btnCheckout = document.querySelector('.wc-proceed-to-checkout .checkout-button');
+
+            btnCheckout?.addEventListener('click', (e) => {
+                // ¿Hay filas de items?
+                const hasItems = !!document.querySelector('#cart-body tr[data-row]');
+                if (!hasItems) {
+                    e.preventDefault();
+                    toastr.info(i18n.cartEmpty); // "Tu carrito está vacío"
+                }
+            });
+
             // ⚠️ Eliminado el segundo listener que disparaba otro toastr.success
         });
     </script>

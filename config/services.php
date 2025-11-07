@@ -38,4 +38,11 @@ return [
         'redirect'      => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'pagadito' => [
+        'uid'     => env('PAGADITO_UID'),
+        'wsk'     => env('PAGADITO_WSK'),
+        'sandbox' => env('PAGADITO_SANDBOX', true),
+        'debug'   => env('PAGADITO_DEBUG', false),
+    ],
+
 ];

@@ -20,6 +20,7 @@ use App\Http\Controllers\Frontend\Sistema\OrderController;
 use App\Http\Controllers\Frontend\Sistema\PasswordResetController;
 use App\Http\Controllers\Frontend\Sistema\CartController;
 use App\Http\Controllers\Frontend\Sistema\CheckoutController;
+use App\Http\Controllers\Frontend\Pagos\PagaditoController;
 
 
 use App\Http\Controllers\Auth\GoogleController;
@@ -308,14 +309,19 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
 
 
+        Route::post('/checkout/pagadito/init', [PagaditoController::class, 'init'])
+            ->name('checkout.pagadito.init');
 
-        // === NO SE USARA, RUTAS WOMPI ===
-       /* Route::post('/wompi/tokenize',  [WompiController::class, 'tokenize'])->name('wompi.tokenize');
-        Route::post('/wompi/3ds',       [WompiController::class, 'pay3ds'])->name('wompi.pay.3ds');
-        Route::get('/wompi/tx-status',  [WompiController::class, 'txStatus'])->name('wompi.tx.status');
+        Route::get('/checkout/pagadito/ok', [PagaditoController::class, 'ok'])
+            ->name('checkout.pagadito.ok');
 
-        // flujo de retorno (abre dentro del iframe o popup y hace postMessage para cerrar tu modal)
-        Route::get('/pagos/wompi/return', [WompiController::class, 'return'])->name('wompi.return');*/
+        Route::get('/checkout/pagadito/cancel', [PagaditoController::class, 'cancel'])
+            ->name('checkout.pagadito.cancel');
+
+
+
+
+
     });
 });
 
