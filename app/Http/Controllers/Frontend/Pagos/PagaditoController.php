@@ -124,6 +124,7 @@ class PagaditoController extends Controller
     }
 
 
+
     public function ok(Request $request)
     {
         $token     = $request->get('token') ?? $request->get('parametro1');
