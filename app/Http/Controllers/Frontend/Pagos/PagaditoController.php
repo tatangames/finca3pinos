@@ -51,12 +51,7 @@ class PagaditoController extends Controller
 
     public function init(Request $request)
     {
-        // =========================
-        // 1) Billing desde el front
-        // =========================
         $billing = $request->input('billing');
-
-        // Si viene como JSON string, lo convertimos a array
         if (is_string($billing)) {
             $billing = json_decode($billing, true);
         }
@@ -69,158 +64,64 @@ class PagaditoController extends Controller
         ]);
 
         $userId = Auth::guard('web')->id();
-
-        // =========================
-        // 2) Carrito
-        // =========================
-        $cart  = $this->cart();
-        $items = $cart->getContent();
+        $cart   = $this->cart();
+        $items  = $cart->getContent();
 
         if ($items->isEmpty()) {
-            return redirect()
-                ->route('checkout.show')
+            return redirect()->route('checkout.show')
                 ->with('error', 'Tu carrito está vacío.');
         }
 
         $subtotal = (float) $cart->getSubTotal();
-
-        // Monto mínimo para Pagadito (ajusta si tu cuenta indica otro)
         if ($subtotal < 1) {
-            return redirect()
-                ->route('checkout.show')
+            return redirect()->route('checkout.show')
                 ->with('error', 'El monto mínimo para pagar con Pagadito es $1.00 USD.');
         }
 
-        // Normalizamos monto (sin símbolos, sin comas)
-        $amount = number_format($subtotal, 2, '.', ''); // "10.00"
+        $amount = number_format($subtotal, 2, '.', '');
+        $ern    = 'F3P-' . time();
 
-        // =========================
-        // 3) Dirección de envío
-        // =========================
-        $envioId = (int) $request->envio_id;
+        require_once app_path('Libraries/Pagadito.php');
 
-        $direccionEnvio = Direcciones::query()
-            ->where('direcciones.id_usuario', $userId)
-            ->where('direcciones.id', $envioId)
-            ->first();
+        $Pagadito = new \Pagadito(env('PAGADITO_UID'), env('PAGADITO_WSK'));
 
-        if (!$direccionEnvio) {
-            return redirect()
-                ->route('checkout.show')
-                ->with('error', 'La dirección de envío seleccionada no es válida.');
-        }
-
-        // (Si quieres guardar la dirección/billing en sesión o DB para validarlo al regresar de Pagadito, hazlo aquí)
-
-        // =========================
-        // 4) Cargar SDK Pagadito
-        // =========================
-        $pagaditoPath = app_path('Libraries/Pagadito.php');
-
-        if (!file_exists($pagaditoPath)) {
-            \Log::error("Pagadito SDK no encontrado en: {$pagaditoPath}");
-            return back()->with('error', 'Error interno al iniciar el pago. (SDK Pagadito no encontrado)');
-        }
-
-        require_once $pagaditoPath;
-
-        // =========================
-        // 5) Instanciar Pagadito
-        // =========================
-        $Pagadito = new \Pagadito(
-            env('PAGADITO_UID'),
-            env('PAGADITO_WSK')
-        );
-
-        // Sandbox ON/OFF
-        if (filter_var(env('PAGADITO_SANDBOX', true), FILTER_VALIDATE_BOOL)) {
+        if (env('PAGADITO_SANDBOX', true)) {
             $Pagadito->mode_sandbox_on();
         }
 
-        // =========================
-        // 6) Conectar con Pagadito
-        // =========================
         if (!$Pagadito->connect()) {
-            Log::error('Error al conectar con Pagadito', [
-                'code'    => $Pagadito->get_rs_code(),
-                'message' => $Pagadito->get_rs_message(),
-            ]);
-
-            return back()->with(
-                'error',
-                'Error al conectar con Pagadito (' .
-                $Pagadito->get_rs_code() . '): ' . $Pagadito->get_rs_message()
+            return back()->with('error',
+                'Error al conectar con Pagadito ('.
+                $Pagadito->get_rs_code().'): '.$Pagadito->get_rs_message()
             );
         }
 
-        // =========================
-        // 7) Agregar items del carrito
-        // =========================
         foreach ($items as $item) {
             $qty   = (int) $item->quantity;
             $price = (float) $item->price;
 
             if ($qty <= 0 || $price <= 0) {
-                Log::warning('Producto con cantidad o precio inválido al crear transacción Pagadito', [
-                    'product_id' => $item->id,
-                    'qty'        => $qty,
-                    'price'      => $price,
-                ]);
-
-                return redirect()
-                    ->route('checkout.show')
-                    ->with('error', 'Hay un producto con cantidad o precio inválido en tu carrito.');
+                return back()->with('error', 'Producto con cantidad o precio inválido.');
             }
 
-            // Descripción corta y limpia
-            $description = mb_substr((string) $item->name, 0, 125);
-
-            // Precio con 2 decimales, punto como separador
-            $unitPrice = number_format($price, 2, '.', '');
-
-            $Pagadito->add_detail($qty, $description, $unitPrice);
+            $Pagadito->add_detail(
+                $qty,
+                substr($item->name, 0, 125),
+                number_format($price, 2, '.', '')
+            );
         }
 
-        // (Opcional) Si tienes costo de envío aparte, podrías agregarlo como otro detail:
-        //
-        // if ($costoEnvio > 0) {
-        //     $Pagadito->add_detail(1, 'Envío', number_format($costoEnvio, 2, '.', ''));
-        // }
-
-        // =========================
-        // 8) Crear ERN único
-        // =========================
-        $ern = 'F3P-' . $userId . '-' . time();
-
-        // Aquí podrías guardar en BD la orden pendiente vinculada a $ern, $amount, usuario, dirección, etc.
-
-        // =========================
-        // 9) Ejecutar transacción
-        // =========================
-        // La mayoría de implementaciones del SDK usa sólo el ERN; los montos salen de los detail.
-        if ($Pagadito->exec_trans($ern)) {
-            // Si es exitoso, el propio SDK normalmente hace el redirect a la pasarela de Pagadito.
-            // Por seguridad, terminamos la ejecución.
+        // Ejecutar transacción
+        if ($Pagadito->exec_trans($ern, $amount, 'USD')) {
+            // Pagadito se encarga de redirigir al checkout seguro
             exit;
         }
 
-        // =========================
-        // 10) Manejo de error en creación de transacción
-        // =========================
-        Log::error('No se pudo crear la transacción en Pagadito', [
-            'ern'     => $ern,
-            'amount'  => $amount,
-            'code'    => $Pagadito->get_rs_code(),
-            'message' => $Pagadito->get_rs_message(),
-        ]);
-
-        return back()->with(
-            'error',
-            'No se pudo crear la transacción en Pagadito (' .
-            $Pagadito->get_rs_code() . '): ' . $Pagadito->get_rs_message()
+        return back()->with('error',
+            'No se pudo crear la transacción en Pagadito ('.
+            $Pagadito->get_rs_code().'): '.$Pagadito->get_rs_message()
         );
     }
-
 
 
 
