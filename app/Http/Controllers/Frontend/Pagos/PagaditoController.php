@@ -51,11 +51,11 @@ class PagaditoController extends Controller
 
     public function init(Request $request)
     {
-        // ========== Billing ==========
         $billing = $request->input('billing');
         if (is_string($billing)) {
             $billing = json_decode($billing, true);
         }
+
         $request->merge(['billing' => $billing]);
 
         $request->validate([
@@ -64,121 +64,65 @@ class PagaditoController extends Controller
         ]);
 
         $userId = Auth::guard('web')->id();
-
-        // ========== Carrito ==========
-        $cart     = $this->cart();
-        $items    = $cart->getContent();
-        $subtotal = (float) $cart->getSubTotal();
+        $cart   = $this->cart();
+        $items  = $cart->getContent();
 
         if ($items->isEmpty()) {
-            return redirect()
-                ->route('checkout.show')
+            return redirect()->route('checkout.show')
                 ->with('error', 'Tu carrito está vacío.');
         }
 
-        // ========== Dirección envío ==========
-        $envioId = (int) $request->envio_id;
-
-        $direccionEnvio = Direcciones::query()
-            ->where('direcciones.id_usuario', $userId)
-            ->where('direcciones.id', $envioId)
-            ->leftJoin('paises',        'paises.id',        '=', 'direcciones.id_paises')
-            ->leftJoin('departamentos', 'departamentos.id', '=', 'direcciones.id_departamento')
-            ->leftJoin('municipios',    'municipios.id',    '=', 'direcciones.id_municipio')
-            ->first([
-                'direcciones.*',
-                DB::raw('paises.nombre        as pais_nombre'),
-                DB::raw('departamentos.nombre as depto_nombre'),
-                DB::raw('municipios.nombre    as muni_nombre'),
-                DB::raw("
-                    CASE
-                        WHEN direcciones.id_paises = 1
-                            THEN COALESCE(municipios.precio_envio, 0)
-                        ELSE COALESCE(paises.precio_envio, 0)
-                    END AS precio_envio
-                "),
-            ]);
-
-        if (!$direccionEnvio) {
-            return redirect()
-                ->route('checkout.show')
-                ->with('error', 'La dirección de envío seleccionada no es válida.');
+        $subtotal = (float) $cart->getSubTotal();
+        if ($subtotal < 1) {
+            return redirect()->route('checkout.show')
+                ->with('error', 'El monto mínimo para pagar con Pagadito es $1.00 USD.');
         }
 
-        $shipping = (float) ($direccionEnvio->precio_envio ?? 0.0);
-        $total    = $subtotal + $shipping;
+        $amount = number_format($subtotal, 2, '.', '');
+        $ern    = 'F3P-' . time();
 
-        if ($total <= 0) {
-            return redirect()
-                ->route('checkout.show')
-                ->with('error', 'El total debe ser mayor a 0.');
+        require_once base_path('pagadito/Pagadito.php');
+
+        $Pagadito = new \Pagadito(env('PAGADITO_UID'), env('PAGADITO_WSK'));
+
+        if (env('PAGADITO_SANDBOX', true)) {
+            $Pagadito->mode_sandbox_on();
         }
 
-        // ========== Código de orden ==========
-        $orderCode = 'F3P-' . Str::upper(Str::random(10));
-
-        $pagadito = $this->pagadito;
-
-        // ========== Conectar con Pagadito ==========
-        if (!$pagadito->connect()) {
-            $code    = $pagadito->get_rs_code();
-            $message = $pagadito->get_rs_message();
-
-            Log::error('Pagadito connect() failed', [
-                'code'    => $code,
-                'message' => $message,
-            ]);
-
-            return redirect()
-                ->route('checkout.show')
-                ->with('error', "Error al conectar con Pagadito ($code): $message");
-        }
-
-        // ========== Detalles del carrito ==========
-        foreach ($items as $it) {
-            $pagadito->add_detail(
-                (int) $it->quantity,
-                mb_substr($it->name, 0, 80),
-                round((float) $it->price, 2)
+        if (!$Pagadito->connect()) {
+            return back()->with('error',
+                'Error al conectar con Pagadito ('.
+                $Pagadito->get_rs_code().'): '.$Pagadito->get_rs_message()
             );
         }
 
-        if ($shipping > 0) {
-            $pagadito->add_detail(1, 'Envío', round($shipping, 2));
+        foreach ($items as $item) {
+            $qty   = (int) $item->quantity;
+            $price = (float) $item->price;
+
+            if ($qty <= 0 || $price <= 0) {
+                return back()->with('error', 'Producto con cantidad o precio inválido.');
+            }
+
+            $Pagadito->add_detail(
+                $qty,
+                substr($item->name, 0, 125),
+                number_format($price, 2, '.', '')
+            );
         }
 
-        // (Opcional) Puedes mandar parámetros personalizados
-        $pagadito->set_custom_param('order', $orderCode);
-
-        // OJO: tu versión de la clase Pagadito que pegaste NO tiene set_url_ok/set_url_cancel.
-        // Esa lógica va incluida dentro de Pagadito o se maneja con custom_params + config en Pagadito.
-        // Si tu archivo SÍ las trae más abajo, puedes descomentar:
-        //
-        // $pagadito->set_url_ok(route('checkout.pagadito.ok', ['order' => $orderCode]));
-        // $pagadito->set_url_cancel(route('checkout.pagadito.cancel', ['order' => $orderCode]));
-
-        // ========== Ejecutar transacción ==========
-        // IMPORTANTE:
-        // En tu SDK, exec_trans() hace header("Location ...") y exit() cuando es PG1002.
-        // Si devuelve false, algo falló -> mostramos mensaje.
-        if (!$pagadito->exec_trans($orderCode)) {
-            $code    = $pagadito->get_rs_code();
-            $message = $pagadito->get_rs_message();
-
-            Log::error('Pagadito exec_trans() failed', [
-                'code'    => $code,
-                'message' => $message,
-                'order'   => $orderCode,
-            ]);
-
-            return redirect()
-                ->route('checkout.show')
-                ->with('error', "No se pudo crear la transacción en Pagadito ($code): $message");
+        // Ejecutar transacción
+        if ($Pagadito->exec_trans($ern, $amount, 'USD')) {
+            // Pagadito se encarga de redirigir al checkout seguro
+            exit;
         }
 
-        // Si fue exitoso, la librería ya redirigió con header() y exit().
-        return;
+        return back()->with('error',
+            'No se pudo crear la transacción en Pagadito ('.
+            $Pagadito->get_rs_code().'): '.$Pagadito->get_rs_message()
+        );
     }
+
 
     public function ok(Request $request)
     {
