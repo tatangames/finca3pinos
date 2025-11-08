@@ -276,32 +276,29 @@ class PagaditoController extends Controller
      */
     public function retorno(Request $request)
     {
-        $token = $request->input('param1'); // {value}
-        $refErn = $request->input('param2'); // {ern_value} (referencia de Pagadito)
+        // Según configuración en Pagadito:
+        // URL de retorno: https://finca3pinos.com/pagadito/retorno?param1={value}&param2={ern_value}
+        // param1 = token, param2 = ern/reference
+
+        $token  = $request->input('param1') ?? $request->input('token');
+        $refErn = $request->input('param2') ?? $request->input('order') ?? $request->input('pedido');
 
         Log::channel('pagadito')->info('Retorno Pagadito recibido', [
-            'params' => $request->all(),
+            'query'  => $request->query(),
             'token'  => $token,
-            'ref_ern'=> $refErn,
+            'refErn' => $refErn,
         ]);
 
-        if (!$token || !$refErn) {
+        if (!$token) {
             return redirect()
                 ->route('checkout.show')
                 ->with('error', __('meta.payment_not_confirmed'));
         }
 
-        // Buscar la orden local
-        $order = Ordenes::where('ern', $refErn)->first();
-
-        if (!$order) {
-            Log::channel('pagadito')->error('Orden no encontrada para ERN recibido', [
-                'ref_ern' => $refErn,
-            ]);
-
-            return redirect()
-                ->route('checkout.show')
-                ->with('error', __('meta.payment_not_confirmed'));
+        // Buscar orden por ERN recibido (si viene)
+        $order = null;
+        if ($refErn) {
+            $order = Ordenes::where('ern', $refErn)->first();
         }
 
         // Conectar a Pagadito
@@ -328,42 +325,53 @@ class PagaditoController extends Controller
                 ->with('error', __('meta.payment_not_confirmed'));
         }
 
-        $statusPagadito = $this->pagadito->get_rs_status();    // ej: "COMPLETED"
-        $pagaditoRef    = $this->pagadito->get_rs_reference(); // debería coincidir con $refErn
-        $pagaditoAmount = (float) $this->pagadito->get_rs_value();
+        $statusPagadito = $this->pagadito->get_rs_status();    // String
+        $pagaditoRef    = $this->pagadito->get_rs_reference(); // ERN desde Pagadito
+        $rawValue       = $this->pagadito->get_rs_value();     // Puede ser string u objeto según formato
 
+        // Log para ver exactamente qué devuelve
         Log::channel('pagadito')->info('Respuesta get_status Pagadito', [
-            'status'  => $statusPagadito,
-            'ref'     => $pagaditoRef,
-            'amount'  => $pagaditoAmount,
-            'orderId' => $order->id,
+            'status'   => $statusPagadito,
+            'ref'      => $pagaditoRef,
+            'rawValue' => $rawValue,
+            'type'     => is_object($rawValue) ? 'object' : gettype($rawValue),
         ]);
 
-        // Validación básica referencia
-        if ($pagaditoRef !== $order->ern) {
-            Log::channel('pagadito')->warning('Referencia Pagadito no coincide con orden local', [
-                'pagadito_ref' => $pagaditoRef,
-                'order_ern'    => $order->ern,
-            ]);
+        // Resolver orden: si no la encontramos con refErn original, probamos con la referencia que Pagadito responde
+        if (!$order && $pagaditoRef) {
+            $order = Ordenes::where('ern', $pagaditoRef)->first();
         }
 
-        // Mapear estado Pagadito → estado interno
-        if (in_array(strtoupper($statusPagadito), ['COMPLETED', 'APPROVED'])) {
-            // (Opcional) validar monto:
-            // if (abs($order->total - $pagaditoAmount) > 0.01) { ... }
+        if (!$order) {
+            Log::channel('pagadito')->error('Orden no encontrada para ERN/ref recibido', [
+                'refErn'      => $refErn,
+                'pagaditoRef' => $pagaditoRef,
+            ]);
+
+            return redirect()
+                ->route('checkout.show')
+                ->with('error', __('meta.payment_not_confirmed'));
+        }
+
+        // (OPCIONAL) Si quisieras validar monto, primero garantizamos que no sea objeto:
+        // $pagaditoAmount = is_object($rawValue) ? null : (float) $rawValue;
+
+        // Mapear estados Pagadito → sistema
+        $normalized = strtoupper($statusPagadito);
+
+        if (in_array($normalized, ['COMPLETED', 'APPROVED'])) {
 
             $order->update([
                 'status'          => 'paid',
                 'pagadito_token'  => $token,
-                'pagadito_ref'    => $pagaditoRef,
+                'pagadito_ref'    => $pagaditoRef ?: $order->ern,
                 'pagadito_status' => $statusPagadito,
             ]);
 
-            // Limpiar carrito del usuario
             try {
                 $this->cart()->clear();
             } catch (\Throwable $e) {
-                Log::warning('No se pudo limpiar carrito después de pago Pagadito', [
+                Log::channel('pagadito')->warning('No se pudo limpiar carrito después del pago', [
                     'error' => $e->getMessage(),
                 ]);
             }
@@ -373,11 +381,11 @@ class PagaditoController extends Controller
             ]);
         }
 
-        // No aprobado → marcar fallo/cancel si quieres
+        // Cualquier otro estado: lo tratamos como fallo/cancelado
         $order->update([
             'status'          => 'failed',
             'pagadito_token'  => $token,
-            'pagadito_ref'    => $pagaditoRef,
+            'pagadito_ref'    => $pagaditoRef ?: $order->ern,
             'pagadito_status' => $statusPagadito,
         ]);
 
@@ -385,6 +393,7 @@ class PagaditoController extends Controller
             ->route('checkout.show')
             ->with('error', __('meta.payment_not_confirmed'));
     }
+
 
 
 }

@@ -256,6 +256,7 @@ return [
     'payment_process_cancelled' => 'The payment process was cancelled before completion.',
     'if_problem_persists' => 'If the problem persists, you can try the payment again from your orders.',
     'back_to_checkout' => 'Back to checkout',
+    'payment_not_confirmed' => 'The payment was not confirmed.',
 
 
 ];

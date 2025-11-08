@@ -255,6 +255,6 @@ return [
     'payment_process_cancelled' => '결제 과정이 완료되기 전에 취소되었습니다.',
     'if_problem_persists' => '문제가 계속되면 주문 내역에서 결제를 다시 시도할 수 있습니다.',
     'back_to_checkout' => '결제 페이지로 돌아가기',
-
+    'payment_not_confirmed' => '결제가 확인되지 않았습니다.',
 
 ];
