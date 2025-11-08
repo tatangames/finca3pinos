@@ -126,6 +126,14 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+
+        'pagadito' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/pagadito.log'),
+            'level' => 'debug',
+        ],
+
     ],
 
 ];

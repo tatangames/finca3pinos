@@ -319,6 +319,7 @@ Route::middleware(['detect.country.locale'])->group(function () {
             ->name('checkout.pagadito.cancel');
 
 
+        Route::get('/pagadito/retorno', [PagaditoController::class, 'retorno'])->name('pagadito.retorno');
 
 
 

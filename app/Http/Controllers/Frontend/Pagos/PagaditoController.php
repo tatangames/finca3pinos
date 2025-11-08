@@ -194,4 +194,32 @@ class PagaditoController extends Controller
 
         return view('frontend.pages.checkout-cancel', compact('orderCode'));
     }
+
+
+
+    public function retorno(Request $request)
+    {
+        // === Registrar todo lo que Pagadito envía ===
+        Log::channel('pagadito')->info('✅ Retorno recibido desde Pagadito', $request->all());
+
+        // === Simular guardado de orden ===
+        $fakeOrder = [
+            'id'          => rand(1000, 9999),
+            'transaction' => $request->input('param2'), // {ern_value}
+            'token'       => $request->input('param1'), // {value}
+            'amount'      => 1.00,
+            'currency'    => 'USD',
+            'status'      => 'PAGADO',
+            'date'        => now()->toDateTimeString(),
+        ];
+
+        Log::channel('pagadito')->info('💾 Orden simulada guardada', $fakeOrder);
+
+        // === Mostrar respuesta simple en navegador ===
+        return response()->json([
+            'message' => 'Retorno de Pagadito recibido correctamente.',
+            'order'   => $fakeOrder,
+        ]);
+    }
+
 }
