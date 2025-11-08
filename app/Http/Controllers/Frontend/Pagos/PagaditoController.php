@@ -373,12 +373,5 @@ class PagaditoController extends Controller
             ->with('error', __('meta.payment_not_confirmed'));
     }
 
-    /**
-     * Helper del trait HandlesCart (por si tu implementación cambia).
-     */
-    protected function cart()
-    {
-        // Ajusta a cómo ya lo uses en tu proyecto.
-        return $this->getCart(); // si tu trait tiene otro método, ponlo aquí.
-    }
+
 }
