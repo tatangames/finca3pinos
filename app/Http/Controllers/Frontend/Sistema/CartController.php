@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend\Sistema;
 
+use App\Models\ProductosPresentacion;
 use App\Traits\HandlesCart;
 use Illuminate\Http\Request;
 use App\Models\Producto;
@@ -38,7 +39,7 @@ class CartController extends Controller
         $price = (float)($p->precio ?? 0);
 
         if ($presId) {
-            $pres = \App\Models\ProductosPresentacion::where('id', $presId)
+            $pres = ProductosPresentacion::where('id', $presId)
                 ->where('id_productos', $p->id)
                 ->where('activo',1)
                 ->firstOrFail();

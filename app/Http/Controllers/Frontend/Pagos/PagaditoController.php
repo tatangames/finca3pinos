@@ -164,19 +164,32 @@ class PagaditoController extends Controller
                 $price = (float) $item->price;
 
                 if ($qty <= 0 || $price <= 0) {
-                    throw new \RuntimeException('Producto con cantidad o precio inválido.');
+                    throw new \RuntimeException('Error'); // Producto con cantidad o precio inválido.
                 }
 
+                // Attributes del carrito (Darryldecode\Cart los maneja así)
+                $attrs = $item->attributes ?? null;
+
+                // ID real del producto viene de attributes['product_id']
+                $productoId = null;
+                if ($attrs && isset($attrs['product_id']) && is_numeric($attrs['product_id'])) {
+                    $productoId = (int) $attrs['product_id'];
+                }
+
+                // (Opcional) presentacion_id si luego quieres usarlo
+                // $presentacionId = $attrs['presentacion_id'] ?? null;
+
+                // Crear registro de item de orden
                 OrdenesItem::create([
-                    'id_orden'   => $order->id,
-                    'id_producto'=> $item->id ?? null,
-                    'nombre'     => $item->name,
-                    'precio'     => $price,
-                    'cantidad'   => $qty,
-                    'subtotal'   => $qty * $price,
+                    'id_orden'    => $order->id,
+                    'id_producto' => $productoId,        // FK correcta hacia productos.id
+                    'nombre'      => $item->name,        // título completo que ve el cliente
+                    'precio'      => $price,
+                    'cantidad'    => $qty,
+                    'subtotal'    => $qty * $price,
                 ]);
 
-                // Detalle para Pagadito
+                // Detalle para Pagadito (usa el nombre visible)
                 $this->pagadito->add_detail(
                     $qty,
                     mb_substr($item->name, 0, 125),
