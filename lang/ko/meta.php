@@ -242,8 +242,19 @@ return [
     'back_verification' => '은행 인증',
     'close' => '닫기',
 
+    'minimum_amount_to_pay' => 'Pagadito로 결제할 수 있는 최소 금액은 $1.00 USD입니다.',
+    'selected_shipping_notvalid' => '선택한 배송 주소가 유효하지 않습니다.',
+    'error_conecctiong_to_pagadito' => 'Pagadito 연결 오류.',
+    'product_with_invalid_quanity' => '수량이나 가격이 잘못된 상품입니다.',
+    'transaction_could_not_be' => 'Pagadito에서 거래를 생성할 수 없습니다.',
+    'successful_payment' => '결제 성공',
+    'payment_cancelled' => '결제 취소',
 
-
+    'transaction_referencia' => '참조 번호가 있는 거래',
+    'was_cancelled_or_not' => '취소되었거나 완료되지 않았습니다.',
+    'payment_process_cancelled' => '결제 과정이 완료되기 전에 취소되었습니다.',
+    'if_problem_persists' => '문제가 계속되면 주문 내역에서 결제를 다시 시도할 수 있습니다.',
+    'back_to_checkout' => '결제 페이지로 돌아가기',
 
 
 ];

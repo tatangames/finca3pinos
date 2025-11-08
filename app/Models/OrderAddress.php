@@ -29,8 +29,5 @@ class OrderAddress extends Model
         'meta' => 'array',
     ];
 
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
+
 }

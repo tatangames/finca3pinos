@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * GUARDAR REGISTRO DE LOS FORMULARIOS DE CONTACOT
+     * GUARDAR REGISTRO DE LOS FORMULARIOS DE CONTACTO
      */
     public function up(): void
     {

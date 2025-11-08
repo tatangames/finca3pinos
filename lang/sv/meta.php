@@ -243,9 +243,19 @@ return [
     'back_verification' => 'Verificación bancaria',
     'close' => 'Cerrar',
 
+    'minimum_amount_to_pay' => 'El monto mínimo para pagar con Pagadito es $1.00 USD.',
+    'selected_shipping_notvalid' => 'La dirección de envío seleccionada no es válida.',
+    'error_conecctiong_to_pagadito' => 'Error al conectar con Pagadito',
+    'product_with_invalid_quanity' => 'Producto con cantidad o precio inválido.',
+    'transaction_could_not_be' => 'No se pudo crear la transacción en Pagadito',
+    'successful_payment' => 'Pagado Exitoso.',
+    'payment_cancelled' => 'Pagado Cancelado.',
 
-
-
+    'transaction_referencia' => 'La transacción con referencia',
+    'was_cancelled_or_not' => 'fue cancelada o no se completó.',
+    'payment_process_cancelled' => 'El proceso de pago fue cancelado antes de completarse.',
+    'if_problem_persists' => 'Si el problema persiste, puedes volver a intentar el pago desde tus órdenes.',
+    'back_to_checkout' => 'Volver al checkout',
 
 
 

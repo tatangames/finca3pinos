@@ -243,6 +243,19 @@ return [
     'back_verification' => 'Bank verification',
     'close' => 'Close',
 
+    'minimum_amount_to_pay' => 'The minimum amount to pay with Pagadito is $1.00 USD.',
+    'selected_shipping_notvalid' => 'The selected shipping address is not valid.',
+    'error_conecctiong_to_pagadito' => 'Error connecting to Pagadito.',
+    'product_with_invalid_quanity' => 'Product with invalid quantity or price.',
+    'transaction_could_not_be' => 'The transaction could not be created in Pagadito.',
+    'successful_payment' => 'Successful Payment',
+    'payment_cancelled' => 'Payment cancelled',
+
+    'transaction_referencia' => 'The transaction with reference',
+    'was_cancelled_or_not' => 'was cancelled or not completed.',
+    'payment_process_cancelled' => 'The payment process was cancelled before completion.',
+    'if_problem_persists' => 'If the problem persists, you can try the payment again from your orders.',
+    'back_to_checkout' => 'Back to checkout',
 
 
 ];

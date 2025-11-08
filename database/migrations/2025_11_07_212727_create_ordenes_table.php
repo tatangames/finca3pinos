@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('ordenes', function (Blueprint $table) {
             $table->id();
             // Usuario (usa tu tabla usuarios)
             $table->unsignedBigInteger('id_usuario')->nullable()->index();
@@ -53,8 +53,6 @@ return new class extends Migration
             $table->string('pagadito_ref', 150)->nullable();
             $table->string('pagadito_status', 50)->nullable();
 
-
-
             // FKs
             $table->foreign('id_usuario')
                 ->references('id')->on('usuarios')
@@ -67,6 +65,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('ordenes');
     }
 };
