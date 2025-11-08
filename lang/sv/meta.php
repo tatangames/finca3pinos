@@ -207,7 +207,7 @@ return [
     'address_was_detele' => 'La dirección fue borrada correctamente.',
     'edit_address' => 'Editar dirección',
     'save_changes' => 'Guardar cambios',
-    'billing_information' => 'información de facturación',
+    'billing_information' => 'Información de facturación',
     'back' => 'volver',
     'view_cart' => 'Ver carrito',
     'product_not_found' => 'Producto no encontrado.',
@@ -242,7 +242,6 @@ return [
     'order_summary' => 'Resumen de la Orden',
     'back_verification' => 'Verificación bancaria',
     'close' => 'Cerrar',
-
     'minimum_amount_to_pay' => 'El monto mínimo para pagar con Pagadito es $1.00 USD.',
     'selected_shipping_notvalid' => 'La dirección de envío seleccionada no es válida.',
     'error_conecctiong_to_pagadito' => 'Error al conectar con Pagadito',
@@ -250,13 +249,34 @@ return [
     'transaction_could_not_be' => 'No se pudo crear la transacción en Pagadito',
     'successful_payment' => 'Pagado Exitoso.',
     'payment_cancelled' => 'Pagado Cancelado.',
-
     'transaction_referencia' => 'La transacción con referencia',
     'was_cancelled_or_not' => 'fue cancelada o no se completó.',
     'payment_process_cancelled' => 'El proceso de pago fue cancelado antes de completarse.',
     'if_problem_persists' => 'Si el problema persiste, puedes volver a intentar el pago desde tus órdenes.',
     'back_to_checkout' => 'Volver al checkout',
     'payment_not_confirmed' => 'No se pudo completar el pago.',
+    'thanks_for_your_purchase' => '¡Gracias por tu compra! 🎉',
+    'your_order_number' => 'Su pedido numero #',
+    'was_processed_successfully' => 'fue procesado correctamente.',
+    'reference' => 'Referencia',
+    'status' => 'Estado',
+    'billing_readonly_notice' => 'Estos datos se han tomado de tu perfil y no pueden modificarse desde el checkout. Si deseas cambiar tu información de facturación, edítala en tu perfil.',
+    'edit_billing_in_profile' => 'Editar datos en el perfil',
+
+    'secure_payment_with_pagadito' => 'Pago seguro con Pagadito',
+    'your_order_summary' => 'Resumen de tu pedido',
+    'redirect_notice' => 'Serás redirigido a la plataforma segura de Pagadito para completar tu pago. No almacenamos los datos de tu tarjeta.',
+    'pay_with_pagadito' => 'Pagar con Pagadito',
+    'processing_payment' => 'Procesando pago, por favor no cierres esta ventana...',
+    'select_shipping_before_continue' => 'Selecciona una dirección de envío antes de continuar.',
+    'payment_form_not_found' => 'No se encontró el formulario de pago.',
+    'session_expired' => 'Tu sesión ha expirado, inicia sesión nuevamente.',
+
+    'order_status_pending'  => 'Pendiente',
+    'order_status_paid'     => 'Pagada',
+    'order_status_failed'   => 'Fallida',
+    'order_status_canceled' => 'Cancelada',
+    'order_status_refunded' => 'Reembolsada',
 
 
 

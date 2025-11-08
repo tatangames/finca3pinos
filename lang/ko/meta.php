@@ -241,7 +241,6 @@ return [
     'order_summary' => '주문 요약',
     'back_verification' => '은행 인증',
     'close' => '닫기',
-
     'minimum_amount_to_pay' => 'Pagadito로 결제할 수 있는 최소 금액은 $1.00 USD입니다.',
     'selected_shipping_notvalid' => '선택한 배송 주소가 유효하지 않습니다.',
     'error_conecctiong_to_pagadito' => 'Pagadito 연결 오류.',
@@ -249,12 +248,30 @@ return [
     'transaction_could_not_be' => 'Pagadito에서 거래를 생성할 수 없습니다.',
     'successful_payment' => '결제 성공',
     'payment_cancelled' => '결제 취소',
-
     'transaction_referencia' => '참조 번호가 있는 거래',
     'was_cancelled_or_not' => '취소되었거나 완료되지 않았습니다.',
     'payment_process_cancelled' => '결제 과정이 완료되기 전에 취소되었습니다.',
     'if_problem_persists' => '문제가 계속되면 주문 내역에서 결제를 다시 시도할 수 있습니다.',
     'back_to_checkout' => '결제 페이지로 돌아가기',
     'payment_not_confirmed' => '결제가 확인되지 않았습니다.',
+    'thanks_for_your_purchase' => '구매해 주셔서 감사합니다! 🎉',
+    'your_order_number' => '주문 번호 #',
+    'was_processed_successfully' => '성공적으로 처리되었습니다.',
+    'reference' => '참조 번호',
+    'status' => '상태',
+    'billing_readonly_notice' => '이 정보는 프로필에서 가져온 것이며 결제 화면에서 수정할 수 없습니다. 청구 정보를 변경하려면 프로필에서 수정하세요.',
+    'edit_billing_in_profile' => '프로필에서 청구 정보 수정',
+
+    'secure_payment_with_pagadito' => 'Pagadito로 안전한 결제',
+    'your_order_summary' => '주문 요약',
+    'redirect_notice' => '결제를 완료하기 위해 Pagadito의 안전한 결제 페이지로 이동합니다. 카드 정보는 저장되지 않습니다.',
+    'pay_with_pagadito' => 'Pagadito로 결제하기',
+    'processing_payment' => '결제 처리 중입니다. 이 창을 닫지 마세요...',
+    'select_shipping_before_continue' => '계속하기 전에 배송 주소를 선택하세요.',
+    'payment_form_not_found' => '결제 양식을 찾을 수 없습니다.',
+    'session_expired' => '세션이 만료되었습니다. 다시 로그인하세요.',
+
+
+
 
 ];

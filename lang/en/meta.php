@@ -242,7 +242,6 @@ return [
     'order_summary' => 'Order Summary',
     'back_verification' => 'Bank verification',
     'close' => 'Close',
-
     'minimum_amount_to_pay' => 'The minimum amount to pay with Pagadito is $1.00 USD.',
     'selected_shipping_notvalid' => 'The selected shipping address is not valid.',
     'error_conecctiong_to_pagadito' => 'Error connecting to Pagadito.',
@@ -250,13 +249,34 @@ return [
     'transaction_could_not_be' => 'The transaction could not be created in Pagadito.',
     'successful_payment' => 'Successful Payment',
     'payment_cancelled' => 'Payment cancelled',
-
     'transaction_referencia' => 'The transaction with reference',
     'was_cancelled_or_not' => 'was cancelled or not completed.',
     'payment_process_cancelled' => 'The payment process was cancelled before completion.',
     'if_problem_persists' => 'If the problem persists, you can try the payment again from your orders.',
     'back_to_checkout' => 'Back to checkout',
     'payment_not_confirmed' => 'The payment was not confirmed.',
+    'thanks_for_your_purchase' => 'Thank you for your purchase! 🎉',
+    'your_order_number' => 'Your order #',
+    'was_processed_successfully' => 'was processed successfully.',
+    'reference' => 'Reference',
+    'status' => 'Status',
+    'billing_readonly_notice' => 'This information has been taken from your profile and cannot be modified from the checkout. If you wish to change your billing information, please edit it in your profile.',
+    'edit_billing_in_profile' => 'Edit billing information in profile',
+
+    'secure_payment_with_pagadito' => 'Secure payment with Pagadito',
+    'your_order_summary' => 'Your order summary',
+    'redirect_notice' => 'You will be redirected to Pagadito’s secure platform to complete your payment. We do not store your card information.',
+    'pay_with_pagadito' => 'Pay with Pagadito',
+    'processing_payment' => 'Processing payment, please do not close this window...',
+    'select_shipping_before_continue' => 'Select a shipping address before continuing.',
+    'payment_form_not_found' => 'Payment form not found.',
+    'session_expired' => 'Your session has expired, please log in again.',
+
+    'order_status_pending'  => 'Pending',
+    'order_status_paid'     => 'Paid',
+    'order_status_failed'   => 'Failed',
+    'order_status_canceled' => 'Canceled',
+    'order_status_refunded' => 'Refunded',
 
 
 ];

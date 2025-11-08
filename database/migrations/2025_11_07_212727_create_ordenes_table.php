@@ -45,8 +45,7 @@ return new class extends Migration
             $table->decimal('total', 10, 2)->default(0);
 
             // Estado de la orden interna
-            $table->enum('status', ['pending', 'paid', 'failed', 'canceled', 'refunded'])
-                ->default('pending');
+            $table->tinyInteger('status_id')->default(1);
 
             // Datos Pagadito
             $table->string('pagadito_token', 150)->nullable();

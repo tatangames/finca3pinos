@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email', 100)->unique();
             $table->string('password', 255);
             $table->datetime('fecha_registro');
+            $table->string('google_id', 500)->nullable();
         });
     }
 

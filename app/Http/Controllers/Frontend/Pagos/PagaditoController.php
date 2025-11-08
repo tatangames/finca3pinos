@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Frontend\Pagos;
 
 use App\Http\Controllers\Controller;
 use App\Models\Direcciones;
+use App\Models\DireccionFacturacion;
+use App\Models\Municipio;
 use App\Models\Ordenes;
 use App\Models\OrdenesItem;
+use App\Models\Pais;
 use App\Traits\HandlesCart;
 use App\Libraries\Pagadito;
 use Illuminate\Http\Request;
@@ -60,20 +63,18 @@ class PagaditoController extends Controller
      */
     public function init(Request $request)
     {
-        // ===== Billing (JSON desde el front) =====
-        $billing = $request->input('billing');
-        if (is_string($billing)) {
-            $billing = json_decode($billing, true);
-        }
-
-        $request->merge(['billing' => $billing]);
-
+        // ===== Validar solo dirección de envío =====
         $request->validate([
             'envio_id' => 'required|integer',
-            'billing'  => 'required|array',
         ]);
 
         $userId = Auth::guard('web')->id();
+
+        if (!$userId) {
+            return redirect()
+                ->route('login')
+                ->with('error', __('meta.session_expired') ?? 'Tu sesión ha expirado, inicia sesión nuevamente.');
+        }
 
         // ===== Carrito =====
         $cart  = $this->cart();
@@ -87,20 +88,12 @@ class PagaditoController extends Controller
 
         $subtotal = (float) $cart->getSubTotal();
 
-        if ($subtotal < 1) {
-            return redirect()
-                ->route('checkout.show')
-                ->with('error', __('meta.minimum_amount_to_pay'));
-        }
-
-        $amount = (float) number_format($subtotal, 2, '.', '');
-
         // ===== Dirección de envío seleccionada =====
         $envioId = (int) $request->envio_id;
 
         $direccionEnvio = Direcciones::query()
-            ->where('direcciones.id_usuario', $userId)
-            ->where('direcciones.id', $envioId)
+            ->where('id_usuario', $userId)
+            ->where('id', $envioId)
             ->first();
 
         if (!$direccionEnvio) {
@@ -108,6 +101,48 @@ class PagaditoController extends Controller
                 ->route('checkout.show')
                 ->with('error', __('meta.selected_shipping_notvalid'));
         }
+
+        // ===== Costo de envío según país / municipio =====
+        $shippingCost = 0.0;
+
+        if ((int) $direccionEnvio->id_paises === 1) {
+            // El Salvador → usar precio desde municipio
+            // Ajusta 'id_municipio' y 'precio_envio' según tu esquema real
+            if (!empty($direccionEnvio->id_municipio)) {
+                $municipio = Municipio::find($direccionEnvio->id_municipio);
+                if ($municipio && $municipio->precio_envio !== null) {
+                    $shippingCost = (float) $municipio->precio_envio;
+                }
+            }
+        } else {
+            // Otros países → usar precio a nivel país
+            // Ajusta 'precio_envio' al nombre real del campo en tu tabla paises
+            $pais = Pais::find($direccionEnvio->id_paises);
+            if ($pais && $pais->precio_envio !== null) {
+                $shippingCost = (float) $pais->precio_envio;
+            }
+        }
+
+        // (Opcional) fallback: si tu dirección ya tiene un precio específico:
+        // if ($shippingCost == 0 && $direccionEnvio->precio_envio !== null) {
+        //     $shippingCost = (float) $direccionEnvio->precio_envio;
+        // }
+
+        // ===== Totales =====
+        $amountProducts = (float) number_format($subtotal, 2, '.', '');
+        $amount         = (float) number_format($amountProducts + $shippingCost, 2, '.', '');
+
+        if ($amount < 1) {
+            return redirect()
+                ->route('checkout.show')
+                ->with('error', __('meta.minimum_amount_to_pay'));
+        }
+
+        // ===== Dirección de facturación (snapshot desde direcciones_facturacion) =====
+        $billing = DireccionFacturacion::query()
+            ->where('id_usuario', $userId)
+            ->orderByDesc('id') // última registrada
+            ->first();
 
         // ===== Conectar a Pagadito =====
         if (!$this->pagadito->connect()) {
@@ -127,73 +162,80 @@ class PagaditoController extends Controller
         // ===== Generar ERN único =====
         $ern = 'F3P-' . $userId . '-' . time();
 
-        // ===== Crear orden + items en transacción =====
         try {
             DB::beginTransaction();
 
+            // ===== Crear orden (con snapshot de envío + facturación) =====
             $order = Ordenes::create([
                 'id_usuario'         => $userId,
                 'ern'                => $ern,
                 'fecha'              => now(),
 
-                // Snapshot envío
+                // Envío
                 'shipping_nombre'    => $direccionEnvio->nombre,
                 'shipping_telefono'  => $direccionEnvio->telefono,
-                'shipping_pais'      => $direccionEnvio->id_paises, // o nombre si prefieres
+                'shipping_pais'      => $direccionEnvio->id_paises,
                 'shipping_estado'    => $direccionEnvio->estado,
                 'shipping_ciudad'    => $direccionEnvio->ciudad,
                 'shipping_direccion' => $direccionEnvio->direccion,
                 'shipping_zipcode'   => $direccionEnvio->zipcode,
 
-                // Snapshot facturación (desde $billing)
-                'billing_nombre'     => $billing['nombre']   ?? null,
-                'billing_direccion'  => $billing['direccion'] ?? null,
-                'billing_ciudad'     => $billing['ciudad']    ?? null,
-                'billing_estado'     => $billing['estado']    ?? null,
-                'billing_zipcode'    => $billing['zipcode']   ?? null,
-                'billing_telefono'   => $billing['telefono']  ?? null,
+                // Facturación (si existe)
+                'billing_nombre'     => $billing->nombre   ?? null,
+                'billing_direccion'  => $billing->direccion ?? null,
+                'billing_ciudad'     => $billing->ciudad    ?? null,
+                'billing_estado'     => $billing->estado    ?? null,
+                'billing_zipcode'    => $billing->zipcode   ?? null,
+                'billing_telefono'   => $billing->telefono  ?? null,
+                // Si tu tabla ordenes tiene billing_pais:
+                // 'billing_pais'       => $billing->id_paises ?? null,
 
-                'subtotal'           => $amount,
-                'shipping_cost'      => 0, // ajusta si tienes cálculo de envío
+                'subtotal'           => $amountProducts,
+                'shipping_cost'      => $shippingCost,
                 'total'              => $amount,
-                'status'             => 'pending',
+                'status_id'             => 1, // pendiente
             ]);
 
+            // ===== Items de la orden + detalle Pagadito =====
             foreach ($items as $item) {
                 $qty   = (int) $item->quantity;
                 $price = (float) $item->price;
 
                 if ($qty <= 0 || $price <= 0) {
-                    throw new \RuntimeException('Error'); // Producto con cantidad o precio inválido.
+                    throw new \RuntimeException('Producto con cantidad o precio inválido.');
                 }
 
-                // Attributes del carrito (Darryldecode\Cart los maneja así)
                 $attrs = $item->attributes ?? null;
 
-                // ID real del producto viene de attributes['product_id']
                 $productoId = null;
                 if ($attrs && isset($attrs['product_id']) && is_numeric($attrs['product_id'])) {
                     $productoId = (int) $attrs['product_id'];
                 }
 
-                // (Opcional) presentacion_id si luego quieres usarlo
-                // $presentacionId = $attrs['presentacion_id'] ?? null;
-
-                // Crear registro de item de orden
                 OrdenesItem::create([
                     'id_orden'    => $order->id,
-                    'id_producto' => $productoId,        // FK correcta hacia productos.id
-                    'nombre'      => $item->name,        // título completo que ve el cliente
+                    'id_producto' => $productoId,
+                    'nombre'      => $item->name,
                     'precio'      => $price,
                     'cantidad'    => $qty,
                     'subtotal'    => $qty * $price,
                 ]);
 
-                // Detalle para Pagadito (usa el nombre visible)
                 $this->pagadito->add_detail(
                     $qty,
                     mb_substr($item->name, 0, 125),
                     number_format($price, 2, '.', '')
+                );
+            }
+
+            $shippingLabel = __('meta.shipping'); // lo creas en tus lang
+
+            // ===== Envío como ítem Pagadito =====
+            if ($shippingCost > 0) {
+                $this->pagadito->add_detail(
+                    1,
+                    mb_substr($shippingLabel, 0, 125),
+                    number_format($shippingCost, 2, '.', '')
                 );
             }
 
@@ -202,6 +244,8 @@ class PagaditoController extends Controller
             Log::channel('pagadito')->info('Orden creada pendiente e inicializando Pagadito', [
                 'order_id' => $order->id,
                 'ern'      => $ern,
+                'subtotal' => $order->subtotal,
+                'shipping' => $order->shipping_cost,
                 'total'    => $order->total,
             ]);
 
@@ -215,21 +259,12 @@ class PagaditoController extends Controller
             return back()->with('error', __('meta.transaction_could_not_be'));
         }
 
-        // ===== URLs opcionales OK / Cancel (si la librería las soporta) =====
-        // if (method_exists($this->pagadito, 'set_url_ok')) {
-        //     $this->pagadito->set_url_ok(route('checkout.pagadito.ok'));
-        // }
-        // if (method_exists($this->pagadito, 'set_url_error')) {
-        //     $this->pagadito->set_url_error(route('checkout.pagadito.cancel'));
-        // }
-
         // ===== Ejecutar transacción (redirige a Pagadito) =====
         if ($this->pagadito->exec_trans($ern)) {
-            // La librería normalmente hace header("Location: ...") y exit.
             exit;
         }
 
-        // Si falla exec_trans, marcamos la orden como failed
+        // Si falla exec_trans
         $order->update(['status' => 'failed']);
 
         Log::channel('pagadito')->error('No se pudo iniciar transacción Pagadito [exec_trans]', [
@@ -245,6 +280,8 @@ class PagaditoController extends Controller
             . $this->pagadito->get_rs_message()
         );
     }
+
+
 
     /**
      * Opcional: páginas amigables si usas set_url_ok/set_url_error.
@@ -362,7 +399,7 @@ class PagaditoController extends Controller
         if (in_array($normalized, ['COMPLETED', 'APPROVED'])) {
 
             $order->update([
-                'status'          => 'paid',
+                'status_id'          => 2, // Pagado
                 'pagadito_token'  => $token,
                 'pagadito_ref'    => $pagaditoRef ?: $order->ern,
                 'pagadito_status' => $statusPagadito,
@@ -383,7 +420,7 @@ class PagaditoController extends Controller
 
         // Cualquier otro estado: lo tratamos como fallo/cancelado
         $order->update([
-            'status'          => 'failed',
+            'status_id'          => 3, // fallado
             'pagadito_token'  => $token,
             'pagadito_ref'    => $pagaditoRef ?: $order->ern,
             'pagadito_status' => $statusPagadito,

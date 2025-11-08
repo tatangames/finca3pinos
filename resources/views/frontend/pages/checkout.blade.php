@@ -202,6 +202,37 @@
         }
 
         img, iframe { max-width:100%; height:auto; display:block; }
+
+
+        .control[readonly],
+        .control[disabled] {
+            background-color: #f3f3f3 !important;
+            color: #555 !important;
+            cursor: not-allowed;
+        }
+
+        #btnToStep2 {
+            border-radius: 12px !important;
+        }
+
+
+        #btnBack1 {
+            border-radius: 12px !important;
+        }
+
+        #btnToStep3 {
+            border-radius: 12px !important;
+        }
+
+        #btnBack2 {
+            border-radius: 12px !important;
+        }
+
+        #btnPayPagadito {
+            border-radius: 12px !important;
+        }
+
+
     </style>
 
     {{-- PASOS --}}
@@ -335,23 +366,39 @@
         {{-- ========= Paso 2: FACTURACIÓN ========= --}}
         <div class="tab-pane" id="tab2">
             <div class="card">
-                <div class="card-h">{{ __('meta.billing_information') }}</div>
+                <div class="card-h" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                    <span>{{ __('meta.billing_information') }}</span>
+
+                    {{-- Botón para editar en el perfil --}}
+                    <a href="{{ route('user.view.perfil') }}" class="btn btn-sm btn-outline-primary">
+                        {{ __('meta.edit_billing_in_profile') }}
+                    </a>
+                </div>
+
                 <div class="card-b">
+
+
                     <div class="row2">
                         <div>
                             <label>{{ __('meta.contact_v5') }}</label>
                             <input id="bill_nombre" class="control"
-                                   value="{{ $billing->nombre ?? '' }}" placeholder="">
+                                   value="{{ $billing->nombre ?? '' }}"
+                                   placeholder=""
+                                   disabled
+                                   readonly>
                         </div>
                         <div>
                             <label>{{ __('meta.phone') }}</label>
                             <input id="bill_tel" class="control"
-                                   value="{{ $billing->telefono ?? '' }}" placeholder="">
+                                   value="{{ $billing->telefono ?? '' }}"
+                                   placeholder=""
+                                   disabled
+                                   readonly>
                         </div>
                     </div>
 
                     <label style="margin-top:10px">{{ __('meta.country') }}</label>
-                    <select id="bill_pais" class="control">
+                    <select id="bill_pais" class="control" disabled>
                         <option value="">{{ __('meta.select') }}</option>
                         @foreach($paises as $p)
                             <option value="{{ $p->id }}"
@@ -363,18 +410,22 @@
 
                     <label style="margin-top:10px">{{ __('meta.addresses') }}</label>
                     <input id="bill_dir" class="control"
-                           value="{{ $billing->direccion ?? '' }}" placeholder="">
+                           value="{{ $billing->direccion ?? '' }}"
+                           placeholder=""
+                           readonly>
 
                     <div class="row2" style="margin-top:10px">
                         <div>
                             <label>{{ __('meta.city') }}</label>
                             <input id="bill_ciudad" class="control"
-                                   value="{{ $billing->ciudad ?? '' }}">
+                                   value="{{ $billing->ciudad ?? '' }}"
+                                   readonly>
                         </div>
                         <div>
                             <label>{{ __('meta.state_province') }}</label>
                             <input id="bill_estado" class="control"
-                                   value="{{ $billing->estado ?? '' }}">
+                                   value="{{ $billing->estado ?? '' }}"
+                                   readonly>
                         </div>
                     </div>
 
@@ -382,16 +433,18 @@
                         <div>
                             <label>{{ __('meta.postal_code') }}</label>
                             <input id="bill_zip" class="control"
-                                   value="{{ $billing->codigo_postal ?? '' }}">
+                                   value="{{ $billing->codigo_postal ?? '' }}"
+                                   readonly>
                         </div>
+
                         <div style="
-                            display:flex;
-                            justify-content:center;
-                            align-items:center;
-                            gap:20px;
-                            margin-top:30px;
-                            margin-bottom:25px;
-                        ">
+                    display:flex;
+                    justify-content:center;
+                    align-items:center;
+                    gap:20px;
+                    margin-top:30px;
+                    margin-bottom:25px;
+                ">
                             <button class="btn btn-light" id="btnBack1">
                                 {{ __('meta.back') }}
                             </button>
@@ -401,40 +454,41 @@
                         </div>
                     </div>
 
+                    {{-- Payload oculto que usas para enviar al backend / Pagadito --}}
                     <input type="hidden" id="bill_payload">
                 </div>
             </div>
         </div>
 
+
         {{-- ========= Paso 3: PAGO ========= --}}
         <div class="tab-pane" id="tab3">
             <div class="card">
-                <div class="card-h">Pago seguro con Pagadito</div>
+                <div class="card-h">{{ __('meta.secure_payment_with_pagadito') }}</div>
                 <div class="card-b">
 
-                    <h4>Resumen de tu pedido</h4>
+                    <h4>{{ __('meta.your_order_summary') }}</h4>
                     <div class="sum-line">
-                        <span>Subtotal:</span>
+                        <span>{{ __('meta.subtotal') }}:</span>
                         <span id="sum-subtotal">
                             {{ $sumSubtotalFormat ?? '$' . number_format($subtotal, 2) }}
                         </span>
                     </div>
                     <div class="sum-line">
-                        <span>Envío:</span>
+                        <span>{{ __('meta.shipping') }}:</span>
                         <span id="sum-shipping">
                             {{ $sumShippingFormat ?? '$' . number_format($shipping, 2) }}
                         </span>
                     </div>
                     <div class="sum-line sum-total">
-                        <span>Total a pagar:</span>
+                        <span>{{ __('meta.total_to_pay') }}:</span>
                         <span id="sum-total">
                             {{ $sumTotalFormat ?? '$' . number_format($total, 2) }}
                         </span>
                     </div>
 
                     <p class="muted" style="margin-top:8px;">
-                        Serás redirigido a la plataforma segura de Pagadito para completar tu pago.
-                        No almacenamos los datos de tu tarjeta.
+                        {{ __('meta.redirect_notice') }}
                     </p>
 
                     <div class="actions">
@@ -442,14 +496,25 @@
                             {{ __('meta.back') }}
                         </button>
                         <button class="btn btn-primary" type="button" id="btnPayPagadito">
-                            Pagar con Pagadito
+                            {{ __('meta.pay_with_pagadito') }}
                         </button>
+                    </div>
+
+                    <div style="
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-top:20px;
+">
+                        <img src="{{ asset('images/pasarelapagadito.png') }}"
+                             alt="Pasarela Pagadito"
+                             style="max-width:220px; opacity:0.9;">
                     </div>
 
                     <div id="pay-msg"
                          class="muted"
                          style="margin-top:8px;display:none">
-                        Procesando pago, por favor no cierres esta ventana...
+                        {{ __('meta.processing_payment') }}
                     </div>
                 </div>
             </div>
@@ -464,6 +529,11 @@
                 <input type="hidden" name="billing" id="pg_billing">
             </form>
         </div>
+
+
+
+
+
     </div>
 
     {{-- Librerías --}}
@@ -477,33 +547,41 @@
 
     <script>
         const PAISES_MAP = {!! json_encode(
-            $paises->keyBy('id')->map(fn($p)=>$p->nombre)->toArray(),
-            JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
-        ) !!};
+        $paises->keyBy('id')->map(fn($p)=>$p->nombre)->toArray(),
+        JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
+    ) !!};
 
         const HAS_ADDRESSES = {{ $addresses->isNotEmpty() ? 'true' : 'false' }};
 
         const ADDRESS_MAP = {!! json_encode(
-            $addresses->keyBy('id')->map(function($a){
-                return [
-                    'id'            => (int) $a->id,
-                    'nombre'        => $a->nombre,
-                    'direccion'     => $a->direccion,
-                    'pais'          => $a->pais_nombre ?? null,
-                    'departamento'  => $a->depto_nombre ?? null,
-                    'municipio'     => $a->muni_nombre ?? null,
-                    'ciudad'        => $a->ciudad,
-                    'estado'        => $a->estado,
-                    'zipcode'       => $a->zipcode,
-                    'telefono'      => $a->telefono,
-                    'predeterminado'=> (int) $a->predeterminado,
-                    'precio_envio'  => (float) ($a->precio_envio ?? 0),
-                ];
-            })->toArray(),
-            JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
-        ) !!};
+        $addresses->keyBy('id')->map(function($a){
+            return [
+                'id'            => (int) $a->id,
+                'nombre'        => $a->nombre,
+                'direccion'     => $a->direccion,
+                'pais'          => $a->pais_nombre ?? null,
+                'departamento'  => $a->depto_nombre ?? null,
+                'municipio'     => $a->muni_nombre ?? null,
+                'ciudad'        => $a->ciudad,
+                'estado'        => $a->estado,
+                'zipcode'       => $a->zipcode,
+                'telefono'      => $a->telefono,
+                'predeterminado'=> (int) $a->predeterminado,
+                'precio_envio'  => (float) ($a->precio_envio ?? 0),
+            ];
+        })->toArray(),
+        JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
+    ) !!};
 
         const BASE_SUBTOTAL = {{ (float) $subtotal }};
+
+
+        const i18n = {
+            errorDesconocidoMessage: "{{ __('meta.unknown_error') }}",
+            seNecesitaDireccionMessage: "{{ __('meta.select_shipping_before_continue') }}",
+            noHayFormularioPagoMessage: "{{ __('meta.payment_form_not_found') }}",
+        };
+
 
         (function () {
             const stepsHead = document.getElementById('stepsHead');
@@ -525,9 +603,6 @@
             }
             window.go = go;
 
-            function val(id){
-                return (document.getElementById(id)?.value || '').trim();
-            }
             function money(n){
                 return '$' + Number(n || 0).toFixed(2);
             }
@@ -558,7 +633,7 @@
 
                 if (!a) {
                     box.innerHTML = `<div class="addr-empty muted">
-                        {{ __('meta.select_an_address_to') }}
+                    {{ __('meta.select_an_address_to') }}
                     </div>`;
                     return;
                 }
@@ -601,12 +676,16 @@
                     updateSummaryByAddress(id);
                 });
 
+
+
                 document.getElementById('btnToStep2')?.addEventListener('click', () => {
                     const v = sel.value;
                     if (!v) {
-                        toastr.error('Selecciona una dirección de envío.');
+                        toastr.error(i18n.seNecesitaDireccionMessage);
                         return;
                     }
+                    // Solo avanzamos, ya tenemos envio_id
+                    if (hidden) hidden.value = v;
                     go(2);
                 });
             }
@@ -614,34 +693,15 @@
             // Back a paso 1
             document.getElementById('btnBack1')?.addEventListener('click', () => go(1));
 
-            // ===== Paso 2 -> Paso 3 =====
+            // ===== Paso 2 -> Paso 3 (YA NO VALIDA FACTURACIÓN) =====
             document.getElementById('btnToStep3')?.addEventListener('click', () => {
-                const nombre = val('bill_nombre');
-                const dir    = val('bill_dir');
-                const idPais = (document.getElementById('bill_pais')?.value || '').trim();
-
-                if (!idPais) {
-                    toastr.warning('Selecciona el país de facturación.');
+                const envioId = (document.getElementById('envio_id')?.value || '').trim();
+                if (!envioId) {
+                    toastr.error(i18n.seNecesitaDireccionMessage);
+                    go(1);
                     return;
                 }
-                if (!nombre || !dir) {
-                    toastr.warning('Completa al menos Nombre de facturación y Dirección.');
-                    return;
-                }
-
-                const payload = {
-                    id_paises:  parseInt(idPais, 10),
-                    id_region:  12,
-                    pais_nombre: PAISES_MAP[idPais] || null,
-                    nombre:     nombre,
-                    telefono:   val('bill_tel'),
-                    direccion:  dir,
-                    ciudad:     val('bill_ciudad'),
-                    estado:     val('bill_estado'),
-                    zipcode:    val('bill_zip'),
-                };
-
-                document.getElementById('bill_payload').value = JSON.stringify(payload);
+                // Paso 2 es solo informativo, avanzamos directo
                 go(3);
             });
 
@@ -658,43 +718,44 @@
             // Back paso 3 -> 2
             document.getElementById('btnBack2')?.addEventListener('click', () => go(2));
 
-            // ===== Pagar con Pagadito (POST normal) =====
+            // ===== Pagar con Pagadito (solo dirección) =====
             const btnPay = document.getElementById('btnPayPagadito');
             const payMsg = document.getElementById('pay-msg');
 
             if (btnPay) {
                 btnPay.addEventListener('click', () => {
                     const envioId = (document.getElementById('envio_id')?.value || '').trim();
-                    const billRaw = (document.getElementById('bill_payload')?.value || '').trim();
 
                     if (!envioId) {
-                        toastr.error('Selecciona una dirección de envío antes de continuar.');
+                        toastr.error(i18n.seNecesitaDireccionMessage);
                         go(1);
-                        return;
-                    }
-                    if (!billRaw) {
-                        toastr.error('Completa los datos de facturación antes de continuar.');
-                        go(2);
                         return;
                     }
 
                     const form = document.getElementById('formPagadito');
                     if (!form) {
-                        toastr.error('No se encontró el formulario de pago.');
+                        toastr.error(i18n.noHayFormularioPagoMessage);
                         return;
                     }
 
+                    // Enviar solo la dirección seleccionada
                     document.getElementById('pg_envio_id').value = envioId;
-                    document.getElementById('pg_billing').value = billRaw;
+
+                    // Si tienes un campo pg_billing en el form, lo puedes limpiar:
+                    const billingInput = document.getElementById('pg_billing');
+                    if (billingInput) {
+                        billingInput.value = '';
+                    }
 
                     btnPay.disabled = true;
                     if (payMsg) payMsg.style.display = 'block';
 
-                    form.submit(); // ← aquí se hace el POST normal al backend
+                    form.submit();
                 });
             }
         })();
     </script>
+
 
     @include('frontend.partials.superior')
 @endsection

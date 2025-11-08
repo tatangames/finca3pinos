@@ -7,18 +7,20 @@
 
 
     <div class="container py-5 text-center">
-        <h1 class="text-success mb-3">¡Gracias por tu compra! 🎉</h1>
+        <h1 class="text-success mb-3">{{ __('meta.thanks_for_your_purchase') }}</h1>
 
         <p class="lead">
-            Tu pedido <strong>#{{ $order->id }}</strong> fue procesado correctamente.
+            {{ __('meta.your_order_number') }} <strong>#{{ $order->id }}</strong> {{ __('meta.was_processed_successfully') }}
         </p>
 
         <div class="card mt-4 mx-auto" style="max-width: 500px;">
             <div class="card-body">
-                <p><strong>Referencia:</strong> {{ $order->ern }}</p>
-                <p><strong>Total:</strong> ${{ number_format($order->total, 2) }}</p>
-                <p><strong>Estado:</strong> {{ strtoupper($order->status) }}</p>
+                <p><strong>{{ __('meta.reference') }}</strong> {{ $order->ern }}</p>
+                <p><strong>{{ __('meta.total') }}:</strong> ${{ number_format($order->total, 2) }}</p>
+                <p><strong>{{ __('meta.status') }}</strong> {{ __('meta.order_status_' . $order->status_name) }}</p>
             </div>
+
+
         </div>
 
         <a href="{{ route('user.orders') }}" class="btn btn-primary mt-4">

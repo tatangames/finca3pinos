@@ -39,7 +39,7 @@ class Ordenes extends Model
         'total',
 
         // Estado y Pagadito
-        'status',
+        'status_id',
         'pagadito_token',
         'pagadito_ref',
         'pagadito_status',
@@ -54,5 +54,18 @@ class Ordenes extends Model
     public function items()
     {
         return $this->hasMany(OrdenesItem::class, 'id_orden');
+    }
+
+    public const STATUS = [
+        1 => 'pending',
+        2 => 'paid',
+        3 => 'failed',
+        4 => 'canceled',
+        5 => 'refunded',
+    ];
+
+    public function getStatusNameAttribute(): string
+    {
+        return self::STATUS[$this->status_id] ?? 'unknown';
     }
 }
