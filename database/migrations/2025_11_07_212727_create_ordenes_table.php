@@ -78,11 +78,11 @@ return new class extends Migration
 
             // ESTADOS DE LA ORDEN TRACKING
             // Preparando Pedido
-            $table->boolean('estado_pedido_1')->default(0);
+            $table->boolean('estado_pedido_1')->default(0)->nullable();
             $table->date('fecha_pedido_1')->nullable();
 
             // Pedido enviado
-            $table->boolean('estado_pedido_2')->default(0);
+            $table->boolean('estado_pedido_2')->default(0)->nullable();
             $table->date('fecha_pedido_2')->nullable();
 
 

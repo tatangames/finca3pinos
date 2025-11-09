@@ -187,9 +187,9 @@ class PagaditoController extends Controller
                 'total'              => $amount,
                 'status_id'          => 1, // pendiente
 
-                'estado_pedido_1'    => null,
+                'estado_pedido_1'    => 0,
                 'fecha_pedido_1'     => null,
-                'estado_pedido_2'    => null,
+                'estado_pedido_2'    => 0,
                 'fecha_pedido_2'     => null,
                 'seguimiento'        => null,
             ]);
