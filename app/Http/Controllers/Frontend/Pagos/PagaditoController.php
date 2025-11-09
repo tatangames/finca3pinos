@@ -172,15 +172,21 @@ class PagaditoController extends Controller
                 'fecha'              => now(),
 
                 // Envío
+                'id_paises'          => $direccionEnvio->id_paises,
+                'id_departamentos'   => $direccionEnvio->id_departamento,
+                'id_municipios'      => $direccionEnvio->id_municipio,
                 'shipping_nombre'    => $direccionEnvio->nombre,
                 'shipping_telefono'  => $direccionEnvio->telefono,
                 'shipping_pais'      => $direccionEnvio->id_paises,
                 'shipping_estado'    => $direccionEnvio->estado,
                 'shipping_ciudad'    => $direccionEnvio->ciudad,
                 'shipping_direccion' => $direccionEnvio->direccion,
+                'shipping_direccion_opc' => $direccionEnvio->direccion_opcional,
                 'shipping_zipcode'   => $direccionEnvio->zipcode,
 
-                // Facturación (si existe)
+                // Facturación
+
+                'billing_idpaises'   => $billing->id_paises   ?? null,
                 'billing_nombre'     => $billing->nombre   ?? null,
                 'billing_direccion'  => $billing->direccion ?? null,
                 'billing_ciudad'     => $billing->ciudad    ?? null,

@@ -9,7 +9,7 @@ class OrdenesItem extends Model
 {
     use HasFactory;
     protected $table = 'ordenes_items';
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'id_orden',

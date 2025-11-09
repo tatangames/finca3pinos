@@ -15,17 +15,21 @@ class Ordenes extends Model
         'id_usuario',
         'ern',
         'fecha',
+        'id_paises',
+        'id_departamentos',
+        'id_municipios',
 
         // Envío
         'shipping_nombre',
-        'shipping_telefono',
-        'shipping_pais',
-        'shipping_estado',
-        'shipping_ciudad',
         'shipping_direccion',
+        'shipping_ciudad',
+        'shipping_direccion_opc',
+        'shipping_estado',
         'shipping_zipcode',
+        'shipping_telefono',
 
         // Facturación
+        'billing_idpaises',
         'billing_nombre',
         'billing_direccion',
         'billing_ciudad',

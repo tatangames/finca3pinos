@@ -7,42 +7,65 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * ORDENES REALIZADAS
      */
     public function up(): void
     {
         Schema::create('ordenes', function (Blueprint $table) {
             $table->id();
             // Usuario (usa tu tabla usuarios)
-            $table->unsignedBigInteger('id_usuario')->nullable()->index();
+            $table->foreignId('id_usuario')->constrained('usuarios');
 
-            // Referencia única para Pagadito / sistema
-            $table->string('ern', 100)->unique()
-                ->comment('Referencia única de la transacción (F3P-USER-TIME)');
 
+            // REFERENCIA DE PAGADITO
+            $table->string('ern', 100)->unique();
+
+            // Fecha de registro
             $table->dateTime('fecha');
 
-            // Snapshot ENVÍO (para no perder historial si el usuario edita su dirección después)
-            $table->string('shipping_nombre', 100)->nullable();
-            $table->string('shipping_telefono', 30)->nullable();
-            $table->string('shipping_pais', 100)->nullable();
-            $table->string('shipping_estado', 100)->nullable();
-            $table->string('shipping_ciudad', 100)->nullable();
-            $table->string('shipping_direccion', 255)->nullable();
-            $table->string('shipping_zipcode', 20)->nullable();
+            // COPIA DATOS DE DIRECCION DEL USUARIO
 
-            // Snapshot FACTURACIÓN
-            $table->string('billing_nombre', 100)->nullable();
-            $table->string('billing_direccion', 255)->nullable();
-            $table->string('billing_ciudad', 100)->nullable();
-            $table->string('billing_estado', 100)->nullable();
+            $table->foreignId('id_paises')->constrained('paises'); // PAIS
+
+            $table->foreignId('id_departamentos') // DEPARTAMENTOS
+            ->nullable()
+                ->constrained('departamentos')
+                ->nullOnDelete();
+
+            $table->foreignId('id_municipios') // MUNICIPIOS
+            ->nullable()
+                ->constrained('municipios')
+                ->nullOnDelete();
+            $table->string('shipping_nombre', 50)->nullable(); //*
+            $table->string('shipping_direccion', 100)->nullable(); //*
+            $table->string('shipping_ciudad', 50)->nullable(); //*
+            $table->string('shipping_direccion_opc', 100)->nullable(); //*
+            $table->string('shipping_estado', 50)->nullable(); //*
+            $table->string('shipping_zipcode', 20)->nullable(); //*
+            $table->string('shipping_telefono', 20)->nullable(); //*
+
+
+            // COPIA DATOS DE FACTURACION
+            $table->foreignId('billing_idpaises')->constrained('paises'); // PAIS
+            $table->string('billing_nombre', 50)->nullable();
+            $table->string('billing_direccion', 100)->nullable();
+            $table->string('billing_ciudad', 50)->nullable();
+            $table->string('billing_estado', 50)->nullable();
             $table->string('billing_zipcode', 20)->nullable();
-            $table->string('billing_telefono', 30)->nullable();
+            $table->string('billing_telefono', 20)->nullable();
 
             // Totales
             $table->decimal('subtotal', 10, 2)->default(0);
             $table->decimal('shipping_cost', 10, 2)->default(0);
             $table->decimal('total', 10, 2)->default(0);
+
+           /*
+                1 => 'pending',
+                2 => 'paid',
+                3 => 'failed',
+                4 => 'canceled',
+                5 => 'refunded',
+          */
 
             // Estado de la orden interna
             $table->tinyInteger('status_id')->default(1);
@@ -51,11 +74,6 @@ return new class extends Migration
             $table->string('pagadito_token', 150)->nullable();
             $table->string('pagadito_ref', 150)->nullable();
             $table->string('pagadito_status', 50)->nullable();
-
-            // FKs
-            $table->foreign('id_usuario')
-                ->references('id')->on('usuarios')
-                ->onDelete('set null');
         });
     }
 
