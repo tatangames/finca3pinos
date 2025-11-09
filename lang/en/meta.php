@@ -262,7 +262,6 @@ return [
     'status' => 'Status',
     'billing_readonly_notice' => 'This information has been taken from your profile and cannot be modified from the checkout. If you wish to change your billing information, please edit it in your profile.',
     'edit_billing_in_profile' => 'Edit billing information in profile',
-
     'secure_payment_with_pagadito' => 'Secure payment with Pagadito',
     'your_order_summary' => 'Your order summary',
     'redirect_notice' => 'You will be redirected to Pagadito’s secure platform to complete your payment. We do not store your card information.',
@@ -271,17 +270,29 @@ return [
     'select_shipping_before_continue' => 'Select a shipping address before continuing.',
     'payment_form_not_found' => 'Payment form not found.',
     'session_expired' => 'Your session has expired, please log in again.',
-
     'order_status_pending'  => 'Pending',
     'order_status_paid'     => 'Paid',
     'order_status_failed'   => 'Failed',
     'order_status_canceled' => 'Canceled',
     'order_status_refunded' => 'Refunded',
-
     'order'          => 'Order',
     'date'           => 'Date',
     'delivery_type'  => 'Delivery Type',
     'payment_method' => 'Payment Method',
     'options'        => 'Options',
+    'order_status_preparing' => 'Preparing order',
+    'order_status_shipped'   => 'Order shipped',
+    'order_not_found' => 'Order not found',
+    'error_loading_status' => 'Error loading status',
+    'back_to_orders' => 'Back to orders',
+    'order_status' => 'Order status',
+    'order_detail' => 'Order detail',
+
+
+
+
+
+
+
 
 ];

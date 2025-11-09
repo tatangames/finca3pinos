@@ -419,8 +419,11 @@
                                     <td>
                                         {{-- Ajusta estas rutas cuando tengas tracking y detalle --}}
                                         <a class="btn btn-track"
-                                           href="{{ route('user.address', $order->id) }}">
-                                            <i>🚚</i>{{ __('meta.tracking') }}
+                                           href="{{ LaravelLocalization::getLocalizedURL(
+                                            app()->getLocale(),
+                                            route('user.orders.tracking', ['order' => $order->id], false)
+                                        ) }}">
+                                            <i>🚚</i> {{ __('meta.tracking') }}
                                         </a>
                                         <a class="btn btn-gold"
                                            href="{{ route('user.address', $order->id) }}">
@@ -446,6 +449,13 @@
                 @endif
             </div>
         </div>
+
+
+
+
+
+
+
     </section>
 
     <script>

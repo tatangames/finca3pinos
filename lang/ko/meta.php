@@ -214,6 +214,7 @@ return [
     'added_to_cart' => '장바구니에 추가됨',
     'could_not_add_tocart' => '장바구니에 추가할 수 없습니다',
     'your_cart_empty' => '장바구니가 비어 있습니다',
+    'message_is_required' => '메시지는 필수 항목입니다.',
     'msg_not_send' => '현재 요청을 처리할 수 없습니다.',
     'error_login_google' => '구글 로그인에 실패했습니다. 다시 시도해주세요.',
     'edit' => '수정',
@@ -261,7 +262,6 @@ return [
     'status' => '상태',
     'billing_readonly_notice' => '이 정보는 프로필에서 가져온 것이며 결제 화면에서 수정할 수 없습니다. 청구 정보를 변경하려면 프로필에서 수정하세요.',
     'edit_billing_in_profile' => '프로필에서 청구 정보 수정',
-
     'secure_payment_with_pagadito' => 'Pagadito로 안전한 결제',
     'your_order_summary' => '주문 요약',
     'redirect_notice' => '결제를 완료하기 위해 Pagadito의 안전한 결제 페이지로 이동합니다. 카드 정보는 저장되지 않습니다.',
@@ -270,12 +270,28 @@ return [
     'select_shipping_before_continue' => '계속하기 전에 배송 주소를 선택하세요.',
     'payment_form_not_found' => '결제 양식을 찾을 수 없습니다.',
     'session_expired' => '세션이 만료되었습니다. 다시 로그인하세요.',
-
+    'order_status_pending'  => '보류 중',
+    'order_status_paid'     => '결제 완료',
+    'order_status_failed'   => '결제 실패',
+    'order_status_canceled' => '취소됨',
+    'order_status_refunded' => '환불됨',
     'order'          => '주문',
     'date'           => '날짜',
     'delivery_type'  => '배송 유형',
     'payment_method' => '결제 방법',
     'options'        => '옵션',
+    'order_status_preparing' => '주문 준비 중',
+    'order_status_shipped'   => '주문이 발송되었습니다',
+    'order_not_found' => '주문을 찾을 수 없습니다',
+    'error_loading_status' => '상태를 불러오는 중 오류가 발생했습니다',
+    'back_to_orders' => '주문 목록으로 돌아가기',
+    'order_status' => '주문 상태',
+    'order_detail' => '주문 상세',
+
+
+
+
+
 
 
 

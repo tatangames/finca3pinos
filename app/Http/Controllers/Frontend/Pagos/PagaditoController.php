@@ -200,6 +200,14 @@ class PagaditoController extends Controller
                 'shipping_cost'      => $shippingCost,
                 'total'              => $amount,
                 'status_id'             => 1, // pendiente
+
+                'estado_pedido_1' => null,
+                'fecha_pedido_1' => null,
+                'estado_pedido_2' => null,
+                'fecha_pedido_2' => null,
+
+                'seguimiento' => null
+
             ]);
 
             // ===== Items de la orden + detalle Pagadito =====
@@ -208,7 +216,7 @@ class PagaditoController extends Controller
                 $price = (float) $item->price;
 
                 if ($qty <= 0 || $price <= 0) {
-                    throw new \RuntimeException('Producto con cantidad o precio inválido.');
+                    throw new \RuntimeException('Product Invalid.');
                 }
 
                 $attrs = $item->attributes ?? null;

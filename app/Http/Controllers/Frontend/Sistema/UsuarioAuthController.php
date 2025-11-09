@@ -301,6 +301,14 @@ class UsuarioAuthController extends Controller
         return view('frontend.dashboard.vistaordenes', compact('orders'));
     }
 
+
+
+
+
+
+
+
+
     public function vistaMisDirecciones()
     {
         $userId = Auth::guard('web')->id();

@@ -21,10 +21,14 @@ return [
     'updatedirection' => 'update-direction',
     'updatebilling' => 'update-billing',
     'cart' => 'cart',
-
-
     'checkout' => 'checkout',                // GET
     'checkout_post' => 'checkout',           // POST (misma URL)
     'thanks' => 'thanks/{order}',            // página de gracias
+    'tracking_order' => 'tracking-order/{order}',
+    'details_order' => 'details-order/{order}',
+
+
+
+
 
 ];

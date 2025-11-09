@@ -21,9 +21,17 @@ return [
     'updatedirection' => 'actualizar-direccion',
     'updatebilling' => 'actualizar-perfil',
     'cart' => 'carrito',
-
     'checkout' => 'pago',
     'checkout_post' => 'pago',
     'thanks' => 'gracias/{order}',
+    'tracking_order' => 'tracking-pedido/{order}',
+    'details_order' => 'detalle-pedido/{order}',
+
+
+
+
+
+
+
 
 ];

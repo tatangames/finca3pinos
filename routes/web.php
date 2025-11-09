@@ -16,7 +16,7 @@ use App\Http\Controllers\Backend\Sistema\PaisesController;
 // ======================== FRONTEND =============================
 use App\Http\Controllers\Frontend\Sistema\UsuarioAuthController;
 use App\Http\Controllers\Frontend\Sistema\FrontendController;
-use App\Http\Controllers\Frontend\Sistema\OrderController;
+use App\Http\Controllers\Frontend\Sistema\OrdenesController;
 use App\Http\Controllers\Frontend\Sistema\PasswordResetController;
 use App\Http\Controllers\Frontend\Sistema\CartController;
 use App\Http\Controllers\Frontend\Sistema\CheckoutController;
@@ -256,6 +256,26 @@ Route::middleware(['detect.country.locale'])->group(function () {
         // vista ordenes
         Route::get(LaravelLocalization::transRoute('routes.orders'), [UsuarioAuthController::class, 'vistaMisOrdenes'])
             ->name('user.orders');
+
+
+        // vista ordenes
+        Route::get(LaravelLocalization::transRoute('routes.tracking_order'), [OrdenesController::class, 'vistaMisOrdenesSeguimiento'])
+            ->name('user.orders.tracking');
+
+        // vista detalle de la orden
+        Route::get(LaravelLocalization::transRoute('routes.details_order'), [OrdenesController::class, 'vistaMisOrdenesDetalle'])
+            ->name('user.orders.detail');
+
+
+
+
+
+
+
+
+
+
+
 
         // vista direcciones
         Route::get(LaravelLocalization::transRoute('routes.address'), [UsuarioAuthController::class, 'vistaMisDirecciones'])

@@ -66,7 +66,6 @@ return new class extends Migration
                 4 => 'canceled',
                 5 => 'refunded',
           */
-
             // Estado de la orden interna
             $table->tinyInteger('status_id')->default(1);
 
@@ -74,6 +73,24 @@ return new class extends Migration
             $table->string('pagadito_token', 150)->nullable();
             $table->string('pagadito_ref', 150)->nullable();
             $table->string('pagadito_status', 50)->nullable();
+
+
+
+            // ESTADOS DE LA ORDEN TRACKING
+            // Preparando Pedido
+            $table->boolean('estado_pedido_1')->default(0);
+            $table->date('fecha_pedido_1')->nullable();
+
+            // Pedido enviado
+            $table->boolean('estado_pedido_2')->default(0);
+            $table->date('fecha_pedido_2')->nullable();
+
+
+            // seteado por administrador
+            $table->text('seguimiento')->nullable();
+
+
+
         });
     }
 

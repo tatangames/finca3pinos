@@ -47,6 +47,14 @@ class Ordenes extends Model
         'pagadito_token',
         'pagadito_ref',
         'pagadito_status',
+
+        'estado_pedido_1',
+        'fecha_pedido_1',
+        'estado_pedido_2',
+        'fecha_pedido_2',
+        'seguimiento'
+
+
     ];
 
 

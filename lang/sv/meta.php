@@ -174,7 +174,7 @@ return [
     'no_orders_yet' => 'No hay ordenes aun',
     'gotoshop' => 'Ir a comprar',
     'gottocart' => 'Ir al carrito',
-    'tracking' => 'seguimiento',
+    'tracking' => 'Seguimiento',
     'no_addresses' => 'No hay direcciones',
     'add_new_address' => 'Agregar dirección',
     'select' => 'Seleccionar',
@@ -262,7 +262,6 @@ return [
     'status' => 'Estado',
     'billing_readonly_notice' => 'Estos datos se han tomado de tu perfil y no pueden modificarse desde el checkout. Si deseas cambiar tu información de facturación, edítala en tu perfil.',
     'edit_billing_in_profile' => 'Editar datos en el perfil',
-
     'secure_payment_with_pagadito' => 'Pago seguro con Pagadito',
     'your_order_summary' => 'Resumen de tu pedido',
     'redirect_notice' => 'Serás redirigido a la plataforma segura de Pagadito para completar tu pago. No almacenamos los datos de tu tarjeta.',
@@ -271,18 +270,31 @@ return [
     'select_shipping_before_continue' => 'Selecciona una dirección de envío antes de continuar.',
     'payment_form_not_found' => 'No se encontró el formulario de pago.',
     'session_expired' => 'Tu sesión ha expirado, inicia sesión nuevamente.',
-
     'order_status_pending'  => 'Pendiente',
     'order_status_paid'     => 'Pagada',
     'order_status_failed'   => 'Fallida',
     'order_status_canceled' => 'Cancelada',
     'order_status_refunded' => 'Reembolsada',
-
     'order'          => 'Pedido',
     'date'           => 'Fecha',
     'delivery_type'  => 'Tipo de envío',
     'payment_method' => 'Método de pago',
     'options'        => 'Opciones',
+    'order_status_preparing' => 'Preparando orden',
+    'order_status_shipped'   => 'Orden enviada',
+    'order_not_found' => 'Orden no encontrada',
+    'error_loading_status' => 'Error al cargar estado',
+    'back_to_orders' => 'Volver a órdenes',
+    'order_status' => 'Estado de la orden',
+    'order_detail' => 'Detalle de la orden',
+
+
+
+
+
+
+
+
 
 
 ];
