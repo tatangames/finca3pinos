@@ -102,12 +102,10 @@ class PagaditoController extends Controller
                 ->with('error', __('meta.selected_shipping_notvalid'));
         }
 
-        // ===== Costo de envío según país / municipio =====
+        // ===== Costo de envío =====
         $shippingCost = 0.0;
 
         if ((int) $direccionEnvio->id_paises === 1) {
-            // El Salvador → usar precio desde municipio
-            // Ajusta 'id_municipio' y 'precio_envio' según tu esquema real
             if (!empty($direccionEnvio->id_municipio)) {
                 $municipio = Municipio::find($direccionEnvio->id_municipio);
                 if ($municipio && $municipio->precio_envio !== null) {
@@ -115,18 +113,11 @@ class PagaditoController extends Controller
                 }
             }
         } else {
-            // Otros países → usar precio a nivel país
-            // Ajusta 'precio_envio' al nombre real del campo en tu tabla paises
             $pais = Pais::find($direccionEnvio->id_paises);
             if ($pais && $pais->precio_envio !== null) {
                 $shippingCost = (float) $pais->precio_envio;
             }
         }
-
-        // (Opcional) fallback: si tu dirección ya tiene un precio específico:
-        // if ($shippingCost == 0 && $direccionEnvio->precio_envio !== null) {
-        //     $shippingCost = (float) $direccionEnvio->precio_envio;
-        // }
 
         // ===== Totales =====
         $amountProducts = (float) number_format($subtotal, 2, '.', '');
@@ -138,13 +129,13 @@ class PagaditoController extends Controller
                 ->with('error', __('meta.minimum_amount_to_pay'));
         }
 
-        // ===== Dirección de facturación (snapshot desde direcciones_facturacion) =====
+        // ===== Facturación =====
         $billing = DireccionFacturacion::query()
             ->where('id_usuario', $userId)
-            ->orderByDesc('id') // última registrada
+            ->orderByDesc('id')
             ->first();
 
-        // ===== Conectar a Pagadito =====
+        // ===== Conectar Pagadito =====
         if (!$this->pagadito->connect()) {
             Log::channel('pagadito')->error('Error conectando a Pagadito [init]', [
                 'code'    => $this->pagadito->get_rs_code(),
@@ -159,19 +150,18 @@ class PagaditoController extends Controller
             );
         }
 
-        // ===== Generar ERN único =====
+        // ===== ERN =====
         $ern = 'F3P-' . $userId . '-' . time();
 
         try {
             DB::beginTransaction();
 
-            // ===== Crear orden (con snapshot de envío + facturación) =====
+            // ===== Crear orden pendiente =====
             $order = Ordenes::create([
                 'id_usuario'         => $userId,
                 'ern'                => $ern,
                 'fecha'              => now(),
 
-                // Envío
                 'id_paises'          => $direccionEnvio->id_paises,
                 'id_departamentos'   => $direccionEnvio->id_departamento,
                 'id_municipios'      => $direccionEnvio->id_municipio,
@@ -184,33 +174,27 @@ class PagaditoController extends Controller
                 'shipping_direccion_opc' => $direccionEnvio->direccion_opcional,
                 'shipping_zipcode'   => $direccionEnvio->zipcode,
 
-                // Facturación
-
                 'billing_idpaises'   => $billing->id_paises   ?? null,
-                'billing_nombre'     => $billing->nombre   ?? null,
-                'billing_direccion'  => $billing->direccion ?? null,
-                'billing_ciudad'     => $billing->ciudad    ?? null,
-                'billing_estado'     => $billing->estado    ?? null,
-                'billing_zipcode'    => $billing->zipcode   ?? null,
-                'billing_telefono'   => $billing->telefono  ?? null,
-                // Si tu tabla ordenes tiene billing_pais:
-                // 'billing_pais'       => $billing->id_paises ?? null,
+                'billing_nombre'     => $billing->nombre      ?? null,
+                'billing_direccion'  => $billing->direccion   ?? null,
+                'billing_ciudad'     => $billing->ciudad      ?? null,
+                'billing_estado'     => $billing->estado      ?? null,
+                'billing_zipcode'    => $billing->zipcode     ?? null,
+                'billing_telefono'   => $billing->telefono    ?? null,
 
                 'subtotal'           => $amountProducts,
                 'shipping_cost'      => $shippingCost,
                 'total'              => $amount,
-                'status_id'             => 1, // pendiente
+                'status_id'          => 1, // pendiente
 
-                'estado_pedido_1' => null,
-                'fecha_pedido_1' => null,
-                'estado_pedido_2' => null,
-                'fecha_pedido_2' => null,
-
-                'seguimiento' => null
-
+                'estado_pedido_1'    => null,
+                'fecha_pedido_1'     => null,
+                'estado_pedido_2'    => null,
+                'fecha_pedido_2'     => null,
+                'seguimiento'        => null,
             ]);
 
-            // ===== Items de la orden + detalle Pagadito =====
+            // ===== Items =====
             foreach ($items as $item) {
                 $qty   = (int) $item->quantity;
                 $price = (float) $item->price;
@@ -242,9 +226,8 @@ class PagaditoController extends Controller
                 );
             }
 
-            $shippingLabel = __('meta.shipping'); // lo creas en tus lang
-
-            // ===== Envío como ítem Pagadito =====
+            // Envío como ítem
+            $shippingLabel = __('meta.shipping');
             if ($shippingCost > 0) {
                 $this->pagadito->add_detail(
                     1,
@@ -273,13 +256,16 @@ class PagaditoController extends Controller
             return back()->with('error', __('meta.transaction_could_not_be'));
         }
 
-        // ===== Ejecutar transacción (redirige a Pagadito) =====
+        // ===== Ejecutar transacción =====
         if ($this->pagadito->exec_trans($ern)) {
+            // Importante: aquí NO limpiamos carrito
             exit;
         }
 
-        // Si falla exec_trans
-        $order->update(['status' => 'failed']);
+        // Si falla exec_trans: marcar orden como fallo técnico
+        $order->update([
+            'status_id' => 3, // por ejemplo "failed" en tu tabla de estados
+        ]);
 
         Log::channel('pagadito')->error('No se pudo iniciar transacción Pagadito [exec_trans]', [
             'ern'     => $ern,
@@ -294,6 +280,7 @@ class PagaditoController extends Controller
             . $this->pagadito->get_rs_message()
         );
     }
+
 
 
 
@@ -327,10 +314,6 @@ class PagaditoController extends Controller
      */
     public function retorno(Request $request)
     {
-        // Según configuración en Pagadito:
-        // URL de retorno: https://finca3pinos.com/pagadito/retorno?param1={value}&param2={ern_value}
-        // param1 = token, param2 = ern/reference
-
         $token  = $request->input('param1') ?? $request->input('token');
         $refErn = $request->input('param2') ?? $request->input('order') ?? $request->input('pedido');
 
@@ -346,7 +329,7 @@ class PagaditoController extends Controller
                 ->with('error', __('meta.payment_not_confirmed'));
         }
 
-        // Buscar orden por ERN recibido (si viene)
+        // Buscar orden por ERN recibido
         $order = null;
         if ($refErn) {
             $order = Ordenes::where('ern', $refErn)->first();
@@ -376,11 +359,10 @@ class PagaditoController extends Controller
                 ->with('error', __('meta.payment_not_confirmed'));
         }
 
-        $statusPagadito = $this->pagadito->get_rs_status();    // String
-        $pagaditoRef    = $this->pagadito->get_rs_reference(); // ERN desde Pagadito
-        $rawValue       = $this->pagadito->get_rs_value();     // Puede ser string u objeto según formato
+        $statusPagadito = $this->pagadito->get_rs_status();    // estado texto
+        $pagaditoRef    = $this->pagadito->get_rs_reference(); // ERN / ref
+        $rawValue       = $this->pagadito->get_rs_value();
 
-        // Log para ver exactamente qué devuelve
         Log::channel('pagadito')->info('Respuesta get_status Pagadito', [
             'status'   => $statusPagadito,
             'ref'      => $pagaditoRef,
@@ -388,7 +370,7 @@ class PagaditoController extends Controller
             'type'     => is_object($rawValue) ? 'object' : gettype($rawValue),
         ]);
 
-        // Resolver orden: si no la encontramos con refErn original, probamos con la referencia que Pagadito responde
+        // Intentar con referencia de Pagadito si no se encontró antes
         if (!$order && $pagaditoRef) {
             $order = Ordenes::where('ern', $pagaditoRef)->first();
         }
@@ -404,21 +386,32 @@ class PagaditoController extends Controller
                 ->with('error', __('meta.payment_not_confirmed'));
         }
 
-        // (OPCIONAL) Si quisieras validar monto, primero garantizamos que no sea objeto:
-        // $pagaditoAmount = is_object($rawValue) ? null : (float) $rawValue;
+        $normalized = strtoupper(trim($statusPagadito));
 
-        // Mapear estados Pagadito → sistema
-        $normalized = strtoupper($statusPagadito);
+        // Estados de éxito (según docs Pagadito / integración)
+        $successStates = ['COMPLETED', 'APPROVED'];
 
-        if (in_array($normalized, ['COMPLETED', 'APPROVED'])) {
+        // Estados que NO deben borrar carrito (pendientes)
+        $pendingStates = ['REGISTERED', 'VERIFIED', 'IN_PROCESS', 'PENDING'];
 
-            $order->update([
-                'status_id'          => 2, // Pagado
-                'pagadito_token'  => $token,
-                'pagadito_ref'    => $pagaditoRef ?: $order->ern,
-                'pagadito_status' => $statusPagadito,
-            ]);
+        // Estados de fallo / cancelación
+        $failedStates   = ['REJECTED', 'FAILED', 'ERROR', 'EXPIRED', 'REVOKED'];
+        $canceledStates = ['CANCELLED', 'CANCELED'];
 
+        // ===== ÉXITO: pago confirmado =====
+        if (in_array($normalized, $successStates, true)) {
+
+            // Evitar downgrade si ya estaba marcada como pagada
+            if ((int)$order->status_id !== 2) {
+                $order->update([
+                    'status_id'       => 2, // Pagado
+                    'pagadito_token'  => $token,
+                    'pagadito_ref'    => $pagaditoRef ?: $order->ern,
+                    'pagadito_status' => $statusPagadito,
+                ]);
+            }
+
+            // AHORA SÍ limpiamos carrito
             try {
                 $this->cart()->clear();
             } catch (\Throwable $e) {
@@ -432,18 +425,61 @@ class PagaditoController extends Controller
             ]);
         }
 
-        // Cualquier otro estado: lo tratamos como fallo/cancelado
-        $order->update([
-            'status_id'          => 3, // fallado
-            'pagadito_token'  => $token,
-            'pagadito_ref'    => $pagaditoRef ?: $order->ern,
-            'pagadito_status' => $statusPagadito,
+        // ===== PENDIENTE: no confirmamos ni borramos nada =====
+        if (in_array($normalized, $pendingStates, true)) {
+
+            // Mantener como pendiente si aún no está pagada
+            if ((int)$order->status_id === 1) {
+                $order->update([
+                    'pagadito_token'  => $token,
+                    'pagadito_ref'    => $pagaditoRef ?: $order->ern,
+                    'pagadito_status' => $statusPagadito,
+                ]);
+            }
+
+            return redirect()
+                ->route('user.orders')
+                ->with('info', __('meta.payment_in_process') ?? 'Tu pago está en proceso de verificación.');
+        }
+
+        // ===== FALLÓ o CANCELADO: NO borrar carrito, solo marcar orden =====
+        if (in_array($normalized, $failedStates, true) || in_array($normalized, $canceledStates, true)) {
+
+            // Solo marcar fallo si no está pagada
+            if ((int)$order->status_id !== 2) {
+                $order->update([
+                    'status_id'       => 3, // fallado / cancelado (ajusta según tu catálogo)
+                    'pagadito_token'  => $token,
+                    'pagadito_ref'    => $pagaditoRef ?: $order->ern,
+                    'pagadito_status' => $statusPagadito,
+                ]);
+            }
+
+            return redirect()
+                ->route('checkout.show')
+                ->with('error', __('meta.payment_not_confirmed'));
+        }
+
+        // ===== Estado desconocido: tratamos como no confirmado =====
+        Log::channel('pagadito')->warning('Estado Pagadito desconocido en retorno', [
+            'status' => $statusPagadito,
+            'ern'    => $order->ern,
         ]);
+
+        if ((int)$order->status_id !== 2) {
+            $order->update([
+                'status_id'       => 3,
+                'pagadito_token'  => $token,
+                'pagadito_ref'    => $pagaditoRef ?: $order->ern,
+                'pagadito_status' => $statusPagadito,
+            ]);
+        }
 
         return redirect()
             ->route('checkout.show')
             ->with('error', __('meta.payment_not_confirmed'));
     }
+
 
 
 

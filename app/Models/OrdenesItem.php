@@ -30,4 +30,9 @@ class OrdenesItem extends Model
     {
         return $this->belongsTo(Producto::class, 'id_producto');
     }
+
+    public function presentacion()
+    {
+        return $this->belongsTo(ProductosPresentacion::class, 'id_presentacion');
+    }
 }

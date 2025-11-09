@@ -70,6 +70,17 @@ class Ordenes extends Model
         return $this->hasMany(OrdenesItem::class, 'id_orden');
     }
 
+    public function producto()
+    {
+        // Ajusta 'id_producto' y modelo Producto según tu estructura
+        return $this->belongsTo(Producto::class, 'id_producto', 'id');
+    }
+
+    public function detalles()
+    {
+        return $this->hasMany(OrdenesItem::class, 'id_orden');
+    }
+
     public const STATUS = [
         1 => 'pending',
         2 => 'paid',

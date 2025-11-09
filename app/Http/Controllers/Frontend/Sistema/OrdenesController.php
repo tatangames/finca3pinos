@@ -86,8 +86,50 @@ class OrdenesController extends Controller
 
     public function vistaMisOrdenesDetalle($idorden)
     {
+        $userId = Auth::id();
 
+        $order = Ordenes::with(['detalles.producto', 'detalles.presentacion'])
+            ->where('id', $idorden)
+            ->where('id_usuario', $userId)
+            ->first();
+
+        if (!$order) {
+            return redirect()
+                ->route('user.orders')
+                ->with('error', __('meta.order_not_found'));
+        }
+
+        $formatoFecha = $order->id_paises == 1 ? 'd-m-M' : 'm-d-Y';
+
+        $fechaOrden = $order->fecha
+            ? Carbon::parse($order->fecha)->format($formatoFecha)
+            : null;
+
+        $subtotal = $order->detalles->reduce(function ($carry, $item) {
+            $precio   = $item->precio ?? $item->precio_unitario ?? 0;
+            $cantidad = $item->cantidad ?? 1;
+            return $carry + ($precio * $cantidad);
+        }, 0);
+
+        $envio = $order->costo_envio ?? $order->shipping_cost ?? 0;
+        $total = $order->total ?? ($subtotal + $envio);
+
+        $infoPais = Pais::find($order->id_paises);
+        $nombreDepartamento = Departamento::find($order->id_departamentos)->nombre ?? '';
+        $nombreMunicipio    = Municipio::find($order->id_municipios)->nombre ?? '';
+
+        return view('frontend.dashboard.seguimiento.vistadetalleorden', [
+            'order'             => $order,
+            'fechaOrden'        => $fechaOrden,
+            'subtotal'          => $subtotal,
+            'envio'             => $envio,
+            'total'             => $total,
+            'nombrePais'        => $infoPais->nombre ?? '',
+            'nombreDepartamento'=> $nombreDepartamento,
+            'nombreMunicipio'   => $nombreMunicipio,
+        ]);
     }
+
 
 
 

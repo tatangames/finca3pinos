@@ -426,7 +426,10 @@
                                             <i>🚚</i> {{ __('meta.tracking') }}
                                         </a>
                                         <a class="btn btn-gold"
-                                           href="{{ route('user.address', $order->id) }}">
+                                           href="{{ LaravelLocalization::getLocalizedURL(
+                                            app()->getLocale(),
+                                            route('user.orders.detail', ['order' => $order->id], false)
+                                        ) }}">
                                             <i>📄</i>{{ __('meta.order') }}
                                         </a>
                                     </td>
