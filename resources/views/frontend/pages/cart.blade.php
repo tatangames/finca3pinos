@@ -686,19 +686,20 @@
                 }
             });
 
-            // === BOTÓN "UPDATE CART" === (único listener)
+            // === BOTÓN "UPDATE CART" === (secuencial para evitar errores raros)
             btnUpdate?.addEventListener('click', async () => {
                 const rows = body.querySelectorAll('tr[data-row]');
                 if (!rows.length) {
                     return toastr.info(i18n.cartEmpty);
                 }
 
-                // Bloquear botón para evitar múltiples clics
                 btnUpdate.disabled = true;
 
+                let lastSubtotal = 0;
+                let lastCount = 0;
+                let huboError = false;
+
                 try {
-                    // Puedes hacerlo en serie o en paralelo; aquí en paralelo:
-                    const requests = [];
                     for (const tr of rows) {
                         const input = tr.querySelector('.qty-input');
                         if (!input) continue;
@@ -706,53 +707,63 @@
                         const rowId = tr.dataset.row;
                         const qty = parseInt(input.value || '0', 10);
 
-                        requests.push(
-                            axios.post("{{ route('cart.update') }}", { row_id: rowId, qty })
-                                .then(({ data }) => {
-                                    // Actualiza total por fila
-                                    const bdi = tr.querySelector('.row-total bdi');
-                                    if (bdi) bdi.textContent = '$' + Number(data.rowTotal).toFixed(2);
+                        // Evita mandar NaN
+                        if (isNaN(qty) || !rowId) continue;
 
-                                    // Si qty llegó a 0 y el backend removió el item, quita la fila
-                                    if (qty === 0) tr.remove();
+                        const { data } = await axios.post("{{ route('cart.update') }}", {
+                            row_id: rowId,
+                            qty: qty
+                        });
 
-                                    return data; // para colectar último subtotal / count
-                                })
-                        );
+                        // Actualiza total por fila si la fila sigue existiendo
+                        const bdi = tr.querySelector('.row-total bdi');
+                        if (bdi && typeof data.rowTotal !== 'undefined') {
+                            bdi.textContent = '$' + Number(data.rowTotal).toFixed(2);
+                        }
+
+                        // Si qty llegó a 0, el backend debió eliminar el item
+                        if (qty === 0) {
+                            tr.remove();
+                        }
+
+                        // Guarda último estado global que devuelve el backend
+                        if (typeof data.subtotal !== 'undefined') {
+                            lastSubtotal = Number(data.subtotal);
+                        }
+                        if (typeof data.count !== 'undefined') {
+                            lastCount = Number(data.count);
+                        }
                     }
 
-                    const results = await Promise.all(requests);
-
-                    // Si se eliminaron todas las filas, agrega mensaje vacío
+                    // Si se eliminaron todos, mostrar mensaje de carrito vacío
                     if (!body.querySelector('tr[data-row]')) {
-                        body.insertAdjacentHTML(
-                            'afterbegin',
-                            `<tr><td colspan="6" class="text-center">${i18n.cartEmpty}</td></tr>`
-                        );
+                        body.innerHTML = `<tr><td colspan="6" class="text-center">${i18n.cartEmpty}</td></tr>`;
+                        lastSubtotal = 0;
+                        lastCount = 0;
                     }
 
-                    // Toma el último estado agregado por el backend
-                    const last = results[results.length - 1];
-                    const subtotalAcum = Number(last?.subtotal ?? 0);
-                    const totalItems   = Number(last?.count ?? 0);
+                    // Actualiza subtotal
+                    subtotalBadge.textContent = '$' + lastSubtotal.toFixed(2);
 
-                    subtotalBadge.textContent = '$' + subtotalAcum.toFixed(2);
-
-                    // Un solo toast de éxito
-                    toastr.success(i18n.carritoActualizadoMessage);
+                    // Toast de éxito sólo si no hubo error global
+                    if (!huboError) {
+                        toastr.success(i18n.carritoActualizadoMessage);
+                    }
 
                     // Actualiza navbar una vez
                     window.dispatchEvent(new CustomEvent('cart:updated', {
-                        detail: { count: totalItems, subtotal: subtotalAcum }
+                        detail: { count: lastCount, subtotal: lastSubtotal }
                     }));
 
-                } catch (err) {
-                    console.error(err);
+                } catch (error) {
+                    console.error('Error:', error);
+                    huboError = true;
                     toastr.error(i18n.errorDesconocidoMessage);
                 } finally {
                     btnUpdate.disabled = false;
                 }
             });
+
 
             // === BOTÓN "PROCEDER AL CHECKOUT" ===
             const btnCheckout = document.querySelector('.wc-proceed-to-checkout .checkout-button');
