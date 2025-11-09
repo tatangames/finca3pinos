@@ -278,6 +278,11 @@ return [
     'order_status_canceled' => 'Cancelada',
     'order_status_refunded' => 'Reembolsada',
 
+    'order'          => 'Pedido',
+    'date'           => 'Fecha',
+    'delivery_type'  => 'Tipo de envío',
+    'payment_method' => 'Método de pago',
+    'options'        => 'Opciones',
 
 
 ];

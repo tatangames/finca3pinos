@@ -271,6 +271,12 @@ return [
     'payment_form_not_found' => '결제 양식을 찾을 수 없습니다.',
     'session_expired' => '세션이 만료되었습니다. 다시 로그인하세요.',
 
+    'order'          => '주문',
+    'date'           => '날짜',
+    'delivery_type'  => '배송 유형',
+    'payment_method' => '결제 방법',
+    'options'        => '옵션',
+
 
 
 

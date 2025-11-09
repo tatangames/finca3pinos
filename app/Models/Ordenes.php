@@ -49,6 +49,8 @@ class Ordenes extends Model
         'pagadito_status',
     ];
 
+
+
     // === Relaciones ===
     public function usuario()
     {

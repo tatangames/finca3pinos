@@ -8,6 +8,7 @@ use App\Models\Departamento;
 use App\Models\Direcciones;
 use App\Models\DireccionFacturacion;
 use App\Models\Municipio;
+use App\Models\Ordenes;
 use App\Models\Pais;
 use App\Models\Producto;
 use App\Models\ProductosPresentacion;
@@ -258,7 +259,46 @@ class UsuarioAuthController extends Controller
     // @Auth
     public function vistaMisOrdenes()
     {
-       return view('frontend.dashboard.vistaordenes');
+        $user = Auth::guard('web')->user();
+
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $orders = Ordenes::where('id_usuario', $user->id)
+            ->orderByDesc('fecha')
+            ->paginate(10)
+            ->through(function ($order) use ($user) {
+                // Formato de fecha según país
+                if ($user->id_paises == 1) {
+                    // Formato latino (Ej: 08/11/2025 04:30 PM)
+                    $order->fecha_formateada = $order->fecha
+                        ? Carbon::parse($order->fecha)->format('d/m/Y')
+                        : null;
+                } else {
+                    // Formato USA (Ej: 11/08/2025 04:30 PM)
+                    $order->fecha_formateada = $order->fecha
+                        ? Carbon::parse($order->fecha)->format('m/d/Y')
+                        : null;
+                }
+
+                // Monto y estado formateados
+                $order->monto_formateado = number_format($order->total, 2);
+
+
+                // === ESTADO traducido ===
+                // 1) Obtener nombre interno: pending, paid, etc.
+                $statusName = Ordenes::STATUS[$order->status_id] ?? '';
+
+                // 2) Buscar traducción del meta
+                $order->estado_texto = __('meta.order_status_' . $statusName);
+
+
+
+                return $order;
+            });
+
+        return view('frontend.dashboard.vistaordenes', compact('orders'));
     }
 
     public function vistaMisDirecciones()

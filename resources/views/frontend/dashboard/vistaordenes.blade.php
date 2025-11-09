@@ -265,6 +265,72 @@
         }
 
         /* centra el texto del botón */
+
+
+        .btn.btn-track,
+        .btn.btn-gold {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            padding: 4px 10px;
+            border-radius: 20px;   /* 🔹 hace que se vean redondos */
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .btn.btn-track {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        .btn.btn-gold {
+            background-color: #c8b083;
+            color: #fff;
+        }
+        .btn.btn-track:hover {
+            background-color: #e2e2e2;
+        }
+        .btn.btn-gold:hover {
+            background-color: #b39c6b;
+        }
+
+        /* Íconos un poco más pequeños */
+        .btn i {
+            font-size: 14px;
+            line-height: 1;
+        }
+        /* ===== Botones pequeños redondeados SOLO en la tabla de órdenes ===== */
+        table.orders .btn.btn-track,
+        table.orders .btn.btn-gold {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px !important;
+            padding: 3px 9px !important;
+            border-radius: 999px !important; /* pill bien redondo */
+            text-decoration: none;
+            line-height: 1.2;
+        }
+
+        /* Colores */
+        table.orders .btn.btn-track {
+            background-color: #f1f1f1 !important;
+            color: #333 !important;
+        }
+
+        table.orders .btn.btn-gold {
+            background-color: #c8b083 !important;
+            color: #fff !important;
+        }
+
+        /* Ícono compacto */
+        table.orders .btn.btn-track i,
+        table.orders .btn.btn-gold i {
+            font-size: 16px;
+            line-height: 3;
+        }
+
+
     </style>
 
     @php
@@ -335,35 +401,31 @@
                             <tr>
                                 <th>{{ __('meta.order') }}</th>
                                 <th>{{ __('meta.date') }}</th>
-                                <th>{{ __('meta.delivery_type') }}</th>
-                                <th>{{ __('meta.payment_method') }}</th>
-                                <th>{{ __('meta.status') }}</th>
                                 <th>{{ __('meta.total') }}</th>
+                                <th>{{ __('meta.status') }}</th>
                                 <th>{{ __('meta.options') }}</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($orders as $order)
-                                @php
-                                    $status = \Illuminate\Support\Str::lower($order->status ?? '');
-                                    $statusClass = match($status){
-                                        'entregado','delivered' => 'status--delivered',
-                                        'procesando','processing' => 'status--processing',
-                                        default => 'status--pending'
-                                    };
-                                @endphp
                                 <tr>
                                     <td># {{ $order->id }}</td>
-                                    <td>{{ optional($order->created_at)->format('Y/m/d h:i A') }}</td>
-                                    <td>{{ $order->delivery_type ?? __('meta.home_delivery') }}</td>
-                                    <td>{{ $order->payment_method ?? '—' }}</td>
-                                    <td><span
-                                            class="badge {{ $statusClass }}">{{ \Illuminate\Support\Str::upper($order->status ?? __('meta.pending')) }}</span>
-                                    </td>
-                                    <td class="price">$ {{ number_format($order->total ?? 0, 2) }}</td>
+                                    <td>{{ $order->fecha_formateada }}</td>
+                                    <td class="price">$ {{ number_format($order->total, 2) }}</td>
                                     <td>
-                                        <a class="btn btn-track" href="#"><i>🚚</i>{{ __('meta.tracking') }}</a>
-                                        <a class="btn btn-gold" href="#"><i>📄</i>{{ __('meta.order') }}</a>
+                                        {{ $order->estado_texto }}
+                                    </td>
+
+                                    <td>
+                                        {{-- Ajusta estas rutas cuando tengas tracking y detalle --}}
+                                        <a class="btn btn-track"
+                                           href="{{ route('user.address', $order->id) }}">
+                                            <i>🚚</i>{{ __('meta.tracking') }}
+                                        </a>
+                                        <a class="btn btn-gold"
+                                           href="{{ route('user.address', $order->id) }}">
+                                            <i>📄</i>{{ __('meta.order') }}
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

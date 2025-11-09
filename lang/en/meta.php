@@ -278,5 +278,10 @@ return [
     'order_status_canceled' => 'Canceled',
     'order_status_refunded' => 'Refunded',
 
+    'order'          => 'Order',
+    'date'           => 'Date',
+    'delivery_type'  => 'Delivery Type',
+    'payment_method' => 'Payment Method',
+    'options'        => 'Options',
 
 ];
