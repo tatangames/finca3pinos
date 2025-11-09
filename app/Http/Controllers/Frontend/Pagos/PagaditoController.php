@@ -20,6 +20,8 @@ class PagaditoController extends Controller
 {
     use HandlesCart;
 
+
+
     /**
      * @var Pagadito
      */
@@ -73,7 +75,7 @@ class PagaditoController extends Controller
         if (!$userId) {
             return redirect()
                 ->route('login')
-                ->with('error', __('meta.session_expired') ?? 'Tu sesión ha expirado, inicia sesión nuevamente.');
+                ->with('error', __('meta.session_expired'));
         }
 
         // ===== Carrito =====

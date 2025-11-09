@@ -287,6 +287,7 @@ return [
     'back_to_orders' => '주문 목록으로 돌아가기',
     'order_status' => '주문 상태',
     'order_detail' => '주문 상세',
+    'shipping_unavailable' => '배송이 일시적으로 불가능합니다',
 
 
 

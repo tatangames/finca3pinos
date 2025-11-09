@@ -1,0 +1,328 @@
+@extends('backend.menus.superior')
+
+@section('content-admin-css')
+    <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
+@stop
+
+<style>
+    table{
+        /*Ajustar tablas*/
+        table-layout:fixed;
+    }
+
+
+</style>
+
+<div id="divcontenedor" style="display: none">
+
+    <section class="content-header">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+
+            </div>
+
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">Clientes</li>
+                    <li class="breadcrumb-item active">Listado de Clientes</li>
+                </ol>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card card-gray-dark">
+                <div class="card-header">
+                    <h3 class="card-title">Clientes</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="tablaDatatable">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+@extends('backend.menus.footerjs')
+@section('archivos-js')
+
+        <script src="{{ asset('js/jquery.dataTables.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('js/dataTables.bootstrap4.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('js/toastr.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
+
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+            var ruta = "{{ URL::to('/admin/clientes/index/tabla') }}";
+            $('#tablaDatatable').load(ruta);
+
+            document.getElementById("divcontenedor").style.display = "block";
+        });
+    </script>
+
+    <script>
+
+        // recarga tabla
+        function recargar(){
+            var ruta = "{{ URL::to('/admin/clientes/index/tabla') }}";
+            $('#tablaDatatable').load(ruta);
+        }
+
+
+        // abre modal para agregar nuevo pais
+        function modalAgregar(){
+            document.getElementById("formulario-nuevo").reset();
+            $('#modalAgregar').modal('show');
+        }
+
+        function nuevo(){
+            var key = document.getElementById('key').value.trim();
+
+            if (key === '') {
+                toastr.error('Debe ingresar la key global');
+                return;
+            }
+
+            // 🔹 Creamos el FormData
+            let formData = new FormData();
+            formData.append('key', key);
+
+
+        }
+
+
+        function modalBorrar(idfila){
+            Swal.fire({
+                title: '¿Borrar?',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    solicitarBorrar(idfila);
+                }
+            })
+        }
+
+        function solicitarBorrar(idfila){
+
+            openLoading();
+
+            axios.post('/admin/categoria/borrar',{
+                'id': idfila
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        toastr.success('Fila Borrada');
+                        recargar();
+                    }else{
+                        toastr.error('Error al borrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al borrar');
+                    closeLoading();
+                });
+        }
+
+        function modalDesactivar(idfila){
+            Swal.fire({
+                title: '¿Desactivar?',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    desactivarFila(idfila);
+                }
+            })
+        }
+
+        function desactivarFila(idfila){
+            openLoading();
+
+            axios.post('/admin/categoria/desactivar',{
+                'id': idfila
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado');
+                        recargar();
+                    }else{
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+        function modalActivar(idfila){
+            Swal.fire({
+                title: '¿Activar?',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    activarFila(idfila);
+                }
+            })
+        }
+
+        function activarFila(idfila){
+            openLoading();
+
+            axios.post('/admin/categoria/activar',{
+                'id': idfila
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado');
+                        recargar();
+                    }else{
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+        function cardIdiomaHTML(item) {
+            // item = { name, locale, title }
+            const loc = item.locale;
+            return `
+      <div class="card mt-3 border">
+        <div class="card-header" style="background:#f4f4f4;">
+          <strong>${item.name}</strong> (${loc.toUpperCase()})
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Contenido (${loc})</label>
+            <textarea id="title_${loc}_editar"
+                      rows="4"
+                      class="form-control"
+                      placeholder="<p>Texto o HTML...</p>">${item.title || ''}</textarea>
+          </div>
+        </div>
+      </div>
+    `;
+        }
+
+        function informacionEditar(id){
+            openLoading();
+            document.getElementById("formulario-editar").reset();
+
+            axios.post('/admin/categoria/informacion', { id })
+                .then((response) => {
+                    closeLoading();
+                    if (response.data.success === 1) {
+                        const { info, langs } = response.data;
+
+                        $('#modalEditar').modal('show');
+                        $('#id-editar').val(info.id);
+
+                        // ✅ Idiomas dinámicos
+                        const cont = document.getElementById('langs-editar');
+                        cont.innerHTML = langs.map(cardIdiomaHTML).join('');
+                        cont.dataset.locales = langs.map(l => l.locale).join(',');
+                    } else {
+                        toastr.error('Información no encontrada');
+                    }
+                })
+                .catch(() => {
+                    closeLoading();
+                    toastr.error('Error al obtener la información');
+                });
+        }
+
+        function editar(){
+            const id = document.getElementById('id-editar').value;
+
+            // Recolectar traducciones dinámicas
+            const cont = document.getElementById('langs-editar');
+            const locales = (cont.dataset.locales || '').split(',').filter(Boolean);
+
+            const formData = new FormData();
+            formData.append('id', id);
+
+            // Enviar como arrays: title[en], title[sv], title[sv], ...
+            for (const loc of locales) {
+                const b = document.getElementById(`title_${loc}_editar`)?.value.trim() ?? '';
+
+                if (!b) {
+                    toastr.error(`Título es requerido para ${loc.toUpperCase()}`);
+                    return; // 🔴 corta toda la función
+                }
+
+                formData.append(`title[${loc}]`, b);
+            }
+
+            openLoading();
+
+            axios.post('/admin/categoria/editar', formData)
+                .then((response) => {
+                    closeLoading();
+
+                    if (response.data.success === 1) {
+                        toastr.success('Actualizado correctamente');
+                        $('#modalEditar').modal('hide');
+                        recargar();
+                        return;
+                    }else{
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Error al actualizar');
+                });
+        }
+
+
+
+        function vistaProductos(idcategoria){
+            window.location.href="{{ url('/admin/producto') }}/" + idcategoria;
+        }
+
+
+
+    </script>
+
+
+@endsection

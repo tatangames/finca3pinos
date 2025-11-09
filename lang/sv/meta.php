@@ -287,6 +287,7 @@ return [
     'back_to_orders' => 'Volver a órdenes',
     'order_status' => 'Estado de la orden',
     'order_detail' => 'Detalle de la orden',
+    'shipping_unavailable' => 'Envío no disponible temporalmente',
 
 
 

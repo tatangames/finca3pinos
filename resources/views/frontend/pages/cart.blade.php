@@ -764,7 +764,6 @@
                 }
             });
 
-
             // === BOTÓN "PROCEDER AL CHECKOUT" ===
             const btnCheckout = document.querySelector('.wc-proceed-to-checkout .checkout-button');
 

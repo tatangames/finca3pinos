@@ -287,6 +287,7 @@ return [
     'back_to_orders' => 'Back to orders',
     'order_status' => 'Order status',
     'order_detail' => 'Order detail',
+    'shipping_unavailable' => 'Shipping temporarily unavailable',
 
 
 

@@ -11,6 +11,7 @@ use App\Http\Controllers\Backend\Sistema\PerfilController;
 use App\Http\Controllers\Controles\ControlRolController;
 use App\Http\Controllers\Backend\Sistema\CategoriasController;
 use App\Http\Controllers\Backend\Sistema\PaisesController;
+use App\Http\Controllers\Backend\Sistema\AdminClienteController;
 
 
 // ======================== FRONTEND =============================
@@ -190,6 +191,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/municipios/informacion', [PaisesController::class,'informacionMunicipio']);
     Route::post('/municipios/nuevo', [PaisesController::class,'registrarNuevoMunicipio']);
     Route::post('/municipios/editar', [PaisesController::class,'editarMunicipio']);
+
+
+
+    Route::get('/clientes', [AdminClienteController::class, 'vistaClientes'])->name('clientes');
+    Route::get('/clientes/index/tabla', [AdminClienteController::class, 'tablaClientes']);
 
 
 
