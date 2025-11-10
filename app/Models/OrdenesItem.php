@@ -14,6 +14,7 @@ class OrdenesItem extends Model
     protected $fillable = [
         'id_orden',
         'id_producto',
+        'id_presentacion',
         'nombre',
         'precio',
         'cantidad',
