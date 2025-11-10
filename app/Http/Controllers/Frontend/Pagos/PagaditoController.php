@@ -200,44 +200,59 @@ class PagaditoController extends Controller
 
             // ===== Crear orden pendiente =====
             $order = Ordenes::create([
-                'id_usuario'         => $userId,
-                'ern'                => $ern,
-                'fecha'              => now(),
+                'id_usuario'              => $userId,
+                'ern'                     => $ern,
+                'fecha'                   => now(),
 
-                'id_paises'          => $direccionEnvio->id_paises,
-                'id_departamentos'   => $direccionEnvio->id_departamento ?? null,
-                'id_municipios'      => $direccionEnvio->id_municipio ?? null,
-                'shipping_nombre'    => $direccionEnvio->nombre,
-                'shipping_telefono'  => $direccionEnvio->telefono,
-                'shipping_pais'      => $direccionEnvio->id_paises,
-                'shipping_estado'    => $direccionEnvio->estado,
-                'shipping_ciudad'    => $direccionEnvio->ciudad,
-                'shipping_direccion' => $direccionEnvio->direccion,
-                'shipping_direccion_opc' => $direccionEnvio->direccion_opcional,
-                'shipping_zipcode'   => $direccionEnvio->zipcode,
+                'id_paises'               => $direccionEnvio->id_paises,
+                'id_departamentos'        => $direccionEnvio->id_departamento ?? null,
+                'id_municipios'           => $direccionEnvio->id_municipio ?? null,
+                'shipping_nombre'         => $direccionEnvio->nombre,
+                'shipping_telefono'       => $direccionEnvio->telefono,
+                'shipping_pais'           => $direccionEnvio->id_paises,
+                'shipping_estado'         => $direccionEnvio->estado,
+                'shipping_ciudad'         => $direccionEnvio->ciudad,
+                'shipping_direccion'      => $direccionEnvio->direccion,
+                'shipping_direccion_opc'  => $direccionEnvio->direccion_opcional,
+                'shipping_zipcode'        => $direccionEnvio->zipcode,
 
-                'billing_idpaises'   => optional($billing)->id_paises,
-                'billing_nombre'     => optional($billing)->nombre,
-                'billing_direccion'  => optional($billing)->direccion,
-                'billing_ciudad'     => optional($billing)->ciudad,
-                'billing_estado'     => optional($billing)->estado,
-                'billing_zipcode'    => optional($billing)->zipcode,
-                'billing_telefono'   => optional($billing)->telefono,
+                'billing_idpaises'        => optional($billing)->id_paises,
+                'billing_nombre'          => optional($billing)->nombre,
+                'billing_direccion'       => optional($billing)->direccion,
+                'billing_ciudad'          => optional($billing)->ciudad,
+                'billing_estado'          => optional($billing)->estado,
+                'billing_zipcode'         => optional($billing)->zipcode,
+                'billing_telefono'        => optional($billing)->telefono,
 
-                'subtotal'           => $amountProducts,
-                'shipping_cost'      => $shippingCost,
-                'total'              => $amount,
-                'status_id'          => 1,
+                'subtotal'                => $amountProducts,
+                'shipping_cost'           => $shippingCost,
+                'total'                   => $amount,
+                'status_id'               => 1,
 
-                'estado_pedido_1'    => 0,
-                'fecha_pedido_1'     => null,
-                'estado_pedido_2'    => 0,
-                'fecha_pedido_2'     => null,
-                'seguimiento'        => null,
-                'visible_cliente'    => 1 // visible al cliente
+                'estado_pedido_1'         => 0,
+                'fecha_pedido_1'          => null,
+                'estado_pedido_2'         => 0,
+                'fecha_pedido_2'          => null,
+                'seguimiento'             => null,
+                'visible_cliente'         => 1,
             ]);
 
-            // ===== Items de la orden =====
+            // Helper para leer attributes del carrito (array / objeto)
+            $getAttr = function ($attrs, $key) {
+                if (is_array($attrs) && isset($attrs[$key])) {
+                    return $attrs[$key];
+                }
+                if (is_object($attrs)) {
+                    if (isset($attrs->$key)) {
+                        return $attrs->$key;
+                    }
+                    if (method_exists($attrs, 'get')) {
+                        return $attrs->get($key);
+                    }
+                }
+                return null;
+            };
+
             // ===== Items de la orden =====
             foreach ($items as $item) {
                 $qty   = (int) $item->quantity;
@@ -249,14 +264,8 @@ class PagaditoController extends Controller
 
                 $attrs = $item->attributes ?? [];
 
-                // Leer desde attributes (soporta array / AttributeCollection)
-                $productoId = isset($attrs['product_id'])
-                    ? (int)$attrs['product_id']
-                    : (is_object($attrs) && method_exists($attrs, 'get') ? (int)$attrs->get('product_id') : null);
-
-                $presentacionId = isset($attrs['presentacion_id'])
-                    ? (int)$attrs['presentacion_id']
-                    : (is_object($attrs) && method_exists($attrs, 'get') ? (int)$attrs->get('presentacion_id') : null);
+                $productoId     = (int) $getAttr($attrs, 'product_id');
+                $presentacionId = (int) $getAttr($attrs, 'presentacion_id');
 
                 // Producto requerido
                 if (!$productoId) {
@@ -272,7 +281,7 @@ class PagaditoController extends Controller
                     throw new \RuntimeException('Este producto no está disponible actualmente.');
                 }
 
-                // Presentación requerida (según tu regla)
+                // Presentación requerida
                 if (!$presentacionId) {
                     throw new \RuntimeException('Falta la presentación de un producto en el carrito.');
                 }
@@ -286,34 +295,44 @@ class PagaditoController extends Controller
                     throw new \RuntimeException('Esta presentación de producto no está disponible actualmente.');
                 }
 
-                // ===== Nombre según locale: Producto — Presentación =====
-                // Producto
-                if (!empty($producto->content_key)) {
-                    $nombreProducto = __($producto->content_key);
-                } else {
-                    $nombreProducto = $producto->nombre ?? ($item->name ?? '');
+                // ===== Nombre según región + locale con getRegionContent =====
+                // PRODUCTO
+                $nombreProducto = $producto->nombre ?? ($item->name ?? '');
+
+                if (!empty($producto->content_key) && function_exists('getRegionContent')) {
+                    $rc = getRegionContent($producto->content_key);
+                    if (!empty($rc['title'])) {
+                        $nombreProducto = $rc['title'];
+                    }
                 }
 
-                // Presentación
-                $nombrePresentacion = '';
-                if (!empty($presentacion->content_key)) {
-                    $nombrePresentacion = __($presentacion->content_key);
-                } else {
-                    $nombrePresentacion = $presentacion->nombre ?? '';
+                // PRESENTACIÓN
+                $nombrePresentacion = $presentacion->nombre ?? '';
+
+                if (!empty($presentacion->content_key) && function_exists('getRegionContent')) {
+                    $rcPres = getRegionContent($presentacion->content_key);
+                    if (!empty($rcPres['title'])) {
+                        $nombrePresentacion = $rcPres['title'];
+                    }
                 }
 
-                // Concatenado final
+                // CONCATENADO: Producto — Presentación
                 $nombreItem = trim(
                     $nombreProducto .
                     ($nombrePresentacion ? ' — ' . $nombrePresentacion : '')
                 );
+
+                // Fallback final
+                if ($nombreItem === '') {
+                    $nombreItem = (string) $item->name;
+                }
 
                 // ===== Guardar detalle en BD =====
                 OrdenesItem::create([
                     'id_orden'        => $order->id,
                     'id_producto'     => $productoId,
                     'id_presentacion' => $presentacionId,
-                    'nombre'          => $nombreItem, // si tienes este campo en la tabla
+                    'nombre'          => $nombreItem, // asegúrate de tener este campo si lo usas
                     'precio'          => $price,
                     'cantidad'        => $qty,
                     'subtotal'        => $qty * $price,
@@ -367,9 +386,10 @@ class PagaditoController extends Controller
             exit;
         }
 
+        // Si falla inicio de transacción, marcar orden como error
         if ($order) {
             $order->update([
-                'status_id' => 3,
+                'status_id' => 3, // por ejemplo: 3 = error / cancelado
             ]);
         }
 
@@ -386,6 +406,7 @@ class PagaditoController extends Controller
             . $this->pagadito->get_rs_message()
         );
     }
+
 
 
 
