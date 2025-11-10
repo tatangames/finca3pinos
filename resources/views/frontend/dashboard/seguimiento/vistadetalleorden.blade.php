@@ -384,38 +384,21 @@
 
                 {{-- Items --}}
                 <div class="items-wrap">
-                    @foreach($order->detalles as $item)
+                    @foreach($items as $index => $item)
                         @php
-                            $producto      = $item->producto ?? null;
-                            $presentacion  = $item->presentacion ?? null;
+                            // Detalle bruto (para imagen, etc.)
+                            $detalle  = $order->detalles[$index] ?? null;
+                            $producto = $detalle->producto ?? null;
 
-                            // Nombre del producto según content_key
-                            if ($producto && !empty($producto->content_key)) {
-                                $nombreProducto = __($producto->content_key);
-                            } else {
-                                $nombreProducto = $item->nombre
-                                    ?? ($producto->nombre ?? '');
-                            }
+                            // Nombre ya viene completo desde el backend: "Producto X — Presentación"
+                            $nombreCompleto = $item['nombre'] ?? '';
 
-                            // Nombre de la presentación según content_key
-                            $nombrePresentacion = '';
-                            if ($presentacion) {
-                                if (!empty($presentacion->content_key)) {
-                                    $nombrePresentacion = __($presentacion->content_key);
-                                } else {
-                                    $nombrePresentacion = $presentacion->nombre ?? '';
-                                }
-                            }
-
-                            // Concatenar Producto — Presentación (solo si hay presentación)
-                            $nombreCompleto = trim(
-                                $nombreProducto .
-                                ($nombrePresentacion ? ' — ' . $nombrePresentacion : '')
-                            );
-
-                            $precio    = $item->precio ?? $item->precio_unitario ?? 0;
-                            $cantidad  = $item->cantidad ?? 1;
-                            $lineTotal = $precio * $cantidad;
+                            // Valores numéricos seguros
+                            $precio    = isset($item['precio']) ? (float)$item['precio'] : 0;
+                            $cantidad  = isset($item['cantidad']) ? (int)$item['cantidad'] : 1;
+                            $lineTotal = isset($item['subtotal'])
+                                ? (float)$item['subtotal']
+                                : $precio * $cantidad;
                         @endphp
 
                         <div class="item-card">
@@ -434,15 +417,21 @@
                                 </div>
                                 <p class="item-line">
                                     <span class="label" style="font-size: 14px">{{ __('meta.price') ?? 'Precio' }}: </span>
-                                    <span class="value" style="font-size: 14px">${{ number_format($precio, 2) }}</span>
+                                    <span class="value" style="font-size: 14px">
+                        ${{ number_format($precio, 2) }}
+                    </span>
                                 </p>
                                 <p class="item-line">
                                     <span class="label" style="font-size: 14px">{{ __('meta.quantity') ?? 'Cantidad' }}: </span>
-                                    <span class="value" style="font-size: 14px">{{ $cantidad }}</span>
+                                    <span class="value" style="font-size: 14px">
+                        {{ $cantidad }}
+                    </span>
                                 </p>
                                 <p class="item-line">
                                     <span class="label" style="font-size: 14px">{{ __('meta.subtotal') ?? 'Total' }}: </span>
-                                    <span class="value" style="font-size: 14px">${{ number_format($lineTotal, 2) }}</span>
+                                    <span class="value" style="font-size: 14px">
+                        ${{ number_format($lineTotal, 2) }}
+                    </span>
                                 </p>
                             </div>
                         </div>
