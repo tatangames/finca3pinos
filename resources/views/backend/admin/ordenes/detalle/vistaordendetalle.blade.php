@@ -105,6 +105,7 @@
                             Estado de la Orden
                         </div>
                         <div class="card-body">
+                            {{-- Select estado --}}
                             <div class="form-group mb-3">
                                 <label for="selectEstadoOrden" class="order-label">Cambiar estado</label>
                                 <select id="selectEstadoOrden" class="form-control">
@@ -117,16 +118,36 @@
                             </div>
 
                             <button type="button"
-                                    class="btn btn-primary btn-sm"
+                                    class="btn btn-primary btn-sm mb-3"
                                     onclick="actualizarEstadoOrden()">
                                 Actualizar estado
                             </button>
 
+                            <hr>
+
+                            {{-- Select visibilidad cliente --}}
+                            <div class="form-group mb-3">
+                                <label for="selectVisibleCliente" class="order-label">Visibilidad para el cliente</label>
+                                <select id="selectVisibleCliente" class="form-control">
+                                    <option value="1" {{ ($ordenData['visible_cliente'] ?? 1) == 1 ? 'selected' : '' }}>Visible en su panel</option>
+                                    <option value="0" {{ ($ordenData['visible_cliente'] ?? 1) == 0 ? 'selected' : '' }}>Ocultar al cliente</option>
+                                </select>
+                            </div>
+
+                            <button type="button"
+                                    class="btn btn-secondary btn-sm"
+                                    onclick="actualizarVisibleCliente()">
+                                Actualizar visibilidad
+                            </button>
+
                             <small class="text-muted d-block mt-2">
-                                Usa este control para actualizar manualmente el estado interno de la orden.
+                                Controla si esta orden será visible o no en el panel del cliente.
                             </small>
                         </div>
                     </div>
+
+
+
 
                 </div>
 
@@ -286,6 +307,31 @@
                 })
                 .catch(function () {
                     toastr.error('No se pudo actualizar el estado');
+                });
+        }
+
+
+        function actualizarVisibleCliente() {
+            const visible = document.getElementById('selectVisibleCliente').value;
+
+            let formData = new FormData();
+            formData.append('orden_id', '{{ $ordenData['id'] }}');
+            formData.append('visible_cliente', visible);
+
+            axios.post("{{ route('admin.ordenes.estado.visible.update') }}", formData, {
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+                .then(function (response) {
+                    if (response.data && response.data.success) {
+                        toastr.success('Visibilidad actualizada');
+                    } else {
+                        toastr.error(response.data.message || 'No se pudo actualizar la visibilidad');
+                    }
+                })
+                .catch(function () {
+                    toastr.error('No se pudo actualizar la visibilidad');
                 });
         }
     </script>

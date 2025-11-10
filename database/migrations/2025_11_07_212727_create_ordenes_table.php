@@ -89,6 +89,7 @@ return new class extends Migration
             // seteado por administrador
             $table->text('seguimiento')->nullable();
 
+            $table->boolean('visible_cliente')->default(0);
 
 
         });

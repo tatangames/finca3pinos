@@ -52,7 +52,8 @@ class Ordenes extends Model
         'fecha_pedido_1',
         'estado_pedido_2',
         'fecha_pedido_2',
-        'seguimiento'
+        'seguimiento',
+        'visible_cliente'
 
 
     ];

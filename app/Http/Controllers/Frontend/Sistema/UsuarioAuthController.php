@@ -266,6 +266,7 @@ class UsuarioAuthController extends Controller
         }
 
         $orders = Ordenes::where('id_usuario', $user->id)
+            ->where('visible_cliente', 1)
             ->orderByDesc('fecha')
             ->paginate(10)
             ->through(function ($order) use ($user) {

@@ -234,8 +234,10 @@ class PagaditoController extends Controller
                 'estado_pedido_2'    => 0,
                 'fecha_pedido_2'     => null,
                 'seguimiento'        => null,
+                'visible_cliente'    => 1 // visible al cliente
             ]);
 
+            // ===== Items de la orden =====
             // ===== Items de la orden =====
             foreach ($items as $item) {
                 $qty   = (int) $item->quantity;
@@ -284,17 +286,40 @@ class PagaditoController extends Controller
                     throw new \RuntimeException('Esta presentación de producto no está disponible actualmente.');
                 }
 
-                $nombreItem = $item->name;
+                // ===== Nombre según locale: Producto — Presentación =====
+                // Producto
+                if (!empty($producto->content_key)) {
+                    $nombreProducto = __($producto->content_key);
+                } else {
+                    $nombreProducto = $producto->nombre ?? ($item->name ?? '');
+                }
 
+                // Presentación
+                $nombrePresentacion = '';
+                if (!empty($presentacion->content_key)) {
+                    $nombrePresentacion = __($presentacion->content_key);
+                } else {
+                    $nombrePresentacion = $presentacion->nombre ?? '';
+                }
+
+                // Concatenado final
+                $nombreItem = trim(
+                    $nombreProducto .
+                    ($nombrePresentacion ? ' — ' . $nombrePresentacion : '')
+                );
+
+                // ===== Guardar detalle en BD =====
                 OrdenesItem::create([
                     'id_orden'        => $order->id,
                     'id_producto'     => $productoId,
                     'id_presentacion' => $presentacionId,
+                    'nombre'          => $nombreItem, // si tienes este campo en la tabla
                     'precio'          => $price,
                     'cantidad'        => $qty,
                     'subtotal'        => $qty * $price,
                 ]);
 
+                // ===== Enviar a Pagadito =====
                 $this->pagadito->add_detail(
                     $qty,
                     mb_substr($nombreItem, 0, 125),

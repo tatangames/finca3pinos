@@ -202,6 +202,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
 
     Route::get('/ordenes/detalle/index/{id}', [AdminClienteController::class, 'vistaOrdenDetalle']);
     Route::post('/ordenes/estadoorden/editar', [AdminClienteController::class,'actualizarEstadoOrden'])->name('ordenes.estado.update');
+    Route::post('/ordenes/visibilidad/editar', [AdminClienteController::class,'actualizarEstadoVisibleOrden'])
+        ->name('ordenes.estado.visible.update');
+
 
 
 

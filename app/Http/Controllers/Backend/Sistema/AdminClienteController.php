@@ -141,6 +141,7 @@ class AdminClienteController extends Controller
                 ? Carbon::parse($orden->fecha)->format('d-m-Y h:i A')
                 : null,
             'status_id'  => $orden->status_id,
+            'visible_cliente' => (int)($orden->visible_cliente ?? 1),
             'status'   => $statusNombre,
             'subtotal' => number_format($orden->subtotal, 2, '.', ','),
             'envio'    => number_format($orden->shipping_cost, 2, '.', ','),
@@ -273,6 +274,44 @@ class AdminClienteController extends Controller
 
         return $STATUS[$statusId] ?? 'Desconocido';
     }
+
+
+
+    public function actualizarEstadoVisibleOrden(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'orden_id'        => ['required', 'integer', 'exists:ordenes,id'],
+                'visible_cliente' => ['required', 'in:0,1'],
+            ]);
+
+            $orden = Ordenes::findOrFail($data['orden_id']);
+            $orden->visible_cliente = (int)$data['visible_cliente'];
+            $orden->save();
+
+            Log::info('Visibilidad de orden actualizada', [
+                'orden_id'        => $orden->id,
+                'visible_cliente' => $orden->visible_cliente,
+                'user_id'         => auth()->id(),
+            ]);
+
+            return response()->json([
+                'success'          => true,
+                'visible_cliente'  => (int)$orden->visible_cliente,
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('Error al actualizar visibilidad de orden', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar la visibilidad de la orden.',
+            ], 500);
+        }
+    }
+
 
 
 }
