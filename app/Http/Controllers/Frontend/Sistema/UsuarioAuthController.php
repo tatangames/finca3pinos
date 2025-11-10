@@ -293,10 +293,10 @@ class UsuarioAuthController extends Controller
                 // 2) Buscar traducción del meta
                 $order->estado_texto = __('meta.order_status_' . $statusName);
 
-
-
                 return $order;
             });
+
+
 
         return view('frontend.dashboard.vistaordenes', compact('orders'));
     }

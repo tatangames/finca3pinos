@@ -290,7 +290,6 @@ class PagaditoController extends Controller
                     'id_orden'        => $order->id,
                     'id_producto'     => $productoId,
                     'id_presentacion' => $presentacionId,
-                    'nombre'          => $nombreItem,
                     'precio'          => $price,
                     'cantidad'        => $qty,
                     'subtotal'        => $qty * $price,

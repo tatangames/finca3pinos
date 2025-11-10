@@ -413,7 +413,17 @@
                                     <td>{{ $order->fecha_formateada }}</td>
                                     <td class="price">$ {{ number_format($order->total, 2) }}</td>
                                     <td>
-                                        {{ $order->estado_texto }}
+                                        @php
+                                            $status = $order->status_id ?? 0;
+                                        @endphp
+
+                                        @if ($status == 2)
+                                            <span class="badge" style="background-color:#28a745; color:#fff; padding:6px 12px; border-radius:20px; font-weight:500;">
+                                            {{ $order->estado_texto }}
+                                        </span>
+                                        @else
+                                            {{ $order->estado_texto }}
+                                        @endif
                                     </td>
 
                                     <td>

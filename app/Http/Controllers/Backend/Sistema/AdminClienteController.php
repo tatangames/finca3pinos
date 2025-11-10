@@ -7,9 +7,12 @@ use App\Models\Departamento;
 use App\Models\Municipio;
 use App\Models\Ordenes;
 use App\Models\Pais;
+use App\Models\RegionContent;
+use App\Models\RegionContentTranslation;
 use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AdminClienteController extends Controller
 {
@@ -78,7 +81,7 @@ class AdminClienteController extends Controller
 
     public function vistaOrdenDetalle($idorden)
     {
-        // ====== Constante STATUS dentro del método ======
+        // ====== Constante STATUS ======
         $STATUS = [
             1 => 'Pendiente',
             2 => 'Pagado',
@@ -87,15 +90,17 @@ class AdminClienteController extends Controller
             5 => 'Reembolso',
         ];
 
-        // ====== Traer la orden y sus productos ======
-        $orden = Ordenes::with('items')->findOrFail($idorden);
+        // ====== Traer la orden con items + producto + presentacion ======
+        $orden = Ordenes::with([
+            'items.producto',
+            'items.presentacion',
+        ])->findOrFail($idorden);
 
         // ====== Nombre de estado ======
         $statusNombre = $STATUS[$orden->status_id] ?? 'Desconocido';
 
-        // ====== Ubicación envío (país siempre, depto/muni opcionales) ======
+        // ====== Ubicación envío ======
         $paisEnvio  = Pais::find($orden->id_paises);
-
         $deptoEnvio = $orden->id_departamentos
             ? Departamento::find($orden->id_departamentos)
             : null;
@@ -103,25 +108,54 @@ class AdminClienteController extends Controller
             ? Municipio::find($orden->id_municipios)
             : null;
 
-        // ====== Ubicación facturación (si quieres también) ======
-        $paisFactura = Pais::find($orden->billing_idpaises);
+        // ====== Ubicación facturación ======
+        $paisFactura = $orden->billing_idpaises
+            ? Pais::find($orden->billing_idpaises)
+            : null;
 
-        // ====== Formatear datos ======
+        // ====== Helper: obtener nombre traducido desde RegionContent (SV) ======
+        $getNombreSV = function (?string $contentKey, ?string $fallback = null) {
+            if (!$contentKey) {
+                return $fallback ?: '—';
+            }
+
+            $nombre = '';
+
+            if ($infoRegion = RegionContent::where('key', $contentKey)
+                ->where('region_id', 1) // 1 = SV
+                ->first()
+            ) {
+                if ($infoIdioma = RegionContentTranslation::where('content_id', $infoRegion->id)->first()) {
+                    $nombre = $infoIdioma->title ?: '';
+                }
+            }
+
+            return $nombre !== '' ? $nombre : ($fallback ?: $contentKey);
+        };
+
+        // ====== Armar datos de la orden ======
         $ordenData = collect([
             'id'       => $orden->id,
             'ern'      => $orden->ern,
             'fecha'    => $orden->fecha
                 ? Carbon::parse($orden->fecha)->format('d-m-Y h:i A')
                 : null,
+            'status_id'  => $orden->status_id,
             'status'   => $statusNombre,
             'subtotal' => number_format($orden->subtotal, 2, '.', ','),
             'envio'    => number_format($orden->shipping_cost, 2, '.', ','),
             'total'    => number_format($orden->total, 2, '.', ','),
 
+            // ==== Referencia Pagadito (top-level) ====
+            // Si aún sólo usas 'ern' como referencia de Pagadito:
+            'pagadito_ref'    => $orden->pagadito_ref ?? $orden->ern ?? null,
+            'pagadito_status' => $orden->pagadito_status ?? null,
+            'pagadito_token'  => $orden->pagadito_token ?? null,
+
             'shipping' => [
-                'pais'         => $paisEnvio->nombre ?? '—',          // SIEMPRE
-                'departamento' => $deptoEnvio->nombre ?? null,        // PUEDE SER NULL
-                'municipio'    => $muniEnvio->nombre ?? null,         // PUEDE SER NULL
+                'pais'         => $paisEnvio->nombre ?? '—',
+                'departamento' => $deptoEnvio->nombre ?? null,
+                'municipio'    => $muniEnvio->nombre ?? null,
                 'nombre'       => $orden->shipping_nombre,
                 'direccion'    => $orden->shipping_direccion,
                 'ciudad'       => $orden->shipping_ciudad,
@@ -140,12 +174,32 @@ class AdminClienteController extends Controller
                 'telefono'  => $orden->billing_telefono,
             ],
 
-            'items' => $orden->items->map(fn ($item) => [
-                'nombre'   => $item->nombre,
-                'precio'   => number_format($item->precio, 2, '.', ','),
-                'cantidad' => $item->cantidad,
-                'subtotal' => number_format($item->subtotal, 2, '.', ','),
-            ]),
+            'items' => $orden->items->map(function ($item) use ($getNombreSV) {
+                $producto     = $item->producto;
+                $presentacion = $item->presentacion;
+
+                $nombreProducto = $producto
+                    ? $getNombreSV($producto->content_key ?? null, $producto->nombre ?? null)
+                    : '—';
+
+                $nombrePresentacion = $presentacion
+                    ? $getNombreSV($presentacion->content_key ?? null, $presentacion->nombre ?? null)
+                    : '';
+
+                $nombreCompleto = trim(
+                    $nombreProducto .
+                    ($nombrePresentacion ? ' — ' . $nombrePresentacion : '')
+                );
+
+                return [
+                    'nombre_producto'     => $nombreProducto,
+                    'nombre_presentacion' => $nombrePresentacion,
+                    'nombre'              => $nombreCompleto,
+                    'precio'              => number_format($item->precio, 2, '.', ','),
+                    'cantidad'            => $item->cantidad,
+                    'subtotal'            => number_format($item->subtotal, 2, '.', ','),
+                ];
+            }),
         ]);
 
         return view('backend.admin.ordenes.detalle.vistaordendetalle', compact('ordenData'));
@@ -153,7 +207,72 @@ class AdminClienteController extends Controller
 
 
 
+    public function actualizarEstadoOrden(Request $request)
+    {
+        try {
+            // Validar datos
+            $data = $request->validate([
+                'orden_id'  => ['required', 'integer', 'exists:ordenes,id'],
+                'status_id' => ['required', 'integer', 'in:1,2,3,4,5'],
+            ]);
 
+            // Buscar orden
+            $orden = Ordenes::findOrFail($data['orden_id']);
+
+            // Si el estado ya es el mismo, devolvemos ok sin tocar DB
+            if ((int)$orden->status_id === (int)$data['status_id']) {
+                return response()->json([
+                    'success'      => true,
+                    'no_changes'   => true,
+                    'status_id'    => $orden->status_id,
+                    'status_label' => $this->getStatusLabel($orden->status_id),
+                ]);
+            }
+
+            // Actualizar estado
+            $orden->status_id = $data['status_id'];
+            $orden->save();
+
+            // Opcional: log
+            Log::info('Estado de orden actualizado manualmente', [
+                'orden_id'   => $orden->id,
+                'nuevo_estado_id' => $orden->status_id,
+                'nuevo_estado'    => $this->getStatusLabel($orden->status_id),
+                'user_id'    => auth()->id(),
+            ]);
+
+            return response()->json([
+                'success'      => true,
+                'status_id'    => $orden->status_id,
+                'status_label' => $this->getStatusLabel($orden->status_id),
+            ]);
+
+        } catch (\Throwable $e) {
+
+            Log::error('Error al actualizar estado de orden', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar el estado de la orden.',
+            ], 500);
+        }
+    }
+
+
+    private function getStatusLabel(int $statusId): string
+    {
+        $STATUS = [
+            1 => 'Pendiente',
+            2 => 'Pagado',
+            3 => 'Fallo',
+            4 => 'Cancelado',
+            5 => 'Reembolso',
+        ];
+
+        return $STATUS[$statusId] ?? 'Desconocido';
+    }
 
 
 }

@@ -23,7 +23,6 @@ return new class extends Migration
             $table->unsignedBigInteger('id_presentacion');
 
             // Snapshot del producto en el momento de la compra
-            $table->string('nombre', 150);
             $table->decimal('precio', 10, 2);      // precio unitario
             $table->integer('cantidad');
             $table->decimal('subtotal', 10, 2);    // precio * cantidad
