@@ -17,7 +17,7 @@
             <div class="card-body">
                 <p><strong>{{ __('meta.reference') }}</strong> {{ $order->ern }}</p>
                 <p><strong>{{ __('meta.total') }}:</strong> ${{ number_format($order->total, 2) }}</p>
-                <p><strong>{{ __('meta.status') }}</strong> {{ __('meta.order_status_' . ":" . $order->status_name) }}</p>
+                <p><strong>{{ __('meta.status') }}:</strong> {{ __('meta.order_status_' . $order->status_name) }}</p>
             </div>
 
 
