@@ -10,6 +10,7 @@
                                 <th>Fecha Creada</th>
                                 <th>País</th>
                                 <th>Nombre</th>
+                                <th>Estado Orden</th>
                                 <th>Sub Total</th>
                                 <th>Envío</th>
                                 <th>Total</th>
@@ -22,6 +23,7 @@
                                     <td data-order="{{ $o['fecha_orden'] }}">{{ $o['fecha_formato'] }}</td>
                                     <td>{{ $o['pais'] }}</td>
                                     <td>{{ $o['nombre'] }}</td>
+                                    <td>{!! $o['status_badge'] !!}</td>
                                     <td>{{ $o['subtotal'] }}</td>
                                     <td>{{ $o['envio'] }}</td>
                                     <td><strong>{{ $o['total'] }}</strong></td>

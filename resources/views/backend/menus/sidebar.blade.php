@@ -48,7 +48,7 @@
                     <li class="nav-item">
                         <a href="{{ route('admin.ordenes') }}" target="frameprincipal" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
-                            <p>Ordenes</p>
+                            <p>Todas las Ordenes</p>
                         </a>
                     </li>
 

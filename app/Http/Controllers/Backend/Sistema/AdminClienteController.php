@@ -55,7 +55,7 @@ class AdminClienteController extends Controller
 
     public function tablaOrdenes()
     {
-        $ordenes = Ordenes::select('id', 'fecha', 'id_paises', 'shipping_nombre', 'subtotal', 'shipping_cost', 'total')
+        $ordenes = Ordenes::select('id', 'fecha', 'id_paises', 'shipping_nombre', 'subtotal', 'shipping_cost', 'total', 'status_id')
             ->orderBy('fecha', 'desc')
             ->get()
             ->map(function ($o) {
@@ -64,20 +64,43 @@ class AdminClienteController extends Controller
                     ? Pais::find($o->id_paises)
                     : null;
 
+                // ===== Mapeo de estado =====
+                $statusNombre = match ($o->status_id) {
+                    1       => 'Pendiente',
+                    2       => 'Pagado',
+                    3       => 'Fallo',
+                    4       => 'Cancelado',
+                    5       => 'Reembolso',
+                    default => 'Desconocido',
+                };
+
+                // Color opcional para mostrar badge (si lo usas en DataTables)
+                $statusColor = match ($o->status_id) {
+                    1       => 'warning',
+                    2       => 'success',
+                    3       => 'danger',
+                    4       => 'secondary',
+                    5       => 'info',
+                    default => 'dark',
+                };
+
                 return [
                     'id'            => $o->id,
                     'fecha_formato' => $fecha ? $fecha->format('d-m-Y h:i A') : '',
-                    'fecha_orden'   => $fecha ? $fecha->timestamp : 0, // para ordenar en DataTables
+                    'fecha_orden'   => $fecha ? $fecha->timestamp : 0, // para ordenar
                     'pais'          => $pais?->nombre ?? '—',
                     'nombre'        => $o->shipping_nombre ?? '—',
                     'subtotal'      => '$' . number_format((float) $o->subtotal, 2, '.', ','),
                     'envio'         => '$' . number_format((float) $o->shipping_cost, 2, '.', ','),
                     'total'         => '$' . number_format((float) $o->total, 2, '.', ','),
+                    'status'        => $statusNombre,
+                    'status_badge'  => "<span class='badge badge-{$statusColor}'>{$statusNombre}</span>",
                 ];
             });
 
         return view('backend.admin.ordenes.tablaordenes', compact('ordenes'));
     }
+
 
 
     public function vistaOrdenDetalle($idorden)
@@ -370,6 +393,22 @@ class AdminClienteController extends Controller
         ]);
     }
 
+    public function actualizarSeguimientoOrdenCkEditor(Request $request)
+    {
+        $data = $request->validate([
+            'orden_id'    => ['required', 'integer', 'exists:ordenes,id'],
+            'seguimiento' => ['nullable', 'string'],
+        ]);
+
+        $orden = Ordenes::findOrFail($data['orden_id']);
+        $orden->seguimiento = $data['seguimiento'] ?? null;
+        $orden->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notas de seguimiento guardadas correctamente.',
+        ]);
+    }
 
 
 
