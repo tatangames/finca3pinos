@@ -37,11 +37,12 @@ return new class extends Migration
 
             $table->foreign('id_producto')
                 ->references('id')->on('productos')
-                ->onDelete('set null');
+                ->onDelete('cascade');
 
             $table->foreign('id_presentacion')
                 ->references('id')->on('productos_presentacion')
-                ->onDelete('set null');
+                ->onDelete('cascade');
+
         });
     }
 
