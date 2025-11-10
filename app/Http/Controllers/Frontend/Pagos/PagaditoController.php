@@ -253,9 +253,20 @@ class PagaditoController extends Controller
 
                 $attrs = $item->attributes ?? [];
 
-                $productoId      = isset($attrs['product_id']) ? (int)$attrs['product_id'] : null;
-                $presentacionId  = isset($attrs['presentacion_id']) ? (int)$attrs['presentacion_id'] : null;
-                $presentacionTxt = $attrs['presentacion_txt'] ?? null;
+                // Soportar tanto array como AttributeCollection
+                $productoId = null;
+                if (isset($attrs['product_id'])) {
+                    $productoId = (int)$attrs['product_id'];
+                } elseif (is_object($attrs) && method_exists($attrs, 'get') && $attrs->get('product_id')) {
+                    $productoId = (int)$attrs->get('product_id');
+                }
+
+                $presentacionId = null;
+                if (isset($attrs['presentacion_id'])) {
+                    $presentacionId = (int)$attrs['presentacion_id'];
+                } elseif (is_object($attrs) && method_exists($attrs, 'get') && $attrs->get('presentacion_id')) {
+                    $presentacionId = (int)$attrs->get('presentacion_id');
+                }
 
                 // Revalidar producto
                 if ($productoId) {
@@ -274,21 +285,16 @@ class PagaditoController extends Controller
                 if ($presentacionId) {
                     $presentacion = ProductosPresentacion::where('id', $presentacionId)
                         ->where('id_productos', $productoId)
+                        ->where('activo', 1)
                         ->first();
 
-                    if (
-                        !$presentacion ||
-                        (isset($presentacion->activo) && (int)$presentacion->activo === 0)
-                    ) {
+                    if (!$presentacion) {
                         throw new \RuntimeException('Esta presentación de producto no está disponible actualmente.');
                     }
                 }
 
-                // Nombre visible final
+                // Nombre visible (sin texto de presentación adicional)
                 $nombreItem = $item->name;
-                if ($presentacionTxt) {
-                    $nombreItem .= ' — ' . $presentacionTxt;
-                }
 
                 OrdenesItem::create([
                     'id_orden'        => $order->id,
@@ -369,6 +375,7 @@ class PagaditoController extends Controller
             . $this->pagadito->get_rs_message()
         );
     }
+
 
 
 
