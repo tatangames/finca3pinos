@@ -30,67 +30,41 @@ class CartController extends Controller
         $cart   = $this->cart();
         $qtyReq = (int)($data['quantity'] ?? 1);
 
-        // 1) Producto
-        $p = Producto::where('id', $data['product_id'])->where('activo',1)->firstOrFail();
+        // Producto
+        $p = Producto::where('id', $data['product_id'])
+            ->where('activo', 1)
+            ->firstOrFail();
 
-        // 2) Presentación (opcional)
-        $presId = isset($data['presentacionId']) ? (int)$data['presentacionId'] : null;
+        // Presentación (opcional)
+        $presId = $data['presentacionId'] ?? null;
         $tituloPres = null;
-        $price = (float)($p->precio ?? 0);
+        $precio = (float)$p->precio;
 
         if ($presId) {
             $pres = ProductosPresentacion::where('id', $presId)
                 ->where('id_productos', $p->id)
-                ->where('activo',1)
+                ->where('activo', 1)
                 ->firstOrFail();
 
-            $rcPres     = getRegionContent($pres->content_key);
-            $tituloPres = $rcPres['title'] ?? null;
-
-            if (!is_null($pres->precio)) {
-                $price = (float)$pres->precio;
-            }
+            $tituloPres = $pres->titulo ?? null;
+            $precio     = (float)$pres->precio;
         }
 
-        // 3) Título por región
-        $rcProd     = getRegionContent($p->content_key);
-        $tituloProd = $rcProd['title'] ?? ($p->titulo ?? $p->nombre ?? "Producto {$p->id}");
-
-        // 4) row_id único y nombre final
-        $lineId = $presId ? "{$p->id}:{$presId}" : (string)$p->id;
-        $name   = $tituloPres ? "{$tituloProd} — {$tituloPres}" : $tituloProd;
-
-        // 5) Si existe en carrito, sumamos cantidad; si no, lo agregamos
-        if ($cart->get($lineId)) {
-            $cart->update($lineId, [
-                'quantity' => [
-                    'relative' => true,
-                    'value'    => $qtyReq,
-                ],
-            ]);
-        } else {
-            $this->cart()->add([
-                'id'        => $lineId,
-                'name'      => $name,
-                'price'     => $price,
-                'quantity'  => $qtyReq,
-                'attributes'=> [
-                    'product_id'      => $p->id,
-                    'presentacion_id' => $presId,
-                ],
-            ]);
-        }
-
-        // 6) Respuesta consistente con tu front
-        $row = $cart->get($lineId);
+        $cart->add([
+            'id'       => 'p'.$p->id.($presId ? '-pres'.$presId : ''),
+            'name'     => $p->content_title,
+            'price'    => $precio,
+            'quantity' => $qtyReq,
+            'attributes' => [
+                'product_id'        => $p->id,
+                'presentacion_id'   => $presId,      // 🔴 clave EXACTA
+                'presentacion_txt'  => $tituloPres,
+            ],
+        ]);
 
         return response()->json([
-            'ok'       => true,
-            'row_id'   => $lineId,
-            'count'    => (int)$cart->getTotalQuantity(),
-            'subtotal' => (float)$cart->getSubTotal(),
-            'rowTotal' => $row ? (float)$row->getPriceSum() : 0.0,
-            'msg'      => __('Producto agregado al carrito'),
+            'ok'    => true,
+            'count' => $cart->getTotalQuantity(),
         ]);
     }
 

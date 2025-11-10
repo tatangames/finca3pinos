@@ -17,10 +17,10 @@ return new class extends Migration
             $table->unsignedBigInteger('id_orden');
 
             // Relación opcional con productos (si tienes tabla productos)
-            $table->unsignedBigInteger('id_producto')->nullable();
+            $table->unsignedBigInteger('id_producto');
 
             // Relación opcional con productos (si tienes tabla productos)
-            $table->unsignedBigInteger('id_presentacion')->nullable();
+            $table->unsignedBigInteger('id_presentacion');
 
             // Snapshot del producto en el momento de la compra
             $table->string('nombre', 150);
