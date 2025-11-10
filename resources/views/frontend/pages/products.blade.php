@@ -474,7 +474,7 @@
 
                 @forelse($arrayProductos as $prod)
                     @php
-                        $isArray = is_array($prod);
+                        $isArray        = is_array($prod);
                         $id             = $isArray ? ($prod['id'] ?? null) : ($prod->id ?? null);
                         $img            = $isArray ? ($prod['imagen'] ?? '') : ($prod->imagen ?? '');
                         $titulo         = $isArray ? ($prod['titulo'] ?? '') : ($prod->titulo ?? '');
@@ -504,14 +504,14 @@
                             @endif
 
                             {{-- Presentaciones --}}
-                            @if(!empty($presentaciones))
+                            @if (!empty($presentaciones))
                                 <div>
                                     <label class="select-label">{{ __('meta.product_v3') }}</label>
                                     <div class="select-wrap">
                                         <select class="form-select"
-                                                id="presentacion_{{ $id ?? 1 }}"
+                                                id="presentacion_{{ $id }}"
                                                 name="presentacion"
-                                                data-product="{{ $id ?? 1 }}">
+                                                data-product="{{ $id }}">
                                             @foreach ($presentaciones as $pres)
                                                 @php
                                                     $pIsArray = is_array($pres);
@@ -530,34 +530,35 @@
                                 {{ $precioFormat ?? ('$' . number_format((float)$precio, 2)) }}
                             </div>
 
-                            {{-- Si no disponible --}}
+                            {{-- No disponible --}}
                             @if($disponible == 0)
                                 <div class="product-unavailable" style="margin-top:6px; color:#fff;
-                                 background:#d9534f; border-radius:6px;
-                                 padding:6px 12px; display:inline-block;
-                                 font-weight:400; font-size:12px;">
+                                     background:#d9534f; border-radius:6px;
+                                     padding:6px 12px; display:inline-block;
+                                     font-weight:400; font-size:12px;">
                                     {{ __('meta.out_of_stock') }}
                                 </div>
                             @endif
 
-                            {{-- Cantidad --}}
-                            @if($disponible != 0)
+                            {{-- Cantidad + botón (solo si disponible) --}}
+                            @if($disponible != 0 && $id)
                                 <div class="quantity-row">
-                                    <label for="cantidad_{{ $id ?? 1 }}">Cantidad</label>
+                                    <label for="cantidad_{{ $id }}">Cantidad</label>
                                     <div class="qty-control">
-                                        <button type="button" class="qty-btn" onclick="stepQty({{ $id ?? 1 }}, -1)">−</button>
+                                        <button type="button" class="qty-btn" onclick="stepQty({{ $id }}, -1)">−</button>
                                         <input type="number"
-                                               id="cantidad_{{ $id ?? 1 }}"
+                                               id="cantidad_{{ $id }}"
                                                name="cantidad"
                                                min="1" max="100" value="1"
                                                class="quantity-input"
                                                oninput="validarNumero(this)">
-                                        <button type="button" class="qty-btn" onclick="stepQty({{ $id ?? 1 }}, 1)">+</button>
+                                        <button type="button" class="qty-btn" onclick="stepQty({{ $id }}, 1)">+</button>
                                     </div>
                                 </div>
 
-                                {{-- Botón carrito --}}
-                                <button type="button" class="btn-cart" onclick="agregarAlCarrito({{ $id ?? 1 }})">
+                                <button type="button"
+                                        class="btn-cart"
+                                        onclick="agregarAlCarrito({{ $id }}, this)">
                                     <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                                     {{ __('meta.product_v2') }}
                                 </button>
@@ -576,6 +577,7 @@
     @endif
 
 
+
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}"></script>
@@ -585,9 +587,9 @@
     @include('frontend.partials.superior')
 
     <script>
-        function stepQty(productId, delta){
+        function stepQty(productId, delta) {
             const el = document.getElementById(`cantidad_${productId}`);
-            let v = parseInt(el.value || "1", 10);
+            let v = parseInt(el?.value || "1", 10);
             if (isNaN(v)) v = 1;
             v += delta;
             if (v < 1) v = 1;
@@ -595,7 +597,7 @@
             el.value = v;
         }
 
-        function validarNumero(input){
+        function validarNumero(input) {
             input.value = input.value.replace(/[^0-9]/g, '');
             let v = parseInt(input.value, 10);
             if (isNaN(v) || v < 1) v = 1;
@@ -604,42 +606,39 @@
         }
 
         const i18n = {
-            addToCartMessage:      "{{ __('meta.added_to_cart') }}",
-            noAddToCartMessage:         "{{ __('meta.could_not_add_tocart') }}",
+            addToCartMessage: "{{ __('meta.added_to_cart') }}",
+            noAddToCartMessage: "{{ __('meta.could_not_add_tocart') }}",
         };
 
-        // Agregar al carrito: ejemplo con lectura de presentacion + cantidad
-        async function agregarAlCarrito(productId, event) {
-            // botón que disparó la acción
-            const btn = event?.currentTarget || document.querySelector(`button[onclick*="agregarAlCarrito(${productId}"]`);
+        async function agregarAlCarrito(productId, btnEl) {
+            const btn = btnEl || null;
+
             if (btn) {
                 btn.disabled = true;
                 btn.style.opacity = 0.7;
             }
 
-            // Presentación (si existe select)
+            // Presentación
             const select = document.getElementById(`presentacion_${productId}`);
             let presentacionId = null;
 
             if (select) {
                 const val = select.value;
-                // si tiene valor y no es cadena vacía
                 if (val !== '' && val !== null && typeof val !== 'undefined') {
                     presentacionId = val;
                 }
             }
 
             // Cantidad
-            const cantidadEl = document.getElementById(`cantidad_${productId}`);
-            const cantidad = parseInt(cantidadEl ? cantidadEl.value : 1, 10);
+            const inputQty = document.getElementById(`cantidad_${productId}`);
+            const cantidad = parseInt(inputQty ? inputQty.value : 1, 10);
             const qty = isNaN(cantidad) || cantidad <= 0 ? 1 : cantidad;
 
-            // Armamos body
             const body = new URLSearchParams();
             body.append('product_id', productId);
             body.append('quantity', qty);
             if (presentacionId) {
-                body.append('presentacionId', presentacionId); // 👈 nombre consistente con backend
+                body.append('presentacionId', presentacionId);
             }
 
             try {
@@ -653,18 +652,18 @@
                     body
                 });
 
-                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json().catch(() => ({}));
 
-                const data = await res.json();
-
-                if (data?.ok) {
-                    document.querySelectorAll('.header-cart-count.count')
-                        .forEach(el => el.textContent = data.count);
-
-                    toastr.success(i18n.addToCartMessage);
-                } else {
-                    toastr.error(i18n.noAddToCartMessage);
+                if (!res.ok || !data?.ok) {
+                    toastr.error(data?.message || i18n.noAddToCartMessage);
+                    return;
                 }
+
+                document.querySelectorAll('.header-cart-count.count')
+                    .forEach(el => el.textContent = data.count);
+
+                toastr.success(i18n.addToCartMessage);
+
             } catch (e) {
                 toastr.error(i18n.noAddToCartMessage);
             } finally {
@@ -674,6 +673,7 @@
                 }
             }
         }
-
     </script>
+
+
 @endsection

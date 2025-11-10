@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Producto;
 use Darryldecode\Cart\Facades\CartFacade as Cart;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cookie;
 class CartController extends Controller
@@ -22,43 +23,76 @@ class CartController extends Controller
     public function add(Request $r)
     {
         $data = $r->validate([
-            'product_id'     => ['required','integer'],
-            'quantity'       => ['nullable','integer','min:1','max:100'],
-            'presentacionId' => ['nullable','integer'],
+            'product_id'     => ['required', 'integer'],
+            'quantity'       => ['nullable', 'integer', 'min:1', 'max:100'],
+            'presentacionId' => ['nullable', 'integer'],
         ]);
 
-        $cart   = $this->cart();
-        $qtyReq = (int)($data['quantity'] ?? 1);
+        $cart = $this->cart();
 
-        // Producto
+        // ===== Cantidad =====
+        $qtyReq = (int)($data['quantity'] ?? 1);
+        if ($qtyReq < 1) {
+            $qtyReq = 1;
+        }
+
+        // ===== Producto =====
         $p = Producto::where('id', $data['product_id'])
             ->where('activo', 1)
+            ->where('disponible', 1)
             ->firstOrFail();
 
-        // Presentación (opcional)
-        $presId = $data['presentacionId'] ?? null;
+        // Nombre visible (por si usas content_key + traducciones)
+        $name = $p->content_title
+            ?? $p->titulo
+            ?? $p->nombre
+            ?? ('Producto ' . $p->id);
+
+        // ===== Precio (siempre desde productos) =====
+        $precioFinal = $p->precio !== null ? (float)$p->precio : 0;
+
+        if ($precioFinal <= 0) {
+            // Si el producto no tiene precio > 0, es un problema de config
+            return response()->json([
+                'ok'      => false,
+                'message' => 'El producto no tiene un precio válido configurado.',
+            ], 422);
+        }
+
+        // ===== Presentación (opcional, solo texto/validación) =====
+        $presId     = $data['presentacionId'] ?? null;
         $tituloPres = null;
-        $precio = (float)$p->precio;
 
         if ($presId) {
             $pres = ProductosPresentacion::where('id', $presId)
                 ->where('id_productos', $p->id)
                 ->where('activo', 1)
-                ->firstOrFail();
+                ->first();
 
-            $tituloPres = $pres->titulo ?? null;
-            $precio     = (float)$pres->precio;
+            if (!$pres) {
+                // Presentación inválida o no pertenece al producto
+                return response()->json([
+                    'ok'      => false,
+                    'message' => 'La presentación seleccionada no es válida.',
+                ], 422);
+            }
+
+            // Estos campos (titulo/nombre) pueden venir de tu join o accessor
+            $tituloPres = $pres->titulo
+                ?? $pres->nombre
+                ?? null;
         }
 
+        // ===== Agregar al carrito =====
         $cart->add([
-            'id'       => 'p'.$p->id.($presId ? '-pres'.$presId : ''),
-            'name'     => $p->content_title,
-            'price'    => $precio,
+            'id'       => 'p' . $p->id . ($presId ? '-pres' . $presId : ''),
+            'name'     => $name,
+            'price'    => $precioFinal,
             'quantity' => $qtyReq,
             'attributes' => [
-                'product_id'        => $p->id,
-                'presentacion_id'   => $presId,      // 🔴 clave EXACTA
-                'presentacion_txt'  => $tituloPres,
+                'product_id'       => $p->id,
+                'presentacion_id'  => $presId,
+                'presentacion_txt' => $tituloPres,
             ],
         ]);
 
@@ -67,6 +101,11 @@ class CartController extends Controller
             'count' => $cart->getTotalQuantity(),
         ]);
     }
+
+
+
+
+
 
     // GET /cart/count (AJAX para badge)
     public function count()

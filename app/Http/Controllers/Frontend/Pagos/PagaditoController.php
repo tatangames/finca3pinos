@@ -220,13 +220,13 @@ class PagaditoController extends Controller
                 'shipping_zipcode'   => $direccionEnvio->zipcode,
 
                 // Datos de facturación (si existen)
-                'billing_idpaises'   => $billing->id_paises  ?? null,
-                'billing_nombre'     => $billing->nombre     ?? null,
-                'billing_direccion'  => $billing->direccion  ?? null,
-                'billing_ciudad'     => $billing->ciudad     ?? null,
-                'billing_estado'     => $billing->estado     ?? null,
-                'billing_zipcode'    => $billing->zipcode    ?? null,
-                'billing_telefono'   => $billing->telefono   ?? null,
+                'billing_idpaises'   => optional($billing)->id_paises,
+                'billing_nombre'     => optional($billing)->nombre,
+                'billing_direccion'  => optional($billing)->direccion,
+                'billing_ciudad'     => optional($billing)->ciudad,
+                'billing_estado'     => optional($billing)->estado,
+                'billing_zipcode'    => optional($billing)->zipcode,
+                'billing_telefono'   => optional($billing)->telefono,
 
                 // Totales
                 'subtotal'           => $amountProducts,
@@ -257,7 +257,7 @@ class PagaditoController extends Controller
                 $presentacionId  = isset($attrs['presentacion_id']) ? (int)$attrs['presentacion_id'] : null;
                 $presentacionTxt = $attrs['presentacion_txt'] ?? null;
 
-                // ===== Revalidar producto =====
+                // Revalidar producto
                 if ($productoId) {
                     $producto = Producto::find($productoId);
 
@@ -270,7 +270,7 @@ class PagaditoController extends Controller
                     }
                 }
 
-                // ===== Revalidar presentación (si existe) =====
+                // Revalidar presentación (si existe)
                 if ($presentacionId) {
                     $presentacion = ProductosPresentacion::where('id', $presentacionId)
                         ->where('id_productos', $productoId)
@@ -284,7 +284,7 @@ class PagaditoController extends Controller
                     }
                 }
 
-                // Nombre visible
+                // Nombre visible final
                 $nombreItem = $item->name;
                 if ($presentacionTxt) {
                     $nombreItem .= ' — ' . $presentacionTxt;
@@ -336,7 +336,6 @@ class PagaditoController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            // Si es RuntimeException usamos su mensaje (producto / presentacion / etc)
             $msg = $e instanceof \RuntimeException
                 ? $e->getMessage()
                 : __('meta.transaction_could_not_be');
