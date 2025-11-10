@@ -147,7 +147,6 @@ class PagaditoController extends Controller
         $shippingCost = 0.0;
 
         if ((int)$direccionEnvio->id_paises === 1) {
-            // El Salvador → usa municipio si tiene precio
             if (!empty($direccionEnvio->id_municipio)) {
                 $municipio = Municipio::find($direccionEnvio->id_municipio);
                 if ($municipio && $municipio->precio_envio !== null) {
@@ -155,7 +154,6 @@ class PagaditoController extends Controller
                 }
             }
         } else {
-            // Internacional → usa precio del país
             if ($pais && $pais->precio_envio !== null) {
                 $shippingCost = (float)$pais->precio_envio;
             }
@@ -206,7 +204,6 @@ class PagaditoController extends Controller
                 'ern'                => $ern,
                 'fecha'              => now(),
 
-                // Copia datos de envío
                 'id_paises'          => $direccionEnvio->id_paises,
                 'id_departamentos'   => $direccionEnvio->id_departamento ?? null,
                 'id_municipios'      => $direccionEnvio->id_municipio ?? null,
@@ -219,7 +216,6 @@ class PagaditoController extends Controller
                 'shipping_direccion_opc' => $direccionEnvio->direccion_opcional,
                 'shipping_zipcode'   => $direccionEnvio->zipcode,
 
-                // Datos de facturación (si existen)
                 'billing_idpaises'   => optional($billing)->id_paises,
                 'billing_nombre'     => optional($billing)->nombre,
                 'billing_direccion'  => optional($billing)->direccion,
@@ -228,13 +224,11 @@ class PagaditoController extends Controller
                 'billing_zipcode'    => optional($billing)->zipcode,
                 'billing_telefono'   => optional($billing)->telefono,
 
-                // Totales
                 'subtotal'           => $amountProducts,
                 'shipping_cost'      => $shippingCost,
                 'total'              => $amount,
-                'status_id'          => 1, // pendiente
+                'status_id'          => 1,
 
-                // Seguimiento interno
                 'estado_pedido_1'    => 0,
                 'fecha_pedido_1'     => null,
                 'estado_pedido_2'    => 0,
@@ -253,47 +247,43 @@ class PagaditoController extends Controller
 
                 $attrs = $item->attributes ?? [];
 
-                // Soportar tanto array como AttributeCollection
-                $productoId = null;
-                if (isset($attrs['product_id'])) {
-                    $productoId = (int)$attrs['product_id'];
-                } elseif (is_object($attrs) && method_exists($attrs, 'get') && $attrs->get('product_id')) {
-                    $productoId = (int)$attrs->get('product_id');
+                // Leer desde attributes (soporta array / AttributeCollection)
+                $productoId = isset($attrs['product_id'])
+                    ? (int)$attrs['product_id']
+                    : (is_object($attrs) && method_exists($attrs, 'get') ? (int)$attrs->get('product_id') : null);
+
+                $presentacionId = isset($attrs['presentacion_id'])
+                    ? (int)$attrs['presentacion_id']
+                    : (is_object($attrs) && method_exists($attrs, 'get') ? (int)$attrs->get('presentacion_id') : null);
+
+                // Producto requerido
+                if (!$productoId) {
+                    throw new \RuntimeException('Falta el producto en uno de los ítems del carrito.');
                 }
 
-                $presentacionId = null;
-                if (isset($attrs['presentacion_id'])) {
-                    $presentacionId = (int)$attrs['presentacion_id'];
-                } elseif (is_object($attrs) && method_exists($attrs, 'get') && $attrs->get('presentacion_id')) {
-                    $presentacionId = (int)$attrs->get('presentacion_id');
+                $producto = Producto::find($productoId);
+                if (
+                    !$producto ||
+                    (int)$producto->activo === 0 ||
+                    (int)$producto->disponible === 0
+                ) {
+                    throw new \RuntimeException('Este producto no está disponible actualmente.');
                 }
 
-                // Revalidar producto
-                if ($productoId) {
-                    $producto = Producto::find($productoId);
-
-                    if (
-                        !$producto ||
-                        (isset($producto->activo) && (int)$producto->activo === 0) ||
-                        (isset($producto->disponible) && (int)$producto->disponible === 0)
-                    ) {
-                        throw new \RuntimeException('Este producto no está disponible actualmente.');
-                    }
+                // Presentación requerida (según tu regla)
+                if (!$presentacionId) {
+                    throw new \RuntimeException('Falta la presentación de un producto en el carrito.');
                 }
 
-                // Revalidar presentación (si existe)
-                if ($presentacionId) {
-                    $presentacion = ProductosPresentacion::where('id', $presentacionId)
-                        ->where('id_productos', $productoId)
-                        ->where('activo', 1)
-                        ->first();
+                $presentacion = ProductosPresentacion::where('id', $presentacionId)
+                    ->where('id_productos', $productoId)
+                    ->where('activo', 1)
+                    ->first();
 
-                    if (!$presentacion) {
-                        throw new \RuntimeException('Esta presentación de producto no está disponible actualmente.');
-                    }
+                if (!$presentacion) {
+                    throw new \RuntimeException('Esta presentación de producto no está disponible actualmente.');
                 }
 
-                // Nombre visible (sin texto de presentación adicional)
                 $nombreItem = $item->name;
 
                 OrdenesItem::create([
@@ -306,7 +296,6 @@ class PagaditoController extends Controller
                     'subtotal'        => $qty * $price,
                 ]);
 
-                // Detalle hacia Pagadito
                 $this->pagadito->add_detail(
                     $qty,
                     mb_substr($nombreItem, 0, 125),
@@ -314,7 +303,7 @@ class PagaditoController extends Controller
                 );
             }
 
-            // ===== Envío como ítem para Pagadito (si tiene costo) =====
+            // ===== Envío como ítem =====
             if ($shippingCost > 0) {
                 $shippingLabel = __('meta.shipping');
 
@@ -351,14 +340,12 @@ class PagaditoController extends Controller
 
         // ===== Ejecutar transacción Pagadito =====
         if ($this->pagadito->exec_trans($ern)) {
-            // No vaciar carrito aquí; se hace en retorno si pago = OK
             exit;
         }
 
-        // Si falla exec_trans: marcar como fallo técnico
         if ($order) {
             $order->update([
-                'status_id' => 3, // failed
+                'status_id' => 3,
             ]);
         }
 
@@ -375,6 +362,7 @@ class PagaditoController extends Controller
             . $this->pagadito->get_rs_message()
         );
     }
+
 
 
 
