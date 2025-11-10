@@ -288,6 +288,7 @@ return [
     'order_status' => 'Estado de la orden',
     'order_detail' => 'Detalle de la orden',
     'shipping_unavailable' => 'Envío no disponible temporalmente',
+    'shipping_not_available_for_address' => 'No hay envío para esta dirección actualmente.',
 
 
 

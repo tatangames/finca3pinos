@@ -288,6 +288,7 @@ return [
     'order_status' => 'Order status',
     'order_detail' => 'Order detail',
     'shipping_unavailable' => 'Shipping temporarily unavailable',
+    'shipping_not_available_for_address' => 'Shipping is not available for this address at the moment.',
 
 
 

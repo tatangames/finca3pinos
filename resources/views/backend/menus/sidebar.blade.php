@@ -45,6 +45,13 @@
                     </li>
                 @endcan
 
+                    <li class="nav-item">
+                        <a href="{{ route('admin.ordenes') }}" target="frameprincipal" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Ordenes</p>
+                        </a>
+                    </li>
+
 
                     <li class="nav-item">
                         <a href="{{ route('admin.categoria') }}" target="frameprincipal" class="nav-link">

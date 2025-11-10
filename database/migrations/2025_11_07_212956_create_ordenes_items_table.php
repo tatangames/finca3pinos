@@ -19,6 +19,9 @@ return new class extends Migration
             // Relación opcional con productos (si tienes tabla productos)
             $table->unsignedBigInteger('id_producto')->nullable();
 
+            // Relación opcional con productos (si tienes tabla productos)
+            $table->unsignedBigInteger('id_presentacion')->nullable();
+
             // Snapshot del producto en el momento de la compra
             $table->string('nombre', 150);
             $table->decimal('precio', 10, 2);      // precio unitario
@@ -34,6 +37,10 @@ return new class extends Migration
 
             $table->foreign('id_producto')
                 ->references('id')->on('productos')
+                ->onDelete('set null');
+
+            $table->foreign('id_presentacion')
+                ->references('id')->on('productos_presentacion')
                 ->onDelete('set null');
         });
     }

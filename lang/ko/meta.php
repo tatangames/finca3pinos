@@ -288,6 +288,7 @@ return [
     'order_status' => '주문 상태',
     'order_detail' => '주문 상세',
     'shipping_unavailable' => '배송이 일시적으로 불가능합니다',
+    'shipping_not_available_for_address' => '현재 이 주소로는 배송이 불가능합니다.',
 
 
 

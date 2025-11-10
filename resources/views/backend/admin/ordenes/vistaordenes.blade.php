@@ -15,6 +15,9 @@
     }
 
 
+
+
+
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -27,8 +30,8 @@
 
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Clientes</li>
-                    <li class="breadcrumb-item active">Listado de Clientes</li>
+                    <li class="breadcrumb-item">Ordenes</li>
+                    <li class="breadcrumb-item active">Listado de Ordenes</li>
                 </ol>
             </div>
 
@@ -39,7 +42,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Clientes</h3>
+                    <h3 class="card-title">Categoría</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -70,7 +73,7 @@
     <script type="text/javascript">
         $(document).ready(function(){
 
-            var ruta = "{{ URL::to('/admin/clientes/index/tabla') }}";
+            var ruta = "{{ URL::to('/admin/ordenes/index/tabla') }}";
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -81,9 +84,14 @@
 
         // recarga tabla
         function recargar(){
-            var ruta = "{{ URL::to('/admin/clientes/index/tabla') }}";
+            var ruta = "{{ URL::to('/admin/ordenes/index/tabla') }}";
             $('#tablaDatatable').load(ruta);
         }
+
+
+      function detalle(id){
+          window.location.href="{{ url('/admin/ordenes/detalle/index') }}/"+id;
+      }
 
 
 

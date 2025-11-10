@@ -197,6 +197,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::get('/clientes', [AdminClienteController::class, 'vistaClientes'])->name('clientes');
     Route::get('/clientes/index/tabla', [AdminClienteController::class, 'tablaClientes']);
 
+    Route::get('/ordenes', [AdminClienteController::class, 'vistaOrdenes'])->name('ordenes');
+    Route::get('/ordenes/index/tabla', [AdminClienteController::class, 'tablaOrdenes']);
+
+    Route::get('/ordenes/detalle/index/{id}', [AdminClienteController::class, 'vistaOrdenDetalle']);
+
+
+
 
 
 });

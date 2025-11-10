@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Frontend\Pagos;
 
 use App\Http\Controllers\Controller;
+use App\Models\Departamento;
 use App\Models\Direcciones;
 use App\Models\DireccionFacturacion;
 use App\Models\Municipio;
 use App\Models\Ordenes;
 use App\Models\OrdenesItem;
 use App\Models\Pais;
+use App\Models\Producto;
+use App\Models\ProductosPresentacion;
 use App\Traits\HandlesCart;
 use App\Libraries\Pagadito;
 use Illuminate\Http\Request;
@@ -104,20 +107,57 @@ class PagaditoController extends Controller
                 ->with('error', __('meta.selected_shipping_notvalid'));
         }
 
+        // ===== Helper: validar activo / disponible =====
+        $isInactive = function ($model) {
+            if (!$model) return true;
+            if (isset($model->disponible) && (int)$model->disponible === 0) return true;
+            if (isset($model->activo) && (int)$model->activo === 0) return true;
+            return false;
+        };
+
+        // ===== Verificar país =====
+        $pais = Pais::find($direccionEnvio->id_paises);
+        if ($isInactive($pais)) {
+            return redirect()
+                ->route('checkout.show')
+                ->with('error', __('meta.shipping_not_available_for_address'));
+        }
+
+        // ===== Verificar departamento (si aplica) =====
+        if (!empty($direccionEnvio->id_departamento)) {
+            $depto = Departamento::find($direccionEnvio->id_departamento);
+            if ($isInactive($depto)) {
+                return redirect()
+                    ->route('checkout.show')
+                    ->with('error', __('meta.shipping_not_available_for_address'));
+            }
+        }
+
+        // ===== Verificar municipio (si aplica) =====
+        if (!empty($direccionEnvio->id_municipio)) {
+            $muni = Municipio::find($direccionEnvio->id_municipio);
+            if ($isInactive($muni)) {
+                return redirect()
+                    ->route('checkout.show')
+                    ->with('error', __('meta.shipping_not_available_for_address'));
+            }
+        }
+
         // ===== Costo de envío =====
         $shippingCost = 0.0;
 
-        if ((int) $direccionEnvio->id_paises === 1) {
+        if ((int)$direccionEnvio->id_paises === 1) {
+            // El Salvador → usa municipio si tiene precio
             if (!empty($direccionEnvio->id_municipio)) {
                 $municipio = Municipio::find($direccionEnvio->id_municipio);
                 if ($municipio && $municipio->precio_envio !== null) {
-                    $shippingCost = (float) $municipio->precio_envio;
+                    $shippingCost = (float)$municipio->precio_envio;
                 }
             }
         } else {
-            $pais = Pais::find($direccionEnvio->id_paises);
+            // Internacional → usa precio del país
             if ($pais && $pais->precio_envio !== null) {
-                $shippingCost = (float) $pais->precio_envio;
+                $shippingCost = (float)$pais->precio_envio;
             }
         }
 
@@ -131,7 +171,7 @@ class PagaditoController extends Controller
                 ->with('error', __('meta.minimum_amount_to_pay'));
         }
 
-        // ===== Facturación =====
+        // ===== Facturación (última del usuario, opcional) =====
         $billing = DireccionFacturacion::query()
             ->where('id_usuario', $userId)
             ->orderByDesc('id')
@@ -152,8 +192,10 @@ class PagaditoController extends Controller
             );
         }
 
-        // ===== ERN =====
+        // ===== ERN único =====
         $ern = 'F3P-' . $userId . '-' . time();
+
+        $order = null;
 
         try {
             DB::beginTransaction();
@@ -164,9 +206,10 @@ class PagaditoController extends Controller
                 'ern'                => $ern,
                 'fecha'              => now(),
 
+                // Copia datos de envío
                 'id_paises'          => $direccionEnvio->id_paises,
-                'id_departamentos'   => $direccionEnvio->id_departamento,
-                'id_municipios'      => $direccionEnvio->id_municipio,
+                'id_departamentos'   => $direccionEnvio->id_departamento ?? null,
+                'id_municipios'      => $direccionEnvio->id_municipio ?? null,
                 'shipping_nombre'    => $direccionEnvio->nombre,
                 'shipping_telefono'  => $direccionEnvio->telefono,
                 'shipping_pais'      => $direccionEnvio->id_paises,
@@ -176,19 +219,22 @@ class PagaditoController extends Controller
                 'shipping_direccion_opc' => $direccionEnvio->direccion_opcional,
                 'shipping_zipcode'   => $direccionEnvio->zipcode,
 
-                'billing_idpaises'   => $billing->id_paises   ?? null,
-                'billing_nombre'     => $billing->nombre      ?? null,
-                'billing_direccion'  => $billing->direccion   ?? null,
-                'billing_ciudad'     => $billing->ciudad      ?? null,
-                'billing_estado'     => $billing->estado      ?? null,
-                'billing_zipcode'    => $billing->zipcode     ?? null,
-                'billing_telefono'   => $billing->telefono    ?? null,
+                // Datos de facturación (si existen)
+                'billing_idpaises'   => $billing->id_paises  ?? null,
+                'billing_nombre'     => $billing->nombre     ?? null,
+                'billing_direccion'  => $billing->direccion  ?? null,
+                'billing_ciudad'     => $billing->ciudad     ?? null,
+                'billing_estado'     => $billing->estado     ?? null,
+                'billing_zipcode'    => $billing->zipcode    ?? null,
+                'billing_telefono'   => $billing->telefono   ?? null,
 
+                // Totales
                 'subtotal'           => $amountProducts,
                 'shipping_cost'      => $shippingCost,
                 'total'              => $amount,
                 'status_id'          => 1, // pendiente
 
+                // Seguimiento interno
                 'estado_pedido_1'    => 0,
                 'fecha_pedido_1'     => null,
                 'estado_pedido_2'    => 0,
@@ -196,7 +242,7 @@ class PagaditoController extends Controller
                 'seguimiento'        => null,
             ]);
 
-            // ===== Items =====
+            // ===== Items de la orden =====
             foreach ($items as $item) {
                 $qty   = (int) $item->quantity;
                 $price = (float) $item->price;
@@ -205,32 +251,67 @@ class PagaditoController extends Controller
                     throw new \RuntimeException('Product Invalid.');
                 }
 
-                $attrs = $item->attributes ?? null;
+                $attrs = $item->attributes ?? [];
 
-                $productoId = null;
-                if ($attrs && isset($attrs['product_id']) && is_numeric($attrs['product_id'])) {
-                    $productoId = (int) $attrs['product_id'];
+                $productoId      = isset($attrs['product_id']) ? (int)$attrs['product_id'] : null;
+                $presentacionId  = isset($attrs['presentacion_id']) ? (int)$attrs['presentacion_id'] : null;
+                $presentacionTxt = $attrs['presentacion_txt'] ?? null;
+
+                // ===== Revalidar producto =====
+                if ($productoId) {
+                    $producto = Producto::find($productoId);
+
+                    if (
+                        !$producto ||
+                        (isset($producto->activo) && (int)$producto->activo === 0) ||
+                        (isset($producto->disponible) && (int)$producto->disponible === 0)
+                    ) {
+                        throw new \RuntimeException('Este producto no está disponible actualmente.');
+                    }
+                }
+
+                // ===== Revalidar presentación (si existe) =====
+                if ($presentacionId) {
+                    $presentacion = ProductosPresentacion::where('id', $presentacionId)
+                        ->where('id_producto', $productoId)
+                        ->first();
+
+                    if (
+                        !$presentacion ||
+                        (isset($presentacion->activo) && (int)$presentacion->activo === 0)
+                    ) {
+                        throw new \RuntimeException('Esta presentación de producto no está disponible actualmente.');
+                    }
+                }
+
+                // Nombre visible
+                $nombreItem = $item->name;
+                if ($presentacionTxt) {
+                    $nombreItem .= ' — ' . $presentacionTxt;
                 }
 
                 OrdenesItem::create([
-                    'id_orden'    => $order->id,
-                    'id_producto' => $productoId,
-                    'nombre'      => $item->name,
-                    'precio'      => $price,
-                    'cantidad'    => $qty,
-                    'subtotal'    => $qty * $price,
+                    'id_orden'        => $order->id,
+                    'id_producto'     => $productoId,
+                    'id_presentacion' => $presentacionId,
+                    'nombre'          => $nombreItem,
+                    'precio'          => $price,
+                    'cantidad'        => $qty,
+                    'subtotal'        => $qty * $price,
                 ]);
 
+                // Detalle hacia Pagadito
                 $this->pagadito->add_detail(
                     $qty,
-                    mb_substr($item->name, 0, 125),
+                    mb_substr($nombreItem, 0, 125),
                     number_format($price, 2, '.', '')
                 );
             }
 
-            // Envío como ítem
-            $shippingLabel = __('meta.shipping');
+            // ===== Envío como ítem para Pagadito (si tiene costo) =====
             if ($shippingCost > 0) {
+                $shippingLabel = __('meta.shipping');
+
                 $this->pagadito->add_detail(
                     1,
                     mb_substr($shippingLabel, 0, 125),
@@ -255,19 +336,26 @@ class PagaditoController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', __('meta.transaction_could_not_be'));
+            // Si es RuntimeException usamos su mensaje (producto / presentacion / etc)
+            $msg = $e instanceof \RuntimeException
+                ? $e->getMessage()
+                : __('meta.transaction_could_not_be');
+
+            return back()->with('error', $msg);
         }
 
-        // ===== Ejecutar transacción =====
+        // ===== Ejecutar transacción Pagadito =====
         if ($this->pagadito->exec_trans($ern)) {
-            // Importante: aquí NO limpiamos carrito
+            // No vaciar carrito aquí; se hace en retorno si pago = OK
             exit;
         }
 
-        // Si falla exec_trans: marcar orden como fallo técnico
-        $order->update([
-            'status_id' => 3, // por ejemplo "failed" en tu tabla de estados
-        ]);
+        // Si falla exec_trans: marcar como fallo técnico
+        if ($order) {
+            $order->update([
+                'status_id' => 3, // failed
+            ]);
+        }
 
         Log::channel('pagadito')->error('No se pudo iniciar transacción Pagadito [exec_trans]', [
             'ern'     => $ern,
@@ -282,6 +370,10 @@ class PagaditoController extends Controller
             . $this->pagadito->get_rs_message()
         );
     }
+
+
+
+
 
 
 
