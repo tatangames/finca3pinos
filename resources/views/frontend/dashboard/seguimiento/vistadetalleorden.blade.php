@@ -38,7 +38,7 @@
             }
         }
 
-        /* Sidebar igual que antes */
+        /* Sidebar */
         .account-sidebar {
             background: var(--card);
             border: 1px solid var(--border);
@@ -143,7 +143,7 @@
             background: #000;
         }
 
-        /* Box cabecera orden */
+        /* Header orden */
         .order-header {
             display: flex;
             align-items: center;
@@ -172,29 +172,6 @@
             display: block;
             font-size: 12px;
             color: var(--muted);
-        }
-
-        /* Acordeones simples (Fotos / Firma) */
-        .accordion-btn {
-            width: 100%;
-            text-align: left;
-            padding: 10px 16px;
-            margin: 0;
-            background: #111827;
-            color: #fff;
-            border: none;
-            border-radius: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .accordion-content {
-            display: none;
-            padding: 10px 16px 14px;
-            background: #f9fafb;
-            border-bottom: 1px solid var(--border);
         }
 
         /* Info envío + resumen */
@@ -366,9 +343,6 @@
                     </div>
                 </div>
 
-
-
-
                 {{-- Info envío + resumen --}}
                 <div class="order-info-wrap">
                     <div class="order-block">
@@ -412,44 +386,67 @@
                 <div class="items-wrap">
                     @foreach($order->detalles as $item)
                         @php
-                            // Nombre base del producto
-                            $nombreProducto = $item->nombre
-                                ?? ($item->producto->content_key ? __($item->producto->content_key) : null)
-                                ?? ($item->producto->nombre ?? '');
+                            $producto      = $item->producto ?? null;
+                            $presentacion  = $item->presentacion ?? null;
 
-                            // Nombre de la presentación según idioma
+                            // Nombre del producto según content_key
+                            if ($producto && !empty($producto->content_key)) {
+                                $nombreProducto = __($producto->content_key);
+                            } else {
+                                $nombreProducto = $item->nombre
+                                    ?? ($producto->nombre ?? '');
+                            }
+
+                            // Nombre de la presentación según content_key
                             $nombrePresentacion = '';
-
-                            if ($item->presentacion) {
-                                if ($locale === 'es' && !empty($item->presentacion->nombre_es)) {
-                                    $nombrePresentacion = $item->presentacion->nombre_es;
-                                } elseif ($locale === 'en' && !empty($item->presentacion->nombre_en)) {
-                                    $nombrePresentacion = $item->presentacion->nombre_en;
-                                } elseif (in_array($locale, ['ko', 'kr']) && !empty($item->presentacion->nombre_ko)) {
-                                    $nombrePresentacion = $item->presentacion->nombre_ko;
+                            if ($presentacion) {
+                                if (!empty($presentacion->content_key)) {
+                                    $nombrePresentacion = __($presentacion->content_key);
                                 } else {
-                                    // fallback genérico
-                                    $nombrePresentacion = $item->presentacion->nombre ?? '';
+                                    $nombrePresentacion = $presentacion->nombre ?? '';
                                 }
                             }
 
-                            // Concatenar: Producto — Presentación (si existe)
-                            $nombreCompleto = trim($nombreProducto . ($nombrePresentacion ? ' — '.$nombrePresentacion : ''));
+                            // Concatenar Producto — Presentación (solo si hay presentación)
+                            $nombreCompleto = trim(
+                                $nombreProducto .
+                                ($nombrePresentacion ? ' — ' . $nombrePresentacion : '')
+                            );
 
-                            $precio   = $item->precio ?? $item->precio_unitario ?? 0;
-                            $cantidad = $item->cantidad ?? 1;
-                            $lineaSub = $precio * $cantidad;
+                            $precio    = $item->precio ?? $item->precio_unitario ?? 0;
+                            $cantidad  = $item->cantidad ?? 1;
+                            $lineTotal = $precio * $cantidad;
                         @endphp
 
-                        <tr>
-                            <td>{{ $nombreCompleto }}</td>
-                            <td>{{ $cantidad }}</td>
-                            <td>${{ number_format($precio, 2) }}</td>
-                            <td>${{ number_format($lineaSub, 2) }}</td>
-                        </tr>
+                        <div class="item-card">
+                            <div class="item-img">
+                                @if($producto && !empty($producto->imagen))
+                                    <img src="{{ asset('storage/archivos/' . $producto->imagen) }}"
+                                         alt="{{ $nombreCompleto }}"
+                                         class="img-fluid rounded">
+                                @else
+                                    📷
+                                @endif
+                            </div>
+                            <div>
+                                <div class="item-title">
+                                    {{ $nombreCompleto }}
+                                </div>
+                                <p class="item-line">
+                                    <span class="label" style="font-size: 14px">{{ __('meta.price') ?? 'Precio' }}: </span>
+                                    <span class="value" style="font-size: 14px">${{ number_format($precio, 2) }}</span>
+                                </p>
+                                <p class="item-line">
+                                    <span class="label" style="font-size: 14px">{{ __('meta.quantity') ?? 'Cantidad' }}: </span>
+                                    <span class="value" style="font-size: 14px">{{ $cantidad }}</span>
+                                </p>
+                                <p class="item-line">
+                                    <span class="label" style="font-size: 14px">{{ __('meta.subtotal') ?? 'Total' }}: </span>
+                                    <span class="value" style="font-size: 14px">${{ number_format($lineTotal, 2) }}</span>
+                                </p>
+                            </div>
+                        </div>
                     @endforeach
-
-
                 </div>
 
             </div>
@@ -459,21 +456,9 @@
     @include('frontend.partials.superior')
 
     <script>
-        // Logout
         document.getElementById('logoutLink')?.addEventListener('click', function (e) {
             e.preventDefault();
             document.getElementById('logoutForm')?.submit();
-        });
-
-        // Acordeones Fotos / Firma
-        document.querySelectorAll('.accordion-btn').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                const target = document.querySelector(this.dataset.target);
-                if (!target) return;
-                const isOpen = target.style.display === 'block';
-                target.style.display = isOpen ? 'none' : 'block';
-                this.querySelector('span:last-child').textContent = isOpen ? '›' : '⌄';
-            });
         });
     </script>
 @endsection
