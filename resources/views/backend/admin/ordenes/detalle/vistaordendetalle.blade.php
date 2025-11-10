@@ -357,15 +357,15 @@
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
 
     {{-- CKEditor (incluye herramienta de links) --}}
-    <script src="https://cdn.ckeditor.com/4.25.1-lts/standard/ckeditor.js"></script>
-
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
     <script>
         // Inicializar CKEditor en textarea seguimiento
-        CKEDITOR.replace('seguimiento', {
-            // Dejamos activo el plugin de enlaces (Link) que ya viene en "standard"
-            // Puedes ajustar la barra si quieres algo más simple:
-            // removeButtons: 'Image,Table,Source,About'
-        });
+        ClassicEditor
+            .create(document.querySelector('#seguimiento'), {
+                toolbar: ['bold','italic','link','bulletedList','numberedList','undo','redo']
+            })
+            .then(editor => { window.editor = editor; })
+            .catch(error => console.error(error));
 
         function actualizarEstadoOrden() {
             const estadoId = document.getElementById('selectEstadoOrden').value;
