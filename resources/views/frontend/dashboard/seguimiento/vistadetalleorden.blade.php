@@ -412,54 +412,41 @@
                 <div class="items-wrap">
                     @foreach($order->detalles as $item)
                         @php
-                            $producto  = $item->producto ?? null;
-                            $precio    = (float)($item->precio ?? 0);
-                            $cantidad  = (int)($item->cantidad ?? 1);
-                            $lineTotal = $precio * $cantidad;
+                            // Nombre base del producto
+                            $nombreProducto = $item->nombre
+                                ?? ($item->producto->content_key ? __($item->producto->content_key) : null)
+                                ?? ($item->producto->nombre ?? '');
 
-                            // Nombre ya viene con producto + presentación
-                            $nombreCompleto = $item->nombre ?? '—';
+                            // Nombre de la presentación según idioma
+                            $nombrePresentacion = '';
+
+                            if ($item->presentacion) {
+                                if ($locale === 'es' && !empty($item->presentacion->nombre_es)) {
+                                    $nombrePresentacion = $item->presentacion->nombre_es;
+                                } elseif ($locale === 'en' && !empty($item->presentacion->nombre_en)) {
+                                    $nombrePresentacion = $item->presentacion->nombre_en;
+                                } elseif (in_array($locale, ['ko', 'kr']) && !empty($item->presentacion->nombre_ko)) {
+                                    $nombrePresentacion = $item->presentacion->nombre_ko;
+                                } else {
+                                    // fallback genérico
+                                    $nombrePresentacion = $item->presentacion->nombre ?? '';
+                                }
+                            }
+
+                            // Concatenar: Producto — Presentación (si existe)
+                            $nombreCompleto = trim($nombreProducto . ($nombrePresentacion ? ' — '.$nombrePresentacion : ''));
+
+                            $precio   = $item->precio ?? $item->precio_unitario ?? 0;
+                            $cantidad = $item->cantidad ?? 1;
+                            $lineaSub = $precio * $cantidad;
                         @endphp
 
-                        <div class="item-card">
-                            <div class="item-img">
-                                @if($producto && !empty($producto->imagen))
-                                    <img src="{{ asset('storage/archivos/' . ltrim($producto->imagen, '/')) }}"
-                                         alt="{{ $nombreCompleto }}"
-                                         class="img-fluid rounded"
-                                         style="max-width: 100px;">
-                                @else
-                                    📷
-                                @endif
-                            </div>
-
-                            <div>
-                                <div class="item-title">
-                                    {{ $nombreCompleto }}
-                                </div>
-
-                                <p class="item-line">
-                                    <span class="label" style="font-size: 14px">Precio: </span>
-                                    <span class="value" style="font-size: 14px">
-                    ${{ number_format($precio, 2) }}
-                </span>
-                                </p>
-
-                                <p class="item-line">
-                                    <span class="label" style="font-size: 14px">Cantidad: </span>
-                                    <span class="value" style="font-size: 14px">
-                    {{ $cantidad }}
-                </span>
-                                </p>
-
-                                <p class="item-line">
-                                    <span class="label" style="font-size: 14px">Total: </span>
-                                    <span class="value" style="font-size: 14px">
-                    ${{ number_format($lineTotal, 2) }}
-                </span>
-                                </p>
-                            </div>
-                        </div>
+                        <tr>
+                            <td>{{ $nombreCompleto }}</td>
+                            <td>{{ $cantidad }}</td>
+                            <td>${{ number_format($precio, 2) }}</td>
+                            <td>${{ number_format($lineaSub, 2) }}</td>
+                        </tr>
                     @endforeach
 
 

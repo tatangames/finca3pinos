@@ -114,19 +114,19 @@ class OrdenesController extends Controller
         $envio = $order->costo_envio ?? $order->shipping_cost ?? 0;
         $total = $order->total ?? ($subtotal + $envio);
 
-        $infoPais = Pais::find($order->id_paises);
-        $nombreDepartamento = Departamento::find($order->id_departamentos)->nombre ?? '';
-        $nombreMunicipio    = Municipio::find($order->id_municipios)->nombre ?? '';
+        $infoPais          = Pais::find($order->id_paises);
+        $nombreDepartamento= Departamento::find($order->id_departamentos)->nombre ?? '';
+        $nombreMunicipio   = Municipio::find($order->id_municipios)->nombre ?? '';
 
         return view('frontend.dashboard.seguimiento.vistadetalleorden', [
-            'order'             => $order,
-            'fechaOrden'        => $fechaOrden,
-            'subtotal'          => $subtotal,
-            'envio'             => $envio,
-            'total'             => $total,
-            'nombrePais'        => $infoPais->nombre ?? '',
-            'nombreDepartamento'=> $nombreDepartamento,
-            'nombreMunicipio'   => $nombreMunicipio,
+            'order'              => $order,
+            'fechaOrden'         => $fechaOrden,
+            'subtotal'           => $subtotal,
+            'envio'              => $envio,
+            'total'              => $total,
+            'nombrePais'         => $infoPais->nombre ?? '',
+            'nombreDepartamento' => $nombreDepartamento,
+            'nombreMunicipio'    => $nombreMunicipio,
         ]);
     }
 
