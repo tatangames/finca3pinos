@@ -273,7 +273,7 @@ class PagaditoController extends Controller
                 // ===== Revalidar presentación (si existe) =====
                 if ($presentacionId) {
                     $presentacion = ProductosPresentacion::where('id', $presentacionId)
-                        ->where('id_producto', $productoId)
+                        ->where('id_productos', $productoId)
                         ->first();
 
                     if (
