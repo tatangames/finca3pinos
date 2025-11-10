@@ -609,19 +609,38 @@
         };
 
         // Agregar al carrito: ejemplo con lectura de presentacion + cantidad
-        async function agregarAlCarrito(productId) {
+        async function agregarAlCarrito(productId, event) {
             // botón que disparó la acción
-            const btn = event?.currentTarget || document.querySelector(`button[onclick="agregarAlCarrito(${productId})"]`);
-            if (btn) { btn.disabled = true; btn.style.opacity = .7; }
+            const btn = event?.currentTarget || document.querySelector(`button[onclick*="agregarAlCarrito(${productId}"]`);
+            if (btn) {
+                btn.disabled = true;
+                btn.style.opacity = 0.7;
+            }
 
+            // Presentación (si existe select)
             const select = document.getElementById(`presentacion_${productId}`);
-            const presentacionId = select ? select.value : null;
-            const cantidad = parseInt(document.getElementById(`cantidad_${productId}`)?.value || 1, 10);
+            let presentacionId = null;
 
+            if (select) {
+                const val = select.value;
+                // si tiene valor y no es cadena vacía
+                if (val !== '' && val !== null && typeof val !== 'undefined') {
+                    presentacionId = val;
+                }
+            }
+
+            // Cantidad
+            const cantidadEl = document.getElementById(`cantidad_${productId}`);
+            const cantidad = parseInt(cantidadEl ? cantidadEl.value : 1, 10);
+            const qty = isNaN(cantidad) || cantidad <= 0 ? 1 : cantidad;
+
+            // Armamos body
             const body = new URLSearchParams();
             body.append('product_id', productId);
-            body.append('quantity', isNaN(cantidad) ? 1 : cantidad); // por defecto 1 sino encuentra
-            if (presentacionId) body.append('presentacionId', presentacionId);
+            body.append('quantity', qty);
+            if (presentacionId) {
+                body.append('presentacionId', presentacionId); // 👈 nombre consistente con backend
+            }
 
             try {
                 const res = await fetch(`{{ route('cart.add') }}`, {
@@ -637,6 +656,7 @@
                 if (!res.ok) throw new Error('HTTP ' + res.status);
 
                 const data = await res.json();
+
                 if (data?.ok) {
                     document.querySelectorAll('.header-cart-count.count')
                         .forEach(el => el.textContent = data.count);
@@ -648,8 +668,12 @@
             } catch (e) {
                 toastr.error(i18n.noAddToCartMessage);
             } finally {
-                if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+                if (btn) {
+                    btn.disabled = false;
+                    btn.style.opacity = '';
+                }
             }
         }
+
     </script>
 @endsection
