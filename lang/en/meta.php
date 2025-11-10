@@ -289,7 +289,21 @@ return [
     'order_detail' => 'Order detail',
     'shipping_unavailable' => 'Shipping temporarily unavailable',
     'shipping_not_available_for_address' => 'Shipping is not available for this address at the moment.',
+    'your_order_is_being_prepared' => 'Your order is being prepared',
 
+    'order_preparing_title' => 'Your order is being prepared!',
+    'go_to_store' => 'Go to store',
+    'thank_you_finca' => 'Thank you for trusting Finca 3 Pinos ☕',
+    'we_are_happy_to_inform_you' => 'We’re happy to inform you that your order',
+    'is_being_prepared' => 'is being prepared.',
+    'we_will_notify_when_shipped' => 'We’ll send you another notification once your package has been shipped.',
+    'your_order_has_been_shipped' => 'Your order has been shipped',
+    'your_order' => 'Your order',
+    'has_been_shipped_and_on_the_way' => 'has already been shipped and is on its way to you.',
+    'you_can_check_order_status' => 'You can view the current status of your order from your dashboard in our store.',
+    'view_my_order' => 'View my order',
+    'preparation_date' => 'Preparation date',
+    'shipping_date' => 'Shipping date',
 
 
 

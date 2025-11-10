@@ -289,7 +289,21 @@ return [
     'order_detail' => 'Detalle de la orden',
     'shipping_unavailable' => 'Envío no disponible temporalmente',
     'shipping_not_available_for_address' => 'No hay envío para esta dirección actualmente.',
+    'your_order_is_being_prepared' => 'Tu pedido está siendo preparado',
 
+    'order_preparing_title' => '¡Tu pedido está siendo preparado!',
+    'go_to_store' => 'Ir a la tienda',
+    'thank_you_finca' => 'Gracias por confiar en Finca 3 Pinos ☕',
+    'we_are_happy_to_inform_you' => 'Nos alegra informarte que tu pedido',
+    'is_being_prepared' => 'está en proceso de preparación.',
+    'we_will_notify_when_shipped' => 'Pronto te enviaremos otra notificación cuando tu paquete haya sido despachado.',
+    'your_order_has_been_shipped' => 'Tu pedido ha sido enviado',
+    'your_order' => 'Tu pedido',
+    'has_been_shipped_and_on_the_way' => 'ya ha sido enviado y está en camino hacia ti.',
+    'you_can_check_order_status' => 'Podrás ver el estado actual de tu pedido desde tu panel en nuestra tienda.',
+    'view_my_order' => 'Ver mi pedido',
+    'preparation_date' => 'Fecha de preparación',
+    'shipping_date' => 'Fecha de envío',
 
 
 

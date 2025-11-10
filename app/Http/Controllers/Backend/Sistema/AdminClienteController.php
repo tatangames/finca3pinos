@@ -13,6 +13,7 @@ use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AdminClienteController extends Controller
 {
@@ -142,6 +143,17 @@ class AdminClienteController extends Controller
                 : null,
             'status_id'  => $orden->status_id,
             'visible_cliente' => (int)($orden->visible_cliente ?? 1),
+
+            // 👇 seguimiento (para inputs date usamos Y-m-d)
+            'estado_pedido_1' => (int)($orden->estado_pedido_1 ?? 0),
+            'fecha_pedido_1'  => $orden->fecha_pedido_1
+                ? Carbon::parse($orden->fecha_pedido_1)->format('Y-m-d')
+                : '',
+            'estado_pedido_2' => (int)($orden->estado_pedido_2 ?? 0),
+            'fecha_pedido_2'  => $orden->fecha_pedido_2
+                ? Carbon::parse($orden->fecha_pedido_2)->format('Y-m-d')
+                : '',
+
             'status'   => $statusNombre,
             'subtotal' => number_format($orden->subtotal, 2, '.', ','),
             'envio'    => number_format($orden->shipping_cost, 2, '.', ','),
@@ -311,6 +323,174 @@ class AdminClienteController extends Controller
             ], 500);
         }
     }
+
+
+
+    public function actualizarSeguimientoOrden(Request $request)
+    {
+        $data = $request->validate([
+            'orden_id'        => ['required', 'integer', 'exists:ordenes,id'],
+            'estado_pedido_1' => ['required', 'in:0,1'],
+            'fecha_pedido_1'  => ['nullable', 'date'],
+            'estado_pedido_2' => ['required', 'in:0,1'],
+            'fecha_pedido_2'  => ['nullable', 'date'],
+        ]);
+
+        // Validaciones: si estado = 1, fecha obligatoria
+        if ($data['estado_pedido_1'] == 1 && empty($data['fecha_pedido_1'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La fecha de "Preparando orden" es requerida.',
+            ], 422);
+        }
+
+        if ($data['estado_pedido_2'] == 1 && empty($data['fecha_pedido_2'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La fecha de "Orden enviada" es requerida.',
+            ], 422);
+        }
+
+        $orden = Ordenes::findOrFail($data['orden_id']);
+
+        $orden->estado_pedido_1 = (int)$data['estado_pedido_1'];
+        $orden->fecha_pedido_1  = $data['estado_pedido_1'] == 1
+            ? $data['fecha_pedido_1']
+            : null;
+
+        $orden->estado_pedido_2 = (int)$data['estado_pedido_2'];
+        $orden->fecha_pedido_2  = $data['estado_pedido_2'] == 1
+            ? $data['fecha_pedido_2']
+            : null;
+
+        $orden->save();
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
+
+
+
+    public function enviarCorreoPreparando(Request $request)
+    {
+        $orden = Ordenes::with('usuario')->findOrFail($request->orden_id);
+
+        // ===== Validar usuario =====
+        if (!$orden->usuario || !$orden->usuario->email) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El cliente no tiene correo registrado.',
+            ]);
+        }
+
+        // ===== Validar estado y fecha =====
+        if ($orden->estado_pedido_1 == 0 || empty($orden->fecha_pedido_1)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se puede enviar el correo: la orden aún no está marcada como "Preparando" o no tiene fecha registrada.',
+            ]);
+        }
+
+        // ===== Mapeo de idioma por país =====
+        $locale = match ($orden->id_paises) {
+            1       => 'sv', // El Salvador
+            2       => 'en', // USA
+            3       => 'ko', // Corea
+            default => 'sv', // fallback
+        };
+
+        // ===== Formato de fecha según país =====
+        $formatoFecha = $orden->id_paises == 1 ? 'd-m-Y' : 'm-d-Y';
+        $fechaPreparacion = $orden->fecha_pedido_1
+            ? \Carbon\Carbon::parse($orden->fecha_pedido_1)->format($formatoFecha)
+            : null;
+
+        // ===== Guardar locale actual y forzar idioma =====
+        $previousLocale = app()->getLocale();
+        app()->setLocale($locale);
+
+        // ===== Envío del correo =====
+        Mail::send('mail.orden_preparando', [
+            'orden'            => $orden,
+            'locale'           => $locale,
+            'fechaPreparacion' => $fechaPreparacion,
+        ], function ($m) use ($orden) {
+            $m->to($orden->usuario->email, $orden->usuario->nombre ?? 'Cliente')
+                ->subject(__('meta.your_order_is_being_prepared'));
+        });
+
+        // ===== Restaurar idioma original =====
+        app()->setLocale($previousLocale);
+
+        return response()->json(['success' => true]);
+    }
+
+
+
+
+
+
+    public function enviarCorreoSeguimiento(Request $request)
+    {
+        $orden = Ordenes::with('usuario')->findOrFail($request->orden_id);
+
+        // ===== Validar usuario =====
+        if (!$orden->usuario || !$orden->usuario->email) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El cliente no tiene correo registrado.',
+            ]);
+        }
+
+        // ===== Validar estado y fecha =====
+        if ($orden->estado_pedido_2 == 0 || empty($orden->fecha_pedido_2)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se puede enviar el correo: la orden aún no está marcada como "Enviada" o no tiene fecha de envío registrada.',
+            ]);
+        }
+
+        // ====== Mapeo de idioma por país ======
+        $locale = match ($orden->id_paises) {
+            1       => 'sv', // El Salvador
+            2       => 'en', // Estados Unidos
+            3       => 'ko', // Corea
+            default => 'sv', // fallback
+        };
+
+        // ====== Formato de fecha según país ======
+        $formatoFecha = $orden->id_paises == 1 ? 'd-m-Y' : 'm-d-Y';
+        $fechaEnvio   = $orden->fecha_pedido_2
+            ? \Carbon\Carbon::parse($orden->fecha_pedido_2)->format($formatoFecha)
+            : null;
+
+        // ===== Guardar idioma actual =====
+        $previousLocale = app()->getLocale();
+
+        // ===== Forzar idioma del correo =====
+        app()->setLocale($locale);
+
+        // ===== Enviar correo =====
+        Mail::send('mail.orden_seguimiento', [
+            'orden'      => $orden,
+            'locale'     => $locale,
+            'fechaEnvio' => $fechaEnvio,
+        ], function ($m) use ($orden) {
+            $m->to($orden->usuario->email, $orden->usuario->nombre ?? 'Cliente')
+                ->subject(__('meta.your_order_has_been_shipped'));
+        });
+
+        // ===== Restaurar idioma original =====
+        app()->setLocale($previousLocale);
+
+        return response()->json(['success' => true]);
+    }
+
+
+
+
 
 
 

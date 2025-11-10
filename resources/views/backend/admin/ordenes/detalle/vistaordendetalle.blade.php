@@ -148,6 +148,92 @@
 
 
 
+                    {{-- ==== SEGUIMIENTO ==== --}}
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            Seguimiento
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+
+                                {{-- Columna: Preparando orden --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="order-label d-block mb-1">Preparando orden</label>
+
+                                    <select id="estadoPedido1" class="form-control mb-2">
+                                        <option value="0" {{ ($ordenData['estado_pedido_1'] ?? 0) == 0 ? 'selected' : '' }}>Pendiente</option>
+                                        <option value="1" {{ ($ordenData['estado_pedido_1'] ?? 0) == 1 ? 'selected' : '' }}>Preparando orden</option>
+                                    </select>
+
+                                    <input type="date"
+                                           id="fechaPedido1"
+                                           class="form-control"
+                                           value="{{ $ordenData['fecha_pedido_1'] ?? '' }}">
+                                    <small class="text-muted">
+                                        Si marcas "Preparando orden", debes indicar la fecha.
+                                    </small>
+                                </div>
+
+                                {{-- Columna: Orden enviada --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="order-label d-block mb-1">Orden enviada</label>
+
+                                    <select id="estadoPedido2" class="form-control mb-2">
+                                        <option value="0" {{ ($ordenData['estado_pedido_2'] ?? 0) == 0 ? 'selected' : '' }}>Pendiente</option>
+                                        <option value="1" {{ ($ordenData['estado_pedido_2'] ?? 0) == 1 ? 'selected' : '' }}>Orden enviada</option>
+                                    </select>
+
+                                    <input type="date"
+                                           id="fechaPedido2"
+                                           class="form-control"
+                                           value="{{ $ordenData['fecha_pedido_2'] ?? '' }}">
+                                    <small class="text-muted">
+                                        Si marcas "Orden enviada", debes indicar la fecha.
+                                    </small>
+                                </div>
+
+                            </div>
+
+                            <button type="button"
+                                    class="btn btn-info btn-sm"
+                                    onclick="actualizarSeguimiento()">
+                                Guardar seguimiento
+                            </button>
+                        </div>
+                    </div>
+
+
+
+
+                    {{-- ==== NOTIFICACIONES AL CLIENTE ==== --}}
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            Notificaciones al Cliente
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">
+                                Usa los siguientes botones para enviar correos automáticos al cliente según el estado de la orden.
+                            </p>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="button"
+                                        class="btn btn-warning btn-sm mr-2"
+                                        onclick="enviarCorreoPreparando()">
+                                    ✉️ Enviar correo: Preparando orden
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-info btn-sm"
+                                        onclick="enviarCorreoSeguimiento()">
+                                    ✉️ Enviar correo: Seguimiento orden
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
 
                 </div>
 
@@ -334,5 +420,114 @@
                     toastr.error('No se pudo actualizar la visibilidad');
                 });
         }
+
+
+        function actualizarSeguimiento() {
+            const estado1 = document.getElementById('estadoPedido1').value;
+            const fecha1  = document.getElementById('fechaPedido1').value;
+            const estado2 = document.getElementById('estadoPedido2').value;
+            const fecha2  = document.getElementById('fechaPedido2').value;
+
+            // Validaciones front:
+            if (estado1 === '1' && !fecha1) {
+                toastr.error('La fecha de "Preparando orden" es requerida.');
+                return;
+            }
+            if (estado2 === '1' && !fecha2) {
+                toastr.error('La fecha de "Orden enviada" es requerida.');
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('orden_id', '{{ $ordenData['id'] }}');
+            formData.append('estado_pedido_1', estado1);
+            formData.append('fecha_pedido_1', fecha1);
+            formData.append('estado_pedido_2', estado2);
+            formData.append('fecha_pedido_2', fecha2);
+
+            axios.post("{{ route('admin.ordenes.seguimiento.update') }}", formData, {
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+                .then(function (response) {
+                    if (response.data && response.data.success) {
+                        toastr.success('Seguimiento actualizado');
+                    } else {
+                        toastr.error(response.data.message || 'No se pudo actualizar el seguimiento');
+                    }
+                })
+                .catch(function () {
+                    toastr.error('No se pudo actualizar el seguimiento');
+                });
+        }
+
+
+
+
+
+        function enviarCorreoPreparando() {
+            Swal.fire({
+                title: '¿Enviar correo al cliente?',
+                text: 'Se notificará que la orden está en preparación.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, enviar',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let formData = new FormData();
+                    formData.append('orden_id', '{{ $ordenData['id'] }}');
+
+                    axios.post("{{ route('admin.ordenes.email.preparando') }}", formData, {
+                        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                    })
+                        .then(function (response) {
+                            if (response.data && response.data.success) {
+                                toastr.success('Correo enviado correctamente');
+                            } else {
+                                toastr.error(response.data.message || 'No se pudo enviar el correo');
+                            }
+                        })
+                        .catch(function () {
+                            toastr.error('Error al enviar el correo');
+                        });
+                }
+            });
+        }
+
+        function enviarCorreoSeguimiento() {
+            Swal.fire({
+                title: '¿Enviar correo al cliente?',
+                text: 'Se notificará que la orden ha sido enviada.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, enviar',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let formData = new FormData();
+                    formData.append('orden_id', '{{ $ordenData['id'] }}');
+
+                    axios.post("{{ route('admin.ordenes.email.seguimiento') }}", formData, {
+                        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                    })
+                        .then(function (response) {
+                            if (response.data && response.data.success) {
+                                toastr.success('Correo enviado correctamente');
+                            } else {
+                                toastr.error(response.data.message || 'No se pudo enviar el correo');
+                            }
+                        })
+                        .catch(function () {
+                            toastr.error('Error al enviar el correo');
+                        });
+                }
+            });
+        }
+
+
+
+
     </script>
 @endsection

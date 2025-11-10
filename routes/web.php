@@ -204,9 +204,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/ordenes/estadoorden/editar', [AdminClienteController::class,'actualizarEstadoOrden'])->name('ordenes.estado.update');
     Route::post('/ordenes/visibilidad/editar', [AdminClienteController::class,'actualizarEstadoVisibleOrden'])
         ->name('ordenes.estado.visible.update');
+    Route::post('/ordenes/seguimiento/editar', [AdminClienteController::class,'actualizarSeguimientoOrden'])
+        ->name('ordenes.seguimiento.update');
 
+    Route::post('/ordenes/enviar-correo-preparando', [AdminClienteController::class, 'enviarCorreoPreparando'])
+        ->name('ordenes.email.preparando');
 
-
+    Route::post('/ordenes/enviar-correo-seguimiento', [AdminClienteController::class, 'enviarCorreoSeguimiento'])
+        ->name('ordenes.email.seguimiento');
 
 
 

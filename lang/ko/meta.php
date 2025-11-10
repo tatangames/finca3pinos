@@ -289,7 +289,21 @@ return [
     'order_detail' => '주문 상세',
     'shipping_unavailable' => '배송이 일시적으로 불가능합니다',
     'shipping_not_available_for_address' => '현재 이 주소로는 배송이 불가능합니다.',
+    'your_order_is_being_prepared' => '주문이 준비 중입니다',
 
+    'order_preparing_title' => '주문이 준비 중입니다!',
+    'go_to_store' => '상점으로 이동',
+    'thank_you_finca' => 'Finca 3 Pinos를 믿고 이용해 주셔서 감사합니다 ☕',
+    'we_are_happy_to_inform_you' => '주문이 있음을 알려드리게 되어 기쁩니다',
+    'is_being_prepared' => '준비 중입니다.',
+    'we_will_notify_when_shipped' => '패키지가 발송되면 다시 알림을 보내드리겠습니다.',
+    'your_order_has_been_shipped' => '주문이 발송되었습니다',
+    'your_order' => '주문',
+    'has_been_shipped_and_on_the_way' => '이미 발송되었으며 고객님께 배송 중입니다.',
+    'you_can_check_order_status' => '매장 내 내 패널에서 주문의 현재 상태를 확인할 수 있습니다.',
+    'view_my_order' => '내 주문 보기',
+    'preparation_date' => '준비 날짜',
+    'shipping_date' => '배송 날짜',
 
 
 
