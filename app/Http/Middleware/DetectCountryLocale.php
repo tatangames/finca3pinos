@@ -10,10 +10,10 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 class DetectCountryLocale
 {
     private const COUNTRY_TO_LOCALE = [
-        'SV' => 'sv',
-        'US' => 'en',
-        'CA' => 'en',
-        // resto => 'sv'
+        'SV' => 'sv', // El Salvador
+        'US' => 'en', // Estados Unidos
+        'CA' => 'en', // Canadá
+        'KR' => 'ko', // Corea del Sur
     ];
 
     public function handle($request, \Closure $next)
