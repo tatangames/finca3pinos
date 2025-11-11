@@ -177,6 +177,8 @@ class AdminClienteController extends Controller
                 ? Carbon::parse($orden->fecha_pedido_2)->format('Y-m-d')
                 : '',
 
+            'seguimiento' => $orden->seguimiento,
+
             'status'   => $statusNombre,
             'subtotal' => number_format($orden->subtotal, 2, '.', ','),
             'envio'    => number_format($orden->shipping_cost, 2, '.', ','),

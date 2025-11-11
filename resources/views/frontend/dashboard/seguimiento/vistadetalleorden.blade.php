@@ -257,6 +257,30 @@
         .item-line span.value {
             font-weight: 600;
         }
+
+        .order-tracking {
+            font-size: 14px;
+        }
+
+        /* Enlaces dentro del contenido de seguimiento */
+        .order-tracking a {
+            color: #0d6efd;              /* azul tipo enlace normal */
+            font-weight: normal;
+            text-decoration: underline;
+        }
+
+        /* Listas como en el editor */
+        .order-tracking ul,
+        .order-tracking ol {
+            margin: 0 0 0 1.5rem;
+            padding-left: 0;
+        }
+
+        .order-tracking li {
+            list-style: disc;
+        }
+
+
     </style>
 
     @php
@@ -322,7 +346,7 @@
 
                     <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.orders', [], false)) }}"
                        class="btn btn-back">
-                        ← {{ __('meta.back_to_orders') ?? 'Volver' }}
+                        ← {{ __('meta.back_to_orders') }}
                     </a>
                 </div>
 
@@ -334,11 +358,11 @@
                         @if($fechaOrden)
                             <span style="font-size: 14px">{{ $fechaOrden }}</span>
                         @endif
-                        @if(!empty($order->seguimiento))
-                            <span style="font-size: 14px">
-                                {{ __('meta.tracking') }}:
-                                &nbsp;{!! $order->seguimiento !!}
-                            </span>
+                        @if (!empty($order->seguimiento))
+                            <div class="order-tracking">
+                                <strong>{{ __('meta.tracking') }}:</strong>
+                                {!! $order->seguimiento !!}
+                            </div>
                         @endif
                     </div>
                 </div>

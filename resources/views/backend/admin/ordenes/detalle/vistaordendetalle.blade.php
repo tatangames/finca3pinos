@@ -216,8 +216,7 @@
                                       rows="5"
                                       class="form-control">{{ $ordenData['seguimiento'] ?? '' }}</textarea>
                             <small class="text-muted d-block mt-2">
-                                Aquí puedes guardar notas internas, enlaces de tracking, URLs de guía, etc.
-                                Solo es visible en el panel admin (según cómo lo manejes en backend).
+                                Enlaces de tracking, URLs de guía, para el Cliente
                             </small>
 
                             <button type="button"
@@ -356,19 +355,31 @@
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
 
-    {{-- CKEditor (incluye herramienta de links) --}}
+    {{-- CKEditor 5 --}}
     <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+
     <script>
-        // Inicializar CKEditor en textarea seguimiento
+        // Inicializar CKEditor 5
+        let seguimientoEditor = null;
+
         ClassicEditor
             .create(document.querySelector('#seguimiento'), {
                 toolbar: ['bold','italic','link','bulletedList','numberedList','undo','redo']
             })
-            .then(editor => { window.editor = editor; })
+            .then(editor => {
+                seguimientoEditor = editor;
+
+                // === Mostrar contenido al cargar ===
+                const contenido = `{!! addslashes($ordenData['seguimiento'] ?? '') !!}`;
+                if (contenido.trim() !== '') {
+                    editor.setData(contenido);
+                }
+            })
             .catch(error => console.error(error));
 
         function actualizarEstadoOrden() {
             const estadoId = document.getElementById('selectEstadoOrden').value;
+
             let formData = new FormData();
             formData.append('orden_id', '{{ $ordenData['id'] }}');
             formData.append('status_id', estadoId);
@@ -379,12 +390,15 @@
                 if (r.data && r.data.success) {
                     toastr.success('Actualizado');
                     setTimeout(() => location.reload(), 600);
-                } else toastr.error('No se pudo actualizar el estado');
+                } else {
+                    toastr.error(r.data.message || 'No se pudo actualizar el estado');
+                }
             }).catch(() => toastr.error('No se pudo actualizar el estado'));
         }
 
         function actualizarVisibleCliente() {
             const visible = document.getElementById('selectVisibleCliente').value;
+
             let formData = new FormData();
             formData.append('orden_id', '{{ $ordenData['id'] }}');
             formData.append('visible_cliente', visible);
@@ -394,9 +408,15 @@
             }).then(r => {
                 if (r.data && r.data.success) {
                     toastr.success('Visibilidad actualizada');
-                } else toastr.error(r.data.message || 'No se pudo actualizar la visibilidad');
+                } else {
+                    toastr.error(r.data.message || 'No se pudo actualizar la visibilidad');
+                }
             }).catch(() => toastr.error('No se pudo actualizar la visibilidad'));
         }
+
+
+
+
 
         function actualizarSeguimiento() {
             const estado1 = document.getElementById('estadoPedido1').value;
@@ -420,9 +440,9 @@
             formData.append('estado_pedido_2', estado2);
             formData.append('fecha_pedido_2', fecha2);
 
-            // también mandamos el texto de seguimiento si quieres guardarlo junto aquí
-            if (CKEDITOR.instances.seguimiento) {
-                formData.append('seguimiento', CKEDITOR.instances.seguimiento.getData());
+            // Si quieres mandar también las notas internas aquí:
+            if (seguimientoEditor) {
+                formData.append('seguimiento', seguimientoEditor.getData());
             }
 
             axios.post("{{ route('admin.ordenes.seguimiento.update') }}", formData, {
@@ -430,21 +450,31 @@
             }).then(r => {
                 if (r.data && r.data.success) {
                     toastr.success('Seguimiento actualizado');
-                } else toastr.error(r.data.message || 'No se pudo actualizar el seguimiento');
+                } else {
+                    toastr.error(r.data.message || 'No se pudo actualizar el seguimiento');
+                }
             }).catch(() => toastr.error('No se pudo actualizar el seguimiento'));
         }
 
         function guardarSeguimientoTexto() {
             let formData = new FormData();
             formData.append('orden_id', '{{ $ordenData['id'] }}');
-            formData.append('seguimiento', CKEDITOR.instances.seguimiento.getData());
+
+            if (seguimientoEditor) {
+                formData.append('seguimiento', seguimientoEditor.getData());
+            } else {
+                toastr.error('El editor todavía no está listo.');
+                return;
+            }
 
             axios.post("{{ route('admin.ordenes.seguimiento.ckeditor.update') }}", formData, {
                 headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
             }).then(r => {
                 if (r.data && r.data.success) {
                     toastr.success('Notas de seguimiento guardadas');
-                } else toastr.error(r.data.message || 'No se pudo guardar el seguimiento');
+                } else {
+                    toastr.error(r.data.message || 'No se pudo guardar el seguimiento');
+                }
             }).catch(() => toastr.error('No se pudo guardar el seguimiento'));
         }
 
@@ -458,14 +488,18 @@
                 cancelButtonText: 'Cancelar',
             }).then(result => {
                 if (!result.isConfirmed) return;
+
                 let formData = new FormData();
                 formData.append('orden_id', '{{ $ordenData['id'] }}');
 
                 axios.post("{{ route('admin.ordenes.email.preparando') }}", formData, {
                     headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 }).then(r => {
-                    if (r.data && r.data.success) toastr.success('Correo enviado correctamente');
-                    else toastr.error(r.data.message || 'No se pudo enviar el correo');
+                    if (r.data && r.data.success) {
+                        toastr.success('Correo enviado correctamente');
+                    } else {
+                        toastr.error(r.data.message || 'No se pudo enviar el correo');
+                    }
                 }).catch(() => toastr.error('Error al enviar el correo'));
             });
         }
@@ -480,14 +514,18 @@
                 cancelButtonText: 'Cancelar',
             }).then(result => {
                 if (!result.isConfirmed) return;
+
                 let formData = new FormData();
                 formData.append('orden_id', '{{ $ordenData['id'] }}');
 
                 axios.post("{{ route('admin.ordenes.email.seguimiento') }}", formData, {
                     headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 }).then(r => {
-                    if (r.data && r.data.success) toastr.success('Correo enviado correctamente');
-                    else toastr.error(r.data.message || 'No se pudo enviar el correo');
+                    if (r.data && r.data.success) {
+                        toastr.success('Correo enviado correctamente');
+                    } else {
+                        toastr.error(r.data.message || 'No se pudo enviar el correo');
+                    }
                 }).catch(() => toastr.error('Error al enviar el correo'));
             });
         }
