@@ -9,65 +9,61 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 class DetectCountryLocale
 {
-    /**
-     * Mapa PAÍS (ISO2) -> locale de Laravel
-     * Fallback global: 'sv' (idioma por defecto sin prefijo)
-     */
     private const COUNTRY_TO_LOCALE = [
-        'SV' => 'sv', // El Salvador -> sv (sin prefijo)
-        'US' => 'en', // USA/Canadá -> en (/en o /us si usas mapping)
+        'SV' => 'sv',
+        'US' => 'en',
         'CA' => 'en',
-        // resto: 'sv'
+        // resto => 'sv'
     ];
 
-    public function handle($request, Closure $next)
+    public function handle($request, \Closure $next)
     {
-        // 0) Si ya viene con locale/alias en la URL, continuar
-        $first = (string) $request->segment(1);
+        $first = strtolower((string) $request->segment(1));
 
-        $supportedLocales = array_keys(config('laravellocalization.supportedLocales', [])); // p.ej. ['en','sv','ko']
-        $localesMapping   = array_keys(config('laravellocalization.localesMapping', []));   // p.ej. ['us','sv','kr']
+        $supportedLocales = array_keys(config('laravellocalization.supportedLocales', []));
+        $localesMapping   = array_keys(config('laravellocalization.localesMapping', []));
+        $acceptSegments   = array_unique(array_merge($supportedLocales, $localesMapping));
 
-        $acceptSegments = array_unique(array_merge($supportedLocales, $localesMapping));
-
+        // 0) Si ya viene con /en, /sv, /ko, etc -> seguir normal
         if (in_array($first, $acceptSegments, true)) {
+            // opcional: guardar lo que viene en la URL para futuras peticiones
+            Session::put('locale', $first);
             return $next($request);
         }
 
-        // 1) Respeta elección manual almacenada en sesión
+        // 1) Respeta elección manual
         if (Session::get('locale_forced') && ($saved = Session::get('locale'))) {
-            return redirect()->to(LaravelLocalization::getLocalizedURL($saved));
+            return $this->redirectIfNeeded($request, $saved, $next);
         }
 
-        // 2) Fuerzas locales en entorno local (dev)
+        // 2) Forzar en local (dev)
         if (app()->environment('local')) {
             if ($force = env('LOCALE_FORCE')) {
                 Session::put('locale', $force);
                 Session::put('locale_forced', true);
-                return redirect()->to(LaravelLocalization::getLocalizedURL($force));
+                return $this->redirectIfNeeded($request, $force, $next);
             }
             if ($forceCountry = env('REGION_FORCE')) {
                 $guess = self::COUNTRY_TO_LOCALE[strtoupper($forceCountry)] ?? 'sv';
                 Session::put('locale', $guess);
                 Session::put('locale_forced', true);
-                return redirect()->to(LaravelLocalization::getLocalizedURL($guess));
+                return $this->redirectIfNeeded($request, $guess, $next);
             }
         }
 
-        // 3) Cloudflare: CF-IPCountry primero
+        // 3) Cloudflare
         $iso = strtoupper($request->header('CF-IPCountry', ''));
         if ($iso && $iso !== 'XX' && $iso !== 'T1') {
             $locale = self::COUNTRY_TO_LOCALE[$iso] ?? 'sv';
             Session::put('locale', $locale);
-            return redirect()->to(LaravelLocalization::getLocalizedURL($locale));
+            return $this->redirectIfNeeded($request, $locale, $next);
         }
 
-        // 4) IP real (TrustProxies ya ajusta $request->ip())
+        // 4) IP real + GeoIP
         $ip = $this->clientIp($request);
-
-        // 5) GeoIP como fallback
         $country = '';
         $city = 'N/A';
+
         try {
             $loc     = geoip()->getLocation($ip);
             $country = strtoupper($loc->iso_code ?? '');
@@ -82,15 +78,39 @@ class DetectCountryLocale
             'city'    => $city,
             'cf_iso'  => $iso ?: 'N/A',
             'picked'  => $locale,
-            'headers' => [
-                'X-Forwarded-For'   => $request->header('X-Forwarded-For'),
-                'CF-Connecting-IP'  => $request->header('CF-Connecting-IP'),
-                'X-Real-IP'         => $request->header('X-Real-IP'),
-            ],
         ]);
 
         Session::put('locale', $locale);
-        return redirect()->to(LaravelLocalization::getLocalizedURL($locale));
+        return $this->redirectIfNeeded($request, $locale, $next);
+    }
+
+    private function redirectIfNeeded($request, string $locale, \Closure $next)
+    {
+        $hideDefault = (bool) config('laravellocalization.hideDefaultLocaleInURL', true);
+        $default     = config('laravellocalization.defaultLocale', config('app.locale', 'sv'));
+
+        $supportedLocales = array_keys(config('laravellocalization.supportedLocales', []));
+        $localesMapping   = array_keys(config('laravellocalization.localesMapping', []));
+        $acceptSegments   = array_unique(array_merge($supportedLocales, $localesMapping));
+
+        $first = strtolower((string) $request->segment(1));
+
+        // Caso: locale = default oculto (sv), ya estamos en URL sin prefijo -> NO redirigir
+        if ($hideDefault && $locale === $default && !in_array($first, $acceptSegments, true)) {
+            app()->setLocale($locale);
+            return $next($request);
+        }
+
+        // Construir URL localizada
+        $target = LaravelLocalization::getLocalizedURL($locale, null, [], true);
+
+        // Si ya estamos en la misma URL -> evitar loop
+        if (rtrim($target, '/') === rtrim($request->fullUrl(), '/')) {
+            app()->setLocale($locale);
+            return $next($request);
+        }
+
+        return redirect()->to($target);
     }
 
     private function clientIp($request): string
@@ -101,6 +121,7 @@ class DetectCountryLocale
             $parts = array_map('trim', explode(',', $xff));
             if (!empty($parts[0])) return $parts[0];
         }
+
         if ($rip = $request->header('X-Real-IP')) return $rip;
 
         return $request->ip();
