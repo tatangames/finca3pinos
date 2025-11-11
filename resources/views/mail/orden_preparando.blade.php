@@ -37,8 +37,20 @@
 
     <p>{{ __('meta.we_will_notify_when_shipped') }}</p>
 
-    <p style="margin-top: 20px;">
-        <a href="{{ url('/') }}" class="btn">{{ __('meta.go_to_store') }}</a>
+    <p style="margin-top: 30px; text-align: center;">
+        <a href="{{ url('/') }}"
+           style="background:#b48a4e;
+              color:#ffffff !important;
+              padding:12px 24px;
+              text-decoration:none !important;
+              border-radius:6px;
+              border:1px solid #b48a4e;
+              font-weight:bold;
+              font-family:Arial, sans-serif;
+              display:inline-block;
+              text-align:center;">
+            {{ __('meta.go_to_store') }}
+        </a>
     </p>
 
     <div class="footer">
