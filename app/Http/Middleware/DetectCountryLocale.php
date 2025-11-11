@@ -9,14 +9,17 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 class DetectCountryLocale
 {
+    /**
+     * Países con locales específicos.
+     * Todo país no listado usará 'en' (inglés).
+     */
     private const COUNTRY_TO_LOCALE = [
-        'SV' => 'sv', // El Salvador
-        'US' => 'en', // Estados Unidos
-        'CA' => 'en', // Canadá
-        'KR' => 'ko', // Corea del Sur
+        'SV' => 'sv', // 🇸🇻 El Salvador → español
+        'KR' => 'ko', // 🇰🇷 Corea del Sur → coreano
+        // Todos los demás → inglés
     ];
 
-    public function handle($request, \Closure $next)
+    public function handle($request, Closure $next)
     {
         $first = strtolower((string) $request->segment(1));
 
@@ -24,9 +27,8 @@ class DetectCountryLocale
         $localesMapping   = array_keys(config('laravellocalization.localesMapping', []));
         $acceptSegments   = array_unique(array_merge($supportedLocales, $localesMapping));
 
-        // 0) Si ya viene con /en, /sv, /ko, etc -> seguir normal
+        // 0) Si ya viene con /en, /sv, /ko → seguir normal
         if (in_array($first, $acceptSegments, true)) {
-            // opcional: guardar lo que viene en la URL para futuras peticiones
             Session::put('locale', $first);
             return $next($request);
         }
@@ -36,7 +38,7 @@ class DetectCountryLocale
             return $this->redirectIfNeeded($request, $saved, $next);
         }
 
-        // 2) Forzar en local (dev)
+        // 2) Forzar en entorno local (para pruebas)
         if (app()->environment('local')) {
             if ($force = env('LOCALE_FORCE')) {
                 Session::put('locale', $force);
@@ -44,22 +46,22 @@ class DetectCountryLocale
                 return $this->redirectIfNeeded($request, $force, $next);
             }
             if ($forceCountry = env('REGION_FORCE')) {
-                $guess = self::COUNTRY_TO_LOCALE[strtoupper($forceCountry)] ?? 'sv';
+                $guess = self::COUNTRY_TO_LOCALE[strtoupper($forceCountry)] ?? 'en';
                 Session::put('locale', $guess);
                 Session::put('locale_forced', true);
                 return $this->redirectIfNeeded($request, $guess, $next);
             }
         }
 
-        // 3) Cloudflare
+        // 3) Cloudflare (si está activo)
         $iso = strtoupper($request->header('CF-IPCountry', ''));
         if ($iso && $iso !== 'XX' && $iso !== 'T1') {
-            $locale = self::COUNTRY_TO_LOCALE[$iso] ?? 'sv';
+            $locale = self::COUNTRY_TO_LOCALE[$iso] ?? 'en';
             Session::put('locale', $locale);
             return $this->redirectIfNeeded($request, $locale, $next);
         }
 
-        // 4) IP real + GeoIP
+        // 4) GeoIP como respaldo
         $ip = $this->clientIp($request);
         $country = '';
         $city = 'N/A';
@@ -70,7 +72,7 @@ class DetectCountryLocale
             $city    = $loc->city ?? 'N/A';
         } catch (\Throwable $e) {}
 
-        $locale = self::COUNTRY_TO_LOCALE[$country] ?? 'sv';
+        $locale = self::COUNTRY_TO_LOCALE[$country] ?? 'en';
 
         Log::info('🌎 GEOIP detect', [
             'ip'      => $ip,
@@ -84,7 +86,7 @@ class DetectCountryLocale
         return $this->redirectIfNeeded($request, $locale, $next);
     }
 
-    private function redirectIfNeeded($request, string $locale, \Closure $next)
+    private function redirectIfNeeded($request, string $locale, Closure $next)
     {
         $hideDefault = (bool) config('laravellocalization.hideDefaultLocaleInURL', true);
         $default     = config('laravellocalization.defaultLocale', config('app.locale', 'sv'));
@@ -95,7 +97,7 @@ class DetectCountryLocale
 
         $first = strtolower((string) $request->segment(1));
 
-        // Caso: locale = default oculto (sv), ya estamos en URL sin prefijo -> NO redirigir
+        // Caso: idioma por defecto oculto (sv) y sin prefijo → no redirigir
         if ($hideDefault && $locale === $default && !in_array($first, $acceptSegments, true)) {
             app()->setLocale($locale);
             return $next($request);
@@ -104,7 +106,7 @@ class DetectCountryLocale
         // Construir URL localizada
         $target = LaravelLocalization::getLocalizedURL($locale, null, [], true);
 
-        // Si ya estamos en la misma URL -> evitar loop
+        // Evitar loops
         if (rtrim($target, '/') === rtrim($request->fullUrl(), '/')) {
             app()->setLocale($locale);
             return $next($request);
