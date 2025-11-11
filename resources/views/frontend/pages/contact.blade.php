@@ -416,8 +416,8 @@
                                                 <div class="align-default ">
                                                     <ul class="social-list">
                                                         <li>
-                                                            <a href="https://www.facebook.com/finca3pinos" target="_blank" rel="noopener">
-                                                                <img src="{{ asset('images/facebook.png') }}" alt="Facebook" class="social-icon">
+                                                            <a href="https://www.tiktok.com/@finca3pinos" target="_blank" rel="noopener">
+                                                                <img src="{{ asset('images/tiktok.png') }}" alt="TikTok" class="social-icon">
                                                             </a>
                                                         </li>
                                                         <li>

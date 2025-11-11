@@ -91,7 +91,6 @@ return new class extends Migration
 
             $table->boolean('visible_cliente')->default(0);
 
-
         });
     }
 

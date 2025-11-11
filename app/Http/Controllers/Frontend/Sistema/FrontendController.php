@@ -157,7 +157,7 @@ class FrontendController extends Controller
                 ]);
             });
 
-            // 2️⃣ Enviar correo (sin afterCommit)
+            // 2️⃣ Enviar correo AL ADMINISTRADOR DEL SITIO
             Mail::to('tatangamess@gmail.com')->queue(new ContactMail($data));
 
            return ['success' => 1];

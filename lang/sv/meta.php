@@ -103,7 +103,7 @@ return [
     'contact_v1' => '¿Tienes preguntas sobre nuestros cafés o deseas realizar un pedido especial? En Finca 3 Pinos estamos para atenderte. Escríbenos y uno de nuestros especialistas te responderá lo antes posible.',
     'contact_v2' => 'Contáctanos',
     'contact_v3' => 'El Pinar, Cantón Montenegro Metapán, Santa Ana Norte.',
-    'contact_v4' => 'Social',
+    'contact_v4' => 'Redes Sociales',
     'contact_v5' => 'Nombre',
     'contact_v6' => 'Correo',
     'contact_v7' => 'Mensaje',
