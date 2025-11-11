@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * REGION CONTENIDO - TRASLADO
      */
     public function up(): void
     {

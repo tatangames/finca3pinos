@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * ARRAY ITEMS DE LA ORDEN
      */
     public function up(): void
     {

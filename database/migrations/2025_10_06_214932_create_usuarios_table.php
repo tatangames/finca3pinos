@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * REGISTRO DE USUARIOS / CLIENTES
      */
     public function up(): void
     {
@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('password', 255);
             $table->datetime('fecha_registro');
             $table->string('google_id', 500)->nullable();
+            $table->rememberToken()->nullable();
         });
     }
 

@@ -74,8 +74,6 @@ return new class extends Migration
             $table->string('pagadito_ref', 150)->nullable();
             $table->string('pagadito_status', 50)->nullable();
 
-
-
             // ESTADOS DE LA ORDEN TRACKING
             // Preparando Pedido
             $table->boolean('estado_pedido_1')->default(0)->nullable();
@@ -90,7 +88,6 @@ return new class extends Migration
             $table->text('seguimiento')->nullable();
 
             $table->boolean('visible_cliente')->default(0);
-
         });
     }
 
