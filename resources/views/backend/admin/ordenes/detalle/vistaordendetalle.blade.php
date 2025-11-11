@@ -198,6 +198,7 @@
 
                                 <button type="button"
                                         class="btn btn-info btn-sm"
+                                        style="margin: 8px"
                                         onclick="enviarCorreoSeguimiento()">
                                     ✉️ Enviar correo: Seguimiento orden
                                 </button>
