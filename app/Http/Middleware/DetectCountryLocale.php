@@ -9,14 +9,11 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 class DetectCountryLocale
 {
-    /**
-     * Mapa explícito: solo las excepciones.
-     * Todo país no listado caerá automáticamente a 'en' (inglés).
-     */
     private const COUNTRY_TO_LOCALE = [
-        'SV' => 'sv', // El Salvador → español (por defecto)
-        'KR' => 'ko', // Corea del Sur → coreano
-        // todos los demás → inglés
+        'SV' => 'sv', // El Salvador
+        'US' => 'en', // Estados Unidos
+        'CA' => 'en', // Canadá
+        'KR' => 'ko', // Corea del Sur
     ];
 
     public function handle($request, \Closure $next)
@@ -27,8 +24,9 @@ class DetectCountryLocale
         $localesMapping   = array_keys(config('laravellocalization.localesMapping', []));
         $acceptSegments   = array_unique(array_merge($supportedLocales, $localesMapping));
 
-        // 0) Si ya viene con /en, /sv, /ko → continuar
+        // 0) Si ya viene con /en, /sv, /ko, etc -> seguir normal
         if (in_array($first, $acceptSegments, true)) {
+            // opcional: guardar lo que viene en la URL para futuras peticiones
             Session::put('locale', $first);
             return $next($request);
         }
@@ -38,7 +36,7 @@ class DetectCountryLocale
             return $this->redirectIfNeeded($request, $saved, $next);
         }
 
-        // 2) Forzar en local (solo dev)
+        // 2) Forzar en local (dev)
         if (app()->environment('local')) {
             if ($force = env('LOCALE_FORCE')) {
                 Session::put('locale', $force);
@@ -46,22 +44,22 @@ class DetectCountryLocale
                 return $this->redirectIfNeeded($request, $force, $next);
             }
             if ($forceCountry = env('REGION_FORCE')) {
-                $guess = self::COUNTRY_TO_LOCALE[strtoupper($forceCountry)] ?? 'en';
+                $guess = self::COUNTRY_TO_LOCALE[strtoupper($forceCountry)] ?? 'sv';
                 Session::put('locale', $guess);
                 Session::put('locale_forced', true);
                 return $this->redirectIfNeeded($request, $guess, $next);
             }
         }
 
-        // 3) Cloudflare (más confiable)
+        // 3) Cloudflare
         $iso = strtoupper($request->header('CF-IPCountry', ''));
         if ($iso && $iso !== 'XX' && $iso !== 'T1') {
-            $locale = self::COUNTRY_TO_LOCALE[$iso] ?? 'en';
+            $locale = self::COUNTRY_TO_LOCALE[$iso] ?? 'sv';
             Session::put('locale', $locale);
             return $this->redirectIfNeeded($request, $locale, $next);
         }
 
-        // 4) GeoIP como respaldo
+        // 4) IP real + GeoIP
         $ip = $this->clientIp($request);
         $country = '';
         $city = 'N/A';
@@ -72,7 +70,7 @@ class DetectCountryLocale
             $city    = $loc->city ?? 'N/A';
         } catch (\Throwable $e) {}
 
-        $locale = self::COUNTRY_TO_LOCALE[$country] ?? 'en';
+        $locale = self::COUNTRY_TO_LOCALE[$country] ?? 'sv';
 
         Log::info('🌎 GEOIP detect', [
             'ip'      => $ip,
@@ -97,15 +95,16 @@ class DetectCountryLocale
 
         $first = strtolower((string) $request->segment(1));
 
-        // Caso: locale = default (sv) y sin prefijo → no redirigir
+        // Caso: locale = default oculto (sv), ya estamos en URL sin prefijo -> NO redirigir
         if ($hideDefault && $locale === $default && !in_array($first, $acceptSegments, true)) {
             app()->setLocale($locale);
             return $next($request);
         }
 
+        // Construir URL localizada
         $target = LaravelLocalization::getLocalizedURL($locale, null, [], true);
 
-        // Evitar loops
+        // Si ya estamos en la misma URL -> evitar loop
         if (rtrim($target, '/') === rtrim($request->fullUrl(), '/')) {
             app()->setLocale($locale);
             return $next($request);
@@ -117,13 +116,14 @@ class DetectCountryLocale
     private function clientIp($request): string
     {
         if ($cip = $request->header('CF-Connecting-IP')) return $cip;
+
         if ($xff = $request->header('X-Forwarded-For')) {
             $parts = array_map('trim', explode(',', $xff));
             if (!empty($parts[0])) return $parts[0];
         }
+
         if ($rip = $request->header('X-Real-IP')) return $rip;
 
         return $request->ip();
     }
 }
-
