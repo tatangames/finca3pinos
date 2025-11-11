@@ -679,6 +679,7 @@ class UsuarioAuthController extends Controller
 
     public function actualizarPerfil(Request $request)
     {
+
         $userId = Auth::id();
 
         // 1) Validación: todos los campos opcionales

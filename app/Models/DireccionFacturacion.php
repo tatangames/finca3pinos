@@ -18,7 +18,7 @@ class DireccionFacturacion extends Model
         'direccion',
         'ciudad',
         'estado',
-        'codigo_postal',
+        'zipcode',
         'telefono',
     ];
 

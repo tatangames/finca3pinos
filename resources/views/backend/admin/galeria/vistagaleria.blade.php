@@ -24,7 +24,7 @@
             <div class="col-sm-6">
                 <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus-square"></i>
-                    Nueva Imagen
+                    Nueva Imagen/Video
                 </button>
             </div>
 

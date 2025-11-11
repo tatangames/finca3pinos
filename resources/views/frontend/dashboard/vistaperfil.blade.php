@@ -875,7 +875,7 @@
                         <div class="form-group">
                             <label>{{ __('meta.postal_code') }}</label>
                             <input id="codigo_postal" name="codigo_postal" type="text" maxlength="20"
-                                   value="{{ $arrayDireccionFactura->codigo_postal ?? '' }}"
+                                   value="{{ $arrayDireccionFactura->zipcode ?? '' }}"
                                    placeholder="{{ __('meta.postal_code') }}">
                         </div>
 
