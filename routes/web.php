@@ -350,6 +350,8 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
 
 
+
+
 /// ==== RUTAS PARA CARRITO DE COMPRAS ====
 // agregar al carrito
 Route::post('/cart/add',   [CartController::class,'add'])->name('cart.add');

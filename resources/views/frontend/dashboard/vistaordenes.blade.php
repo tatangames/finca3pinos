@@ -457,7 +457,7 @@
                 @else
                     <div class="empty">
                         <h4>{{ __('meta.no_orders_yet') }}</h4>
-                        <a class="btn btn-order" href="#"><span>{{ __('meta.gotoshop') }}</span></a>
+                        <a class="btn btn-order" href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.products', [], false)) }}"><span>{{ __('meta.gotoshop') }}</span></a>
                     </div>
                 @endif
             </div>

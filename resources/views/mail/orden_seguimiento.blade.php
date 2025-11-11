@@ -9,8 +9,8 @@
         h2 { color: #2a58ff; }
         .footer { margin-top: 20px; font-size: 12px; color: #777; }
         .btn {
-            background: #ffffff;
-            color: #2a58ff;
+            background: #2a58ff;
+            color: #ffffff;
             padding: 10px 18px;
             text-decoration: none;
             border-radius: 5px;
