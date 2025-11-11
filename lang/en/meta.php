@@ -290,7 +290,6 @@ return [
     'shipping_unavailable' => 'Shipping temporarily unavailable',
     'shipping_not_available_for_address' => 'Shipping is not available for this address at the moment.',
     'your_order_is_being_prepared' => 'Your order is being prepared',
-
     'order_preparing_title' => 'Your order is being prepared!',
     'go_to_store' => 'Go to store',
     'thank_you_finca' => 'Thank you for trusting Finca 3 Pinos ☕',
@@ -304,6 +303,8 @@ return [
     'view_my_order' => 'View my order',
     'preparation_date' => 'Preparation date',
     'shipping_date' => 'Shipping date',
+    'go_back' => 'Go back',
+    'no_additional_data' => 'No additional data.',
 
 
 

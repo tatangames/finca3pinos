@@ -596,10 +596,6 @@
                         </button>
                     </form>
                 </div>
-
-
-
-
             </div>
         </div>
     </div>
@@ -663,9 +659,6 @@
                 input.removeAttribute('aria-invalid');
             }
 
-
-
-
             function showLoadingButton() {
                 btn.classList.add('loading');
                 btn.disabled = true;
@@ -674,10 +667,6 @@
                 btn.classList.remove('loading');
                 btn.disabled = false;
             }
-
-
-
-
 
             function validate() {
                 let ok = true;
@@ -1009,10 +998,6 @@
             activate('login');
         })();
     </script>
-
-
-
-
 
 
     {{-- Superior (Newsletter) block --}}

@@ -185,16 +185,18 @@
                         <h4 class="header-widget">{{ __('meta.siguenos') }}</h4>
                         <ul class="social-icons-list">
                             <li>
-                                <a href="https://facebook.com/finca3pinos" target="_blank">
-                                    <span class="fa fa-facebook"></span> Facebook
-                                </a>
-                            </li>
-                            <li>
                                 <a href="https://instagram.com/finca3pinos" target="_blank">
                                     <span class="fa fa-instagram"></span> Instagram
                                 </a>
                             </li>
-
+                            <li>
+                                <a href="https://www.tiktok.com/@finca3pinos" target="_blank">
+                                    <img src="{{ asset('images/logotik.png') }}"
+                                         alt="TikTok"
+                                         style="width:20px;height:20px;vertical-align:middle;margin-right:6px;">
+                                    TikTok
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

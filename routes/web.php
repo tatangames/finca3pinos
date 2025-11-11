@@ -30,7 +30,6 @@ use App\Http\Controllers\Auth\GoogleController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 
-
 // ===============================================
 //  RUTAS DE LOGIN CON GOOGLE
 // ===============================================
@@ -167,62 +166,55 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::post('/producto/presentacion/editar', [CategoriasController::class,'editarProductoPresentacion']);
 
     // PAIS
-
     Route::get('/paises', [PaisesController::class, 'vistaPaises'])->name('paises');
     Route::get('/paises/index/tabla', [PaisesController::class, 'tablaPaises']);
     Route::post('/paises/informacion', [PaisesController::class,'informacionPais']);
     Route::post('/paises/nuevo', [PaisesController::class,'registrarNuevoPais']);
     Route::post('/paises/editar', [PaisesController::class,'editarPais']);
 
+    // DEPARTAMENTOS
     Route::get('/departamentos/index/{idpais}', [PaisesController::class, 'vistaDepartamentos']);
     Route::get('/departamentos/tabla/{idpais}', [PaisesController::class, 'tablaDepartamentos']);
     Route::post('/departamentos/informacion', [PaisesController::class,'informacionDepartamento']);
     Route::post('/departamentos/nuevo', [PaisesController::class,'registrarNuevoDepartamento']);
     Route::post('/departamentos/editar', [PaisesController::class,'editarDepartamento']);
 
-    Route::get('/departamentos/index/{idpais}', [PaisesController::class, 'vistaDepartamentos']);
-    Route::get('/departamentos/tabla/{idpais}', [PaisesController::class, 'tablaDepartamentos']);
-    Route::post('/departamentos/informacion', [PaisesController::class,'informacionDepartamento']);
-    Route::post('/departamentos/nuevo', [PaisesController::class,'registrarNuevoDepartamento']);
-    Route::post('/departamentos/editar', [PaisesController::class,'editarDepartamento']);
-
+    // MUNICIPIOS
     Route::get('/municipios/index/{idpais}', [PaisesController::class, 'vistaMunicipios']);
     Route::get('/municipios/tabla/{idpais}', [PaisesController::class, 'tablaMunicipios']);
     Route::post('/municipios/informacion', [PaisesController::class,'informacionMunicipio']);
     Route::post('/municipios/nuevo', [PaisesController::class,'registrarNuevoMunicipio']);
     Route::post('/municipios/editar', [PaisesController::class,'editarMunicipio']);
 
-
-
+    // REGISTRO CLIENTES
     Route::get('/clientes', [AdminClienteController::class, 'vistaClientes'])->name('clientes');
     Route::get('/clientes/index/tabla', [AdminClienteController::class, 'tablaClientes']);
 
+    // ORDENES
     Route::get('/ordenes', [AdminClienteController::class, 'vistaOrdenes'])->name('ordenes');
     Route::get('/ordenes/index/tabla', [AdminClienteController::class, 'tablaOrdenes']);
 
+    // DETALLE ORDEN
     Route::get('/ordenes/detalle/index/{id}', [AdminClienteController::class, 'vistaOrdenDetalle']);
+    // editar estado de la orden
     Route::post('/ordenes/estadoorden/editar', [AdminClienteController::class,'actualizarEstadoOrden'])->name('ordenes.estado.update');
+    // visibilidad al cliente de la orden
     Route::post('/ordenes/visibilidad/editar', [AdminClienteController::class,'actualizarEstadoVisibleOrden'])
         ->name('ordenes.estado.visible.update');
+    // editar seguimiento orden
     Route::post('/ordenes/seguimiento/editar', [AdminClienteController::class,'actualizarSeguimientoOrden'])
         ->name('ordenes.seguimiento.update');
+    // editar ckeditor
     Route::post('/ordenes/seguimiento/ckeditor/editar', [AdminClienteController::class,'actualizarSeguimientoOrdenCkEditor'])
         ->name('ordenes.seguimiento.ckeditor.update');
-
+    // enviar correo de preparando orden
     Route::post('/ordenes/enviar-correo-preparando', [AdminClienteController::class, 'enviarCorreoPreparando'])
         ->name('ordenes.email.preparando');
 
+    // enviar correo de seguimiento
     Route::post('/ordenes/enviar-correo-seguimiento', [AdminClienteController::class, 'enviarCorreoSeguimiento'])
         ->name('ordenes.email.seguimiento');
-
-
-
-
-
 });
-
-
-
 
 
 Route::middleware(['detect.country.locale'])->group(function () {
@@ -261,6 +253,7 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.passwordrequest'), [UsuarioAuthController::class, 'showIngresarCorreoForm'])
             ->name('user.password.request');
 
+        // INICIO DE SESION CLIENTE
         Route::post('/login', [UsuarioAuthController::class, 'loginUsuario'])->name('user.login.process');
         Route::post('/logout', [UsuarioAuthController::class, 'logoutUsuario'])->name('user.logout');
         Route::post('/request-code', [UsuarioAuthController::class, 'solicitarCodigoCorreo']);
@@ -291,14 +284,6 @@ Route::middleware(['detect.country.locale'])->group(function () {
         // vista detalle de la orden
         Route::get(LaravelLocalization::transRoute('routes.details_order'), [OrdenesController::class, 'vistaMisOrdenesDetalle'])
             ->name('user.orders.detail');
-
-
-
-
-
-
-
-
 
 
 
@@ -354,21 +339,12 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
 
 
-
+        // INICIAR PAGADITO - GUARDAR ORDEN
         Route::post('/checkout/pagadito/init', [PagaditoController::class, 'init'])
             ->name('checkout.pagadito.init');
 
-        Route::get('/checkout/pagadito/ok', [PagaditoController::class, 'ok'])
-            ->name('checkout.pagadito.ok');
-
-        Route::get('/checkout/pagadito/cancel', [PagaditoController::class, 'cancel'])
-            ->name('checkout.pagadito.cancel');
-
-
+        // RETORNO PAGADITO - CONFIRMANDO ORDEN
         Route::get('/pagadito/retorno', [PagaditoController::class, 'retorno'])->name('pagadito.retorno');
-
-
-
     });
 });
 

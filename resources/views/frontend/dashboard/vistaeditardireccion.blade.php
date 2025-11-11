@@ -702,10 +702,6 @@
                 })()
             };
 
-
-
-
-
             // ===== MASTER de Municipios =====
             const MUNICIPIO_MASTER = (() => {
                 if(!selMun) return [];
@@ -747,7 +743,6 @@
                     selMun.classList.remove('is-placeholder');
                 }
             }
-
 
             // ===== Filtro de departamentos por país (require data-pais en <option>) =====
             const filtrarDepartamentos = (idPais) => {
@@ -815,7 +810,6 @@
             attachAutoClear(selMun,       fgMun,    () => selMun.value !== '' && selMun.selectedIndex > 0);
 
             // ===== URLS / CSRF =====
-            const UPDATE_URL = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.update.direction', ['id' => $address->id], false)) }}";
             const CSRF = (document.querySelector('meta[name=\"csrf-token\"]')?.getAttribute('content'))
                 || (form?.querySelector('input[name=_token]')?.value) || '';
 
@@ -834,10 +828,6 @@
                 }
             }
             function getVal(el){ return (el?.value ?? '').trim(); }
-
-            // ===== Lógica por país (CIUDAD/PROVINCIA/POSTAL ocultos para ES) =====
-
-
 
                 // === Helpers "duros" para mostrar/ocultar ===
                 function hardHide(wrap, ctrl){
@@ -860,15 +850,10 @@
                 ctrl.required = !!required;
             }
 
-
             function aplicarEstadoPorPais(rawId){
                 const id  = parseInt(rawId, 10) || 0;
                 const isES = id === 1;
                 const isUS = id === 2;
-
-                // Asegura que estas variables existen en tu scope (ya las tienes arriba)
-                // boxDep, boxMun, boxCity, boxProvincia, boxPostal
-                // selDep, selMun, inpCiudad, inpProvincia, inpPostal
 
                 if (isES){
                     // 🇸🇻 El Salvador: Dep + Mun visibles, ciudad/estado/postal ocultos
@@ -897,8 +882,6 @@
                     clearSelectToPlaceholder(selMun);
                     return;
                 }
-
-
 
                 // 🌎 Otros países: ocultar Dep y Mun, mostrar todos los demás
                 hardHide(boxDep, selDep);
@@ -930,12 +913,7 @@
             });
 
 
-
-
-
-
-
-    // ===== Listeners =====
+            // ===== Listeners =====
             selPais?.addEventListener('change', function(){
                 aplicarEstadoPorPais(this.value);
                 const paisId = parseInt(this.value || '0', 10);

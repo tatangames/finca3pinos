@@ -3,8 +3,6 @@
 @section('title', __('meta.title'))
 
 @section('content')
-
-
     <style>
 
         /* ============================================================
@@ -376,7 +374,6 @@
         </div>
     </header>
 
-
     <div class="container">
         <!-- Content -->
         <div class="margin-top">
@@ -513,11 +510,7 @@
                                                                 <div class="wpcf7-response-output"
                                                                      aria-hidden="true"></div>
                                                             </form>
-
-
                                                         </section>
-
-
                                                     </div>
                                                 </div>
                                             </div>
@@ -550,7 +543,6 @@
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
 
     <script>
-
         document.addEventListener("DOMContentLoaded", function () {
             const textarea = document.getElementById("mensaje-form");
             const counter = document.getElementById("msg-count");
@@ -577,48 +569,17 @@
             });
         });
 
-        const currentLocale = "{{ app()->getLocale() }}"; // 'sv', 'en', 'es', etc.
-
         function showError(el, msg) {
             el.textContent = msg || '';
             el.style.display = msg ? 'block' : 'none';
         }
 
-        function getContactMessages() {
-            let msgCampoRequerido = "";
-            let msgCorreoNoValido = "";
-            let msgEnviado = "";
-            let msgNoEnviado = "";
-
-            switch (currentLocale) {
-                case 'sv':
-                    msgCampoRequerido = "{{ __('meta.contact_v9') }}"; // 'Campo requerido' en sv
-                    msgCorreoNoValido = "{{ __('meta.contact_v10') }}"; // 'Correo no válido' en sv
-                    msgEnviado = "{{ __('meta.contact_v11') }}";
-                    msgNoEnviado = "{{ __('meta.msg_not_send') }}";
-                    break;
-                case 'en':
-                    msgCampoRequerido = "{{ __('meta.contact_v9', [], 'en') }}";
-                    msgCorreoNoValido = "{{ __('meta.contact_v10', [], 'en') }}";
-                    msgEnviado = "{{ __('meta.contact_v11', [], 'en') }}";
-                    msgNoEnviado = "{{ __('meta.msg_not_send') }}";
-                    break;
-                case 'ko':
-                    msgCampoRequerido = "{{ __('meta.contact_v9', [], 'ko') }}";
-                    msgCorreoNoValido = "{{ __('meta.contact_v10', [], 'ko') }}";
-                    msgEnviado = "{{ __('meta.contact_v11', [], 'ko') }}";
-                    msgNoEnviado = "{{ __('meta.msg_not_send') }}";
-                    break;
-                default: // español u otro
-                    msgCampoRequerido = "{{ __('meta.contact_v9', [], 'es') }}";
-                    msgCorreoNoValido = "{{ __('meta.contact_v10', [], 'es') }}";
-                    msgEnviado = "{{ __('meta.contact_v11', [], 'es') }}"; // correo enviado
-                    msgNoEnviado = "{{ __('meta.msg_not_send') }}";
-                    break;
-            }
-
-            return { msgCampoRequerido, msgCorreoNoValido, msgEnviado, msgNoEnviado };
-        }
+        const contactMsg = {
+            campoRequerido: "{{ __('meta.contact_v9') }}",
+            correoNoValido: "{{ __('meta.contact_v10') }}",
+            enviado: "{{ __('meta.contact_v11') }}",
+            noEnviado: "{{ __('meta.msg_not_send') }}"
+        };
 
         function enviarFormulario() {
             const nameInput  = document.getElementById('nombre-form');
@@ -634,31 +595,29 @@
             errorEmail.textContent = '';
             errorMsg.textContent   = '';
 
-            const { msgCampoRequerido, msgCorreoNoValido, msgEnviado, msgNoEnviado } = getContactMessages();
-
             let valido = true;
 
             // --- Validar nombre ---
             if (!nameInput.value.trim()) {
-                showError(errorName, msgCampoRequerido);
+                showError(errorName, contactMsg.campoRequerido);
                 valido = false;
             }
 
             // --- Validar correo ---
             if (!emailInput.value.trim()) {
-                showError(errorEmail, msgCampoRequerido);
+                showError(errorEmail, contactMsg.campoRequerido);
                 valido = false;
             } else {
                 const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!regexCorreo.test(emailInput.value.trim())) {
-                    showError(errorEmail, msgCorreoNoValido);
+                    showError(errorEmail, contactMsg.correoNoValido);
                     valido = false;
                 }
             }
 
             // --- Validar mensaje ---
             if (!msgInput.value.trim()) {
-                showError(errorMsg, msgCampoRequerido);
+                showError(errorMsg, contactMsg.campoRequerido);
                 valido = false;
             }
 
@@ -690,7 +649,6 @@
             errorEmail.textContent = '';
             errorMsg.textContent   = '';
 
-
             // Enviar con Axios
             axios.post('{{ route('contact.send') }}', data)
                 .then(response => {
@@ -699,10 +657,10 @@
                         emailInput.value = '';
                         msgInput.value = '';
 
-                        mensajeEnviado(msgEnviado)
+                        mensajeEnviado(contactMsg.enviado)
                     }else{
                         // error: intentar de nuevo
-                        mensajeNoEnviado(msgNoEnviado)
+                        mensajeNoEnviado(contactMsg.noEnviado)
                     }
                 })
                 .catch(error => {

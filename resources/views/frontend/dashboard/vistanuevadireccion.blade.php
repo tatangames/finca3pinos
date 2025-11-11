@@ -423,7 +423,6 @@
             margin: 0 !important;
         }
 
-
         .btn-back, .btn-save {
             font-weight: 600;
             border-radius: 5px;
@@ -785,7 +784,6 @@
             font-weight: inherit !important; /* o 400 si lo quieres explícitamente regular */
         }
 
-
     </style>
 
     @php
@@ -822,8 +820,6 @@
             {{-- ===== Content (Addresses) ===== --}}
             <div class="account-content" role="region" aria-label="{{ __('meta.addresses') }}">
                 <div class="address-wrap">
-
-                    {{-- Tu grid de direcciones (si aplica) --}}
 
                     {{-- ===== Formulario ===== --}}
                     <form id="address-form"
@@ -868,8 +864,6 @@
                                 </select>
                             </div>
 
-
-
                             <!-- Nombre -->
                             <div class="form-group">
                                 <label>{{ __('meta.name_and_lastname') }} <span style="color: red">*</span></label>
@@ -881,7 +875,6 @@
                                 <label>{{ __('meta.direction') }} <span style="color: red">*</span></label>
                                 <input id="direccion-usuario" type="text" maxlength="100" placeholder="{{ __('meta.input_direction') }}">
                             </div>
-
 
                             <div class="form-group">
                                 <input id="direccionopcional-usuario" style="margin-top: 10px" type="text" maxlength="100" placeholder="{{ __('meta.input_directionv2') }}">
@@ -907,22 +900,17 @@
                                        placeholder="{{ __('meta.postal_code') }}" disabled>
                             </div>
 
-
                             <!-- numero de telefono -->
                             <div class="form-group" id="bloque-telefono" style="display:none; margin-top: 15px">
                                 <label>{{ __('meta.phone_number')}} <span style="color: red">*</span></label>
                                 <input id="telefono-usuario" type="text" maxlength="20" placeholder="{{ __('meta.phone_number') }}">
                             </div>
 
-
-
-
                             <!-- Acciones -->
                             <div class="form-actions">
-                                <a href="#" class="btn-back" id="btn-back">Regresar</a>
-                                <button type="submit" class="btn-save">Guardar</button>
+                                <a href="#" class="btn-back" id="btn-back">{{ __('meta.go_back') }}</a>
+                                <button type="submit" class="btn-save">{{ __('meta.save_changes') }}</button>
                             </div>
-
 
                         </div>
                     </form>
@@ -1262,8 +1250,7 @@
             // ==== Axios submit ====
             // URL localizada (Blade):
             const SAVE_URL = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.savenew.direction', [], false)) }}";
-            // Redirección por defecto si el backend no envía 'redirect'
-            const REDIRECT_FALLBACK = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.index', [], false)) }}";
+
             // Token CSRF
             const CSRF = (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'))
                 || (form?.querySelector('input[name=_token]')?.value) || '';
@@ -1356,11 +1343,6 @@
             });
         })();
     </script>
-
-
-
-
-
 
 
     {{-- Superior (Newsletter) block --}}

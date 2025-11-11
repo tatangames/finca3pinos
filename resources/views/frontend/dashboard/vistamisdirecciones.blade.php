@@ -431,7 +431,6 @@
 
 </style>
 
-
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}"></script>
@@ -571,7 +570,6 @@
     <script>
 
         const DELETE_URL = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.delete.direction', [], false)) }}";
-
         const MAKE_DEFAULT_URL = "{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.direction.default', [], false)) }}";
         const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || "{{ csrf_token() }}";
 
@@ -633,7 +631,6 @@
                             })
                             .catch(err => {
 
-
                             });
                     }
                 });
@@ -658,9 +655,7 @@
         }
 
         function borrar(iddireccion) {
-
             openLoading()
-
             axios.post(DELETE_URL, {
                 id: iddireccion})
                 .then(res => {
@@ -683,12 +678,9 @@
                 closeLoading()
             });
         }
-
     </script>
 
-
     <script>
-
         // El que arranca como predeterminado
         let currentDefaultRadio = document.querySelector('.address-radio[data-is-default="1"]') || null;
 
@@ -764,7 +756,6 @@
             }
         }
     </script>
-
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')

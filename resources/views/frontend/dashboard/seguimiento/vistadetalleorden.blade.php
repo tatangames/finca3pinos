@@ -358,13 +358,14 @@
                         @if($fechaOrden)
                             <span style="font-size: 14px">{{ $fechaOrden }}</span>
                         @endif
-                        @if (!empty($order->seguimiento))
-                            <div class="order-tracking">
-                                <strong>{{ __('meta.tracking') }}:</strong>
-                                {!! $order->seguimiento !!}
-                            </div>
-                        @endif
+
                     </div>
+                    @if (!empty($order->seguimiento))
+                        <div class="order-tracking">
+                            <strong>{{ __('meta.tracking') }}:</strong>
+                            {!! $order->seguimiento !!}
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Info envío + resumen --}}

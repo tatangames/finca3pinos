@@ -531,8 +531,6 @@
                                                 <div class="slider-sc swiper-container" data-autoplay="4000"
                                                      data-arrows="" data-pagination="1" data-effect="fade">
                                                     <div class="swiper-wrapper">
-
-
                                                         {{-- Slide 1 --}}
                                                         <div class="swiper-slide">
                                                             <section class="hero-geisha">
@@ -547,11 +545,12 @@
                                                                             {{ __('meta.coffee_v13') }}
                                                                         </p>
                                                                         <div class="btn-group">
+
+
                                                                             <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(),
                                                                     route('user.ourcoffee', [], false)) }}"
                                                                                class="btn btn-primary"
                                                                                style="color: white">{{ __('meta.coffee_v6') }}</a>
-
 
                                                                             <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(),
                                                                     route('user.products', [], false)) }}"
@@ -584,7 +583,6 @@
                             </div>
 
                             <div class="vc_row-full-width"></div>
-
 
                             {{-- About section --}}
                             <section data-vc-full-width="true" data-vc-full-width-init="false"
@@ -619,7 +617,6 @@
 
                                                 <div class="vc_empty_space" style="height:20px"><span
                                                         class="vc_empty_space_inner"></span></div>
-
                                             </div>
                                         </div>
                                     </div>
@@ -708,18 +705,13 @@
                                 </div>
                                 <div style="margin-top: 3px"></div>
                             </section>
-
-
                             <div class="vc_row-full-width vc_clearfix"></div>
-
-
                         </div>
                     </article>
                 </div>
             </div>
         </div>
     </div>
-
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -754,7 +746,6 @@
             });
         });
     </script>
-
 
     {{-- Superior (Newsletter) block --}}
     @include('frontend.partials.superior')

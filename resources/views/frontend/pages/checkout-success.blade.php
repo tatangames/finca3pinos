@@ -4,8 +4,6 @@
 
 @section('content')
     <link rel="stylesheet" href="{{ asset('css/toastr.min.css') }}">
-
-
     <div class="container py-5 text-center">
         <h1 class="text-success mb-3">{{ __('meta.thanks_for_your_purchase') }}</h1>
 
@@ -19,8 +17,6 @@
                 <p><strong>{{ __('meta.total') }}:</strong> ${{ number_format($order->total, 2) }}</p>
                 <p><strong>{{ __('meta.status') }}:</strong> {{ __('meta.order_status_' . $order->status_name) }}</p>
             </div>
-
-
         </div>
 
         <a href="{{ route('user.orders') }}" class="btn btn-primary mt-4">

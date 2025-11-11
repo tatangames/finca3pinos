@@ -438,8 +438,6 @@
             inset: -8px;                    /* hit-area más grande */
         }
 
-
-
     </style>
 
     <header class="page-header like-parallax"
@@ -460,7 +458,6 @@
             </ul>
         </div>
     </header>
-
 
     <div class="container">
         <div class="auth-wrapper">
@@ -512,16 +509,12 @@
         </div>
     </div>
 
-
-
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
 
-
     <script>
+
         const requestCodeUrl = "{{ route('user.password.update') }}";
-    </script>
 
-    <script>
         (function () {
             const form   = document.getElementById('form-reset');
             const btn    = document.getElementById('btn-reset');
@@ -646,9 +639,6 @@
             });
         })();
     </script>
-
-
-
 
 
     {{-- Superior (Newsletter) block --}}

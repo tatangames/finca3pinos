@@ -46,8 +46,8 @@ return [
     'coffee_v2' => 'Excelencia desde la Cordillera Alotepec-Metapán',
     'coffee_v3' => 'Una de las regiones más altas y reconocidas de El Salvador, ubicada en la frontera con Honduras y Guatemala; ideal para cafés de especialidad con acidez brillante y aromas florales.',
     'coffee_v4' => 'Trazabilidad total',
-    'coffee_v5' => 'ver productos',
-    'coffee_v6' => 'conoce mas',
+    'coffee_v5' => 'Ver productos',
+    'coffee_v6' => 'Conoce más',
     'coffee_v7' => 'Quiénes somos',
     'coffee_v8' => 'Producimos Café Geisha de altura en Metapán, El Salvador. Un café de origen único, cultivado con pasión, tecnología y respeto por la tierra.',
     'coffee_v9' => 'Origen y prestigio',
@@ -290,7 +290,6 @@ return [
     'shipping_unavailable' => 'Envío no disponible temporalmente',
     'shipping_not_available_for_address' => 'No hay envío para esta dirección actualmente.',
     'your_order_is_being_prepared' => 'Tu pedido está siendo preparado',
-
     'order_preparing_title' => '¡Tu pedido está siendo preparado!',
     'go_to_store' => 'Ir a la tienda',
     'thank_you_finca' => 'Gracias por confiar en Finca 3 Pinos ☕',
@@ -304,6 +303,8 @@ return [
     'view_my_order' => 'Ver mi pedido',
     'preparation_date' => 'Fecha de preparación',
     'shipping_date' => 'Fecha de envío',
+    'go_back' => 'Regresar',
+    'no_additional_data' => 'Sin datos adicionales.',
 
 
 

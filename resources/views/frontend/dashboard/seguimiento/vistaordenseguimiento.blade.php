@@ -259,6 +259,10 @@
                 font-size: 18px;
             }
         }
+
+
+
+
     </style>
 
     @php
@@ -322,14 +326,19 @@
 
             {{-- ===== Contenido Tracking ===== --}}
             <div class="account-content">
-                <div class="head">
-                    {{ __('meta.tracking') }}:&nbsp;{!! $order->seguimiento !!}
+                <div class="head d-flex justify-content-between align-items-center">
+                    <div class="tracking-text" style="text-align:left;">
+                        {{ __('meta.tracking') }}:&nbsp;{!! $order->seguimiento !!}
+                    </div>
 
                     <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.orders', [], false)) }}"
                        class="btn btn-order">
                         {{ __('meta.back_to_orders') ?? '← '.__('meta.orders') }}
                     </a>
                 </div>
+
+
+
 
                 <div class="tracking-wrap">
 

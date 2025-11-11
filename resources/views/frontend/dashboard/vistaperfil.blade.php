@@ -828,7 +828,6 @@
                             <label>{{ __('meta.country') }}</label>
                             <div class="select-wrap">
                                 <select id="pais" name="pais">
-                                    <option value="">{{ __('meta.select') }}</option>
                                     @foreach($paises as $p)
                                         <option value="{{ $p->id }}" {{ (int)($arrayDireccionFactura->id_paises ?? 0) === (int)$p->id ? 'selected' : '' }}>
                                             {{ $p->nombre }}
@@ -967,82 +966,72 @@
             const form = document.getElementById('facturacion-form');
             if (!form) return;
 
-
             // CSRF desde meta o input hidden
             const CSRF = (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'))
                 || (form.querySelector('input[name="_token"]')?.value) || '';
 
+
+            const in8 = {
+                paisRequired: "{{ __('meta.country_required') }}",
+                generalError : "{{ __('meta.unknown_error') }}",
+            };
+
+
+
             // Helpers UI
-            function setSubmitting(state){
+            function setSubmitting(state) {
                 const btn = form.querySelector('.btn-save');
                 if (!btn) return;
                 if (state) {
                     btn.dataset.prevText = btn.innerHTML;
                     btn.disabled = true;
-                    btn.innerHTML = '{{ __("meta.saving")}}';
+                    btn.innerHTML = '{{ __("meta.saving") }}';
                 } else {
                     btn.disabled = false;
                     if (btn.dataset.prevText) btn.innerHTML = btn.dataset.prevText;
                 }
             }
 
-            function clearErrors(){
-                form.querySelectorAll('.error-text').forEach(n => n.remove());
-                form.querySelectorAll('.has-error').forEach(n => n.classList.remove('has-error'));
+            // ✅ VALIDACIÓN
+            function validate() {
+                let valid = true;
+
+                // limpiar errores previos
+                form.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+
+                const pais = form.pais?.value?.trim();
+                if (!pais) {
+                    valid = false;
+                    const field = form.querySelector('[name="pais"]');
+                    field?.classList.add('has-error');
+                    if (window.toastr) toastr.error(in8.paisRequired);
+                }
+
+                return valid;
             }
 
-            function setFieldError(fieldName, msg){
-                const el = form.querySelector(`[name="${fieldName}"]`) || document.getElementById(fieldName);
-                const group = el?.closest('.form-group');
-                if (!group) return;
-                group.classList.add('has-error');
-                const span = document.createElement('span');
-                span.className = 'error-text';
-                span.textContent = msg;
-                group.appendChild(span);
-            }
-
-            // Validación mínima (solo que no vayan vacíos)
-            function validate(){
-                clearErrors();
-                let ok = true;
-               /* const requiredIds = ['pais','nombre','direccion','telefono']; // agrega/quita si quieres obligatorios
-
-                requiredIds.forEach(id => {
-                    const el = form.querySelector(`#${id}[name="${id}"]`) || form.querySelector(`[name="${id}"]`);
-                    if (!el) return;
-                    if (!String(el.value || '').trim()){
-                        ok = false;
-                        setFieldError(id, '{{ __("validation.required") ?? "Campo requerido" }}');
-                    }
-                });*/
-
-                return ok;
-            }
-
-            async function submitForm(){
-                if (typeof window.axios === 'undefined'){
+            async function submitForm() {
+                if (typeof window.axios === 'undefined') {
                     return;
                 }
 
                 // Construir payload
                 const fd = new FormData();
-                fd.set('pais',          form.pais?.value || '');
-                fd.set('nombre',        form.nombre?.value?.trim() || '');
-                fd.set('direccion',     form.direccion?.value?.trim() || '');
-                fd.set('ciudad',        form.ciudad?.value?.trim() || '');
-                fd.set('estado',        form.estado?.value?.trim() || '');
+                fd.set('pais', form.pais?.value || '');
+                fd.set('nombre', form.nombre?.value?.trim() || '');
+                fd.set('direccion', form.direccion?.value?.trim() || '');
+                fd.set('ciudad', form.ciudad?.value?.trim() || '');
+                fd.set('estado', form.estado?.value?.trim() || '');
                 fd.set('codigo_postal', form.codigo_postal?.value?.trim() || '');
-                fd.set('telefono',      form.telefono?.value?.trim() || '');
+                fd.set('telefono', form.telefono?.value?.trim() || '');
 
-                try{
+                try {
                     setSubmitting(true);
 
                     const res = await axios.post(SAVE_URL, fd, {
                         headers: {
                             'X-CSRF-TOKEN': CSRF,
                             'Accept': 'application/json'
-                            // No pongas Content-Type manual: el navegador agrega boundary de FormData
                         }
                     });
 
@@ -1050,16 +1039,13 @@
                     if (data.success === 1) {
                         if (window.toastr) toastr.success('{{ __("meta.saved_successfully") }}');
                     } else {
-                        // Mensaje genérico o específico
                         const msg = '{{ __("meta.error_v1") }}';
                         if (window.toastr) toastr.error(msg);
                     }
 
-                } catch (err){
-                    // Errores de validación Laravel (422)
+                } catch (err) {
                     const msg = '{{ __("meta.error_v1") }}';
                     if (window.toastr) toastr.error(msg);
-
                 } finally {
                     setSubmitting(false);
                 }
@@ -1067,8 +1053,8 @@
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
-                if (!validate()){
-                    const first = form.querySelector('.has-error input, .has-error select, .has-error textarea');
+                if (!validate()) {
+                    const first = form.querySelector('.has-error');
                     first?.focus();
                     return;
                 }
@@ -1076,6 +1062,7 @@
             });
         })();
     </script>
+
 
 
     {{-- Superior (Newsletter) block --}}

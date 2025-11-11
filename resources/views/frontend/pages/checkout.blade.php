@@ -4,8 +4,13 @@
 @section('content')
 
     <style>
-        html, body { overflow-x: hidden; }
-        *, *::before, *::after { box-sizing: border-box; }
+        html, body {
+            overflow-x: hidden;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
 
         /* Contenedor pasos */
         .checkout-shell {
@@ -13,79 +18,115 @@
             margin: 0 auto;
             padding: 0 28px;
         }
-        @media (max-width: 992px){
-            .checkout-shell { padding: 0 16px; }
+
+        @media (max-width: 992px) {
+            .checkout-shell {
+                padding: 0 16px;
+            }
         }
 
-        .steps-bar{
-            background:#f1f6ff;
-            border-radius:14px;
-            padding:14px 22px;
-            border:1px solid rgba(42,88,255,.05);
-            display:flex;
-            justify-content:center;
+        .steps-bar {
+            background: #f1f6ff;
+            border-radius: 14px;
+            padding: 14px 22px;
+            border: 1px solid rgba(42, 88, 255, .05);
+            display: flex;
+            justify-content: center;
         }
-        .checkout-steps{
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            gap:40px;
-            max-width:700px;
-            width:100%;
-            margin:0;
+
+        .checkout-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            max-width: 700px;
+            width: 100%;
+            margin: 0;
         }
-        .step{
-            display:flex;
-            align-items:center;
-            gap:10px;
-            color:#1f2937;
-            font-weight:500;
-            background:transparent;
-            border:0;
-            padding:0;
-            user-select:none;
-            cursor:default;
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1f2937;
+            font-weight: 500;
+            background: transparent;
+            border: 0;
+            padding: 0;
+            user-select: none;
+            cursor: default;
         }
-        .step-dot{
-            width:32px;
-            height:32px;
-            border-radius:999px;
-            display:grid;
-            place-items:center;
-            font-weight:700;
-            font-size:.95rem;
-            background:#111;
-            color:#fff;
-            box-shadow:0 1px 0 rgba(0,0,0,.08) inset;
+
+        .step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            font-size: .95rem;
+            background: #111;
+            color: #fff;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, .08) inset;
         }
+
         .step.active .step-dot,
-        .step.done .step-dot{ background:#2a58ff; color:#fff; }
-        .step.active span:last-child,
-        .step.done span:last-child{ color:#2a58ff; }
-        .step.done, .step.active{ cursor:pointer; }
-        .step:hover .step-dot{ filter:brightness(.96); }
+        .step.done .step-dot {
+            background: #2a58ff;
+            color: #fff;
+        }
 
-        @media(max-width:768px){
-            .checkout-steps{ gap:20px; max-width:100%; }
-            .step-dot{ width:28px; height:28px; font-size:.85rem; }
-            .step span:last-child{ font-size:.9rem; }
+        .step.active span:last-child,
+        .step.done span:last-child {
+            color: #2a58ff;
+        }
+
+        .step.done, .step.active {
+            cursor: pointer;
+        }
+
+        .step:hover .step-dot {
+            filter: brightness(.96);
+        }
+
+        @media (max-width: 768px) {
+            .checkout-steps {
+                gap: 20px;
+                max-width: 100%;
+            }
+
+            .step-dot {
+                width: 28px;
+                height: 28px;
+                font-size: .85rem;
+            }
+
+            .step span:last-child {
+                font-size: .9rem;
+            }
         }
 
         /* Tabs */
-        .tab-pane{ display:none; }
-        .tab-pane.active{ display:block; }
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
 
         /* Layout general: una columna, compacto */
-        .checkout-wrap{
+        .checkout-wrap {
             max-width: 780px;
             margin: 24px auto 40px;
             padding: 0 16px;
         }
-        @media(max-width:992px){
-            .checkout-wrap{
-                padding:0 16px;
-                margin-top:18px;
-                margin-bottom:40px;
+
+        @media (max-width: 992px) {
+            .checkout-wrap {
+                padding: 0 16px;
+                margin-top: 18px;
+                margin-bottom: 40px;
             }
         }
 
@@ -93,115 +134,146 @@
         .card-ship,
         .addr-card,
         .steps-bar {
-            max-width:100%;
+            max-width: 100%;
         }
 
-        .card{
-            background:#fff;
-            border:1px solid rgba(0,0,0,.07);
-            border-radius:12px;
-            box-shadow:0 2px 6px rgba(0,0,0,.04);
-            overflow:hidden;
-            margin-bottom:14px;
-        }
-        .card-h{
-            padding:10px 14px;
-            border-bottom:1px solid rgba(0,0,0,.05);
-            font-weight:600;
-            font-size:1rem;
-        }
-        .card-b{
-            padding:20px;
+        .card {
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, .07);
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .04);
+            overflow: hidden;
+            margin-bottom: 14px;
         }
 
-        .card-ship{
-            background:#fff;
-            border:1px solid rgba(0,0,0,.08);
-            border-radius:14px;
-            margin:12px 0;
-            box-shadow:0 1px 8px rgba(0,0,0,.04);
-        }
-        .card-ship .h{
-            padding:12px 16px;
-            border-bottom:1px solid rgba(0,0,0,.06);
-            font-weight:600;
-        }
-        .card-ship .b{
-            padding:16px 16px;
+        .card-h {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(0, 0, 0, .05);
+            font-weight: 600;
+            font-size: 1rem;
         }
 
-        .row2{
-            display:grid;
+        .card-b {
+            padding: 20px;
+        }
+
+        .card-ship {
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, .08);
+            border-radius: 14px;
+            margin: 12px 0;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, .04);
+        }
+
+        .card-ship .h {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, .06);
+            font-weight: 600;
+        }
+
+        .card-ship .b {
+            padding: 16px 16px;
+        }
+
+        .row2 {
+            display: grid;
             grid-template-columns:1fr 1fr;
-            gap:12px;
-        }
-        @media(max-width:576px){
-            .row2{ grid-template-columns:1fr; }
+            gap: 12px;
         }
 
-        .control{
-            display:block;
-            width:100%;
-            padding:8px 10px;
-            border:1px solid rgba(0,0,0,.15);
-            border-radius:10px;
-            background:#fff;
-            font-size:.95rem;
+        @media (max-width: 576px) {
+            .row2 {
+                grid-template-columns:1fr;
+            }
         }
 
-        .btn{
-            display:inline-block;
-            border:0;
-            border-radius:999px;
-            padding:10px 16px;
-            cursor:pointer;
-            font-size:.95rem;
+        .control {
+            display: block;
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid rgba(0, 0, 0, .15);
+            border-radius: 10px;
+            background: #fff;
+            font-size: .95rem;
         }
-        .btn-primary{ background:#2a58ff; color:#fff; }
-        .btn-light{ background:#f3f4f6; color:#111; }
-        .btn[disabled]{ opacity:.6; cursor:not-allowed; }
 
-        .muted{
-            color:#6b7280;
-            font-size:13px;
+        .btn {
+            display: inline-block;
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: .95rem;
+        }
+
+        .btn-primary {
+            background: #2a58ff;
+            color: #fff;
+        }
+
+        .btn-light {
+            background: #f3f4f6;
+            color: #111;
+        }
+
+        .btn[disabled] {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .muted {
+            color: #6b7280;
+            font-size: 13px;
         }
 
         /* Address preview */
-        .addr-card{
-            border:1px solid rgba(0,0,0,.1);
-            border-radius:10px;
-            padding:10px 12px;
-            background:#fff;
+        .addr-card {
+            border: 1px solid rgba(0, 0, 0, .1);
+            border-radius: 10px;
+            padding: 10px 12px;
+            background: #fff;
         }
-        .addr-line{ color:#374151; font-size:.95rem; }
-        .addr-empty{ padding:8px 0; }
+
+        .addr-line {
+            color: #374151;
+            font-size: .95rem;
+        }
+
+        .addr-empty {
+            padding: 8px 0;
+        }
 
         /* Resumen */
-        .sum-line{
-            display:flex;
-            justify-content:space-between;
-            margin:2px 0;
-            font-size:15px;
-        }
-        .sum-total{
-            font-weight:800;
-            font-size:1rem;
-            margin-top:6px;
+        .sum-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 2px 0;
+            font-size: 15px;
         }
 
-        .card-b h4{
-            font-size:1.1rem;
-            margin-bottom:10px;
+        .sum-total {
+            font-weight: 800;
+            font-size: 1rem;
+            margin-top: 6px;
         }
 
-        .actions{
-            display:flex;
-            justify-content:flex-end;
-            gap:10px;
-            margin-top:14px;
+        .card-b h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
         }
 
-        img, iframe { max-width:100%; height:auto; display:block; }
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        img, iframe {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
 
 
         .control[readonly],
@@ -317,12 +389,14 @@
                                     @endif
                                     @if($addrSelected->depto_nombre)
                                         <div class="addr-line">
-                                            <strong>{{ __('meta.department') }}:</strong> {{ $addrSelected->depto_nombre }}
+                                            <strong>{{ __('meta.department') }}
+                                                :</strong> {{ $addrSelected->depto_nombre }}
                                         </div>
                                     @endif
                                     @if($addrSelected->muni_nombre)
                                         <div class="addr-line">
-                                            <strong>{{ __('meta.municipality') }}:</strong> {{ $addrSelected->muni_nombre }}
+                                            <strong>{{ __('meta.municipality') }}
+                                                :</strong> {{ $addrSelected->muni_nombre }}
                                         </div>
                                     @endif
                                     @if($addrSelected->ciudad)
@@ -332,7 +406,8 @@
                                     @endif
                                     @if($addrSelected->estado)
                                         <div class="addr-line">
-                                            <strong>{{ __('meta.state_province') }}:</strong> {{ $addrSelected->estado }}
+                                            <strong>{{ __('meta.state_province') }}
+                                                :</strong> {{ $addrSelected->estado }}
                                         </div>
                                     @endif
                                     @if($addrSelected->zipcode)
@@ -531,9 +606,6 @@
         </div>
 
 
-
-
-
     </div>
 
     {{-- Librerías --}}
@@ -575,13 +647,11 @@
 
         const BASE_SUBTOTAL = {{ (float) $subtotal }};
 
-
         const i18n = {
             errorDesconocidoMessage: "{{ __('meta.unknown_error') }}",
             seNecesitaDireccionMessage: "{{ __('meta.select_shipping_before_continue') }}",
             noHayFormularioPagoMessage: "{{ __('meta.payment_form_not_found') }}",
         };
-
 
         (function () {
             const stepsHead = document.getElementById('stepsHead');
@@ -591,42 +661,43 @@
                 3: document.getElementById('tab3')
             };
 
-            function go(step){
-                [...stepsHead.querySelectorAll('.step')].forEach((s,i)=>{
+            function go(step) {
+                [...stepsHead.querySelectorAll('.step')].forEach((s, i) => {
                     const idx = i + 1;
                     s.classList.toggle('active', idx === step);
-                    s.classList.toggle('done',   idx < step);
+                    s.classList.toggle('done', idx < step);
                 });
                 Object.values(panes).forEach(p => p.classList.remove('active'));
                 panes[step].classList.add('active');
-                window.scrollTo({top: stepsHead.offsetTop - 8, behavior:'smooth'});
+                window.scrollTo({top: stepsHead.offsetTop - 8, behavior: 'smooth'});
             }
+
             window.go = go;
 
-            function money(n){
+            function money(n) {
                 return '$' + Number(n || 0).toFixed(2);
             }
 
             // ===== Actualizar resumen según dirección =====
-            function updateSummaryByAddress(id){
+            function updateSummaryByAddress(id) {
                 const a = ADDRESS_MAP[id];
                 if (!a) return;
 
                 const shipping = Number(a.precio_envio || 0);
                 const subtotal = BASE_SUBTOTAL;
-                const total    = subtotal + shipping;
+                const total = subtotal + shipping;
 
                 const elSub = document.getElementById('sum-subtotal');
                 const elShip = document.getElementById('sum-shipping');
                 const elTot = document.getElementById('sum-total');
 
-                if (elSub)  elSub.innerText  = money(subtotal);
+                if (elSub) elSub.innerText = money(subtotal);
                 if (elShip) elShip.innerText = money(shipping);
-                if (elTot)  elTot.innerText  = money(total);
+                if (elTot) elTot.innerText = money(total);
             }
 
             // ===== Vista previa dirección =====
-            function renderAddrPreview(id){
+            function renderAddrPreview(id) {
                 const box = document.getElementById('addrPreview');
                 const a = ADDRESS_MAP[id];
                 if (!box) return;
@@ -639,18 +710,18 @@
                 }
 
                 const lines = [];
-                if (a.nombre)       lines.push(`<div class="addr-line"><strong>{{ __('meta.contact_v5') }}:</strong> ${a.nombre}</div>`);
-                if (a.direccion)    lines.push(`<div class="addr-line"><strong>{{ __('meta.direction') }}:</strong> ${a.direccion}</div>`);
-                if (a.pais)         lines.push(`<div class="addr-line"><strong>{{ __('meta.country') }}:</strong> ${a.pais}</div>`);
+                if (a.nombre) lines.push(`<div class="addr-line"><strong>{{ __('meta.contact_v5') }}:</strong> ${a.nombre}</div>`);
+                if (a.direccion) lines.push(`<div class="addr-line"><strong>{{ __('meta.direction') }}:</strong> ${a.direccion}</div>`);
+                if (a.pais) lines.push(`<div class="addr-line"><strong>{{ __('meta.country') }}:</strong> ${a.pais}</div>`);
                 if (a.departamento) lines.push(`<div class="addr-line"><strong>{{ __('meta.department') }}:</strong> ${a.departamento}</div>`);
-                if (a.municipio)    lines.push(`<div class="addr-line"><strong>{{ __('meta.municipality') }}:</strong> ${a.municipio}</div>`);
-                if (a.ciudad)       lines.push(`<div class="addr-line"><strong>{{ __('meta.city') }}:</strong> ${a.ciudad}</div>`);
-                if (a.estado)       lines.push(`<div class="addr-line"><strong>{{ __('meta.state_province') }}:</strong> ${a.estado}</div>`);
-                if (a.zipcode)      lines.push(`<div class="addr-line"><strong>{{ __('meta.postal_code') }}:</strong> ${a.zipcode}</div>`);
-                if (a.telefono)     lines.push(`<div class="addr-line"><strong>{{ __('meta.phone') }}:</strong> ${a.telefono}</div>`);
+                if (a.municipio) lines.push(`<div class="addr-line"><strong>{{ __('meta.municipality') }}:</strong> ${a.municipio}</div>`);
+                if (a.ciudad) lines.push(`<div class="addr-line"><strong>{{ __('meta.city') }}:</strong> ${a.ciudad}</div>`);
+                if (a.estado) lines.push(`<div class="addr-line"><strong>{{ __('meta.state_province') }}:</strong> ${a.estado}</div>`);
+                if (a.zipcode) lines.push(`<div class="addr-line"><strong>{{ __('meta.postal_code') }}:</strong> ${a.zipcode}</div>`);
+                if (a.telefono) lines.push(`<div class="addr-line"><strong>{{ __('meta.phone') }}:</strong> ${a.telefono}</div>`);
 
                 box.innerHTML = `<div class="addr-card">${
-                    lines.length ? lines.join('') : '<div class="addr-empty muted">Sin datos adicionales.</div>'
+                    lines.length ? lines.join('') : '<div class="addr-empty muted">{{ __('meta.no_additional_data') }}</div>'
                 }</div>`;
             }
 
@@ -675,7 +746,6 @@
                     renderAddrPreview(id);
                     updateSummaryByAddress(id);
                 });
-
 
 
                 document.getElementById('btnToStep2')?.addEventListener('click', () => {

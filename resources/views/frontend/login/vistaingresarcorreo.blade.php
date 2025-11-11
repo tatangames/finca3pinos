@@ -460,14 +460,11 @@
                         </button>
                     </form>
                 </div>
-
-
             </div>
         </div>
     </div>
 
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
-
 
     <script>
         const requestCodeUrl = "{{ LaravelLocalization::localizeURL('/request-code') }}";
@@ -573,7 +570,6 @@
                 hideMessage();
             }));
 
-
             btn.addEventListener('click', () => {
                 if (!validate()) return;
 
@@ -624,17 +620,6 @@
             });
         })();
     </script>
-
-
-
-
-
-
-
-
-
-
-
 
 
     {{-- Superior (Newsletter) block --}}

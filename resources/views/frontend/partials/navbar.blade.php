@@ -125,9 +125,6 @@
         color: #c8b083 !important;
     }
 
-
-
-
 </style>
 
 
@@ -176,7 +173,6 @@
                         </div>
                     </li>
 
-
                     {{-- Usuario --}}
                     <li class="only-desktop nav-user dropdown">
                     {{-- ====== USUARIO ====== --}}
@@ -207,7 +203,6 @@
                             </a>
                         </li>
                     @endauth
-
 
                 @auth('web')
                         <form id="logout-form" action="{{ route('user.logout') }}" method="POST" style="display:none;">
@@ -272,7 +267,7 @@
                     .forEach(el => el.textContent = data.count);
             }
         } catch (e) {
-            console.error('Error obteniendo el conteo del carrito:', e);
+
         }
     });
 </script>

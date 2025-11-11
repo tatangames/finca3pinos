@@ -290,7 +290,6 @@ return [
     'shipping_unavailable' => '배송이 일시적으로 불가능합니다',
     'shipping_not_available_for_address' => '현재 이 주소로는 배송이 불가능합니다.',
     'your_order_is_being_prepared' => '주문이 준비 중입니다',
-
     'order_preparing_title' => '주문이 준비 중입니다!',
     'go_to_store' => '상점으로 이동',
     'thank_you_finca' => 'Finca 3 Pinos를 믿고 이용해 주셔서 감사합니다 ☕',
@@ -304,6 +303,8 @@ return [
     'view_my_order' => '내 주문 보기',
     'preparation_date' => '준비 날짜',
     'shipping_date' => '배송 날짜',
+    'go_back' => '돌아가기',
+    'no_additional_data' => '추가 데이터가 없습니다.',
 
 
 

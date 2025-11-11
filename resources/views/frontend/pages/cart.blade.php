@@ -243,9 +243,6 @@
             }
         }
 
-
-
-
         /* ——— Header compacto con máxima prioridad ——— */
         #heroProducts.page-header--compact{
             height: 140px !important;
@@ -292,7 +289,6 @@
         }
 
         /* breadcrumbs también alineadas con el margen del título */
-
 
 
         /* Miga de pan sin margen extra */
@@ -508,9 +504,7 @@
         #btn-update-all.button.btn:hover {
             background-color: #c0975f !important;
         }
-
     </style>
-
 
     <!-- ===== HEADER (sin like-parallax) ===== -->
     <header id="heroProducts"
@@ -550,8 +544,8 @@
                                     <table class="shop_table shop_table_responsive cart woocommerce-cart-form__contents" cellspacing="0">
                                         <thead>
                                         <tr>
-                                            <th class="product-remove"><span class="screen-reader-text">Remove item</span></th>
-                                            <th class="product-thumbnail"><span class="screen-reader-text">Thumbnail image</span></th>
+                                            <th class="product-remove"><span class="screen-reader-text"></span></th>
+                                            <th class="product-thumbnail"><span class="screen-reader-text"></span></th>
                                             <th class="product-name">{{ __('meta.products')}}</th>
                                             <th class="product-price">{{ __('meta.price')}}</th>
                                             <th class="product-quantity">{{ __('meta.quantity')}}</th>
@@ -588,15 +582,9 @@
                                         @empty
                                             <tr><td colspan="6" class="text-center">{{ __('meta.your_cart_empty')}}</td></tr>
                                         @endforelse
-
                                         <tr>
                                             <td colspan="6" class="actions" style="text-align:right;">
-
-
                                                 <button type="button" class="button btn" id="btn-update-all">{{ __('meta.update_cart')}}</button>
-
-
-
                                             </td>
                                         </tr>
                                         </tbody>
@@ -622,7 +610,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </article>
@@ -775,8 +762,6 @@
                     toastr.info(i18n.cartEmpty); // "Tu carrito está vacío"
                 }
             });
-
-            // ⚠️ Eliminado el segundo listener que disparaba otro toastr.success
         });
     </script>
 

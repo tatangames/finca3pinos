@@ -19,34 +19,40 @@
             padding: 0;
             color: #333;
         }
+
         .email-container {
             max-width: 600px;
             margin: 40px auto;
             background-color: #fff;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
         }
+
         .header {
             background-color: #d2aa6d;
             color: #fff;
             text-align: center;
             padding: 28px 20px;
         }
+
         .header h1 {
             margin: 0;
             font-size: 1.6rem;
             font-weight: 700;
             letter-spacing: .03em;
         }
+
         .body {
             padding: 28px 32px;
             line-height: 1.6;
             font-size: 15px;
         }
+
         .body p {
             margin-bottom: 16px;
         }
+
         .btn {
             display: inline-block;
             background-color: #d2aa6d;
@@ -57,6 +63,7 @@
             font-weight: 600;
             margin-top: 12px;
         }
+
         .footer {
             text-align: center;
             font-size: 13px;
@@ -64,28 +71,34 @@
             border-top: 1px solid #eee;
             padding: 20px;
         }
+
         .logo {
             max-width: 120px;
             margin-bottom: 16px;
         }
+
         .social-links {
             margin-top: 16px;
         }
+
         .social-links a {
             display: inline-block;
             margin: 0 6px;
             text-decoration: none;
         }
+
         .social-links img {
             width: 28px;
             height: 28px;
             vertical-align: middle;
             border-radius: 6px;
         }
+
         @media (max-width: 600px) {
             .email-container {
                 margin: 20px;
             }
+
             .body {
                 padding: 22px 20px;
             }
@@ -112,7 +125,8 @@
 
         <p>{{ __('meta.product_v18') }}</p>
 
-        <p style="margin-top: 20px;">{{ __('meta.product_v19') }}<br>{{ __('meta.product_v20') }} <strong>{{ __('meta.finca3pinos') }}</strong></p>
+        <p style="margin-top: 20px;">{{ __('meta.product_v19') }}<br>{{ __('meta.product_v20') }}
+            <strong>{{ __('meta.finca3pinos') }}</strong></p>
     </div>
 
     <div class="footer">
