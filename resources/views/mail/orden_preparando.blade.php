@@ -8,8 +8,22 @@
         .container { background: #fff; margin: 20px auto; padding: 20px; max-width: 600px; border-radius: 8px; }
         h2 { color: #b48a4e; }
         .footer { margin-top: 20px; font-size: 12px; color: #777; }
-        .btn { background: #b48a4e; color: white; padding: 10px 18px; text-decoration: none; border-radius: 5px; }
+        .btn {
+            background: #ffffff;
+            color: #b48a4e;
+            padding: 10px 18px;
+            text-decoration: none;
+            border-radius: 5px;
+            border: 1px solid #b48a4e;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #b48a4e;
+            color: #ffffff;
+        }
     </style>
+
 </head>
 <body>
 <div class="container">
