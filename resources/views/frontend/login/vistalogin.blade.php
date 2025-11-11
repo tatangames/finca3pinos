@@ -563,20 +563,20 @@
 
                         <div class="form-row">
                             <label for="name">{{ __('meta.contact_v5') }} <span class="req">*</span></label>
-                            <input id="name" type="text" name="name" value="{{ old('name') }}" required autocomplete="name">
+                            <input id="name" type="text" maxlength="50" name="name" value="{{ old('name') }}" required autocomplete="name">
                             <!-- errores aquí -->
                         </div>
 
                         <div class="form-row">
                             <label for="email_reg">{{ __('meta.email_address') }} <span class="req">*</span></label>
-                            <input id="email_reg" type="email" name="email" value="{{ old('email') }}" required autocomplete="email">
+                            <input id="email_reg" type="email" maxlength="100" name="email" value="{{ old('email') }}" required autocomplete="email">
                             <!-- errores aquí -->
                         </div>
 
                         <div class="form-row">
                             <label for="password_reg">{{ __('meta.password') }} <span class="req">*</span></label>
                             <div class="password-wrap">
-                                <input id="password_reg" type="password" name="password" required autocomplete="new-password" minlength="8">
+                                <input id="password_reg" maxlength="50" type="password" name="password" required autocomplete="new-password" minlength="8">
                                 <button type="button" class="toggle-pass" data-target="password_reg" aria-label="{{ __('meta.show_or_hide_password') }}">👁️</button>
                             </div>
                             <!-- errores aquí -->
@@ -585,7 +585,7 @@
                         <div class="form-row">
                             <label for="password_confirmation">{{ __('meta.confirm_password') }} <span class="req">*</span></label>
                             <div class="password-wrap">
-                                <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password">
+                                <input id="password_confirmation" maxlength="50" type="password" name="password_confirmation" required autocomplete="new-password">
                                 <button type="button" class="toggle-pass" data-target="password_confirmation" aria-label="{{ __('meta.show_or_hide_password') }}">👁️</button>
                             </div>
                             <!-- errores aquí -->

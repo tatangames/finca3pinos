@@ -22,7 +22,7 @@
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <button type="button" onclick="prueba()" class="btn btn-primary btn-sm">
+                <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus-square"></i>
                     Nueva Imagen
                 </button>
@@ -109,11 +109,25 @@
                                         </div>
                                     @endforeach
 
-                                    <!-- Imagen -->
+                                    <!-- Tipo de contenido -->
                                     <div class="form-group mt-4">
+                                        <label>Tipo de contenido</label>
+                                        <select id="tipo-contenido" class="form-control">
+                                            <option value="0">Imagen</option>
+                                            <option value="1">Video (URL)</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Imagen -->
+                                    <div class="form-group mt-3" id="grupo-imagen">
                                         <label>Imagen</label>
-                                        <input type="file" id="imagen-nuevo" class="form-control"
-                                               accept="image/jpeg,image/png">
+                                        <input type="file" id="imagen-nuevo" class="form-control" accept="image/jpeg,image/png">
+                                    </div>
+
+                                    <!-- URL Video -->
+                                    <div class="form-group mt-3 d-none" id="grupo-video">
+                                        <label>URL del video (YouTube, Vimeo, etc.)</label>
+                                        <input type="url" id="url-video" maxlength="100" class="form-control" placeholder="https://www.youtube.com/watch?v=xxxxxx">
                                     </div>
 
                                 </div>
@@ -128,91 +142,115 @@
             </div>
         </div>
     </div>
-</div>
 
 
-<div class="modal fade" id="modalEditar">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Actualizar</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-editar">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-12">
 
-                                <input type="hidden" id="id-editar">
-                                <!-- Campos dinámicos por idioma -->
-                                <div id="langs-editar"></div>
+    <div class="modal fade" id="modalEditar">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Actualizar</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-editar">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
 
-                                <br>
-                                <hr>
+                                    <input type="hidden" id="id-editar">
+                                    <!-- Campos dinámicos por idioma -->
+                                    <div id="langs-editar"></div>
 
-                                <!-- 👇 Vista previa centrada -->
-                                <div class="mt-3"
-                                     style="
-                                    display:flex !important;
-                                    flex-direction:column !important;
-                                    justify-content:center !important;
-                                    align-items:center !important;
-                                    text-align:center !important;
-                                    width:100% !important;
-                                 ">
-
-                                    <h6 style="
-                                    font-weight:600 !important;
-                                    color:#333 !important;
-                                    margin-bottom:10px !important;
-                                ">
-                                        Vista previa de la imagen actual
-                                    </h6>
-
-                                    <img id="preview-editar"
-                                         src=""
-                                         alt="Vista previa"
-                                         style="
-                                        width: 190px !important;
-                                        height: 176px !important;
-                                        border-radius:12px !important;
-                                        object-fit:cover;
-                                        display:block !important;
-                                        border:1px solid #ccc !important;
-                                        margin:0 auto;
-                                        box-shadow:0 2px 6px rgba(0,0,0,.2) !important;
-                                     ">
-                                </div>
-
-                                <br>
-
-                                <div class="form-group">
-                                    <div>
-                                        <label>Actualizar Imagen</label>
-                                    </div>
                                     <br>
-                                    <div class="col-md-10">
-                                        <input type="file" style="color:#191818" id="imagen-editar" accept="image/jpeg, image/jpg, image/png"/>
-                                    </div>
-                                </div>
+                                    <hr>
 
+                                    <!-- 👇 Vista previa centrada -->
+                                    <div class="mt-3"
+                                         style="
+                                        display:flex !important;
+                                        flex-direction:column !important;
+                                        justify-content:center !important;
+                                        align-items:center !important;
+                                        text-align:center !important;
+                                        width:100% !important;
+                                     ">
+
+                                        <h6 style="
+                                        font-weight:600 !important;
+                                        color:#333 !important;
+                                        margin-bottom:10px !important;
+                                    ">
+                                            Vista previa de la imagen actual
+                                        </h6>
+
+                                        <img id="preview-editar"
+                                             src=""
+                                             alt="Vista previa"
+                                             style="
+                                            width: 190px !important;
+                                            height: 176px !important;
+                                            border-radius:12px !important;
+                                            object-fit:cover;
+                                            display:block !important;
+                                            border:1px solid #ccc !important;
+                                            margin:0 auto;
+                                            box-shadow:0 2px 6px rgba(0,0,0,.2) !important;
+                                         ">
+                                    </div>
+
+                                    <br>
+
+
+                                    <!-- Tipo de contenido -->
+                                    <div class="form-group mt-4">
+                                        <label>Tipo de contenido</label>
+                                        <select id="tipo-contenido-editar" class="form-control">
+                                            <option value="0">Imagen</option>
+                                            <option value="1">Video (URL)</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Grupo Imagen -->
+                                    <div class="form-group" id="grupo-imagen-editar">
+                                        <div>
+                                            <label>Actualizar Imagen</label>
+                                        </div>
+                                        <br>
+                                        <div class="col-md-10">
+                                            <input type="file"
+                                                   style="color:#191818"
+                                                   id="imagen-editar"
+                                                   accept="image/jpeg, image/jpg, image/png" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Grupo Video -->
+                                    <div class="form-group mt-3 d-none" id="grupo-video-editar">
+                                        <label>URL del video (YouTube, Vimeo, etc.)</label>
+                                        <input type="url"
+                                               id="url-video-editar"
+                                               maxlength="200"
+                                               class="form-control"
+                                               placeholder="https://www.youtube.com/watch?v=xxxxxx">
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
+
 </div>
-
-
 @extends('backend.menus.footerjs')
 @section('archivos-js')
 
@@ -225,13 +263,32 @@
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
 
 
-    <script type="text/javascript">
-        $(document).ready(function(){
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
 
             var ruta = "{{ URL::to('/admin/galeria/index/tabla') }}";
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
+
+            const selectTipo = document.getElementById('tipo-contenido');
+            const grupoImagen = document.getElementById('grupo-imagen');
+            const grupoVideo  = document.getElementById('grupo-video');
+
+            if (selectTipo) {
+                selectTipo.addEventListener('change', function () {
+                    if (this.value === '1') {
+                        // Mostrar campo de video
+                        grupoVideo.classList.remove('d-none');
+                        grupoImagen.classList.add('d-none');
+                    } else {
+                        // Mostrar campo de imagen
+                        grupoImagen.classList.remove('d-none');
+                        grupoVideo.classList.add('d-none');
+                    }
+                });
+            }
         });
     </script>
 
@@ -243,7 +300,6 @@
             $('#tablaDatatable').load(ruta);
         }
 
-
         // abre modal para agregar nuevo pais
         function modalAgregar(){
             document.getElementById("formulario-nuevo").reset();
@@ -253,27 +309,40 @@
         function nuevo(){
             var key = document.getElementById('key').value.trim();
             var imagen = document.getElementById('imagen-nuevo');
+            var selectTipo = document.getElementById('tipo-contenido').value;
+            var urlVideo = document.getElementById('url-video').value;
 
             if (key === '') {
                 toastr.error('Debe ingresar la key global');
                 return;
             }
 
-            if(imagen.files && imagen.files[0]){ // si trae imagen
-                if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
-                    toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
+
+            if(selectTipo === '1'){ // video
+
+                if(urlVideo === ''){
+                    toastr.error('URL Video es Requerido')
                     return;
                 }
-            }else{
-                toastr.error('Imagen es Requerida')
-                return;
-            }
 
+            }else{ // imagen
+                if(imagen.files && imagen.files[0]){ // si trae imagen
+                    if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
+                        toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
+                        return;
+                    }
+                }else{
+                    toastr.error('Imagen es Requerida')
+                    return;
+                }
+            }
 
             // 🔹 Creamos el FormData
             let formData = new FormData();
             formData.append('key', key);
             formData.append('imagen', imagen.files[0]);
+            formData.append('urlvideo', urlVideo);
+            formData.append('tipo', selectTipo);
 
             // 🔹 Recorremos las regiones en un array JSON generado por Blade
             let regiones = @json($arrayRegiones);
@@ -319,7 +388,6 @@
                     closeLoading();
                 });
         }
-
 
         function modalBorrar(idfila){
             Swal.fire({
@@ -468,29 +536,77 @@
     `;
         }
 
-        function informacionEditar(id){
+        function informacionEditar(id) {
             openLoading();
             document.getElementById("formulario-editar").reset();
 
             axios.post('/admin/galeria/informacion', { id })
                 .then((response) => {
                     closeLoading();
+
                     if (response.data.success === 1) {
                         const { info, langs } = response.data;
 
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(info.id);
 
-                        // ✅ Imagen
-                        const imagenUrl = '/storage/archivos/' + info.imagen;
-                        const preview = document.getElementById('preview-editar');
-                        preview.src = imagenUrl;
-                        preview.style.display = 'block';
+                        // Referencias
+                        const preview       = document.getElementById('preview-editar');
+                        const tipoSelect    = document.getElementById('tipo-contenido-editar');
+                        const grupoImagen   = document.getElementById('grupo-imagen-editar');
+                        const grupoVideo    = document.getElementById('grupo-video-editar');
+                        const urlVideoInput = document.getElementById('url-video-editar');
+                        const inputFile     = document.getElementById('imagen-editar');
 
-                        // ✅ Idiomas dinámicos
+                        // Idiomas dinámicos
                         const cont = document.getElementById('langs-editar');
                         cont.innerHTML = langs.map(cardIdiomaHTML).join('');
                         cont.dataset.locales = langs.map(l => l.locale).join(',');
+
+                        // Función para aplicar UI según tipo
+                        function aplicarTipo(tipo) {
+                            if (tipo == 1 || tipo === '1') {
+                                // Video
+                                tipoSelect.value = '1';
+
+                                grupoVideo.classList.remove('d-none');
+                                grupoImagen.classList.add('d-none');
+
+                                // Mostrar URL video
+                                urlVideoInput.value = info.urlvideo || '';
+
+                                // Ocultar preview imagen
+                                preview.style.display = 'none';
+
+                                // Limpiar input file
+                                if (inputFile) inputFile.value = '';
+                            } else {
+                                // Imagen
+                                tipoSelect.value = '0';
+
+                                grupoVideo.classList.add('d-none');
+                                grupoImagen.classList.remove('d-none');
+
+                                // Limpiar URL video
+                                urlVideoInput.value = '';
+
+                                if (info.imagen) {
+                                    preview.src = '/storage/archivos/' + info.imagen;
+                                    preview.style.display = 'block';
+                                } else {
+                                    preview.style.display = 'none';
+                                }
+                            }
+                        }
+
+                        // Aplicar según lo que viene de BD
+                        aplicarTipo(info.tipo ?? 0);
+
+                        // Cambiar en tiempo real si el usuario toca el select
+                        tipoSelect.onchange = function (e) {
+                            aplicarTipo(e.target.value);
+                        };
+
                     } else {
                         toastr.error('Información no encontrada');
                     }
@@ -501,30 +617,49 @@
                 });
         }
 
-        function editar(){
-            const id     = document.getElementById('id-editar').value;
-            const imagen = document.getElementById('imagen-editar');
+        function editar() {
+            const id       = document.getElementById('id-editar').value;
+            const tipo     = document.getElementById('tipo-contenido-editar').value; // 0=imagen,1=video
+            const urlVideo = document.getElementById('url-video-editar').value.trim();
+            const imagen   = document.getElementById('imagen-editar');
 
-            // Validación de imagen (si hay)
-            if (imagen.files && imagen.files[0]) {
-                if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
-                    toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
+            // Validaciones según tipo
+            if (tipo === '1') {
+                // Video
+                if (!urlVideo) {
+                    toastr.error('Debe ingresar la URL del video');
                     return;
+                }
+            } else {
+                // Imagen
+                if (imagen.files && imagen.files[0]) {
+                    if (!imagen.files[0].type.match(/^image\/(jpeg|png)$/)) {
+                        toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
+                        return;
+                    }
                 }
             }
 
             // Recolectar traducciones dinámicas
-            const cont = document.getElementById('langs-editar');
-            const locales = (cont.dataset.locales || '').split(',').filter(Boolean);
+            const cont     = document.getElementById('langs-editar');
+            const locales  = (cont.dataset.locales || '').split(',').filter(Boolean);
 
             const formData = new FormData();
             formData.append('id', id);
+            formData.append('tipo', tipo);
 
-            if (imagen.files && imagen.files[0]) {
-                formData.append('imagen', imagen.files[0]);
+            if (tipo === '1') {
+                // Mandamos URL video; no mandamos imagen nueva
+                formData.append('urlvideo', urlVideo);
+            } else {
+                // Imagen
+                formData.append('urlvideo', ''); // limpiar si antes era video
+                if (imagen.files && imagen.files[0]) {
+                    formData.append('imagen', imagen.files[0]);
+                }
             }
 
-            // Enviar como arrays: body[en], title[sv], body[sv], ...
+            // body[loc], altseo[loc]
             for (const loc of locales) {
                 const b = document.getElementById(`body_${loc}_editar`)?.value.trim() ?? '';
                 const s = document.getElementById(`altseo_${loc}_editar`)?.value.trim() ?? '';
@@ -533,7 +668,7 @@
 
                 if (!s) {
                     toastr.error(`ALT SEO es requerido para ${loc.toUpperCase()}`);
-                    return; // 🔴 corta toda la función aquí
+                    return;
                 }
 
                 formData.append(`altseo[${loc}]`, s);
@@ -541,7 +676,9 @@
 
             openLoading();
 
-            axios.post('/admin/galeria/editar', formData)
+            axios.post('/admin/galeria/editar', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            })
                 .then((response) => {
                     closeLoading();
 
@@ -549,45 +686,21 @@
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
                         recargar();
-                        return;
-                    }else{
-                        toastr.error('Error al actualizar');
+                    } else if (response.data.success === 3) {
+                        toastr.error(response.data.message || 'Debe ingresar la URL del video');
+                    } else {
+                        toastr.error(response.data.message || 'Error al actualizar');
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     closeLoading();
                     toastr.error('Error al actualizar');
                 });
         }
 
 
-        function prueba () {
-            openLoading();
 
-            axios.post('/admin/galeria/prueba', {}, {
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json'
-                }
-            })
-                .then(({ data }) => {
-                    closeLoading();
-                    console.log(data);
 
-                    if (data.ok) {
-                        toastr.success('Pago de prueba ejecutado');
-                    } else {
-                        toastr.error(`Error: ${data.step || 'desconocido'} - ${data.status || ''}`);
-                        // ayuda para depurar:
-                        console.log('Detalle error WOMPI:', data.body || data.error || data);
-                    }
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('Fallo la petición');
-                    console.error(error?.response?.data || error);
-                });
-        }
 
 
 

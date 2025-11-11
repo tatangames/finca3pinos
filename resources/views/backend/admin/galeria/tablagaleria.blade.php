@@ -20,7 +20,9 @@
                         <tr>
                             <th style="width: 5%">Posición</th>
                             <th style="width: 15%">Nombre (SV)</th>
+                            <th style="width: 8%">Tipo</th>
                             <th style="width: 8%">Imagen</th>
+                            <th style="width: 8%">Video URL</th>
                             <th style="width: 5%">Estado</th>
                             <th style="width: 8%">Opciones</th>
                         </tr>
@@ -31,15 +33,27 @@
 
                                 <td style="font-weight: bold">{{ $dato->posicion }}</td>
                                 <td>{{ $dato->nombreSV }}</td>
+
                                 <td>
-                                    <img
-                                        src="{{ url('storage/archivos/'.$dato->imagen) }}"
-                                        alt="{{ $dato->alt_seo }}"
-                                        width="190"
-                                        height="176"
-                                        style="border-radius:12px; object-fit:cover; display:block; margin:0 auto;"
-                                    >
+                                    @if($dato->tipo == 1)
+                                        Video
+                                    @else
+                                        Imagen
+                                    @endif
                                 </td>
+
+                                <td>
+                                    @if($dato->imagen != null)
+                                        <img
+                                            src="{{ url('storage/archivos/'.$dato->imagen) }}"
+                                            alt="{{ $dato->alt_seo }}"
+                                            width="190"
+                                            height="176"
+                                            style="border-radius:12px; object-fit:cover; display:block; margin:0 auto;"
+                                        >
+                                    @endif
+                                </td>
+                                <td>{{ $dato->urlvideo }}</td>
                                 <td>
                                     @if($dato->activo == 1)
                                         <small class="badge badge-success"><i class="far fa-check"></i>Activo</small>
@@ -55,8 +69,6 @@
                                     <button type="button" style="margin: 2px" class="btn btn-danger btn-xs" onclick="modalBorrar({{ $dato->id }})">
                                         <i class="fas fa-eye" title="Borrar"></i>&nbsp; Borrar
                                     </button>
-
-
 
                                    @if($dato->activo == 1)
                                         <button type="button" style="margin: 2px" class="btn btn-warning btn-xs" onclick="modalDesactivar({{ $dato->id }})">

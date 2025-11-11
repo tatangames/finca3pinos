@@ -7,6 +7,7 @@ use App\Models\Galeria;
 use App\Models\Region;
 use App\Models\RegionContent;
 use App\Models\RegionContentTranslation;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -134,49 +135,67 @@ class AdminAuthController extends Controller
 
     public function nuevaGaleria(Request $request)
     {
-
         DB::beginTransaction();
 
         try {
-            // 1) Normaliza la key: quita todos los espacios internos y bordes
-            $keySinEspacios = preg_replace('/\s+/', '', (string) $request->key); // "galeria 1" -> "galeria1"
+            // Normalizar key
+            $keySinEspacios = preg_replace('/\s+/', '', (string) $request->key);
 
-            // EVITAR KEY REPETIDAS
-            if(RegionContent::where('key', $keySinEspacios)->first()){
+            // Evitar keys repetidas
+            if (RegionContent::where('key', $keySinEspacios)->first()) {
                 return ['success' => 1];
             }
 
-            // ===== 1) Imagen =====
-            $nombreBase  = Str::slug(Str::random(15) . '-' . microtime(true), '_');
-            $manager = new ImageManager(new Driver());
-            $img     = $manager->read($request->file('imagen')->getPathname());
-            if ($img->width() > 1200) { $img->scale(width: 1200); }
+            // ===== Tipo de contenido =====
+            $tipoContenido = $request->input('tipo'); // 0 = imagen, 1 = video
 
-            $encoded   = $img->encode(new WebpEncoder(quality: 82));
-            $nombreOut = $nombreBase . '.webp';
-            if (!Storage::disk('archivos')->put($nombreOut, $encoded)) {
-                return ['success' => 99, 'message' => 'No se pudo guardar la imagen'];
+            $nombreOut = null;
+
+            // ===== Si viene imagen =====
+            if ($tipoContenido == '0' && $request->hasFile('imagen')) {
+                $nombreBase = Str::slug(Str::random(15) . '-' . microtime(true), '_');
+                $manager    = new ImageManager(new Driver());
+                $img        = $manager->read($request->file('imagen')->getPathname());
+
+                if ($img->width() > 1200) {
+                    $img->scale(width: 1200);
+                }
+
+                $encoded   = $img->encode(new WebpEncoder(quality: 82));
+                $nombreOut = $nombreBase . '.webp';
+
+                if (!Storage::disk('archivos')->put($nombreOut, $encoded)) {
+                    return ['success' => 99, 'message' => 'No se pudo guardar la imagen'];
+                }
             }
 
-            // ===== 2) Galería =====
+            // ===== Si viene URL de video =====
+            $urlVideo = null;
+            if ($tipoContenido == '1') {
+                $urlVideo = trim($request->input('urlvideo'));
+                if (empty($urlVideo)) {
+                    return ['success' => 98, 'message' => 'Debe ingresar la URL del video'];
+                }
+            }
+
+            // ===== Crear registro de galería =====
             $nuevaPosicion = optional(Galeria::orderByDesc('posicion')->first())->posicion + 1 ?? 1;
 
             $gal = new Galeria();
-            $gal->imagen      = $nombreOut;
-            $gal->posicion    = $nuevaPosicion;
-            $gal->activo      = 1;
-            $gal->content_key = $keySinEspacios;     // ← única
+            $gal->fecha = Carbon::now('America/El_Salvador');
+            $gal->imagen       = $nombreOut;     // puede ser null si es video
+            $gal->urlvideo     = $urlVideo;      // agrega esta columna a tu tabla (nullable)
+            $gal->tipo         = $tipoContenido;
+            $gal->posicion     = $nuevaPosicion;
+            $gal->activo       = 1;
+            $gal->content_key  = $keySinEspacios;
             $gal->save();
 
-            // ===== 3) i18n =====
-            // Espera formato: translations[<locale>][title|body]
+            // ===== i18n =====
             $translations = $request->input('translations', []);
-
-            // Trae regiones y crea RegionContent por cada una
-            $regiones = Region::select('id','slug','locale')->get();
+            $regiones     = Region::select('id','slug','locale')->get();
 
             foreach ($regiones as $region) {
-                // Crea/obtiene el contenedor por region_id + key
                 $content = RegionContent::firstOrCreate(
                     ['region_id' => $region->id, 'key' => $keySinEspacios],
                     []
@@ -186,7 +205,8 @@ class AdminAuthController extends Controller
                 if ($tr) {
                     RegionContentTranslation::updateOrCreate(
                         ['content_id' => $content->id, 'locale' => $region->locale],
-                        ['body' => $tr['body'] ?? '',
+                        [
+                            'body'   => $tr['body'] ?? '',
                             'altseo' => $tr['altseo'] ?? ''
                         ]
                     );
@@ -202,6 +222,7 @@ class AdminAuthController extends Controller
             return ['success' => 0, 'message' => 'Excepción al guardar'];
         }
     }
+
 
     public function desactivarGaleria(Request $request)
     {
@@ -333,6 +354,8 @@ class AdminAuthController extends Controller
                 'id'          => $galeria->id,
                 'imagen'      => $galeria->imagen,
                 'content_key' => $galeria->content_key,
+                'tipo' => $galeria->tipo,
+                'urlvideo' => $galeria->urlvideo,
             ],
             'langs' => $langs,
         ];
@@ -341,75 +364,106 @@ class AdminAuthController extends Controller
 
     public function editarGaleria(Request $request)
     {
-        $regla = array(
-            'id' => 'required'
-        );
+        $regla = [
+            'id'   => 'required',
+            'tipo' => 'required|in:0,1',
+            'urlvideo' => 'nullable|string|max:500',
+        ];
 
         $validar = Validator::make($request->all(), $regla);
-
-        if ($validar->fails()){ return ['success' => 0];}
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
 
         $galeria = Galeria::find($request->id);
         if (!$galeria) {
-            return ['success' => 2]; // borrada/no existe
+            return ['success' => 2]; // no existe
         }
 
         DB::beginTransaction();
+
         try {
-            // Imagen opcional → WebP
-            if ($request->hasFile('imagen')) {
-                $old = $galeria->imagen;
+            $tipo = (int) $request->tipo;
 
-                $manager = new ImageManager(new Driver());
-                $img     = $manager->read($request->file('imagen')->getPathname());
+            // ==== TIPO VIDEO ====
+            if ($tipo === 1) {
+                $urlVideo = trim($request->urlvideo ?? '');
 
-                if ($img->width() > 1200) {
-                    $img->scale(width: 1200);
-                }
-
-                $nombreBase = Str::slug(Str::random(15) . '-' . microtime(true), '_');
-                $nombreOut  = $nombreBase . '.webp';
-                $encoded    = $img->encode(new WebpEncoder(quality: 82));
-
-                if (!Storage::disk('archivos')->put($nombreOut, $encoded)) {
+                if ($urlVideo === '') {
                     DB::rollBack();
-                    return ['success' => 99, 'message' => 'No se pudo guardar la imagen'];
+                    return ['success' => 3, 'message' => 'Debe ingresar la URL del video'];
                 }
 
-                $galeria->imagen = $nombreOut;
-
-                if ($old && Storage::disk('archivos')->exists($old)) {
-                    Storage::disk('archivos')->delete($old);
+                // Si tenía imagen previa, eliminar archivo
+                if ($galeria->imagen && Storage::disk('archivos')->exists($galeria->imagen)) {
+                    Storage::disk('archivos')->delete($galeria->imagen);
                 }
+
+                $galeria->tipo     = 1;
+                $galeria->urlvideo = $urlVideo;
+                $galeria->imagen   = null; // ya no aplica
             }
 
-            // 4) Garantiza content_key
+            // ==== TIPO IMAGEN ====
+            if ($tipo === 0) {
+                // Procesar nueva imagen si viene
+                if ($request->hasFile('imagen')) {
+                    $old = $galeria->imagen;
+
+                    $manager = new ImageManager(new Driver());
+                    $img     = $manager->read($request->file('imagen')->getPathname());
+
+                    if ($img->width() > 1200) {
+                        $img->scale(width: 1200);
+                    }
+
+                    $nombreBase = Str::slug(Str::random(15) . '-' . microtime(true), '_');
+                    $nombreOut  = $nombreBase . '.webp';
+                    $encoded    = $img->encode(new WebpEncoder(quality: 82));
+
+                    if (!Storage::disk('archivos')->put($nombreOut, $encoded)) {
+                        DB::rollBack();
+                        return ['success' => 99, 'message' => 'No se pudo guardar la imagen'];
+                    }
+
+                    $galeria->imagen = $nombreOut;
+
+                    if ($old && Storage::disk('archivos')->exists($old)) {
+                        Storage::disk('archivos')->delete($old);
+                    }
+                }
+
+                // Si antes era video, limpiar URL
+                $galeria->tipo     = 0;
+                $galeria->urlvideo = null;
+            }
+
+            // Garantiza content_key
             if (empty($galeria->content_key)) {
                 $galeria->content_key = $galeria->id;
             }
 
             $galeria->save();
 
-            // 5) Upsert de contenidos por región y traducciones por locale
-            $bodies = $request->input('body',  []);   // ej: ['es' => '...', 'en'=>'...']
-            $altseo = $request->input('altseo', []);   // ej: ['es' => '...', 'en'=>'...']
+            // ===== Traducciones =====
+            $bodies = $request->input('body',  []);   // ['es' => '...', 'en'=>'...']
+            $altseo = $request->input('altseo', []);  // ['es' => '...', 'en'=>'...']
 
-            // Para cada región del sistema, garantizamos region_contents (region_id + key)
             $regiones = Region::select('id', 'locale', 'name')->get();
 
             foreach ($regiones as $region) {
-                // Crea/obtiene el row base por región+key
                 $content = RegionContent::firstOrCreate(
-                    ['region_id' => $region->id, 'key' => $galeria->content_key],
-                    [] // no hay más columnas en region_contents
+                    [
+                        'region_id' => $region->id,
+                        'key'       => $galeria->content_key,
+                    ],
+                    []
                 );
 
-                // Usamos el locale de la región para tomar los campos del request
-                $loc  = $region->locale; // p.ej 'es', 'en', 'ko'...
-                $alt  = $altseo[$loc] ?? null;
-                $bod  = $bodies[$loc] ?? null;
+                $loc = $region->locale;
+                $bod = $bodies[$loc] ?? null;
+                $alt = $altseo[$loc] ?? null;
 
-                // Si no hay nada para este locale, puedes saltar o limpiar. Aquí upsert si hay algo.
                 if ($bod !== null) {
                     RegionContentTranslation::updateOrCreate(
                         ['content_id' => $content->id, 'locale' => $loc],
@@ -420,12 +474,14 @@ class AdminAuthController extends Controller
 
             DB::commit();
             return ['success' => 1];
+
         } catch (\Throwable $e) {
             DB::rollBack();
-             Log::error($e->getMessage());
+            Log::error($e->getMessage());
             return ['success' => 0, 'message' => 'Error al actualizar'];
         }
     }
+
 
 
 
