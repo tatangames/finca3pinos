@@ -394,7 +394,6 @@
     </section>
 
     {{-- Superior (Newsletter) block --}}
-    @include('frontend.partials.superior')
 
     <script>
         document.getElementById('logoutLink')?.addEventListener('click', function (e) {

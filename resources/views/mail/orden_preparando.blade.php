@@ -14,7 +14,7 @@
 <body>
 <div class="container">
     <h2>{{ __('meta.order_preparing_title') }} 🧾</h2>
-    <p>{{ __('meta.product_v15') }} {{ $orden->usuario->nombre ?? 'cliente' }},</p>
+    <p>{{ __('meta.product_v15') }} {{ $orden->usuario->nombre}},</p>
     <p>{{ __('meta.we_are_happy_to_inform_you') }} <strong>#{{ $orden->id }}</strong> {{ __('meta.is_being_prepared') }}</p>
 
     @if($fechaPreparacion)

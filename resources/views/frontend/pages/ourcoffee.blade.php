@@ -594,5 +594,4 @@
     </section>
 
     {{-- Superior (Newsletter) block --}}
-    @include('frontend.partials.superior')
 @endsection

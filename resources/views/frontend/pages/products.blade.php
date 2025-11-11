@@ -584,7 +584,6 @@
 
 
     {{-- Superior (Newsletter) block --}}
-    @include('frontend.partials.superior')
 
     <script>
         function stepQty(productId, delta) {

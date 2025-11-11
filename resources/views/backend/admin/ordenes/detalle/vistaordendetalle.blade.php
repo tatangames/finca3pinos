@@ -18,7 +18,7 @@
     .block-separator { margin-bottom: 18px; }
 </style>
 
-<div class="content-wrapper">
+<div id="divcontenedor" class="content-wrapper" style="display: none">
 
     {{-- ENCABEZADO --}}
     <section class="content-header">
@@ -354,6 +354,12 @@
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            document.getElementById("divcontenedor").style.display = "block";
+        });
+    </script>
 
     {{-- CKEditor 5 --}}
     <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>

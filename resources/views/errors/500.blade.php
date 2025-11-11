@@ -72,6 +72,5 @@
 
 
 
-    @include('frontend.partials.superior')
 @endsection
 

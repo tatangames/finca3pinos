@@ -14,10 +14,6 @@
         table-layout:fixed;
     }
 
-
-
-
-
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -42,7 +38,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Categoría</h3>
+                    <h3 class="card-title">Listado de Ordenes</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">

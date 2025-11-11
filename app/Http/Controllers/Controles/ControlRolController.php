@@ -18,6 +18,9 @@ class ControlRolController extends Controller
         if($user->hasRole('admin')){
             $ruta = 'admin.roles.index';
         }
+        else if($user->hasRole('editor')){
+            $ruta = 'admin.ordenes';
+        }
         else{
             $ruta = 'no.permisos.index';
         }

@@ -14,7 +14,7 @@
 <body>
 <div class="container">
     <h2>{{ __('meta.your_order_has_been_shipped') }} 🚚</h2>
-    <p>{{ __('meta.product_v15') }} {{ $orden->usuario->nombre ?? '' }},</p>
+    <p>{{ __('meta.product_v15') }} {{ $orden->usuario->nombre }},</p>
     <p>{{ __('meta.your_order') }} <strong>#{{ $orden->id }}</strong> {{ __('meta.has_been_shipped_and_on_the_way') }}</p>
 
     @if($fechaEnvio)

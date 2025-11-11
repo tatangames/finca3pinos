@@ -814,6 +814,13 @@
                         <h4 style="text-align: left!important; font-weight: 600">{{ __('meta.profile') }}</h4>
 
                         {{-- ===== DATOS DEL USUARIO ===== --}}
+
+                        <div class="form-group">
+                            <label>{{ __('meta.contact_v5') }}</label>
+                            <input type="email" value="{{ $infouser->nombre ?? '' }}" disabled
+                                   style="background-color:#f0f0f0; color:#6c757d; cursor:not-allowed;">
+                        </div>
+
                         <div class="form-group">
                             <label>{{ __('meta.email_address') }}</label>
                             <input type="email" value="{{ $infouser->email ?? '' }}" disabled
@@ -1066,5 +1073,4 @@
 
 
     {{-- Superior (Newsletter) block --}}
-    @include('frontend.partials.superior')
 @endsection

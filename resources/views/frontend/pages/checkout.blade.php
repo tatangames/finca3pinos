@@ -827,5 +827,4 @@
     </script>
 
 
-    @include('frontend.partials.superior')
 @endsection

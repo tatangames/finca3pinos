@@ -9,7 +9,7 @@
                             <tr>
                                 <th>Fecha Creada</th>
                                 <th>País</th>
-                                <th>Nombre</th>
+                                <th>Nombre Cliente</th>
                                 <th>Estado Orden</th>
                                 <th>Sub Total</th>
                                 <th>Envío</th>
