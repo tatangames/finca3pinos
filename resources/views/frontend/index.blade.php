@@ -508,6 +508,47 @@
             }
         }
 
+
+
+        /* ===== BLOQUE DE VIDEO A PANTALLA COMPLETA (sin desborde) ===== */
+        .video-hero{
+            position: relative;
+            /* fallback primero */
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+
+            /* override preciso (si el navegador soporta dvw) */
+            width: 100dvw;
+            margin-left: calc(50% - 50dvw);
+            margin-right: calc(50% - 50dvw);
+
+            background: #000;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        /* contenedor 16:9 */
+        .video-wrapper{
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #000;
+        }
+
+        /* iframe YouTube */
+        .video-hero__iframe{
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+
+
+
     </style>
 
     <div class="container">
@@ -581,6 +622,26 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="vc_row-full-width"></div>
+
+                            {{-- BLOQUE DE VIDEO --}}
+                            <section class="video-hero" aria-label="Video Finca 3 Pinos">
+                                <div class="video-wrapper">
+                                    <iframe
+                                        class="video-hero__iframe"
+                                        src="https://www.youtube.com/embed/BvirH-wQRqo?autoplay=1&mute=1&loop=1&playlist=BvirH-wQRqo&controls=1&playsinline=1"
+                                        title="Video Finca 3 Pinos"
+                                        frameborder="0"
+                                        allow="autoplay; encrypted-media; picture-in-picture"
+                                        allowfullscreen
+                                    ></iframe>
+                                </div>
+                            </section>
+
+
+
+
 
                             <div class="vc_row-full-width"></div>
 

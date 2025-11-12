@@ -90,7 +90,7 @@ class CheckoutController extends Controller
 
     public function vistaCotizar()
     {
-
+        return view('frontend.pages.cotizar');
     }
 
 
