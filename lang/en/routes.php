@@ -26,7 +26,7 @@ return [
     'thanks' => 'thanks/{order}',            // página de gracias
     'tracking_order' => 'tracking-order/{order}',
     'details_order' => 'details-order/{order}',
-
+    'quote' => 'quote'
 
 
 

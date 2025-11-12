@@ -305,7 +305,10 @@ return [
     'shipping_date' => 'Fecha de envío',
     'go_back' => 'Regresar',
     'no_additional_data' => 'Sin datos adicionales.',
-
+    'checkout_limited_notice' => 'El pago automático está habilitado únicamente en ciertas zonas. Para otros destinos, por favor solicita una cotización de envío.',
+    'need_to_quote_shipping' => 'Necesitas cotizar el envío',
+    'quote' => 'Cotizar',
+    'quote_now' => 'Cotizar ahora',
 
 
 

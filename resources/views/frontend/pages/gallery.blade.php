@@ -9,43 +9,48 @@
         .gallery-section {
             background: #0e0e0e;
             color: #fff;
-            padding: 40px 10px;
+            padding: 40px 12px; /* un pelín más de aire lateral en móvil */
             text-align: center;
         }
         .gallery-title {
-            font-size: 2rem;
+            font-size: clamp(1.25rem, 2.2vw + 1rem, 2rem);
             font-weight: 700;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
             color: #d2aa6d;
             letter-spacing: .05em;
             text-transform: uppercase;
         }
 
-        /* === GRID === */
+        /* === GRID RESPONSIVE === */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            /* columnas fluidas: ocupan 1fr cada una, mínimo 160px */
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
             max-width: 1000px;
             margin: 0 auto;
         }
+
+        /* Tarjeta cuadrada flexible (sin 200px fijos) */
         .gallery-item {
             position: relative;
             overflow: hidden;
             border-radius: 16px;
             cursor: pointer;
             transition: transform .3s ease;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
+            width: 100%;
+            aspect-ratio: 1 / 1;            /* mantiene el cuadrado en cualquier ancho */
+            margin: 0;                      /* elimina el "centrado" que forzaba saltos */
+            -webkit-tap-highlight-color: transparent;
         }
-        .gallery-item img {
+        .gallery-item img,
+        .gallery-video-thumb {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            display: block;
             border-radius: 16px;
-            transition: transform .4s ease;
         }
+        .gallery-item img { object-fit: cover; transition: transform .4s ease; }
         .gallery-item:hover img { transform: scale(1.05); }
 
         .overlay {
@@ -53,32 +58,31 @@
             inset: 0;
             background: rgba(0,0,0,.45);
             opacity: 0;
-            transition: opacity .4s ease;
+            transition: opacity .3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            pointer-events: none;
         }
         .overlay i {
             color: #d2aa6d;
-            font-size: 1.8rem;
-            transform: scale(.8);
+            font-size: clamp(1.2rem, 2.5vw + .6rem, 1.8rem);
+            transform: scale(.9);
             transition: transform .3s ease;
         }
         .gallery-item:hover .overlay { opacity: 1; }
         .gallery-item:hover .overlay i { transform: scale(1); }
 
         .gallery-video-thumb {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background: #000;
-            border-radius: 16px;
+            position: relative;
         }
         .gallery-video-thumb i {
-            font-size: 2.4rem;
+            font-size: clamp(1.6rem, 3vw + .8rem, 2.4rem);
             color: #d2aa6d;
+            position: absolute; inset: 50% auto auto 50%;
+            transform: translate(-50%,-50%);
+            text-shadow: 0 0 8px rgba(0,0,0,.7);
         }
 
         /* ===== MODAL ===== */
@@ -91,14 +95,16 @@
             align-items: center;
             z-index: 9999;
             backdrop-filter: blur(6px);
-            padding: 16px;
+            /* respeta notch en iOS */
+            padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+            max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
         }
         .modal-content {
             position: relative;
             background: #111;
             border-radius: 18px;
             box-shadow: 0 0 40px rgba(0,0,0,.7);
-            width: clamp(720px, 88vw, 1280px);
+            width: min(96vw, 1280px);       /* evita el mínimo de 720px en móviles */
             max-height: 92vh;
             overflow: hidden;
             animation: fadeIn .35s ease;
@@ -119,19 +125,18 @@
             background: rgba(0,0,0,.85);
             width: 100%;
             color: #f1f1f1;
-            font-size: 1rem;
-            padding: 12px 0;
+            font-size: .95rem;
+            padding: 10px 12px;
             margin: 0;
             text-align: center;
-            border-top: 1px solid rgba(255,255,255,.1);
+            border-top: 1px solid rgba(255,255,255,.08);
         }
         #modalCaption:empty { display: none; }
         .modal-close {
             position: absolute;
-            top: 14px;
-            right: 18px;
+            top: 10px; right: 14px;
             color: #fff;
-            font-size: 2rem;
+            font-size: 1.8rem;
             cursor: pointer;
             transition: color .3s ease;
             z-index: 10;
@@ -143,26 +148,16 @@
             to   { opacity: 1; transform: scale(1); }
         }
 
-        /* ===== RESPONSIVE ===== */
+        /* ===== BREAKPOINTS FINOS ===== */
         @media (max-width: 1024px) {
-            .gallery-title { font-size: 1.75rem; }
-            .modal-content { width: 96vw; max-height: 90vh; }
-            .modal-content img { max-height: calc(90vh - 48px); }
+            .gallery-grid { gap: 14px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
         }
-        @media (max-width: 640px) {
-            .gallery-title { font-size: 1.5rem; }
-            .modal-content { width: 96vw; max-height: 88vh; }
-            .modal-content img { max-height: calc(88vh - 44px); }
-            #modalCaption { font-size: .9rem; }
+        @media (max-width: 768px) {
+            .gallery-grid { gap: 12px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
         }
-
-        .video-icon-overlay {
-            text-shadow: 0 0 8px rgba(0,0,0,.7);
-            transition: transform .3s ease, opacity .3s ease;
-        }
-        .gallery-item:hover .video-icon-overlay {
-            transform: translate(-50%, -50%) scale(1.1);
-            opacity: 1;
+        @media (max-width: 480px) {
+            .gallery-grid { gap: 10px; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+            .gallery-section { padding: 28px 10px; }
         }
 
 

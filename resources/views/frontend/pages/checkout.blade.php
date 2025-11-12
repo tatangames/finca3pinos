@@ -618,6 +618,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <script>
+        // ===== MAPAS Y BASES =====
         const PAISES_MAP = {!! json_encode(
         $paises->keyBy('id')->map(fn($p)=>$p->nombre)->toArray(),
         JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
@@ -629,6 +630,7 @@
         $addresses->keyBy('id')->map(function($a){
             return [
                 'id'            => (int) $a->id,
+                'id_paises'     => (int) $a->id_paises,   // <-- IMPORTANTE
                 'nombre'        => $a->nombre,
                 'direccion'     => $a->direccion,
                 'pais'          => $a->pais_nombre ?? null,
@@ -647,11 +649,46 @@
 
         const BASE_SUBTOTAL = {{ (float) $subtotal }};
 
+        // ===== I18N BÁSICO =====
         const i18n = {
             errorDesconocidoMessage: "{{ __('meta.unknown_error') }}",
             seNecesitaDireccionMessage: "{{ __('meta.select_shipping_before_continue') }}",
             noHayFormularioPagoMessage: "{{ __('meta.payment_form_not_found') }}",
+            quoteNeededTitle: "{{ __('meta.checkout_limited_notice') }}",
+            quoteNeededHtml: "{{ __('meta.need_to_quote_shipping') }}",
+            quoteNow: "{{ __('meta.quote_now') }}",
+            cancel: "{{ __('meta.cancel') }}",
         };
+
+        // ===== CONFIGURACIÓN DE CONTROL DE PAÍS =====
+        const ALLOWED_COUNTRIES = [1, 2, 3]; // 1: El Salvador, 2: Estados Unidos, 3: Korea
+        const QUOTE_URL = "{{ route('shipping.quote.form') }}"; // <-- AJUSTA ESTA RUTA
+
+        // ¿La dirección seleccionada pertenece a país permitido?
+        function isAllowedAddress(addrId) {
+            const a = ADDRESS_MAP[addrId];
+            if (!a) return false;
+            return ALLOWED_COUNTRIES.includes(Number(a.id_paises));
+        }
+
+        // Muestra SweetAlert para cotización y, si confirman, redirige
+        function showQuoteSwal(addrId) {
+            return Swal.fire({
+                icon: 'info',
+                title: i18n.quoteNeededTitle,
+                html: i18n.quoteNeededHtml,
+                confirmButtonText: i18n.quoteNow,
+                cancelButtonText: i18n.cancel,
+                showCancelButton: true,
+                reverseButtons: true,
+            }).then(res => {
+                if (res.isConfirmed) {
+                    const sep = QUOTE_URL.includes('?') ? '&' : '?';
+                    window.location.href = QUOTE_URL + sep + 'address_id=' + encodeURIComponent(addrId);
+                }
+                return res;
+            });
+        }
 
         (function () {
             const stepsHead = document.getElementById('stepsHead');
@@ -671,7 +708,6 @@
                 panes[step].classList.add('active');
                 window.scrollTo({top: stepsHead.offsetTop - 8, behavior: 'smooth'});
             }
-
             window.go = go;
 
             function money(n) {
@@ -725,12 +761,11 @@
                 }</div>`;
             }
 
-            // ===== Paso 1 -> Paso 2 =====
+            // ===== Inicialización / Cambio de dirección en Paso 1 =====
             if (HAS_ADDRESSES) {
                 const sel = document.getElementById('shipping_address');
                 const hidden = document.getElementById('envio_id');
 
-                // Inicializar
                 document.addEventListener('DOMContentLoaded', () => {
                     const current = (hidden?.value || sel?.value);
                     if (current) {
@@ -739,7 +774,6 @@
                     }
                 });
 
-                // Cambio dirección
                 sel?.addEventListener('change', e => {
                     const id = e.target.value;
                     if (hidden) hidden.value = id;
@@ -747,15 +781,18 @@
                     updateSummaryByAddress(id);
                 });
 
-
-                document.getElementById('btnToStep2')?.addEventListener('click', () => {
-                    const v = sel.value;
-                    if (!v) {
+                // ===== Paso 1 -> Paso 2 (VALIDA PAÍS) =====
+                document.getElementById('btnToStep2')?.addEventListener('click', async () => {
+                    const addrId = sel?.value;
+                    if (!addrId) {
                         toastr.error(i18n.seNecesitaDireccionMessage);
                         return;
                     }
-                    // Solo avanzamos, ya tenemos envio_id
-                    if (hidden) hidden.value = v;
+                    if (!isAllowedAddress(addrId)) {
+                        await showQuoteSwal(addrId);
+                        return; // NO avanzar
+                    }
+                    if (hidden) hidden.value = addrId;
                     go(2);
                 });
             }
@@ -763,15 +800,18 @@
             // Back a paso 1
             document.getElementById('btnBack1')?.addEventListener('click', () => go(1));
 
-            // ===== Paso 2 -> Paso 3 (YA NO VALIDA FACTURACIÓN) =====
-            document.getElementById('btnToStep3')?.addEventListener('click', () => {
-                const envioId = (document.getElementById('envio_id')?.value || '').trim();
-                if (!envioId) {
+            // ===== Paso 2 -> Paso 3 (re-chequeo por seguridad) =====
+            document.getElementById('btnToStep3')?.addEventListener('click', async () => {
+                const addrId = (document.getElementById('envio_id')?.value || '').trim();
+                if (!addrId) {
                     toastr.error(i18n.seNecesitaDireccionMessage);
                     go(1);
                     return;
                 }
-                // Paso 2 es solo informativo, avanzamos directo
+                if (!isAllowedAddress(addrId)) {
+                    await showQuoteSwal(addrId);
+                    return; // NO avanzar
+                }
                 go(3);
             });
 
@@ -788,43 +828,45 @@
             // Back paso 3 -> 2
             document.getElementById('btnBack2')?.addEventListener('click', () => go(2));
 
-            // ===== Pagar con Pagadito (solo dirección) =====
-            const btnPay = document.getElementById('btnPayPagadito');
-            const payMsg = document.getElementById('pay-msg');
+            // ===== Pagar con Pagadito (re-chequeo por seguridad) =====
+            (function () {
+                const btnPay = document.getElementById('btnPayPagadito');
+                const payMsg = document.getElementById('pay-msg');
+                const form   = document.getElementById('formPagadito');
 
-            if (btnPay) {
-                btnPay.addEventListener('click', () => {
-                    const envioId = (document.getElementById('envio_id')?.value || '').trim();
+                btnPay?.addEventListener('click', async () => {
+                    const addrId = (document.getElementById('envio_id')?.value || '').trim();
 
-                    if (!envioId) {
+                    if (!addrId) {
                         toastr.error(i18n.seNecesitaDireccionMessage);
                         go(1);
                         return;
                     }
-
-                    const form = document.getElementById('formPagadito');
+                    if (!isAllowedAddress(addrId)) {
+                        await showQuoteSwal(addrId);
+                        return; // NO pagar
+                    }
                     if (!form) {
                         toastr.error(i18n.noHayFormularioPagoMessage);
                         return;
                     }
 
                     // Enviar solo la dirección seleccionada
-                    document.getElementById('pg_envio_id').value = envioId;
+                    document.getElementById('pg_envio_id').value = addrId;
 
                     // Si tienes un campo pg_billing en el form, lo puedes limpiar:
                     const billingInput = document.getElementById('pg_billing');
-                    if (billingInput) {
-                        billingInput.value = '';
-                    }
+                    if (billingInput) billingInput.value = '';
 
                     btnPay.disabled = true;
                     if (payMsg) payMsg.style.display = 'block';
 
                     form.submit();
                 });
-            }
+            })();
         })();
     </script>
+
 
 
 @endsection

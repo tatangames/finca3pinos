@@ -8,6 +8,7 @@
                             <thead>
                             <tr>
                                 <th>Fecha Creada</th>
+                                <th># orden</th>
                                 <th>País</th>
                                 <th>Nombre Cliente</th>
                                 <th>Estado Orden</th>
@@ -21,6 +22,7 @@
                             @foreach($ordenes as $o)
                                 <tr>
                                     <td data-order="{{ $o['fecha_orden'] }}">{{ $o['fecha_formato'] }}</td>
+                                    <td>{{ $o['id'] }}</td>
                                     <td>{{ $o['pais'] }}</td>
                                     <td>{{ $o['nombre'] }}</td>
                                     <td>{!! $o['status_badge'] !!}</td>

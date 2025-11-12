@@ -334,6 +334,12 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.checkout'), [CheckoutController::class, 'vistaCheckout'])
             ->name('checkout.show');
 
+        // ver vista cotizar
+        Route::get(LaravelLocalization::transRoute('routes.quote'), [CheckoutController::class, 'vistaCotizar'])
+            ->name('shipping.quote.form');
+
+
+
         // Registrar orden y pagar
         Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
 

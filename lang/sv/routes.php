@@ -26,7 +26,7 @@ return [
     'thanks' => 'gracias/{order}',
     'tracking_order' => 'tracking-pedido/{order}',
     'details_order' => 'detalle-pedido/{order}',
-
+    'quote' => 'cotizar'
 
 
 
