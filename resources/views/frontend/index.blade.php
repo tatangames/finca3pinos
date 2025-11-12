@@ -630,7 +630,7 @@
                                 <div class="video-wrapper">
                                     <iframe
                                         class="video-hero__iframe"
-                                        src="https://www.youtube.com/embed/BvirH-wQRqo?autoplay=1&mute=1&loop=1&playlist=BvirH-wQRqo&controls=1&playsinline=1"
+                                        src="https://www.youtube.com/embed/7Kk3AHqJLts?autoplay=1&mute=1&loop=1&playlist=7Kk3AHqJLts&controls=1&playsinline=1"
                                         title="Video Finca 3 Pinos"
                                         frameborder="0"
                                         allow="autoplay; encrypted-media; picture-in-picture"
@@ -638,9 +638,6 @@
                                     ></iframe>
                                 </div>
                             </section>
-
-
-
 
 
                             <div class="vc_row-full-width"></div>
