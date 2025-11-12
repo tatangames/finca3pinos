@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Direcciones;
 use App\Models\DireccionFacturacion;
 use App\Models\Order;
+use App\Models\Pais;
 use App\Models\Producto;
 use App\Models\Usuario;
 use App\Traits\HandlesCart;
@@ -90,7 +91,13 @@ class CheckoutController extends Controller
 
     public function vistaCotizar()
     {
-        return view('frontend.pages.cotizar');
+        // Solo países activos y distintos de El Salvador (1), USA (2), Corea del Sur (3)
+        $paises = Pais::where('activo', 1)
+            ->whereNotIn('id', [1, 2, 3])
+            ->orderBy('nombre')
+            ->get();
+
+        return view('frontend.pages.cotizar', compact('paises'));
     }
 
 

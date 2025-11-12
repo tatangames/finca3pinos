@@ -662,7 +662,7 @@
 
         // ===== CONFIGURACIÓN DE CONTROL DE PAÍS =====
         const ALLOWED_COUNTRIES = [1, 2, 3]; // 1: El Salvador, 2: Estados Unidos, 3: Korea
-        const QUOTE_URL = "{{ route('shipping.quote.form') }}"; // <-- AJUSTA ESTA RUTA
+        const QUOTE_URL = "{{ route('user.quote.form') }}"; // <-- AJUSTA ESTA RUTA
 
         // ¿La dirección seleccionada pertenece a país permitido?
         function isAllowedAddress(addrId) {

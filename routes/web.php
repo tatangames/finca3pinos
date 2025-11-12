@@ -336,7 +336,7 @@ Route::middleware(['detect.country.locale'])->group(function () {
 
         // ver vista cotizar
         Route::get(LaravelLocalization::transRoute('routes.quote'), [CheckoutController::class, 'vistaCotizar'])
-            ->name('shipping.quote.form');
+            ->name('user.quote');
 
 
 

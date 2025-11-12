@@ -309,6 +309,9 @@ return [
     'need_to_quote_shipping' => 'Necesitas cotizar el envío',
     'quote' => 'Cotizar',
     'quote_now' => 'Cotizar ahora',
+    'send_quote' => 'Enviar cotización',
+    'chars_remaining' => 'Caracteres restantes',
+    'message' => 'Mensaje',
 
 
 

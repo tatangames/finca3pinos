@@ -309,6 +309,9 @@ return [
     'need_to_quote_shipping' => 'You need to request a shipping quote',
     'quote' => 'Get quote',
     'quote_now' => 'Get a quote now',
+    'send_quote' => 'Send quote',
+    'chars_remaining' => 'Characters remaining',
+    'message' => 'Message',
 
 
 

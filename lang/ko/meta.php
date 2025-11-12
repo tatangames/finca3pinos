@@ -309,6 +309,9 @@ return [
     'need_to_quote_shipping' => '배송 견적을 요청해야 합니다',
     'quote' => '견적 요청',
     'quote_now' => '지금 견적 요청',
+    'send_quote' => '견적 보내기',
+    'chars_remaining' => '남은 문자 수',
+    'message' => '메시지',
 
 
 

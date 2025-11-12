@@ -161,6 +161,9 @@
                     <li><a class="{{ $is('user.contact') }}"
                            href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.contact', [], false)) }}">{{ __('meta.contact') }}</a>
                     </li>
+                    <li><a class="{{ $is('user.quote') }}"
+                           href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.quote', [], false)) }}">{{ __('meta.quote') }}</a>
+                    </li>
 
                     {{-- Carrito --}}
                     <li class="only-desktop">
