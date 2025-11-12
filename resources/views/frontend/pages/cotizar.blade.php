@@ -115,6 +115,36 @@
             0%{transform:rotate(0deg)}
             100%{transform:rotate(360deg)}
         }
+
+        /* ============================
+           RESET FUERTE SOLO PARA #q-pais
+           (el theme está escondiendo el texto)
+        ============================= */
+        .quote-card select#q-pais.form-control{
+            color:#333 !important;
+            background-color:#fafafa !important;
+            font-size:15px !important;
+            line-height:1.4 !important;
+
+            text-indent:0 !important;
+            text-shadow:none !important;
+            letter-spacing:normal !important;
+
+            opacity:1 !important;
+            -webkit-text-fill-color:#333 !important;
+
+            padding-left:12px !important;
+
+            -webkit-appearance:menulist !important;
+            -moz-appearance:menulist !important;
+            appearance:menulist !important;
+        }
+
+        .quote-card select#q-pais.form-control option{
+            color:#333 !important;
+            background:#fff !important;
+            font-size:15px !important;
+        }
     </style>
 
     <header class="page-header like-parallax"
@@ -140,29 +170,26 @@
         </div>
     </header>
 
+
     {{-- Fondo con blur envolviendo el formulario --}}
     <div class="quote-bg">
         <div class="container">
             <div class="row">
-                <div class="col-md-12 text-page">
-                    <section class="quote-card">
 
+                <div class="col-md-12 text-page">
+
+                    <section class="quote-card">
+                        <select  class="form-control" required>
+                            @foreach($paises as $pais)
+                                <option value="{{ $pais->id }}">{{ $pais->nombre }}</option>
+                            @endforeach
+                        </select>
                         <div class="quote-logo">
                             <img src="{{ asset('images/logo.jpg') }}" alt="Logo Finca 3 Pinos">
                         </div>
 
                         <form id="quote-form">
                             @csrf
-
-                            <div style="margin-bottom:14px">
-                                <label>{{ __('meta.country') }} <span style="color:red">*</span></label>
-                                <select name="pais" id="q-pais" class="form-control" required>
-                                    @foreach($paises as $pais)
-                                        <option value="{{ $pais->id }}">{{ $pais->nombre }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="field-error" data-error-for="pais"></div>
-                            </div>
 
                             <div style="margin-bottom:14px">
                                 <label>{{ __('meta.name_and_lastname') }} <span style="color:red">*</span></label>

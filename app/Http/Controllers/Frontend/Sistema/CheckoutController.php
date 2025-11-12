@@ -89,16 +89,5 @@ class CheckoutController extends Controller
 
 
 
-    public function vistaCotizar()
-    {
-        // Solo países activos y distintos de El Salvador (1), USA (2), Corea del Sur (3)
-        $paises = Pais::where('activo', 1)
-            ->whereNotIn('id', [1, 2, 3])
-            ->orderBy('nombre')
-            ->get();
-
-        return view('frontend.pages.cotizar', compact('paises'));
-    }
-
 
 }

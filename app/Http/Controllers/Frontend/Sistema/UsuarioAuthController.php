@@ -37,7 +37,8 @@ class UsuarioAuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:web')->except(['showLoginFormUsuario', 'loginUsuario', 'showIngresarCorreoForm',
-        'solicitarCodigoCorreo', 'showResetPasswordForm', 'showtokenInvalid', 'registroCliente', 'vistaCarritoDeCompras']);
+        'solicitarCodigoCorreo', 'showResetPasswordForm', 'showtokenInvalid', 'registroCliente', 'vistaCarritoDeCompras',
+        'vistaCotizar']);
     }
 
     public function showLoginFormUsuario()
@@ -816,6 +817,18 @@ class UsuarioAuthController extends Controller
         return view('frontend.pages.cart', compact('items','subtotal'));
     }
 
+
+
+
+    public function vistaCotizar()
+    {
+        // Solo países activos y distintos de El Salvador (1), USA (2), Corea del Sur (3)
+        $paises = Pais::where('activo', 1)
+            ->orderBy('nombre')
+            ->get();
+
+        return view('frontend.pages.cotizar', compact('paises'));
+    }
 
 
 
