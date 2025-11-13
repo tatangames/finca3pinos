@@ -312,6 +312,8 @@ return [
     'send_quote' => 'Send quote',
     'chars_remaining' => 'Characters remaining',
     'message' => 'Message',
+    'quote_shipping' => 'Request shipping quote',
+    'quote_sent' => 'Quote sent',
 
 
 

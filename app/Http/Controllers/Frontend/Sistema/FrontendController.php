@@ -144,6 +144,7 @@ class FrontendController extends Controller
             'name'    => $request->name,
             'email'   => $request->email,
             'message' => $request->message,
+            'phone' => $request->phone
         ];
 
         try {
@@ -154,11 +155,14 @@ class FrontendController extends Controller
                     'nombre'  => $data['name'],
                     'correo'  => $data['email'],
                     'mensaje' => $data['message'],
+                    'id_paises' => null,
+                    'telefono' => $data['phone'],
+                    'tipo_formulario' => 0, // contacto
                 ]);
             });
 
             // 2️⃣ Enviar correo AL ADMINISTRADOR DEL SITIO
-            Mail::to('tatangamess@gmail.com')->queue(new ContactMail($data));
+            Mail::to('finca3pinos.redes@gmail.com')->queue(new ContactMail($data));
 
            return ['success' => 1];
 

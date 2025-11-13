@@ -3,13 +3,18 @@
 @section('title', __('meta.title'))
 
 @section('content')
+
     <style>
         /* Fondo con blur para la sección de cotización */
         .quote-bg{
-            position:relative;
-            padding:40px 0 60px; /* menos padding arriba para subir el formulario */
-            margin-top:-10px;    /* lo sube un poco más hacia el header */
-            overflow:hidden;
+            position: relative;
+            padding: 40px 0 60px;   /* menos padding arriba para subir el formulario */
+            margin-top: -10px;      /* lo sube un poco más hacia el header */
+            overflow: hidden;
+
+            /* >>> Fuerza ancho completo de la pantalla <<< */
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
         }
         .quote-bg::before{
             content:'';
@@ -43,12 +48,21 @@
             margin-bottom:14px;
         }
         .quote-logo img{
-            width:80px;
-            height:80px;
-            border-radius:50%;
-            object-fit:cover;
-            box-shadow:0 0 0 3px #fff,0 0 12px rgba(0,0,0,.18);
+            width:100px;
+            height:auto;         /* mantiene proporción */
+            border-radius:0;     /* cuadrado */
+            object-fit:contain;
+            box-shadow:none;
         }
+        .quote-title{
+            text-align:center;
+            font-size:22px;
+            font-weight:bold;
+            margin-top:15px;
+            margin-bottom:10px;
+            color:#222;
+        }
+
         .quote-card label{
             display:block;
             margin:0 0 6px;
@@ -81,7 +95,9 @@
             background:#fff;
             box-shadow:0 0 0 3px rgba(198,164,113,.15);
         }
-        .btn{
+
+        /* Botón base */
+        .quote-card .btn{
             display:inline-flex;
             align-items:center;
             gap:8px;
@@ -93,8 +109,36 @@
             transition:.2s;
             font-size:.95rem;
         }
-        .btn-primary{background:#c6a471;color:#fff}
-        .btn-primary:hover{background:#b8935e;transform:translateY(-1px)}
+
+        /* Forzamos TODOS los estados del btn-primary dentro de quote-card */
+        .quote-card .btn-primary,
+        .quote-card .btn-primary:hover,
+        .quote-card .btn-primary:focus,
+        .quote-card .btn-primary:active,
+        .quote-card .btn-primary:focus-visible {
+            background:#c6a471 !important;
+            color:#fff !important;
+            border:0 !important;
+            border-radius:10px !important;
+            opacity:1 !important;
+            box-shadow:none !important;
+            transform:none !important;
+            text-decoration:none !important;
+        }
+
+        /* Estado deshabilitado (cuando está enviando) */
+        .quote-card .btn-primary:disabled,
+        .quote-card .btn-primary[disabled],
+        .quote-card .btn-primary.disabled {
+            background:#c6a471 !important;
+            color:#fff !important;
+            border:0 !important;
+            opacity:1 !important;      /* que no se aclare */
+            cursor:wait !important;    /* cursor de espera */
+            box-shadow:none !important;
+            transform:none !important;
+        }
+
         .field-error{
             color:#e60000;
             font-weight:400;
@@ -117,58 +161,74 @@
         }
 
         /* ============================
-           RESET FUERTE SOLO PARA #q-pais
-           (el theme está escondiendo el texto)
-        ============================= */
-        .quote-card select#q-pais.form-control{
-            color:#333 !important;
-            background-color:#fafafa !important;
-            font-size:15px !important;
-            line-height:1.4 !important;
+           RESET COMPLETO PARA #q-pais
+           ============================= */
+        .quote-card select#q-pais.form-control {
+            /* Color y fondo */
+            color: #333 !important;
+            background-color: #fafafa !important;
+            background-image: none !important;
 
-            text-indent:0 !important;
-            text-shadow:none !important;
-            letter-spacing:normal !important;
+            /* Tipografía */
+            font-size: 15px !important;
+            font-family: inherit !important;
+            font-weight: 400 !important;
+            line-height: 1.5 !important;
 
-            opacity:1 !important;
-            -webkit-text-fill-color:#333 !important;
+            /* Espaciado de texto */
+            text-indent: 0 !important;
+            text-shadow: none !important;
+            letter-spacing: normal !important;
+            text-align: left !important;
 
-            padding-left:12px !important;
+            /* Visibilidad */
+            opacity: 1 !important;
+            visibility: visible !important;
 
-            -webkit-appearance:menulist !important;
-            -moz-appearance:menulist !important;
-            appearance:menulist !important;
+            /* WebKit specific */
+            -webkit-text-fill-color: #333 !important;
+            -webkit-appearance: none !important;
+
+            /* Padding ajustado sin flecha */
+            padding: 10px 12px !important;
+            padding-left: 12px !important;
+
+            /* Otros resets */
+            height: auto !important;
+            min-height: 42px !important;
+
+            /* Removemos todas las flechas */
+            -moz-appearance: none !important;
+            appearance: none !important;
+            background-image: none !important;
+
+            /* Evitar transformaciones */
+            transform: none !important;
+            filter: none !important;
         }
 
-        .quote-card select#q-pais.form-control option{
-            color:#333 !important;
-            background:#fff !important;
-            font-size:15px !important;
+        .quote-card select#q-pais.form-control:focus {
+            color: #333 !important;
+            -webkit-text-fill-color: #333 !important;
+        }
+
+        .quote-card select#q-pais.form-control option {
+            color: #333 !important;
+            background: #fff !important;
+            font-size: 15px !important;
+            padding: 8px 12px !important;
+        }
+
+        .quote-card select#q-pais.form-control::before,
+        .quote-card select#q-pais.form-control::after {
+            display: none !important;
+        }
+
+        .quote-card select#q-pais.form-control::-ms-value {
+            color: #333 !important;
+            background: transparent !important;
         }
     </style>
-
-    <header class="page-header like-parallax"
-            style="background-image:url('{{ asset('images/inner_parallax.jpg') }}');background-size:cover;background-position:center;background-repeat:no-repeat;">
-        <div class="container">
-            <h1>{{ __('meta.quote') ?? 'Solicitar cotización' }}</h1>
-            <ul class="breadcrumbs" typeof="BreadcrumbList" vocab="https://schema.org/">
-                <li class="home">
-                <span property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage" href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), '/') }}" class="home">
-                        <span property="name">{{ __('meta.finca3pinos') }}</span>
-                    </a>
-                    <meta property="position" content="1">
-                </span>
-                </li>
-                <li class="post post-page current-item">
-                <span property="itemListElement" typeof="ListItem">
-                    <span property="name">{{ __('meta.quote') ?? 'Cotización' }}</span>
-                    <meta property="position" content="2">
-                </span>
-                </li>
-            </ul>
-        </div>
-    </header>
 
 
     {{-- Fondo con blur envolviendo el formulario --}}
@@ -177,35 +237,43 @@
             <div class="row">
 
                 <div class="col-md-12 text-page">
-
                     <section class="quote-card">
-                        <select  class="form-control" required>
-                            @foreach($paises as $pais)
-                                <option value="{{ $pais->id }}">{{ $pais->nombre }}</option>
-                            @endforeach
-                        </select>
+
+
                         <div class="quote-logo">
-                            <img src="{{ asset('images/logo.jpg') }}" alt="Logo Finca 3 Pinos">
+                            <img src="{{ asset('images/logoindex.png') }}" alt="{{ __('meta.finca3pinos') }}">
+                            <p class="quote-title">{{ __('meta.quote_shipping') }}</p>
                         </div>
 
                         <form id="quote-form">
                             @csrf
 
+                            {{-- PAISES --}}
+                            <div style="margin-bottom:14px">
+                                <label>{{ __('meta.country') ?? 'País' }} <span style="color:red">*</span></label>
+                                <select name="pais" id="q-pais" class="form-control" required>
+                                    @foreach($paises as $pais)
+                                        <option value="{{ $pais->id }}">{{ $pais->nombre }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="field-error" data-error-for="pais"></div>
+                            </div>
+
                             <div style="margin-bottom:14px">
                                 <label>{{ __('meta.name_and_lastname') }} <span style="color:red">*</span></label>
-                                <input type="text" name="nombre" id="q-nombre" class="form-control" maxlength="100">
+                                <input type="text" name="nombre" id="q-nombre" class="form-control" maxlength="50">
                                 <div class="field-error" data-error-for="nombre"></div>
                             </div>
 
                             <div style="margin-bottom:14px">
                                 <label>{{ __('meta.email_address') }} <span style="color:red">*</span></label>
-                                <input type="email" name="email" id="q-email" class="form-control" maxlength="120" style="text-transform:lowercase">
+                                <input type="email" name="email" id="q-email" class="form-control" maxlength="100" style="text-transform:lowercase">
                                 <div class="field-error" data-error-for="email"></div>
                             </div>
 
                             <div style="margin-bottom:14px">
                                 <label>{{ __('meta.phone') }}</label>
-                                <input type="text" name="telefono" id="q-telefono" class="form-control" maxlength="30">
+                                <input type="text" name="telefono" id="q-telefono" class="form-control" maxlength="20">
                                 <div class="field-error" data-error-for="telefono"></div>
                             </div>
 
@@ -219,30 +287,36 @@
                             </div>
 
                             <button type="button" class="btn btn-primary" id="btn-enviar" onclick="enviarCotizacion()">
-                                <span id="btn-spinner" class="spinner"
-                                      style="display:none;border:3px solid #f3f3f3;border-top:3px solid #d2aa6d;border-radius:50%;width:16px;height:16px;animation:spin .8s linear infinite"></span>
+                            <span id="btn-spinner" class="spinner"
+                                  style="display:none;border:3px solid #f3f3f3;border-top:3px solid #d2aa6d;border-radius:50%;width:16px;height:16px;animation:spin .8s linear infinite"></span>
                                 <span id="btn-text">{{ __('meta.send_quote') }}</span>
                             </button>
 
                             <div class="wpcf7-response-output" aria-hidden="true" style="margin-top:12px"></div>
                         </form>
+
                     </section>
                 </div>
             </div>
         </div>
     </div>
 
+
     {{-- Si no están cargadas globalmente, incluye tus libs --}}
+    <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <script src="{{ asset('js/axios.min.js') }}"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
 
     <script>
         const i18nQ = {
-            requerido: "{{ __('meta.required') }}",
-            correoNoValido: "{{ __('meta.contact_v10') }}",
-            enviado: "{{ __('meta.quote_sent') }}",
-            error: "{{ __('meta.msg_not_send') }}"
+            paisRequerido: "{{ __('meta.country_required') }}", // pais es requerido
+            nombreRequerido: "{{ __('meta.name_required') }}", // el nombre es requerido
+            correoRequerido: "{{ __('meta.contact_v12') }}", // el correo es requerido
+            correoNoValido: "{{ __('meta.contact_v10') }}", // correo no valido
+            mensajeRequerido: "{{ __('meta.message_is_required') }}", // el mensaje es requerido
+            enviado: "{{ __('meta.quote_sent') }}", // cotizacion enviada
+            error: "{{ __('meta.msg_not_send') }}" // no pudimos procesar tu solicitud en este momento
         };
 
         const MAX_MSG_LEN = 2000;
@@ -282,19 +356,20 @@
             const spn = document.getElementById('btn-spinner');
             const btx = document.getElementById('btn-text');
 
-            const pais     = document.getElementById('q-pais').value;
-            const nombre   = document.getElementById('q-nombre').value.trim();
-            const email    = document.getElementById('q-email').value.trim().toLowerCase();
-            const telefono = document.getElementById('q-telefono').value.trim();
-            const mensaje  = document.getElementById('q-mensaje').value.trim();
+            const paisEl = document.getElementById('q-pais');
+            const pais     = paisEl ? paisEl.value : '';
+            const nombre   = document.getElementById('q-nombre').value.trim(); // 500
+            const email    = document.getElementById('q-email').value.trim().toLowerCase(); // 100
+            const telefono = document.getElementById('q-telefono').value.trim(); // 20
+            const mensaje  = document.getElementById('q-mensaje').value.trim(); // 2000
 
             // Validación
             let ok = true;
-            if (!pais){ showErr('pais', i18nQ.requerido); ok=false; }
-            if (!nombre){ showErr('nombre', i18nQ.requerido); ok=false; }
-            if (!email){ showErr('email', i18nQ.requerido); ok=false; }
+            if (!pais){ showErr('pais', i18nQ.paisRequerido); ok=false; }
+            if (!nombre){ showErr('nombre', i18nQ.nombreRequerido); ok=false; }
+            if (!email){ showErr('email', i18nQ.correoRequerido); ok=false; }
             else if(!validarEmail(email)){ showErr('email', i18nQ.correoNoValido); ok=false; }
-            if (!mensaje){ showErr('mensaje', i18nQ.requerido); ok=false; }
+            if (!mensaje){ showErr('mensaje', i18nQ.mensajeRequerido); ok=false; }
             if (!ok) return;
 
             btn.disabled = true;
@@ -303,7 +378,7 @@
 
             try{
                 const payload = { pais, nombre, email, telefono, mensaje };
-                const resp = await axios.post('', payload);
+                const resp = await axios.post('{{ route('enviar.cotizacion') }}', payload);
 
                 if (resp.data && resp.data.success){
                     Swal.fire({position:"top-end",icon:"success",title:i18nQ.enviado,showConfirmButton:false,timer:1500});

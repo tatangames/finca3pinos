@@ -4,7 +4,6 @@
 
 @section('content')
     <style>
-
         /* ============================================================
    FORMULARIO DE CONTACTO — FINCA 3 PINOS
    ============================================================ */
@@ -483,6 +482,15 @@
 
 
                                                                 <p>
+                                                                    <label>{{ __('meta.phone') }}<br>
+                                                                        <input size="40" maxlength="20"
+                                                                               id="phone-form"
+                                                                               class="wpcf7-form-control wpcf7-text wpcf7-validates-as-required"
+                                                                               aria-required="true" type="text">
+                                                                    </label>
+                                                                </p>
+
+                                                                <p>
                                                                     <label>{{ __('meta.contact_v7') }}<br>
                                                                         <textarea cols="40" rows="6" maxlength="2000"
                                                                                   id="mensaje-form"
@@ -535,7 +543,7 @@
             </div>
         </div>
     </div>
-
+    <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
     <script src="{{ asset('js/axios.min.js') }}"></script>
@@ -584,6 +592,7 @@
         function enviarFormulario() {
             const nameInput  = document.getElementById('nombre-form');
             const emailInput = document.getElementById('correo-form');
+            const phoneInput  = document.getElementById('phone-form');
             const msgInput   = document.getElementById('mensaje-form');
 
             const errorName  = document.querySelector('[data-error-for="your-name"]');
@@ -642,6 +651,7 @@
                 name: nameInput.value.trim(),
                 email: emailInput.value.trim(),
                 message: msgInput.value.trim(),
+                phone: phoneInput.value.trim(),
             };
 
             // Limpia mensajes previos
@@ -656,6 +666,7 @@
                         nameInput.value = '';
                         emailInput.value = '';
                         msgInput.value = '';
+                        phoneInput.value = '';
 
                         mensajeEnviado(contactMsg.enviado)
                     }else{

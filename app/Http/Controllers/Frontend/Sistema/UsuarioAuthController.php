@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Frontend\Sistema;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ContactMail;
+use App\Mail\CotizacionMail;
 use App\Mail\PasswordResetMail;
 use App\Models\Departamento;
 use App\Models\Direcciones;
@@ -12,6 +14,7 @@ use App\Models\Ordenes;
 use App\Models\Pais;
 use App\Models\Producto;
 use App\Models\ProductosPresentacion;
+use App\Models\RegistroContactos;
 use App\Models\Usuario;
 use App\Traits\HandlesCart;
 use Carbon\Carbon;
@@ -38,7 +41,7 @@ class UsuarioAuthController extends Controller
     {
         $this->middleware('auth:web')->except(['showLoginFormUsuario', 'loginUsuario', 'showIngresarCorreoForm',
         'solicitarCodigoCorreo', 'showResetPasswordForm', 'showtokenInvalid', 'registroCliente', 'vistaCarritoDeCompras',
-        'vistaCotizar']);
+        'vistaCotizar', 'enviarCotizacion']);
     }
 
     public function showLoginFormUsuario()
@@ -822,12 +825,83 @@ class UsuarioAuthController extends Controller
 
     public function vistaCotizar()
     {
-        // Solo países activos y distintos de El Salvador (1), USA (2), Corea del Sur (3)
         $paises = Pais::where('activo', 1)
             ->orderBy('nombre')
             ->get();
 
         return view('frontend.pages.cotizar', compact('paises'));
+    }
+
+
+    public function enviarCotizacion(Request $request)
+    {
+
+        Log::info($request->all());
+
+        $rules = [
+            'pais'     => ['required', 'string', 'max:100'],
+            'nombre'   => ['required', 'string', 'max:100'],
+            'email'    => ['required', 'email', 'max:100'],
+            'telefono' => ['nullable', 'string', 'max:20'],
+            'mensaje'  => ['required', 'string', 'max:2000'],
+        ];
+
+        $attributes = [
+            'pais'     => __('meta.country'),
+            'nombre'   => __('meta.name_required'),
+            'email'    => __('meta.contact_v12'),
+            'telefono' => __('meta.phone'),
+            'mensaje'  => __('meta.message_is_required'),
+        ];
+
+        $validator = Validator::make($request->all(), $rules, [], $attributes);
+
+        if ($validator->fails()) {
+            // 👈 Tu JS mira e.response.data.errors
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        // ✅ Datos ya validados
+        $data = [
+            'pais'     => $request->pais,
+            'nombre'   => $request->nombre,
+            'email'    => $request->email,
+            'telefono' => $request->telefono,
+            'mensaje'  => $request->mensaje,
+        ];
+
+        try {
+            DB::transaction(function () use ($data) {
+                // Ejemplo:
+                 RegistroContactos::create([
+                     'fecha'    => now('America/El_Salvador'),
+                     'id_paises'     => $data['pais'],
+                     'nombre'   => $data['nombre'],
+                     'correo'   => $data['email'],
+                     'telefono' => $data['telefono'],
+                     'mensaje'  => $data['mensaje'],
+                     'tipo_formulario' => 1, // tipo cotizacion
+                 ]);
+            });
+
+            // Enviar correo al admin (ajusta mailable / correo)
+            Mail::to('finca3pinos.redes@gmail.com')->queue(new CotizacionMail($data));
+
+            return response()->json([
+                'success' => true,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Cotización: error al guardar o encolar email', [
+                'msg' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+            ], 500);
+        }
     }
 
 

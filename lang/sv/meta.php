@@ -312,6 +312,8 @@ return [
     'send_quote' => 'Enviar cotización',
     'chars_remaining' => 'Caracteres restantes',
     'message' => 'Mensaje',
+    'quote_shipping' => 'Cotizar envío',
+    'quote_sent' => 'Cotización enviada',
 
 
 

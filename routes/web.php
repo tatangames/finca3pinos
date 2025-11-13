@@ -338,6 +338,12 @@ Route::middleware(['detect.country.locale'])->group(function () {
         Route::get(LaravelLocalization::transRoute('routes.quote'), [UsuarioAuthController::class, 'vistaCotizar'])
             ->name('user.quote');
 
+        // envio de cotizacion
+        Route::post('/enviar/cotizacion', [UsuarioAuthController::class, 'enviarCotizacion'])->name('enviar.cotizacion');
+
+
+
+
 
 
         // Registrar orden y pagar
