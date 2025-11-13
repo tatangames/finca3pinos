@@ -571,7 +571,7 @@ class PagaditoController extends Controller
 
             return redirect()
                 ->route('user.orders')
-                ->with('info', __('meta.payment_in_process') ?? 'Tu pago está en proceso de verificación.');
+                ->with('info', __('meta.payment_in_process'));
         }
 
         // ===== FALLÓ o CANCELADO: NO borrar carrito, solo marcar orden =====

@@ -315,6 +315,7 @@ return [
     'quote_shipping' => '배송 견적 요청',
     'quote_sent' => '견적이 전송되었습니다',
     'language' => '언어',
+    'payment_in_process' => '결제가 확인 중입니다',
 
 
 

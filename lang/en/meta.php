@@ -315,6 +315,7 @@ return [
     'quote_shipping' => 'Request shipping quote',
     'quote_sent' => 'Quote sent',
     'language' => 'Language',
+    'payment_in_process' => 'Your payment is being verified',
 
 
 
