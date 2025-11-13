@@ -203,7 +203,7 @@
 
                             <!-- Instagram -->
                             <li>
-                                <a href="https://www.instagram.com/@finca3pinos" target="_blank" rel="noopener">
+                                <a href="https://www.instagram.com/finca3pinos" target="_blank" rel="noopener">
                                     <img src="{{ asset('images/instagram.png') }}" alt="Instagram">
                                     <span>Instagram</span>
                                 </a>
