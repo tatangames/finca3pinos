@@ -162,7 +162,8 @@ class FrontendController extends Controller
             });
 
             // 2️⃣ Enviar correo AL ADMINISTRADOR DEL SITIO
-            Mail::to('finca3pinos.redes@gmail.com')->queue(new ContactMail($data));
+            // -> redirecciona a
+            Mail::to('no-reply@finca3pinos.com')->queue(new ContactMail($data));
 
            return ['success' => 1];
 
