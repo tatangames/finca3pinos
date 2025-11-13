@@ -75,6 +75,14 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="{{ route('admin.contacto.formulario') }}" target="frameprincipal" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Contacto Formulario</p>
+                        </a>
+                    </li>
+
+
 
                     <li class="nav-item">
 

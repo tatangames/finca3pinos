@@ -214,6 +214,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     // enviar correo de seguimiento
     Route::post('/ordenes/enviar-correo-seguimiento', [AdminClienteController::class, 'enviarCorreoSeguimiento'])
         ->name('ordenes.email.seguimiento');
+
+
+    Route::get('/contacto/formulario', [AdminClienteController::class, 'vistaContactoFormulario'])->name('contacto.formulario');
+    Route::get('/contacto/formulario/tabla', [AdminClienteController::class, 'tablaContactoFormulario']);
+
+
 });
 
 

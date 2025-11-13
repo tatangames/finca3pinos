@@ -662,7 +662,7 @@
 
         // ===== CONFIGURACIÓN DE CONTROL DE PAÍS =====
         const ALLOWED_COUNTRIES = [1, 2, 3]; // 1: El Salvador, 2: Estados Unidos, 3: Korea
-        const QUOTE_URL = "{{ route('user.quote.form') }}"; // <-- AJUSTA ESTA RUTA
+        const QUOTE_URL = "{{ route('user.quote') }}"; // <-- AJUSTA ESTA RUTA
 
         // ¿La dirección seleccionada pertenece a país permitido?
         function isAllowedAddress(addrId) {
@@ -675,8 +675,8 @@
         function showQuoteSwal(addrId) {
             return Swal.fire({
                 icon: 'info',
-                title: i18n.quoteNeededTitle,
-                html: i18n.quoteNeededHtml,
+                title: i18n.quoteNeededHtml,
+                html: i18n.quoteNeededTitle,
                 confirmButtonText: i18n.quoteNow,
                 cancelButtonText: i18n.cancel,
                 showCancelButton: true,

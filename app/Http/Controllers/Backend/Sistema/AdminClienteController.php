@@ -9,6 +9,7 @@ use App\Models\Ordenes;
 use App\Models\Pais;
 use App\Models\RegionContent;
 use App\Models\RegionContentTranslation;
+use App\Models\RegistroContactos;
 use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -532,7 +533,24 @@ class AdminClienteController extends Controller
 
 
 
+    public function vistaContactoFormulario()
+    {
+        return view('backend.admin.contacto.vistacontacto');
+    }
 
+
+    public function tablaContactoFormulario()
+    {
+        $arrayContacto = RegistroContactos::with('pais')
+            ->orderBy('fecha', 'desc')
+            ->get()
+            ->map(function ($item) {
+                $item->nombrePais = $item->pais->nombre ?? null;
+                return $item;
+            });
+
+        return view('backend.admin.contacto.tablacontacto', compact('arrayContacto'));
+    }
 
 
 }

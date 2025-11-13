@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('registro_contactos', function (Blueprint $table) {
             $table->id();
             $table->dateTime('fecha');
-            $table->bigInteger('')->unsigned()->nullable();
+            $table->bigInteger('id_paises')->unsigned()->nullable();
 
             $table->text('nombre')->nullable();
             $table->text('correo')->nullable();

@@ -424,6 +424,11 @@
                                                                 <img src="{{ asset('images/tiktok.png') }}" alt="TikTok" class="social-icon">
                                                             </a>
                                                         </li>
+                                                        <li>
+                                                            <a href="https://wa.me/50369341497" target="_blank" rel="noopener">
+                                                                <img src="{{ asset('images/social.png') }}" alt="WhatsApp" class="social-icon">
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </div>

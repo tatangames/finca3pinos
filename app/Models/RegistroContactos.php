@@ -11,5 +11,12 @@ class RegistroContactos extends Model
     protected $table = 'registro_contactos';
     public $timestamps = false;
 
-    protected $fillable = ['fecha', 'nombre', 'correo', 'mensaje'];
+
+
+    protected $fillable = ['id_paises', 'fecha', 'nombre', 'correo', 'telefono', 'mensaje', 'tipo_formulario'];
+
+    public function pais()
+    {
+        return $this->belongsTo(Pais::class, 'id_paises');
+    }
 }

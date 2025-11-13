@@ -35,7 +35,7 @@
     /* ==== Card del logo (blanco) ==== */
     .footer-logo-card .logo-card {
         display: inline-block;
-        background: #ffffff;               /* fondo blanco */
+        background: #ffffff;
         border-radius: 10px;
         padding: 12px 16px;
         box-shadow: 0 3px 10px rgba(0,0,0,0.25);
@@ -139,6 +139,22 @@
         }
     }
 
+    /* ==== Redes sociales: icono + texto alineado ==== */
+    .social-icons-list li a {
+        display: flex;
+        align-items: center;
+        gap: 14px; /* <<< separación ampliada entre icono y texto */
+    }
+
+    /* Iconos uniformes */
+    .social-icons-list img,
+    .social-icons-list span.fa {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+    }
+
+
 </style>
 
 
@@ -184,20 +200,32 @@
                     <div class="widget widget_coffeeking_icons">
                         <h4 class="header-widget">{{ __('meta.siguenos') }}</h4>
                         <ul class="social-icons-list">
+
+                            <!-- Instagram -->
                             <li>
-                                <a href="https://instagram.com/finca3pinos" target="_blank">
-                                    <span class="fa fa-instagram"></span> Instagram
+                                <a href="https://www.tiktok.com/@finca3pinos" target="_blank" rel="noopener">
+                                    <img src="{{ asset('images/instagram.png') }}" alt="Instagram">
+                                    <span>Instagram</span>
                                 </a>
                             </li>
+                            <!-- TikTok -->
                             <li>
-                                <a href="https://www.tiktok.com/@finca3pinos" target="_blank">
-                                    <img src="{{ asset('images/logotik.png') }}"
-                                         alt="TikTok"
-                                         style="width:20px;height:20px;vertical-align:middle;margin-right:6px;">
-                                    TikTok
+                                <a href="https://www.tiktok.com/@finca3pinos" target="_blank" rel="noopener">
+                                    <img src="{{ asset('images/logotik.png') }}" alt="TikTok">
+                                    <span>TikTok</span>
                                 </a>
                             </li>
+
+                            <!-- WhatsApp -->
+                            <li>
+                                <a href="https://wa.me/50369341497" target="_blank" rel="noopener">
+                                    <img src="{{ asset('images/social.png') }}" alt="WhatsApp">
+                                    <span>WhatsApp</span>
+                                </a>
+                            </li>
+
                         </ul>
+
                     </div>
                 </div>
             </div>

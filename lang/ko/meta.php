@@ -305,7 +305,7 @@ return [
     'shipping_date' => '배송 날짜',
     'go_back' => '돌아가기',
     'no_additional_data' => '추가 데이터가 없습니다.',
-    'checkout_limited_notice' => '자동 결제는 일부 지역에서만 가능합니다. 다른 지역의 경우 배송 견적을 요청하세요.',
+    'checkout_limited_notice' => '자동 결제는 일부 국가에서만 가능합니다. 다른 지역의 경우 배송 견적을 요청하세요.',
     'need_to_quote_shipping' => '배송 견적을 요청해야 합니다',
     'quote' => '견적 요청',
     'quote_now' => '지금 견적 요청',
