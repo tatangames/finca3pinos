@@ -38,7 +38,7 @@
             border-radius:16px;
             box-shadow:0 6px 16px rgba(0,0,0,.12);
             padding:28px 26px;
-            max-width:560px;        /* un poco más grande */
+            max-width:600px;        /* un poco más grande */
             margin:0 auto 40px;     /* centrado */
             position:relative;
             z-index:2;              /* por encima del fondo borroso */

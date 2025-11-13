@@ -98,7 +98,7 @@
     }
 
     .f3p-nav .dropdown .dropdown-menu.menu-compact > li {
-        margin: 0 !important; /* quita “aire” entre <li> */
+        margin: 0 !important; /* quita "aire" entre <li> */
     }
 
     .f3p-nav .dropdown .dropdown-menu.menu-compact > li + li {
@@ -123,6 +123,185 @@
     .f3p-nav .dropdown .dropdown-menu.menu-compact > li > a:hover {
         background: #f6f6f6 !important;
         color: #c8b083 !important;
+    }
+
+    /* ===== Selector de idioma ===== */
+    .f3p-nav .language-selector {
+        position: relative;
+    }
+
+    .f3p-nav .language-selector .lang-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 8px 10px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #222 !important;
+        background: transparent;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all .25s ease;
+        text-decoration: none;
+    }
+
+    .f3p-nav .language-selector .lang-toggle .fa-globe {
+        font-size: 16px;
+    }
+
+    .f3p-nav .language-selector .lang-toggle:hover {
+        color: #c8b083 !important;
+        border-color: #c8b083;
+    }
+
+    .f3p-nav .language-selector .lang-flag {
+        width: 20px;
+        height: 15px;
+        object-fit: cover;
+        border-radius: 2px;
+    }
+
+    .f3p-nav .language-selector .lang-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        min-width: 140px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all .25s ease;
+        z-index: 1000;
+    }
+
+    .f3p-nav .language-selector:hover .lang-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .f3p-nav .language-selector .lang-dropdown a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        color: #222 !important;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: background .2s ease;
+    }
+
+    .f3p-nav .language-selector .lang-dropdown a:first-child {
+        border-radius: 8px 8px 0 0;
+    }
+
+    .f3p-nav .language-selector .lang-dropdown a:last-child {
+        border-radius: 0 0 8px 8px;
+    }
+
+    .f3p-nav .language-selector .lang-dropdown a:hover {
+        background: #f6f6f6;
+        color: #c8b083 !important;
+    }
+
+    .f3p-nav .language-selector .lang-dropdown a.active {
+        background: #f9f5f0;
+        color: #c8b083 !important;
+    }
+
+    /* Versión móvil del selector */
+    .f3p-nav .lang-mobile {
+        padding: 15px 0;
+        border-top: 1px solid rgba(255,255,255,0.15);
+        margin-top: 15px;
+    }
+
+    .f3p-nav .lang-mobile .lang-mobile-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px 12px 15px;
+        color: rgba(255,255,255,0.6) !important;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .f3p-nav .lang-mobile .lang-mobile-title i {
+        font-size: 14px;
+    }
+
+    .f3p-nav .lang-mobile .lang-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 0 15px;
+    }
+
+    .f3p-nav .lang-mobile .lang-options a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 12px 8px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 8px;
+        color: #fff !important;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all .2s ease;
+        min-height: 65px;
+    }
+
+    .f3p-nav .lang-mobile .lang-options a .lang-emoji {
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .f3p-nav .lang-mobile .lang-options a .lang-code {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        opacity: 0.7;
+    }
+
+    .f3p-nav .lang-mobile .lang-options a:hover,
+    .f3p-nav .lang-mobile .lang-options a:active {
+        background: rgba(255,255,255,0.15);
+        border-color: rgba(200,176,131,0.5);
+        transform: translateY(-2px);
+    }
+
+    .f3p-nav .lang-mobile .lang-options a.active {
+        background: rgba(34,34,34,0.3);
+        border-color: rgba(34,34,34,0.5);
+        color: #222 !important;
+    }
+
+    .f3p-nav .lang-mobile .lang-options a.active .lang-code {
+        opacity: 1;
+        color: #222 !important;
+    }
+
+    @media (max-width: 1199px) {
+        .f3p-nav .language-selector {
+            display: none;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .f3p-nav .lang-mobile {
+            display: none;
+        }
     }
 
 </style>
@@ -177,8 +356,6 @@
                     </li>
 
                     {{-- Usuario --}}
-                    <li class="only-desktop nav-user dropdown">
-                    {{-- ====== USUARIO ====== --}}
                     @auth('web')
                         <li id="menu-item-user"
                             class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children only-desktop">
@@ -207,11 +384,39 @@
                         </li>
                     @endauth
 
-                @auth('web')
-                        <form id="logout-form" action="{{ route('user.logout') }}" method="POST" style="display:none;">
-                            @csrf
-                        </form>
-                    @endauth
+                    {{-- Selector de idioma DESKTOP --}}
+                    <li class="only-desktop language-selector">
+                        <a class="lang-toggle">
+                            @php
+                                $currentLang = app()->getLocale();
+                                $flags = [
+                                    'es' => '🇸🇻',
+                                    'sv' => '🇸🇻',
+                                    'en' => '🇺🇸',
+                                    'ko' => '🇰🇷'
+                                ];
+                                $langNames = [
+                                    'es' => 'Español',
+                                    'sv' => 'Español',
+                                    'en' => 'English',
+                                    'ko' => '한국어'
+                                ];
+                            @endphp
+                            <i class="fa fa-globe"></i>
+                            <span style="font-size: 13px;">{{ strtoupper($currentLang) }}</span>
+                            <i class="fa fa-chevron-down" style="font-size: 9px; margin-left: -2px;"></i>
+                        </a>
+
+                        <div class="lang-dropdown">
+                            @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                                <a href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}"
+                                   class="{{ $localeCode === $currentLang ? 'active' : '' }}">
+                                    <span class="lang-flag">{{ $flags[$localeCode] ?? '🌐' }}</span>
+                                    <span>{{ $langNames[$localeCode] ?? $properties['native'] }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </li>
 
                 </ul>
 
@@ -245,6 +450,24 @@
                                 </a>
                             </li>
                         @endauth
+
+                        {{-- Selector de idioma MÓVIL --}}
+                        <div class="lang-mobile only-mobile">
+                            <div class="lang-mobile-title">
+                                <i class="fa fa-globe"></i>
+                                <span>{{ __('meta.language') ?? 'Language' }}</span>
+                            </div>
+                            <div class="lang-options">
+                                @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                                    <a href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}"
+                                       class="{{ $localeCode === $currentLang ? 'active' : '' }}">
+                                        <span class="lang-emoji">{{ $flags[$localeCode] ?? '🌐' }}</span>
+                                        <span>{{ $langNames[$localeCode] ?? $properties['native'] }}</span>
+                                        <span class="lang-code">{{ strtoupper($localeCode) }}</span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
                     </ul>
                 </div>
             </div>

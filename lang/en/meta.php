@@ -314,6 +314,7 @@ return [
     'message' => 'Message',
     'quote_shipping' => 'Request shipping quote',
     'quote_sent' => 'Quote sent',
+    'language' => 'Language',
 
 
 

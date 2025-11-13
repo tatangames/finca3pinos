@@ -314,6 +314,7 @@ return [
     'message' => 'Mensaje',
     'quote_shipping' => 'Cotizar envío',
     'quote_sent' => 'Cotización enviada',
+    'language' => 'Lenguaje',
 
 
 

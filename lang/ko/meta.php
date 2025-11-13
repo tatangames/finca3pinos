@@ -314,6 +314,7 @@ return [
     'message' => '메시지',
     'quote_shipping' => '배송 견적 요청',
     'quote_sent' => '견적이 전송되었습니다',
+    'language' => '언어',
 
 
 
