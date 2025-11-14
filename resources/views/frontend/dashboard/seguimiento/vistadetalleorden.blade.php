@@ -342,7 +342,7 @@
             <div class="account-content">
 
                 <div class="head">
-                    <h3>{{ __('meta.order_detail') ?? 'Detalles de la orden' }}</h3>
+                    <h3>{{ __('meta.order_detail') }}</h3>
 
                     <a href="{{ LaravelLocalization::getLocalizedURL(app()->getLocale(), route('user.orders', [], false)) }}"
                        class="btn btn-back">
@@ -354,7 +354,7 @@
                 <div class="order-header">
                     <div class="order-header-icon">📦</div>
                     <div class="order-header-text">
-                        <h4>ORDEN #{{ $order->id }}</h4>
+                        <h4>{{ __('meta.order_number') }} {{ $order->id }}</h4>
                         @if($fechaOrden)
                             <span style="font-size: 14px">{{ $fechaOrden }}</span>
                         @endif
@@ -441,19 +441,19 @@
                                     {{ $nombreCompleto }}
                                 </div>
                                 <p class="item-line">
-                                    <span class="label" style="font-size: 14px">{{ __('meta.price') ?? 'Precio' }}: </span>
+                                    <span class="label" style="font-size: 14px">{{ __('meta.price')}}: </span>
                                     <span class="value" style="font-size: 14px">
                         ${{ number_format($precio, 2) }}
                     </span>
                                 </p>
                                 <p class="item-line">
-                                    <span class="label" style="font-size: 14px">{{ __('meta.quantity') ?? 'Cantidad' }}: </span>
+                                    <span class="label" style="font-size: 14px">{{ __('meta.quantity') }}: </span>
                                     <span class="value" style="font-size: 14px">
                         {{ $cantidad }}
                     </span>
                                 </p>
                                 <p class="item-line">
-                                    <span class="label" style="font-size: 14px">{{ __('meta.subtotal') ?? 'Total' }}: </span>
+                                    <span class="label" style="font-size: 14px">{{ __('meta.subtotal') }}: </span>
                                     <span class="value" style="font-size: 14px">
                         ${{ number_format($lineTotal, 2) }}
                     </span>

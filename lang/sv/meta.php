@@ -316,6 +316,7 @@ return [
     'quote_sent' => 'Cotización enviada',
     'language' => 'Lenguaje',
     'payment_in_process' => 'Tu pago está en proceso de verificación',
+    'order_number' => 'Orden #',
 
 
 

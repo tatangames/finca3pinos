@@ -864,9 +864,13 @@ class UsuarioAuthController extends Controller
             ], 422);
         }
 
+        // Buscar nombre del país
+        $paisNombre = Pais::where('id', $request->pais)->value('nombre');
+
         // ✅ Datos ya validados
         $data = [
-            'pais'     => $request->pais,
+            'pais_id'     => $request->pais,
+            'pais'  => $paisNombre,      // nombre del país
             'nombre'   => $request->nombre,
             'email'    => $request->email,
             'telefono' => $request->telefono,
@@ -878,7 +882,7 @@ class UsuarioAuthController extends Controller
                 // Ejemplo:
                  RegistroContactos::create([
                      'fecha'    => now('America/El_Salvador'),
-                     'id_paises'     => $data['pais'],
+                     'id_paises'     => $data['pais_id'],
                      'nombre'   => $data['nombre'],
                      'correo'   => $data['email'],
                      'telefono' => $data['telefono'],

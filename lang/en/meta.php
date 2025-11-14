@@ -316,6 +316,7 @@ return [
     'quote_sent' => 'Quote sent',
     'language' => 'Language',
     'payment_in_process' => 'Your payment is being verified',
+    'order_number' => 'Order #',
 
 
 

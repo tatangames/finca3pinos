@@ -7,6 +7,7 @@
 <body>
 <h2>Nuevo mensaje desde el formulario de cotización</h2>
 
+<p><strong>País:</strong> {{ $data['pais'] }}</p>
 <p><strong>Nombre:</strong> {{ $data['nombre'] }}</p>
 <p><strong>Correo:</strong> {{ $data['email'] }}</p>
 <p><strong>Teléfono:</strong> {{ $data['telefono'] }}</p>
