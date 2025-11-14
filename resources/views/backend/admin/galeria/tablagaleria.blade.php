@@ -47,9 +47,7 @@
                                         <img
                                             src="{{ url('storage/archivos/'.$dato->imagen) }}"
                                             alt="{{ $dato->alt_seo }}"
-                                            width="190"
-                                            height="176"
-                                            style="border-radius:12px; object-fit:cover; display:block; margin:0 auto;"
+                                            style="width: 120px !important; height: 120px !important;"
                                         >
                                     @endif
                                 </td>
